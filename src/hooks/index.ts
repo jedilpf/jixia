@@ -1,0 +1,1 @@
+export { useScale } from './useScale';

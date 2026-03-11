@@ -1,0 +1,2187 @@
+================================================================================
+                    稷下对决卡牌对战系统 V1.0
+                        源代码（前60页）
+================================================================================
+
+软件名称：稷下对决卡牌对战系统
+软件版本：V1.0
+软件简称：稷下对决
+
+--------------------------------------------------------------------------------
+                              第1页
+--------------------------------------------------------------------------------
+
+// 文件：src/main.tsx
+// 功能：应用程序入口文件
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+--------------------------------------------------------------------------------
+                              第2页
+--------------------------------------------------------------------------------
+
+// 文件：src/App.tsx
+// 功能：应用程序主组件，管理页面路由和状态
+
+import { useState, useRef, useEffect } from 'react';
+import { BattleLayout } from '@/components/BattleLayout';
+import { MainMenu } from '@/components/MainMenu';
+import { TransitionScreen } from '@/components/TransitionScreen';
+import { CharactersView } from '@/components/CharactersView';
+import { CardShowcase } from '@/components/CardShowcase';
+
+type GameScreen = 'menu' | 'transition' | 'battle' | 'collection' | 'characters';
+
+function App() {
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [screen, setScreen] = useState<GameScreen>('menu');
+  const [battleFadeIn, setBattleFadeIn] = useState(false);
+
+  const audioHallRef = useRef<HTMLAudioElement | null>(null);
+  const audioBattleRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioHallRef.current = new Audio('/assets/bgm-hall.mp3');
+    audioHallRef.current.loop = true;
+    audioHallRef.current.volume = 0.5;
+
+    audioBattleRef.current = new Audio('/assets/bgm-battle.mp3');
+    audioBattleRef.current.loop = true;
+    audioBattleRef.current.volume = 0.5;
+
+    return () => {
+      audioHallRef.current?.pause();
+      audioBattleRef.current?.pause();
+    };
+  }, []);
+
+--------------------------------------------------------------------------------
+                              第3页
+--------------------------------------------------------------------------------
+
+// 文件：src/App.tsx（续）
+// 功能：应用程序主组件，音频控制和页面切换逻辑
+
+  useEffect(() => {
+    if (!audioHallRef.current || !audioBattleRef.current) return;
+    if (!hasStarted && !isFadingOut) return;
+
+    if (screen === 'menu' || screen === 'characters' || screen === 'collection') {
+      audioBattleRef.current.pause();
+      audioBattleRef.current.currentTime = 0;
+      audioHallRef.current.play().catch(console.warn);
+    } else if (screen === 'transition') {
+      audioHallRef.current.pause();
+    } else if (screen === 'battle') {
+      audioHallRef.current.pause();
+      audioHallRef.current.currentTime = 0;
+      audioBattleRef.current.play().catch(console.warn);
+    }
+  }, [screen, hasStarted, isFadingOut]);
+
+  const handleStartGame = () => {
+    setScreen('transition');
+  };
+
+  const handleTransitionComplete = () => {
+    setBattleFadeIn(true);
+    setScreen('battle');
+    setTimeout(() => setBattleFadeIn(false), 50);
+  };
+
+  const handleCollection = () => setScreen('collection');
+  const handleCharacters = () => setScreen('characters');
+
+  const handleBackToMenu = () => {
+    setBattleFadeIn(false);
+    setScreen('menu');
+  };
+
+--------------------------------------------------------------------------------
+                              第4页
+--------------------------------------------------------------------------------
+
+// 文件：src/App.tsx（续）
+// 功能：应用程序主组件，首次进入界面渲染
+
+  if (!hasStarted) {
+    return (
+      <div
+        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center 
+          bg-black text-[#d4a520] cursor-pointer select-none transition-opacity 
+          duration-1000 ease-in-out ${isFadingOut ? 'opacity-0 pointer-events-none' : 
+          'opacity-100'}`}
+        onClick={() => {
+          if (isFadingOut) return;
+          setIsFadingOut(true);
+          setTimeout(() => setHasStarted(true), 1000);
+        }}
+      >
+        <div className="text-4xl font-serif mb-8 tracking-[0.3em] 
+          drop-shadow-[0_0_20px_rgba(212,165,32,0.8)] animate-pulse">
+          稷下藏卷
+        </div>
+        <div className="text-xl tracking-[0.5em] font-light opacity-90 
+          border border-[#d4a520]/50 px-10 py-4 rounded hover:bg-[#d4a520]/10 
+          transition-colors bg-[#d4a520]/5">
+          点击进入游戏
+        </div>
+      </div>
+    );
+  }
+
+--------------------------------------------------------------------------------
+                              第5页
+--------------------------------------------------------------------------------
+
+// 文件：src/App.tsx（续）
+// 功能：应用程序主组件，主界面渲染逻辑
+
+  return (
+    <div className="w-full h-screen overflow-hidden bg-black text-white select-none">
+      {screen === 'menu' && (
+        <MainMenu
+          onStartGame={handleStartGame}
+          onCollection={handleCollection}
+          onCharacters={handleCharacters}
+        />
+      )}
+
+      {screen === 'transition' && (
+        <TransitionScreen onComplete={handleTransitionComplete} />
+      )}
+
+      {screen === 'battle' && (
+        <div className="relative w-full h-full">
+          <BattleLayout />
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: '#000',
+            opacity: battleFadeIn ? 1 : 0,
+            transition: battleFadeIn ? 'none' : 'opacity 0.8s ease-out',
+            zIndex: 100,
+          }} />
+          <button
+            onClick={handleBackToMenu}
+            className="absolute top-4 left-4 z-50 px-4 py-2 bg-black/50 
+              text-white/50 hover:text-white rounded text-sm"
+          >
+            返回菜单
+          </button>
+        </div>
+      )}
+
+      {screen === 'collection' && (
+        <CardShowcase onBack={handleBackToMenu} />
+      )}
+
+      {screen === 'characters' && (
+        <CharactersView onBack={handleBackToMenu} />
+      )}
+    </div>
+  );
+}
+
+export default App;
+
+--------------------------------------------------------------------------------
+                              第6页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/game.ts
+// 功能：游戏核心类型定义
+
+export type CardType = 'minion' | 'spell' | 'weapon';
+export type PlayerId = 'player' | 'enemy';
+export type HeroPowerType = 'summon' | 'damage' | 'armor' | 'draw';
+
+export interface Card {
+  id: string;
+  name: string;
+  cost: number;
+  type: CardType;
+  atk?: number;
+  hp?: number;
+  durability?: number;
+  description?: string;
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  flavor?: string;
+}
+
+export interface MinionCard extends Card {
+  type: 'minion';
+  atk: number;
+  hp: number;
+  hasTaunt?: boolean;
+  hasDivineShield?: boolean;
+  hasCharge?: boolean;
+  battlecry?: string;
+  deathrattle?: string;
+}
+
+export interface WeaponCard extends Card {
+  type: 'weapon';
+  atk: number;
+  durability: number;
+}
+
+--------------------------------------------------------------------------------
+                              第7页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/game.ts（续）
+// 功能：游戏核心类型定义 - 法术卡和随从实例
+
+export interface SpellCard extends Card {
+  type: 'spell';
+  effect: string;
+}
+
+export interface MinionInstance {
+  instanceId: string;
+  cardId: string;
+  name: string;
+  atk: number;
+  hp: number;
+  maxHp: number;
+  canAttack: boolean;
+  hasAttacked: boolean;
+  isExhausted: boolean;
+  hasTaunt?: boolean;
+  hasDivineShield?: boolean;
+  divineShieldActive?: boolean;
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface WeaponInstance {
+  cardId: string;
+  name: string;
+  atk: number;
+  durability: number;
+  maxDurability: number;
+}
+
+--------------------------------------------------------------------------------
+                              第8页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/game.ts（续）
+// 功能：游戏核心类型定义 - 英雄和玩家状态
+
+export interface HeroPower {
+  name: string;
+  cost: number;
+  type: HeroPowerType;
+  value: number;
+  description: string;
+  usedThisTurn: boolean;
+}
+
+export interface Hero {
+  hp: number;
+  maxHp: number;
+  armor: number;
+  weapon: WeaponInstance | null;
+  heroPower: HeroPower;
+  hasAttackedThisTurn: boolean;
+}
+
+export interface PlayerState {
+  hero: Hero;
+  deck: Card[];
+  hand: Card[];
+  board: (MinionInstance | null)[];
+  mana: number;
+  maxMana: number;
+  fatigue: number;
+}
+
+export type GamePhase = 'start' | 'player_turn' | 'enemy_turn' | 'combat' | 'end';
+
+--------------------------------------------------------------------------------
+                              第9页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/game.ts（续）
+// 功能：游戏核心类型定义 - 游戏状态和日志
+
+export interface GameState {
+  phase: GamePhase;
+  currentPlayer: PlayerId;
+  turnNumber: number;
+  player: PlayerState;
+  enemy: PlayerState;
+  winner: PlayerId | null;
+  log: GameLogEntry[];
+}
+
+export interface GameLogEntry {
+  id: string;
+  turn: number;
+  player: PlayerId;
+  action: string;
+  timestamp: number;
+}
+
+export type SelectionType = 'none' | 'card' | 'minion' | 'hero' | 'target' | 'hero_power';
+
+export interface SelectionState {
+  type: SelectionType;
+  playerId?: PlayerId;
+  cardId?: string;
+  minionInstanceId?: string;
+  handIndex?: number;
+  boardIndex?: number;
+}
+
+--------------------------------------------------------------------------------
+                              第10页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/game.ts（续）
+// 功能：游戏核心类型定义 - 交互状态
+
+export interface DragState {
+  isDragging: boolean;
+  cardId: string | null;
+  handIndex: number | null;
+  currentX: number;
+  currentY: number;
+  startX: number;
+  startY: number;
+}
+
+export interface AttackState {
+  isAttacking: boolean;
+  fromX: number;
+  fromY: number;
+  toX: number;
+  toY: number;
+  attackerId?: string;
+  attackerType: 'minion' | 'hero';
+}
+
+--------------------------------------------------------------------------------
+                              第11页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/layout.ts
+// 功能：布局类型定义
+
+export interface BBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface LayoutItem {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label?: string;
+  color?: string;
+}
+
+export interface LayoutSpec {
+  canvasWidth: number;
+  canvasHeight: number;
+  layouts: LayoutItem[];
+}
+
+--------------------------------------------------------------------------------
+                              第12页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts
+// 功能：游戏核心逻辑 - 初始化
+
+import { Card, MinionCard, WeaponCard, MinionInstance, WeaponInstance, 
+  PlayerState, GameState, PlayerId, GameLogEntry, GamePhase } from '@/types/game';
+import { INITIAL_DECK } from '@/data/cards';
+import { createHeroPower } from '@/data/hero';
+
+export function createInitialPlayerState(): PlayerState {
+  const deck = [...INITIAL_DECK].sort(() => Math.random() - 0.5);
+  return {
+    hero: {
+      hp: 30,
+      maxHp: 30,
+      armor: 0,
+      weapon: null,
+      heroPower: createHeroPower(),
+      hasAttackedThisTurn: false,
+    },
+    deck,
+    hand: [],
+    board: Array(7).fill(null),
+    mana: 0,
+    maxMana: 0,
+    fatigue: 0,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第13页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 创建初始游戏状态
+
+export function createInitialGameState(): GameState {
+  const player = createInitialPlayerState();
+  const enemy = createInitialPlayerState();
+
+  for (let i = 0; i < 3; i++) {
+    drawCard(player);
+    drawCard(enemy);
+  }
+
+  return {
+    phase: 'start',
+    currentPlayer: 'player',
+    turnNumber: 1,
+    player,
+    enemy,
+    winner: null,
+    log: [createLogEntry(1, 'player', '游戏开始！玩家先手')],
+  };
+}
+
+function createLogEntry(turn: number, player: PlayerId, action: string): GameLogEntry {
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    turn,
+    player,
+    action,
+    timestamp: Date.now(),
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第14页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 抽牌和回合开始
+
+export function drawCard(player: PlayerState): Card | null {
+  if (player.deck.length === 0) {
+    player.fatigue++;
+    player.hero.hp = Math.max(0, player.hero.hp - player.fatigue);
+    return null;
+  }
+  const card = player.deck.pop()!;
+  if (player.hand.length < 10) {
+    player.hand.push(card);
+  }
+  return card;
+}
+
+export function startTurn(game: GameState, playerId: PlayerId): GameState {
+  const newGame = deepCopyGame(game);
+  const player = playerId === 'player' ? newGame.player : newGame.enemy;
+
+  player.maxMana = Math.min(10, player.maxMana + 1);
+  player.mana = player.maxMana;
+
+  drawCard(player);
+
+  player.board.forEach(minion => {
+    if (minion) {
+      minion.hasAttacked = false;
+      minion.isExhausted = false;
+    }
+  });
+
+  player.hero.heroPower.usedThisTurn = false;
+  player.hero.hasAttackedThisTurn = false;
+
+--------------------------------------------------------------------------------
+                              第15页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 回合开始和深拷贝
+
+  return {
+    ...newGame,
+    phase: (playerId === 'player' ? 'player_turn' : 'enemy_turn') as GamePhase,
+    currentPlayer: playerId,
+    log: [...newGame.log, createLogEntry(newGame.turnNumber, playerId, 
+      `回合开始，法力水晶 ${player.mana}/${player.maxMana}`)],
+  };
+}
+
+export function canPlayCard(player: PlayerState, card: Card): boolean {
+  return player.mana >= card.cost;
+}
+
+function deepCopyGame(game: GameState): GameState {
+  return JSON.parse(JSON.stringify(game)) as GameState;
+}
+
+--------------------------------------------------------------------------------
+                              第16页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 打出卡牌
+
+export function playCard(
+  game: GameState,
+  playerId: PlayerId,
+  handIndex: number,
+  boardIndex: number
+): GameState | null {
+  const newGame = deepCopyGame(game);
+  const player = playerId === 'player' ? newGame.player : newGame.enemy;
+  const card = player.hand[handIndex];
+
+  if (!card || !canPlayCard(player, card)) return null;
+
+  if (card.type === 'weapon') {
+    return equipWeapon(game, playerId, handIndex);
+  }
+
+  if (card.type === 'minion') {
+    if (player.board[boardIndex] !== null) return null;
+
+    const minionCard = card as MinionCard;
+    const minion: MinionInstance = {
+      instanceId: `${card.id}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      cardId: card.id,
+      name: card.name,
+      atk: minionCard.atk,
+      hp: minionCard.hp,
+      maxHp: minionCard.hp,
+      canAttack: true,
+      hasAttacked: false,
+      isExhausted: !minionCard.hasCharge,
+      hasTaunt: minionCard.hasTaunt,
+      rarity: minionCard.rarity,
+    };
+
+--------------------------------------------------------------------------------
+                              第17页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 召唤随从完成
+
+    player.mana -= card.cost;
+    player.hand.splice(handIndex, 1);
+    player.board[boardIndex] = minion;
+
+    return {
+      ...newGame,
+      log: [...newGame.log, createLogEntry(newGame.turnNumber, playerId, 
+        `召唤 ${card.name} (${minionCard.atk}/${minionCard.hp})`)],
+    };
+  }
+
+  return null;
+}
+
+--------------------------------------------------------------------------------
+                              第18页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 装备武器
+
+export function equipWeapon(game: GameState, playerId: PlayerId, 
+  handIndex: number): GameState | null {
+  const newGame = deepCopyGame(game);
+  const player = playerId === 'player' ? newGame.player : newGame.enemy;
+  const card = player.hand[handIndex];
+
+  if (!card || card.type !== 'weapon') return null;
+  if (!canPlayCard(player, card)) return null;
+
+  const weaponCard = card as WeaponCard;
+
+  const weapon: WeaponInstance = {
+    cardId: card.id,
+    name: card.name,
+    atk: weaponCard.atk,
+    durability: weaponCard.durability,
+    maxDurability: weaponCard.durability,
+  };
+
+  player.mana -= card.cost;
+  player.hand.splice(handIndex, 1);
+  player.hero.weapon = weapon;
+  player.hero.hasAttackedThisTurn = false;
+
+  return {
+    ...newGame,
+    log: [...newGame.log, createLogEntry(newGame.turnNumber, playerId, 
+      `装备 ${card.name} (${weaponCard.atk}攻/${weaponCard.durability}耐)`)],
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第19页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 英雄攻击判断
+
+export function canHeroAttack(hero: { weapon: WeaponInstance | null; 
+  hasAttackedThisTurn: boolean }): boolean {
+  return hero.weapon !== null && hero.weapon.durability > 0 && 
+    !hero.hasAttackedThisTurn;
+}
+
+export function heroAttack(
+  game: GameState,
+  attackerPlayerId: PlayerId,
+  targetPlayerId: PlayerId,
+  targetIndex: number | 'hero'
+): GameState | null {
+  const newGame = deepCopyGame(game);
+  const attackerPlayer = attackerPlayerId === 'player' ? newGame.player : newGame.enemy;
+  const targetPlayer = targetPlayerId === 'player' ? newGame.player : newGame.enemy;
+
+  if (!canHeroAttack(attackerPlayer.hero)) return null;
+
+  const weapon = attackerPlayer.hero.weapon!;
+  let logAction = '';
+
+  if (targetIndex === 'hero') {
+    const damage = weapon.atk;
+    const actualDamage = Math.max(0, damage - targetPlayer.hero.armor);
+    targetPlayer.hero.armor = Math.max(0, targetPlayer.hero.armor - damage);
+    targetPlayer.hero.hp -= actualDamage;
+    logAction = `英雄使用 ${weapon.name} 攻击敌方英雄，造成 ${actualDamage} 点伤害`;
+
+--------------------------------------------------------------------------------
+                              第20页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 英雄攻击随从
+
+  } else {
+    const target = targetPlayer.board[targetIndex];
+    if (!target) return null;
+
+    if (target.divineShieldActive) {
+      target.divineShieldActive = false;
+      logAction = `英雄攻击 ${target.name}，圣盾抵挡了伤害`;
+    } else {
+      target.hp -= weapon.atk;
+    }
+
+    const heroIncoming = target.atk;
+    const heroActualDamage = Math.max(0, heroIncoming - attackerPlayer.hero.armor);
+    attackerPlayer.hero.armor = Math.max(0, attackerPlayer.hero.armor - heroIncoming);
+    attackerPlayer.hero.hp -= heroActualDamage;
+
+    logAction = `英雄使用 ${weapon.name}(${weapon.atk}) → ${target.name}(${target.atk})`;
+
+    if (target.hp <= 0) {
+      targetPlayer.board[targetIndex] = null;
+      logAction += `，${target.name} 死亡`;
+    }
+  }
+
+  attackerPlayer.hero.hasAttackedThisTurn = true;
+
+  weapon.durability--;
+  if (weapon.durability <= 0) {
+    attackerPlayer.hero.weapon = null;
+    logAction += `，${weapon.name} 损坏`;
+  }
+
+--------------------------------------------------------------------------------
+                              第21页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 英雄攻击完成
+
+  const winner = checkWinner(newGame);
+
+  return {
+    ...newGame,
+    winner,
+    phase: winner ? 'end' : newGame.phase,
+    log: [...newGame.log, createLogEntry(newGame.turnNumber, 
+      attackerPlayerId, logAction)],
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第22页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 英雄技能
+
+export function canUseHeroPower(player: PlayerState): boolean {
+  return player.mana >= player.hero.heroPower.cost && 
+    !player.hero.heroPower.usedThisTurn;
+}
+
+export function activateHeroPower(
+  game: GameState,
+  playerId: PlayerId
+): GameState | null {
+  const newGame = deepCopyGame(game);
+  const player = playerId === 'player' ? newGame.player : newGame.enemy;
+
+  if (!canUseHeroPower(player)) return null;
+
+  const heroPower = player.hero.heroPower;
+  player.mana -= heroPower.cost;
+  heroPower.usedThisTurn = true;
+
+  let logAction = `使用英雄技能: ${heroPower.name}`;
+
+  switch (heroPower.type) {
+    case 'summon': {
+      const emptySlot = getEmptySlotCenterOut(player.board);
+      if (emptySlot !== -1) {
+        const minion: MinionInstance = {
+          instanceId: `recruit_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          cardId: 'recruit',
+          name: '报告兵',
+          atk: heroPower.value,
+          hp: 1,
+          maxHp: 1,
+          canAttack: true,
+          hasAttacked: false,
+          isExhausted: true,
+        };
+        player.board[emptySlot] = minion;
+        logAction += `，召唤 1/1 报告兵`;
+      } else {
+        logAction += `，但战场已满`;
+      }
+      break;
+    }
+
+--------------------------------------------------------------------------------
+                              第23页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 英雄技能效果
+
+    case 'damage': {
+      const targetPlayer = playerId === 'player' ? newGame.enemy : newGame.player;
+      const dmg = heroPower.value;
+      targetPlayer.hero.hp -= dmg;
+      logAction += `，对敌方英雄造成 ${dmg} 点伤害`;
+      break;
+    }
+
+    case 'armor':
+      player.hero.armor += heroPower.value;
+      logAction += `，获得 ${heroPower.value} 点护甲`;
+      break;
+
+    case 'draw':
+      drawCard(player);
+      logAction += `，抽一张牌`;
+      break;
+  }
+
+  const winner = checkWinner(newGame);
+
+  return {
+    ...newGame,
+    winner,
+    phase: winner ? 'end' : newGame.phase,
+    log: [...newGame.log, createLogEntry(newGame.turnNumber, playerId, logAction)],
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第24页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 随从攻击判断
+
+export function canAttack(minion: MinionInstance): boolean {
+  return minion.canAttack && !minion.hasAttacked && !minion.isExhausted && 
+    minion.atk > 0;
+}
+
+export function performAttack(
+  game: GameState,
+  attackerPlayerId: PlayerId,
+  attackerIndex: number,
+  targetPlayerId: PlayerId,
+  targetIndex: number | 'hero'
+): GameState | null {
+  const newGame = deepCopyGame(game);
+  const attackerPlayer = attackerPlayerId === 'player' ? newGame.player : newGame.enemy;
+  const targetPlayer = targetPlayerId === 'player' ? newGame.player : newGame.enemy;
+  const attacker = attackerPlayer.board[attackerIndex];
+
+  if (!attacker || !canAttack(attacker)) return null;
+
+  let logAction = '';
+
+  if (targetIndex === 'hero') {
+    const damage = attacker.atk;
+    const heroActual = Math.max(0, damage - targetPlayer.hero.armor);
+    targetPlayer.hero.armor = Math.max(0, targetPlayer.hero.armor - damage);
+    targetPlayer.hero.hp -= heroActual;
+    attacker.hasAttacked = true;
+    logAction = `${attacker.name} 攻击英雄，造成 ${heroActual} 点伤害`;
+  }
+
+--------------------------------------------------------------------------------
+                              第25页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 随从攻击随从
+
+  else {
+    const target = targetPlayer.board[targetIndex];
+    if (!target) return null;
+
+    const attackerDamage = attacker.atk;
+    const targetDamage = target.atk;
+
+    if (target.divineShieldActive) {
+      target.divineShieldActive = false;
+      logAction = `${attacker.name} 攻击 ${target.name}，圣盾抵挡`;
+    } else {
+      target.hp -= attackerDamage;
+    }
+
+    if (attacker.divineShieldActive) {
+      attacker.divineShieldActive = false;
+    } else {
+      attacker.hp -= targetDamage;
+    }
+
+    logAction = `${attacker.name}(${attacker.atk}) → ${target.name}(${target.atk})`;
+
+    if (target.hp <= 0) {
+      targetPlayer.board[targetIndex] = null;
+      logAction += `，${target.name} 死亡`;
+    }
+
+    if (attacker.hp <= 0) {
+      attackerPlayer.board[attackerIndex] = null;
+      logAction += `，${attacker.name} 阵亡`;
+    } else {
+      attacker.hasAttacked = true;
+    }
+  }
+
+--------------------------------------------------------------------------------
+                              第26页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 胜负判断和回合结束
+
+  const winner = checkWinner(newGame);
+
+  return {
+    ...newGame,
+    winner,
+    phase: winner ? 'end' : newGame.phase,
+    log: [...newGame.log, createLogEntry(newGame.turnNumber, 
+      attackerPlayerId, logAction)],
+  };
+}
+
+export function checkWinner(game: GameState): PlayerId | null {
+  if (game.player.hero.hp <= 0 && game.enemy.hero.hp <= 0) return 'enemy';
+  if (game.player.hero.hp <= 0) return 'enemy';
+  if (game.enemy.hero.hp <= 0) return 'player';
+  return null;
+}
+
+export function endTurn(game: GameState): GameState {
+  const nextPlayer: PlayerId = game.currentPlayer === 'player' ? 'enemy' : 'player';
+  const turnNumber = nextPlayer === 'player' ? game.turnNumber + 1 : game.turnNumber;
+
+  return {
+    ...game,
+    currentPlayer: nextPlayer,
+    turnNumber,
+    log: [...game.log, createLogEntry(game.turnNumber, game.currentPlayer, '结束回合')],
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第27页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/gameLogic.ts（续）
+// 功能：游戏核心逻辑 - 工具函数
+
+export function getEmptySlotCenterOut(board: (MinionInstance | null)[]): number {
+  const priority = [3, 2, 4, 1, 5, 0, 6];
+  for (const slotIndex of priority) {
+    if (board[slotIndex] === null) {
+      return slotIndex;
+    }
+  }
+  return -1;
+}
+
+--------------------------------------------------------------------------------
+                              第28页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/aiLogic.ts
+// 功能：AI决策逻辑
+
+import { GameState } from '@/types/game';
+import {
+    canUseHeroPower,
+    activateHeroPower,
+    canPlayCard,
+    playCard,
+    canHeroAttack,
+    heroAttack,
+    canAttack,
+    performAttack,
+    getEmptySlotCenterOut,
+    checkWinner,
+} from './gameLogic';
+
+export function getEnemyActions(game: GameState): 
+  { type: string; data?: Record<string, unknown> }[] {
+    const actions: { type: string; data?: Record<string, unknown> }[] = [];
+    let simGame = JSON.parse(JSON.stringify(game)) as GameState;
+    const enemy = simGame.enemy;
+    const MAX_ACTIONS = 20;
+
+    for (let step = 0; step < MAX_ACTIONS; step++) {
+        if (canUseHeroPower(enemy)) {
+            actions.push({ type: 'hero_power' });
+            const result = activateHeroPower(simGame, 'enemy');
+            if (result) simGame = result;
+            continue;
+        }
+
+--------------------------------------------------------------------------------
+                              第29页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/aiLogic.ts（续）
+// 功能：AI决策逻辑 - 召唤随从
+
+        let playedCard = false;
+        const sortedHand = enemy.hand
+            .map((c, i) => ({ card: c, index: i }))
+            .filter(({ card }) => card.type === 'minion' && canPlayCard(enemy, card))
+            .sort((a, b) => a.card.cost - b.card.cost);
+
+        for (const { index } of sortedHand) {
+            const emptySlot = getEmptySlotCenterOut(enemy.board);
+            if (emptySlot !== -1) {
+                actions.push({ type: 'play_card', 
+                  data: { handIndex: index, boardIndex: emptySlot } });
+                const result = playCard(simGame, 'enemy', index, emptySlot);
+                if (result) { simGame = result; playedCard = true; break; }
+            }
+        }
+        if (playedCard) continue;
+
+--------------------------------------------------------------------------------
+                              第30页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/aiLogic.ts（续）
+// 功能：AI决策逻辑 - 装备武器和英雄攻击
+
+        let equippedWeapon = false;
+        for (let i = 0; i < enemy.hand.length; i++) {
+            const card = enemy.hand[i];
+            if (card.type === 'weapon' && canPlayCard(enemy, card)) {
+                actions.push({ type: 'play_card', 
+                  data: { handIndex: i, boardIndex: -1 } });
+                const result = playCard(simGame, 'enemy', i, -1);
+                if (result) { simGame = result; equippedWeapon = true; break; }
+            }
+        }
+        if (equippedWeapon) continue;
+
+        if (canHeroAttack(enemy.hero)) {
+            actions.push({ type: 'hero_attack', data: { targetIndex: 'hero' } });
+            const result = heroAttack(simGame, 'enemy', 'player', 'hero');
+            if (result) simGame = result;
+            if (checkWinner(simGame)) break;
+            continue;
+        }
+
+--------------------------------------------------------------------------------
+                              第31页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/aiLogic.ts（续）
+// 功能：AI决策逻辑 - 随从攻击
+
+        let attacked = false;
+        const attackers = enemy.board
+            .map((m, i) => ({ minion: m, index: i }))
+            .filter(({ minion }) => minion && canAttack(minion))
+            .sort((a, b) => (b.minion?.atk || 0) - (a.minion?.atk || 0));
+
+        for (const { index } of attackers) {
+            actions.push({ type: 'attack', 
+              data: { attackerIndex: index, targetIndex: 'hero' } });
+            const result = performAttack(simGame, 'enemy', index, 'player', 'hero');
+            if (result) { simGame = result; attacked = true; }
+            if (checkWinner(simGame)) break;
+        }
+        if (attacked) continue;
+
+        break;
+    }
+
+    actions.push({ type: 'end_turn' });
+    return actions;
+}
+
+--------------------------------------------------------------------------------
+                              第32页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/aiLogic.ts（续）
+// 功能：AI决策逻辑 - 兼容旧接口
+
+export function getEnemyAction(game: GameState): 
+  { type: string; data?: Record<string, unknown> } | null {
+    const enemy = game.enemy;
+
+    if (canUseHeroPower(enemy)) {
+        return { type: 'hero_power' };
+    }
+
+    for (let i = 0; i < enemy.hand.length; i++) {
+        const card = enemy.hand[i];
+        if (card.type === 'minion' && canPlayCard(enemy, card)) {
+            const emptySlot = getEmptySlotCenterOut(enemy.board);
+            if (emptySlot !== -1) {
+                return { type: 'play_card', 
+                  data: { handIndex: i, boardIndex: emptySlot } };
+            }
+        }
+    }
+
+    for (let i = 0; i < enemy.hand.length; i++) {
+        const card = enemy.hand[i];
+        if (card.type === 'weapon' && canPlayCard(enemy, card)) {
+            return { type: 'play_card', data: { handIndex: i, boardIndex: -1 } };
+        }
+    }
+
+    if (canHeroAttack(enemy.hero)) {
+        return { type: 'hero_attack', data: { targetIndex: 'hero' } };
+    }
+
+    for (let i = 0; i < enemy.board.length; i++) {
+        const minion = enemy.board[i];
+        if (minion && canAttack(minion)) {
+            return { type: 'attack', data: { attackerIndex: i, targetIndex: 'hero' } };
+        }
+    }
+
+    return { type: 'end_turn' };
+}
+
+--------------------------------------------------------------------------------
+                              第33页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/cards.ts
+// 功能：卡牌数据定义
+
+import { Card, MinionCard, WeaponCard } from '@/types/game';
+
+export const createMinionCard = (
+    id: string,
+    name: string,
+    cost: number,
+    atk: number,
+    hp: number,
+    opts?: {
+        rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+        flavor?: string;
+        hasTaunt?: boolean;
+        hasCharge?: boolean;
+        battlecry?: string;
+        deathrattle?: string;
+    }
+): MinionCard => ({
+    id,
+    name,
+    cost,
+    type: 'minion',
+    atk,
+    hp,
+    description: `${atk}/${hp}${opts?.hasTaunt ? ' [嘲讽]' : ''}${opts?.hasCharge ? ' [冲锋]' : ''}`,
+    rarity: opts?.rarity ?? 'common',
+    flavor: opts?.flavor,
+    hasTaunt: opts?.hasTaunt,
+    hasCharge: opts?.hasCharge,
+    battlecry: opts?.battlecry,
+    deathrattle: opts?.deathrattle,
+});
+
+--------------------------------------------------------------------------------
+                              第34页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/cards.ts（续）
+// 功能：卡牌数据定义 - 武器卡创建函数
+
+export const createWeaponCard = (
+    id: string,
+    name: string,
+    cost: number,
+    atk: number,
+    durability: number,
+    rarity?: 'common' | 'rare' | 'epic' | 'legendary'
+): WeaponCard => ({
+    id,
+    name,
+    cost,
+    type: 'weapon',
+    atk,
+    durability,
+    description: `攻击:${atk} 耐久:${durability}`,
+    rarity: rarity ?? 'common',
+});
+
+export const INITIAL_DECK: Card[] = [
+    createMinionCard('m1', '青铜守卫', 1, 1, 2, { flavor: '稷下城门的忠实卫兵' }),
+    createMinionCard('m2', '机械猎犬', 1, 2, 1, { flavor: '铜齿獠牙，快如疾风' }),
+    createMinionCard('m3', '墨家学徒', 1, 1, 3, { flavor: '以守为攻，以柔克刚', hasTaunt: true }),
+    createMinionCard('m4', '铜制傀儡', 1, 1, 1, { flavor: '最简单的机关人偶' }),
+    createMinionCard('m5', '稷下学徒', 2, 2, 2, { flavor: '满腔热血的年轻学子' }),
+    createMinionCard('m6', '机关兽', 2, 3, 2, { flavor: '逻辑爪牙，奇技淫巧', rarity: 'rare' }),
+    createMinionCard('m7', '防御工事', 2, 1, 4, { flavor: '固若金汤，不可撼动', hasTaunt: true }),
+];
+
+--------------------------------------------------------------------------------
+                              第35页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/cards.ts（续）
+// 功能：卡牌数据定义 - 2-3费随从
+
+    createMinionCard('m8', '齿轮报告兵', 2, 2, 3, { flavor: '传令于四方，奔走于疆场' }),
+    createMinionCard('m9', '游侠刺客', 2, 3, 1, { flavor: '快人快语，来去如风', 
+      hasCharge: true, rarity: 'rare' }),
+    createMinionCard('m10', '机关术士', 3, 3, 4, { flavor: '数算阵法，无一不精', 
+      rarity: 'rare' }),
+    createMinionCard('m11', '稷下谋士', 3, 2, 4, { flavor: '运筹帷幄，决胜千里' }),
+    createMinionCard('m12', '齿轮大师', 3, 3, 3, { flavor: '精通十七种机关术', 
+      rarity: 'rare' }),
+    createMinionCard('m13', '铁甲战士', 3, 2, 5, { flavor: '铁甲护体，矢石不伤', 
+      hasTaunt: true }),
+    createMinionCard('m14', '铜炉监工', 3, 4, 2, { flavor: '监管百炉，雷厉风行' }),
+
+--------------------------------------------------------------------------------
+                              第36页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/cards.ts（续）
+// 功能：卡牌数据定义 - 4-5费随从
+
+    createMinionCard('m15', '青铜巨像', 4, 4, 5, { flavor: '三丈铜身，震慑四方', 
+      rarity: 'rare' }),
+    createMinionCard('m16', '稷下论客', 4, 3, 6, { flavor: '纵横捭阖，舌战群儒', 
+      hasTaunt: true }),
+    createMinionCard('m17', '机关弩手', 4, 5, 3, { flavor: '百步穿杨，一击必中' }),
+    createMinionCard('m18', '古青铜龙', 4, 4, 4, { flavor: '上古机关龙，传说中的守护兽', 
+      rarity: 'epic' }),
+    createMinionCard('m19', '法家寒铁卫', 5, 5, 5, { flavor: '以法为剑，护国安民', 
+      rarity: 'rare' }),
+    createMinionCard('m20', '炉火熔铸师', 5, 4, 7, { flavor: '淬火百炼，铸就传奇', 
+      hasTaunt: true, rarity: 'epic' }),
+    createMinionCard('m21', '儒家先贤', 5, 3, 8, { flavor: '仁义为本，博施济众', 
+      hasTaunt: true }),
+
+--------------------------------------------------------------------------------
+                              第37页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/cards.ts（续）
+// 功能：卡牌数据定义 - 6费以上随从和武器
+
+    createMinionCard('m22', '机关巨人', 6, 6, 7, { flavor: '千年机关之精华所在', 
+      rarity: 'epic' }),
+    createMinionCard('m23', '稷下祭酒', 6, 5, 8, { flavor: '天下学宫之首，诸子之师', 
+      hasTaunt: true, rarity: 'legendary' }),
+    createMinionCard('m24', '战国铁骑', 6, 7, 5, { flavor: '横扫千军如卷席', 
+      rarity: 'rare' }),
+    createWeaponCard('w1', '青铜剑', 2, 3, 2),
+    createWeaponCard('w2', '机关弩', 3, 2, 3, 'rare'),
+    createWeaponCard('w3', '齿轮锤', 4, 4, 2, 'rare'),
+    createWeaponCard('w4', '能量刃', 5, 5, 3, 'epic'),
+    createMinionCard('m25', '混沌战炮', 7, 7, 7, { flavor: '百兵之祖，毁天灭地', 
+      rarity: 'legendary' }),
+    createMinionCard('m26', '青铜始祖', 8, 8, 8, { flavor: '机关城的造物之神', 
+      hasTaunt: true, rarity: 'legendary' }),
+];
+
+--------------------------------------------------------------------------------
+                              第38页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts
+// 功能：布局配置规格
+
+import { LayoutSpec } from '@/types/layout';
+
+export type LayoutModule =
+  | 'hero'
+  | 'skill'
+  | 'weapon'
+  | 'hand'
+  | 'minion'
+  | 'mana'
+  | 'deck'
+  | 'end-turn';
+
+export type LayoutInstance =
+  | 'enemy-hero'
+  | 'enemy-skill'
+  | 'enemy-weapon'
+  | 'enemy-hand'
+  | 'enemy-minion'
+  | 'enemy-mana'
+  | 'enemy-deck'
+  | 'player-hero'
+  | 'player-skill'
+  | 'player-weapon'
+  | 'player-hand'
+  | 'player-minion'
+  | 'player-mana'
+  | 'player-deck'
+  | 'end-turn';
+
+export interface Canvas {
+  w: number;
+  h: number;
+}
+
+export interface SafeStage {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+--------------------------------------------------------------------------------
+                              第39页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts（续）
+// 功能：布局配置规格 - 接口定义
+
+export interface ModuleConfig {
+  id: LayoutModule;
+  name: string;
+  description?: string;
+}
+
+export interface ComponentConfig {
+  id: string;
+  module: LayoutModule;
+  defaultW: number;
+  defaultH: number;
+}
+
+export interface InstanceConfig {
+  id: LayoutInstance;
+  component: string;
+  module: LayoutModule;
+}
+
+export interface LayoutItem {
+  id: LayoutInstance | string;
+  x: number | string;
+  y: number | string;
+  w: number;
+  h: number;
+  label?: string;
+  color?: string;
+}
+
+export interface RenderNode {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  label: string;
+  color: string;
+}
+
+--------------------------------------------------------------------------------
+                              第40页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts（续）
+// 功能：布局配置规格 - 常量定义
+
+const CANVAS_WIDTH = 1920;
+const CANVAS_HEIGHT = 1080;
+const CENTER_X = 960;
+
+export function expandLayouts(layouts: LayoutItem[]): RenderNode[] {
+  return layouts.map(item => {
+    let x: number;
+    let y: number;
+
+    if (typeof item.x === 'string') {
+      if (item.x === 'center') {
+        x = CENTER_X - item.w / 2;
+      } else if (item.x.startsWith('center+')) {
+        const offset = parseInt(item.x.replace('center+', ''), 10);
+        x = CENTER_X + offset;
+      } else if (item.x.startsWith('center-')) {
+        const offset = parseInt(item.x.replace('center-', ''), 10);
+        x = CENTER_X - offset;
+      } else {
+        x = parseInt(item.x, 10) || 0;
+      }
+    } else {
+      x = item.x;
+    }
+
+    if (typeof item.y === 'string') {
+      y = parseInt(item.y, 10) || 0;
+    } else {
+      y = item.y;
+    }
+
+    return {
+      id: item.id,
+      x: Math.round(x),
+      y: Math.round(y),
+      w: Math.round(item.w),
+      h: Math.round(item.h),
+      label: item.label || item.id,
+      color: item.color || '#e94560',
+    };
+  });
+}
+
+--------------------------------------------------------------------------------
+                              第41页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts（续）
+// 功能：布局配置规格 - LAYOUT配置
+
+export const LAYOUT = {
+  version: "BATTLE_LAYOUT_V2_JIXIA",
+  
+  canvas: {
+    w: CANVAS_WIDTH,
+    h: CANVAS_HEIGHT
+  },
+  
+  safe_stage: {
+    x: 40,
+    y: 30,
+    w: 1840,
+    h: 1020
+  },
+  
+  center_x: CENTER_X,
+  
+  modules: [
+    { id: 'hero', name: '英雄', description: '英雄角色区域' },
+    { id: 'skill', name: '技能', description: '英雄技能按钮' },
+    { id: 'weapon', name: '武器', description: '装备武器区域' },
+    { id: 'hand', name: '手牌', description: '手牌区域' },
+    { id: 'minion', name: '随从', description: '战场随从区域' },
+    { id: 'mana', name: '法力', description: '法力水晶显示' },
+    { id: 'deck', name: '牌库', description: '牌库区域' },
+    { id: 'end-turn', name: '结束回合', description: '结束回合按钮' }
+  ],
+
+--------------------------------------------------------------------------------
+                              第42页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts（续）
+// 功能：布局配置规格 - 组件配置
+
+  components: [
+    { id: 'hero-card', module: 'hero', defaultW: 180, defaultH: 220 },
+    { id: 'skill-button', module: 'skill', defaultW: 70, defaultH: 70 },
+    { id: 'weapon-slot', module: 'weapon', defaultW: 70, defaultH: 70 },
+    { id: 'hand-card', module: 'hand', defaultW: 90, defaultH: 110 },
+    { id: 'minion-card', module: 'minion', defaultW: 120, defaultH: 140 },
+    { id: 'mana-crystal', module: 'mana', defaultW: 35, defaultH: 35 },
+    { id: 'deck-pile', module: 'deck', defaultW: 100, defaultH: 140 },
+    { id: 'end-turn-button', module: 'end-turn', defaultW: 100, defaultH: 70 }
+  ],
+  
+  instances: [
+    { id: 'enemy-hero', component: 'hero-card', module: 'hero' },
+    { id: 'enemy-skill', component: 'skill-button', module: 'skill' },
+    { id: 'enemy-weapon', component: 'weapon-slot', module: 'weapon' },
+    { id: 'enemy-hand', component: 'hand-card', module: 'hand' },
+    { id: 'enemy-minion', component: 'minion-card', module: 'minion' },
+    { id: 'enemy-mana', component: 'mana-crystal', module: 'mana' },
+    { id: 'enemy-deck', component: 'deck-pile', module: 'deck' },
+    { id: 'player-hero', component: 'hero-card', module: 'hero' },
+    { id: 'player-skill', component: 'skill-button', module: 'skill' },
+    { id: 'player-weapon', component: 'weapon-slot', module: 'weapon' },
+    { id: 'player-hand', component: 'hand-card', module: 'hand' },
+    { id: 'player-minion', component: 'minion-card', module: 'minion' },
+    { id: 'player-mana', component: 'mana-crystal', module: 'mana' },
+    { id: 'player-deck', component: 'deck-pile', module: 'deck' },
+    { id: 'end-turn', component: 'end-turn-button', module: 'end-turn' }
+  ],
+
+--------------------------------------------------------------------------------
+                              第43页
+--------------------------------------------------------------------------------
+
+// 文件：src/config/layoutSpec.ts（续）
+// 功能：布局配置规格 - 布局节点定义
+
+  layouts: [
+    { id: 'enemy-hero', x: 870, y: 30, w: 180, h: 220, label: '敌方英雄', color: '#8b4513' },
+    { id: 'enemy-deck', x: 1700, y: 80, w: 100, h: 140, label: '敌方牌库', color: '#5d4037' },
+    { id: 'enemy-minion-0', x: 417, y: 280, w: 138, h: 161, label: '敌随1', color: '#a1887f' },
+    { id: 'enemy-minion-1', x: 575, y: 280, w: 138, h: 161, label: '敌随2', color: '#a1887f' },
+    { id: 'enemy-minion-2', x: 733, y: 280, w: 138, h: 161, label: '敌随3', color: '#a1887f' },
+    { id: 'enemy-minion-3', x: 891, y: 280, w: 138, h: 161, label: '敌随4', color: '#a1887f' },
+    { id: 'enemy-minion-4', x: 1049, y: 280, w: 138, h: 161, label: '敌随5', color: '#a1887f' },
+    { id: 'enemy-minion-5', x: 1207, y: 280, w: 138, h: 161, label: '敌随6', color: '#a1887f' },
+    { id: 'enemy-minion-6', x: 1365, y: 280, w: 138, h: 161, label: '敌随7', color: '#a1887f' },
+    { id: 'enemy-mana', x: 1060, y: 120, w: 120, h: 40, label: '敌方法力', color: '#4a90e2' },
+    { id: 'player-minion-0', x: 333, y: 520, w: 162, h: 189, label: '我随1', color: '#8d6e63' },
+    { id: 'player-minion-1', x: 515, y: 520, w: 162, h: 189, label: '我随2', color: '#8d6e63' },
+    { id: 'player-minion-2', x: 697, y: 520, w: 162, h: 189, label: '我随3', color: '#8d6e63' },
+    { id: 'player-minion-3', x: 879, y: 520, w: 162, h: 189, label: '我随4', color: '#8d6e63' },
+    { id: 'player-minion-4', x: 1061, y: 520, w: 162, h: 189, label: '我随5', color: '#8d6e63' },
+    { id: 'player-minion-5', x: 1243, y: 520, w: 162, h: 189, label: '我随6', color: '#8d6e63' },
+    { id: 'player-minion-6', x: 1425, y: 520, w: 162, h: 189, label: '我随7', color: '#8d6e63' },
+    { id: 'player-hero', x: 80, y: 720, w: 180, h: 220, label: '我方英雄', color: '#d4a574' },
+    { id: 'player-skill', x: 280, y: 800, w: 70, h: 70, label: '我方技能', color: '#bcaaa4' },
+    { id: 'player-weapon', x: 135, y: 660, w: 70, h: 70, label: '我方武器', color: '#a1887f' },
+    { id: 'player-deck', x: 1700, y: 860, w: 100, h: 140, label: '我方牌库', color: '#4e342e' },
+    { id: 'player-mana', x: 280, y: 810, w: 120, h: 40, label: '我方法力', color: '#5c6bc0' },
+    { id: 'end-turn', x: 1780, y: 500, w: 100, h: 70, label: '结束回合', color: '#ff8f00' }
+  ]
+};
+
+--------------------------------------------------------------------------------
+                              第44页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useScale.ts
+// 功能：缩放适配Hook
+
+import { useState, useCallback, useEffect } from 'react';
+
+interface ScaleInfo {
+  scale: number;
+  containerWidth: number;
+  containerHeight: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+export function useScale(canvasWidth: number, canvasHeight: number) {
+  const [scaleInfo, setScaleInfo] = useState<ScaleInfo>({
+    scale: 1,
+    containerWidth: canvasWidth,
+    containerHeight: canvasHeight,
+    offsetX: 0,
+    offsetY: 0,
+  });
+
+  const calculateScale = useCallback(() => {
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const designW = canvasWidth;
+    const designH = canvasHeight;
+    const scale = Math.min(viewportW / designW, viewportH / designH);
+    const containerWidth = designW * scale;
+    const containerHeight = designH * scale;
+    const offsetX = (viewportW - containerWidth) / 2;
+    const offsetY = (viewportH - containerHeight) / 2;
+
+    setScaleInfo({ scale, containerWidth, containerHeight, offsetX, offsetY });
+  }, [canvasWidth, canvasHeight]);
+
+  useEffect(() => {
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, [calculateScale]);
+
+--------------------------------------------------------------------------------
+                              第45页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useScale.ts（续）
+// 功能：缩放适配Hook - 坐标转换
+
+  const screenToCanvas = useCallback(
+    (clientX: number, clientY: number) => ({
+      x: (clientX - scaleInfo.offsetX) / scaleInfo.scale,
+      y: (clientY - scaleInfo.offsetY) / scaleInfo.scale,
+    }),
+    [scaleInfo]
+  );
+
+  const canvasToScreen = useCallback(
+    (x: number, y: number) => ({
+      x: x * scaleInfo.scale + scaleInfo.offsetX,
+      y: y * scaleInfo.scale + scaleInfo.offsetY,
+    }),
+    [scaleInfo]
+  );
+
+  return {
+    scaleInfo,
+    screenToCanvas,
+    canvasToScreen,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第46页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts
+// 功能：战斗状态管理Hook
+
+import { useState, useCallback } from 'react';
+import { GameState, SelectionState, PlayerId } from '@/types/game';
+import {
+  createInitialGameState,
+  startTurn,
+  endTurn,
+  playCard,
+  performAttack,
+  heroAttack,
+  activateHeroPower,
+  canUseHeroPower,
+  canAttack,
+  canHeroAttack,
+} from '@/utils/gameLogic';
+
+interface CastingState {
+  isCasting: boolean;
+  handIndex: number | null;
+  target: string | null;
+}
+
+export function useBattleState() {
+  const [game, setGame] = useState<GameState>(() => createInitialGameState());
+  const [selection, setSelection] = useState<SelectionState>({ type: 'none' });
+  const [castingState, setCastingState] = useState<CastingState>({
+    isCasting: false,
+    handIndex: null,
+    target: null,
+  });
+
+  const handleStartGame = useCallback(() => {
+    const newGame = startTurn(game, 'player');
+    setGame(newGame);
+  }, [game]);
+
+--------------------------------------------------------------------------------
+                              第47页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 结束回合
+
+  const handleEndTurn = useCallback((
+    executeEnemyPlayCardWithAnimation: (card: { name: string; type: string }, 
+      boardIndex: number, onComplete: () => void) => void,
+    executeEnemyAttackWithAnimation: (attackerType: 'minion' | 'hero', 
+      attackerIndex: number | null, targetType: 'minion' | 'hero', 
+      targetIndex: number | null, onComplete: () => void) => void
+  ) => {
+    if (game.currentPlayer !== 'player' || game.winner) return;
+
+    let newGame = endTurn(game);
+    setGame(newGame);
+    setSelection({ type: 'none' });
+
+    setTimeout(() => {
+      newGame = startTurn(newGame, 'enemy');
+      setGame(newGame);
+
+      const aiAct = () => {
+        const action = getEnemyAction(newGame);
+        if (!action || action.type === 'end_turn') {
+          newGame = endTurn(newGame);
+          newGame = startTurn(newGame, 'player');
+          setGame(newGame);
+          return;
+        }
+
+--------------------------------------------------------------------------------
+                              第48页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - AI行动处理
+
+        if (action.type === 'hero_power') {
+          const result = activateHeroPower(newGame, 'enemy');
+          if (result) {
+            newGame = result;
+            setGame({ ...newGame });
+          }
+          setTimeout(aiAct, 800);
+        } else if (action.type === 'play_card' && action.data) {
+          const card = newGame.enemy.hand[action.data.handIndex];
+          if (card) {
+            executeEnemyPlayCardWithAnimation(
+              card,
+              action.data.boardIndex,
+              () => {
+                const result = playCard(newGame, 'enemy', 
+                  action.data.handIndex, action.data.boardIndex);
+                if (result) {
+                  newGame = result;
+                  setGame({ ...newGame });
+                }
+                setTimeout(aiAct, 500);
+              }
+            );
+          }
+        }
+      };
+
+      setTimeout(aiAct, 500);
+    }, 500);
+  }, [game]);
+
+--------------------------------------------------------------------------------
+                              第49页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 投降和英雄技能
+
+  const handleSurrender = useCallback(() => {
+    if (confirm('确定要投降吗？')) {
+      setGame((prev) => ({
+        ...prev,
+        winner: 'enemy',
+        phase: 'end',
+        log: [...prev.log, { id: Date.now().toString(), turn: prev.turnNumber, 
+          player: 'player' as PlayerId, action: '玩家投降', timestamp: Date.now() }],
+      }));
+    }
+  }, []);
+
+  const handleHeroPowerClick = useCallback(() => {
+    if (game.currentPlayer !== 'player' || game.winner) return;
+    if (!canUseHeroPower(game.player)) return;
+
+    const result = activateHeroPower(game, 'player');
+    if (result) {
+      setGame(result);
+    }
+  }, [game]);
+
+--------------------------------------------------------------------------------
+                              第50页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 槽位点击处理
+
+  const handleSlotClick = useCallback(
+    (playerId: PlayerId, slotIndex: number) => {
+      if (game.currentPlayer !== 'player' || game.winner) return;
+
+      const isPlayerSlot = playerId === 'player';
+      const minion = isPlayerSlot ? game.player.board[slotIndex] : 
+        game.enemy.board[slotIndex];
+
+      if (isPlayerSlot && castingState.isCasting && !minion) {
+        setCastingState((prev) => ({
+          ...prev,
+          target: `槽位${slotIndex}`,
+        }));
+        return;
+      }
+
+      if (isPlayerSlot && selection.type === 'card' && 
+        selection.handIndex !== undefined && !minion) {
+        const result = playCard(game, 'player', selection.handIndex, slotIndex);
+        if (result) {
+          setGame(result);
+          setSelection({ type: 'none' });
+        }
+        return;
+      }
+
+      if (selection.type === 'minion' && selection.playerId === 'player' && 
+        !isPlayerSlot) {
+        const result = performAttack(
+          game,
+          'player',
+          selection.boardIndex!,
+          'enemy',
+          minion ? slotIndex : 'hero'
+        );
+        if (result) {
+          setGame(result);
+          setSelection({ type: 'none' });
+        }
+        return;
+      }
+    },
+    [game, selection, castingState]
+  );
+
+--------------------------------------------------------------------------------
+                              第51页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 英雄点击处理
+
+  const handleHeroClick = useCallback(
+    (playerId: PlayerId) => {
+      if (game.currentPlayer !== 'player' || game.winner) return;
+      if (playerId === 'player') return;
+
+      if (selection.type === 'minion' && selection.playerId === 'player') {
+        const result = performAttack(game, 'player', selection.boardIndex!, 
+          'enemy', 'hero');
+        if (result) {
+          setGame(result);
+          setSelection({ type: 'none' });
+        }
+        return;
+      }
+
+      if (selection.type === 'hero' && selection.playerId === 'player') {
+        const result = heroAttack(game, 'player', 'enemy', 'hero');
+        if (result) {
+          setGame(result);
+          setSelection({ type: 'none' });
+        }
+      }
+    },
+    [game, selection]
+  );
+
+  const handleHeroCardClick = useCallback(
+    (playerId: PlayerId) => {
+      if (game.currentPlayer !== 'player' || game.winner) return;
+      if (playerId !== 'player') return;
+      if (!canHeroAttack(game.player.hero)) return;
+
+      setSelection({
+        type: 'hero',
+        playerId: 'player',
+      });
+    },
+    [game]
+  );
+
+--------------------------------------------------------------------------------
+                              第52页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 法术确认和取消
+
+  const handleCastConfirm = useCallback(() => {
+    if (!castingState.isCasting || castingState.handIndex === null) return;
+
+    const card = game.player.hand[castingState.handIndex];
+    if (!card) return;
+
+    let targetSlot: number | null = null;
+    if (castingState.target) {
+      const match = castingState.target.match(/槽位(\d+)/);
+      if (match) {
+        targetSlot = parseInt(match[1]);
+      }
+    }
+
+    if (targetSlot === null) {
+      const placementPriority = [3, 2, 4, 1, 5, 0, 6];
+      for (const slotIndex of placementPriority) {
+        if (game.player.board[slotIndex] === null) {
+          targetSlot = slotIndex;
+          break;
+        }
+      }
+    }
+
+    if (targetSlot !== null && targetSlot !== -1) {
+      const result = playCard(game, 'player', castingState.handIndex, targetSlot);
+      if (result) {
+        setGame(result);
+      }
+    }
+
+    setCastingState({
+      isCasting: false,
+      handIndex: null,
+      target: null,
+    });
+    setSelection({ type: 'none' });
+  }, [castingState, game]);
+
+--------------------------------------------------------------------------------
+                              第53页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useBattleState.ts（续）
+// 功能：战斗状态管理Hook - 导出
+
+  const handleCastCancel = useCallback(() => {
+    setCastingState({
+      isCasting: false,
+      handIndex: null,
+      target: null,
+    });
+    setSelection({ type: 'none' });
+  }, []);
+
+  return {
+    game,
+    setGame,
+    selection,
+    setSelection,
+    castingState,
+    setCastingState,
+    handleStartGame,
+    handleEndTurn,
+    handleSurrender,
+    handleHeroPowerClick,
+    handleSlotClick,
+    handleHeroClick,
+    handleHeroCardClick,
+    handleCastConfirm,
+    handleCastCancel,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第54页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useDragAndDrop.ts
+// 功能：拖拽功能Hook
+
+import { useState, useCallback } from 'react';
+import { DragState } from '@/types/game';
+
+export function useDragAndDrop() {
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    cardId: null,
+    handIndex: null,
+    currentX: 0,
+    currentY: 0,
+    startX: 0,
+    startY: 0,
+  });
+
+  const handleDragStart = useCallback(
+    (e: React.PointerEvent, cardId: string, handIndex: number, 
+      screenToCanvas: (x: number, y: number) => { x: number; y: number }) => {
+      e.preventDefault();
+      const pos = screenToCanvas(e.clientX, e.clientY);
+
+      setDragState({
+        isDragging: true,
+        cardId,
+        handIndex,
+        currentX: pos.x,
+        currentY: pos.y,
+        startX: pos.x,
+        startY: pos.y,
+      });
+    },
+    []
+  );
+
+--------------------------------------------------------------------------------
+                              第55页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useDragAndDrop.ts（续）
+// 功能：拖拽功能Hook - 拖拽移动和结束
+
+  const handleDragMove = useCallback(
+    (e: PointerEvent, screenToCanvas: (x: number, y: number) => 
+      { x: number; y: number }) => {
+      if (!dragState.isDragging) return;
+
+      const pos = screenToCanvas(e.clientX, e.clientY);
+      setDragState((prev) => ({
+        ...prev,
+        currentX: pos.x,
+        currentY: pos.y,
+      }));
+    },
+    [dragState.isDragging]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    setDragState({
+      isDragging: false,
+      cardId: null,
+      handIndex: null,
+      currentX: 0,
+      currentY: 0,
+      startX: 0,
+      startY: 0,
+    });
+  }, []);
+
+  return {
+    dragState,
+    handleDragStart,
+    handleDragMove,
+    handleDragEnd,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第56页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useDragAttack.ts
+// 功能：拖拽攻击Hook
+
+import { useState, useCallback } from 'react';
+
+interface DragAttackState {
+  isDragging: boolean;
+  attackerType: 'minion' | 'hero' | null;
+  attackerIndex: number | null;
+  startX: number;
+  startY: number;
+  currentX: number;
+  currentY: number;
+}
+
+export function useDragAttack() {
+  const [dragAttackState, setDragAttackState] = useState<DragAttackState>({
+    isDragging: false,
+    attackerType: null,
+    attackerIndex: null,
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0,
+  });
+
+  const startDragAttack = useCallback(
+    (
+      e: React.PointerEvent,
+      attackerType: 'minion' | 'hero',
+      attackerIndex: number | null,
+      screenToCanvas: (x: number, y: number) => { x: number; y: number }
+    ) => {
+      e.preventDefault();
+      const pos = screenToCanvas(e.clientX, e.clientY);
+
+      setDragAttackState({
+        isDragging: true,
+        attackerType,
+        attackerIndex,
+        startX: pos.x,
+        startY: pos.y,
+        currentX: pos.x,
+        currentY: pos.y,
+      });
+    },
+    []
+  );
+
+--------------------------------------------------------------------------------
+                              第57页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useDragAttack.ts（续）
+// 功能：拖拽攻击Hook - 更新和结束
+
+  const updateDragAttack = useCallback(
+    (e: PointerEvent, screenToCanvas: (x: number, y: number) => 
+      { x: number; y: number }) => {
+      if (!dragAttackState.isDragging) return;
+
+      const pos = screenToCanvas(e.clientX, e.clientY);
+      setDragAttackState((prev) => ({
+        ...prev,
+        currentX: pos.x,
+        currentY: pos.y,
+      }));
+    },
+    [dragAttackState.isDragging]
+  );
+
+  const endDragAttack = useCallback(() => {
+    setDragAttackState({
+      isDragging: false,
+      attackerType: null,
+      attackerIndex: null,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0,
+    });
+  }, []);
+
+  return {
+    dragAttackState,
+    startDragAttack,
+    updateDragAttack,
+    endDragAttack,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第58页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useEntityAttack.ts
+// 功能：实体攻击动画Hook
+
+import { useState, useCallback } from 'react';
+
+interface EntityAttackState {
+  isAttacking: boolean;
+  attackerType: 'minion' | 'hero' | null;
+  attackerIndex: number | null;
+  attackerPlayerId: 'player' | 'enemy' | null;
+  targetType: 'minion' | 'hero' | null;
+  targetIndex: number | null;
+  targetPlayerId: 'player' | 'enemy' | null;
+  targetX: number;
+  targetY: number;
+  progress: number;
+}
+
+export function useEntityAttack() {
+  const [entityAttackState, setEntityAttackState] = 
+    useState<EntityAttackState>({
+    isAttacking: false,
+    attackerType: null,
+    attackerIndex: null,
+    attackerPlayerId: null,
+    targetType: null,
+    targetIndex: null,
+    targetPlayerId: null,
+    targetX: 0,
+    targetY: 0,
+    progress: 0,
+  });
+
+  const startEntityAttack = useCallback(
+    (
+      attackerType: 'minion' | 'hero',
+      attackerIndex: number | null,
+      attackerPlayerId: 'player' | 'enemy',
+      targetType: 'minion' | 'hero',
+      targetIndex: number | null,
+      targetPlayerId: 'player' | 'enemy',
+      targetX: number,
+      targetY: number
+    ) => {
+      setEntityAttackState({
+        isAttacking: true,
+        attackerType,
+        attackerIndex,
+        attackerPlayerId,
+        targetType,
+        targetIndex,
+        targetPlayerId,
+        targetX,
+        targetY,
+        progress: 0,
+      });
+    },
+    []
+  );
+
+--------------------------------------------------------------------------------
+                              第59页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/useEntityAttack.ts（续）
+// 功能：实体攻击动画Hook - 更新进度和结束
+
+  const updateAttackProgress = useCallback((progress: number) => {
+    setEntityAttackState((prev) => ({
+      ...prev,
+      progress,
+    }));
+  }, []);
+
+  const endEntityAttack = useCallback(() => {
+    setEntityAttackState({
+      isAttacking: false,
+      attackerType: null,
+      attackerIndex: null,
+      attackerPlayerId: null,
+      targetType: null,
+      targetIndex: null,
+      targetPlayerId: null,
+      targetX: 0,
+      targetY: 0,
+      progress: 0,
+    });
+  }, []);
+
+  return {
+    entityAttackState,
+    startEntityAttack,
+    updateAttackProgress,
+    endEntityAttack,
+  };
+}
+
+--------------------------------------------------------------------------------
+                              第60页
+--------------------------------------------------------------------------------
+
+// 文件：src/hooks/index.ts
+// 功能：Hooks导出索引
+
+export { useScale } from './useScale';
+export { useBattleState } from './useBattleState';
+export { useDragAndDrop } from './useDragAndDrop';
+export { useDragAttack } from './useDragAttack';
+export { useEntityAttack } from './useEntityAttack';
+
+================================================================================
+                        源代码（前60页）结束
+================================================================================
