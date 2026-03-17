@@ -1,4 +1,4 @@
-import { LayoutSpec } from '@/types/layout';
+﻿import { LayoutSpec } from '@/types/layout';
 
 // ==================== 联合类型定义 ====================
 

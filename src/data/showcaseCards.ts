@@ -1,4 +1,4 @@
-// 稀有度颜色映射
+﻿// 稀有度颜色映射
 export const rarityColor: Record<string, string> = {
     '常见': '#9ca3af',
     '稀有': '#60a5fa',
@@ -36,11 +36,11 @@ export const CARDS: CardData[] = [
     { id: 'zhuduchao', name: '竹牍抄录', faction: '礼心殿', type: '事件', rarity: '常见', cost: 2, background: '抄一段旧文，便得一线新路。字落竹纹，心亦随之安定。', skill: '从牌库检索1张【技能】牌加入手牌；然后弃1张牌。' },
     { id: 'jiangxi', name: '讲席清规', faction: '礼心殿', type: '场地', rarity: '常见', cost: 2, shield: 3, background: '讲席之上，清规如绳；入其门者，先收浮躁。几行规约，胜过千句喝止。', skill: '你每回合第1次使用【技能】牌时，抽1；回合末若你本回合未使用牌，获得【护持3】。' },
     { id: 'sishi', name: '司史执笔', faction: '礼心殿', type: '角色', rarity: '稀有', cost: 3, attack: 2, hp: 4, background: '司史不争一时胜负，只记千年是非。笔落之处，便是人心的据证。', skill: '登场：抽2；选择1项：对敌方施加【怀疑+1（2回合）】；或令友方获得【护持4】。' },
-    { id: 'libian', name: '礼辩同归', faction: '礼心殿', type: '事件', rarity: '史诗', cost: 4, background: '礼起则群心不乱，辩正则万事可行。揖让之间，锋芒尽收。', skill: '双方各抽1；本回合你造成的伤害+2，且你获得【护持2】。' },
+    { id: 'libian', name: '礼辩同归', faction: '礼心殿', type: '事件', rarity: '史诗', cost: 4, shield: 2, background: '礼起则群心不乱，辩正则万事可行。揖让之间，锋芒尽收。', skill: '双方各抽1；本回合你造成的伤害+2，且你获得【护持2】。' },
     // ====== 衡戒廷 ======
     { id: 'tiequan', name: '铁券禁令', faction: '衡戒廷', type: '事件', rarity: '稀有', cost: 3, background: '铁券一下，百口噤声；禁令既出，寸步难行。法不待情，唯待执行。', skill: '敌方下回合不能抽牌；若其仍触发抽牌效果，则改为随机弃1张手牌。' },
-    { id: 'duanjian', name: '断简成法', faction: '衡戒廷', type: '反制', rarity: '常见', cost: 1, background: '纷简可断，法度不可断。刀不为杀，只为分明。', skill: '反制正在结算的1张牌；成功后使其操作者弃1张牌。' },
-    { id: 'jianyin', name: '缄印封检', faction: '衡戒廷', type: '装备', rarity: '稀有', cost: 2, shield: 2, background: '一绳一泥，一印一验；密不可窥，制可长行。封缄之处，亦是信与戒。', skill: '装备给角色；该角色受到的首次伤害-2；装备者每回合第1次使用【反制】后抽1。' },
+    { id: 'duanjian', name: '断简成法', faction: '衡戒廷', type: '反制', rarity: '常见', cost: 2, background: '纷简可断，法度不可断。刀不为杀，只为分明。', skill: '反制正在结算的1张牌；成功后使其操作者弃1张牌。' },
+    { id: 'jianyin', name: '缄印封检', faction: '衡戒廷', type: '装备', rarity: '稀有', cost: 2, shield: 1, background: '一绳一泥，一印一验；密不可窥，制可长行。封缄之处，亦是信与戒。', skill: '装备给角色；该角色受到的首次伤害-2；装备者每回合第1次使用【反制】后抽1。' },
     { id: 'juwentang', name: '鞫问堂', faction: '衡戒廷', type: '场地', rarity: '常见', cost: 2, background: '鞫问之下，词难成网；灯火一照，心自见形。堂上无风，亦觉寒意。', skill: '每当敌方使用【技能】牌，其受到1点伤害；若其本回合已受伤，额外+1。' },
     { id: 'chilin', name: '一纸敕令', faction: '衡戒廷', type: '事件', rarity: '传说', cost: 6, background: '纸薄而令重，片言可动千军。敕下如雷，众心自齐。', skill: '选择1项：①摧毁所有敌方【装备】；②本回合敌方不能使用牌；③你抽3并获得【护持6】。' },
     // ====== 归真观 ======
@@ -53,7 +53,7 @@ export const CARDS: CardData[] = [
     { id: 'liannuju', name: '连弩匣', faction: '玄匠盟', type: '装备', rarity: '常见', cost: 2, attack: 1, background: '匣开则弦鸣，连发不息。工匠不言勇，只把机关做到极致。', skill: '装备：你的攻击+1；你每回合第1次造成伤害时，额外造成1点伤害。' },
     { id: 'jimu', name: '机关木鸢', faction: '玄匠盟', type: '装备', rarity: '常见', cost: 2, background: '木鸢虽小，眼可千里。飞在高处，方知城内真假。', skill: '查看敌方随机1张手牌；本回合你对其造成的伤害+1。' },
     { id: 'chengfang', name: '城防尺牍', faction: '玄匠盟', type: '事件', rarity: '常见', cost: 2, shield: 4, background: '尺牍绘城防，方寸定攻守。线条虽细，却能挡万矢。', skill: '获得【壁垒】直到回合结束（吸收4点伤害）；若你已有场地，改为吸收6点伤害。' },
-    { id: 'jianshi', name: '兼济匠师', faction: '玄匠盟', type: '角色', rarity: '稀有', cost: 4, attack: 3, hp: 4, background: '工以济世，不争虚名。手上有茧，心里有城。', skill: '登场：从牌库检索1张【装备】加入手牌；你接下来2回合内打出的装备牌费用-1。' },
+    { id: 'jianshi', name: '兼济匠师', faction: '玄匠盟', type: '角色', rarity: '稀有', cost: 4, attack: 2, hp: 4, background: '工以济世，不争虚名。手上有茧，心里有城。', skill: '登场：从牌库检索1张【装备】加入手牌；你接下来2回合内打出的装备牌费用-1。' },
     { id: 'qianji', name: '千机壁垒', faction: '玄匠盟', type: '场地', rarity: '史诗', cost: 4, shield: 2, background: '千机并起，壁垒如山；攻者失势，守者得时。守到恰处，便是反击之始。', skill: '场地：你打出的【装备】进入场上时，令其持有者获得【护持2】；敌方每回合第1次对你造成的伤害-2。' },
     // ====== 九阵堂 ======
     { id: 'jingqi', name: '旌旗换阵', faction: '九阵堂', type: '技能', rarity: '常见', cost: 2, background: '旗一翻，阵已换；敌未觉，我已先至。兵贵神速，亦贵其变。', skill: '获得【护持2】；本回合你造成的伤害+1；若你本回合首次造成伤害，额外抽1。' },
@@ -147,14 +147,14 @@ export const CARDS: CardData[] = [
 
     // ====== 归真观（二期）======
     { id: 'guizhen6', name: '清虚静笃', faction: '归真观', type: '技能', rarity: '常见', cost: 1, background: '清虚者，道之本；静笃者，德之根。一心归真，万虑皆散。', skill: '回复2点底蕴；你本回合第1次受到伤害时，获得【护持2】。' },
-    { id: 'guizhen7', name: '炼气储真', faction: '归真观', type: '角色', rarity: '稀有', cost: 4, attack: 2, hp: 5, background: '真气充盈，百病不侵；内力深厚，外物难损。', skill: '被动：你每回合结束时若未受伤，回复1底蕴并获得【清明+1】；清明达到5时，清除所有负面状态。' },
+    { id: 'guizhen7', name: '炼气储真', faction: '归真观', type: '角色', rarity: '稀有', cost: 4, attack: 3, hp: 5, background: '真气充盈，百病不侵；内力深厚，外物难损。', skill: '被动：你每回合结束时若未受伤，回复1底蕴并获得【清明+1】；清明达到5时，清除所有负面状态。' },
     { id: 'guizhen8', name: '虚空契道', faction: '归真观', type: '事件', rarity: '稀有', cost: 3, background: '虚室生白，吉祥止止。空处生明，无为而成。', skill: '净化全部负面状态；回复4点底蕴；若你本回合未使用过牌，改为回复7点。' },
-    { id: 'guizhen9', name: '炉鼎炼气', faction: '归真观', type: '装备', rarity: '常见', cost: 2, shield: 1, background: '鼎炉相配，水火既济；炼气自成，进退皆宜。', skill: '装备：你每打出【技能】牌后回复1点底蕴；若该技能净化过负面，额外回复1点。' },
+    { id: 'guizhen9', name: '炉鼎炼气', faction: '归真观', type: '装备', rarity: '常见', cost: 2, shield: 2, background: '鼎炉相配，水火既济；炼气自成，进退皆宜。', skill: '装备：你每打出【技能】牌后回复1点底蕴；若该技能净化过负面，额外回复1点。' },
     { id: 'guizhen10', name: '归一守中', faction: '归真观', type: '场地', rarity: '史诗', cost: 4, background: '天下万物归于一，一归于无；守中不偏，道自在。', skill: '场地：你每回合结束若未造成过伤害，获得【护持4】；你每回合第1次回复底蕴，额外回复+1。' },
 
     // ====== 玄匠盟（二期）======
     { id: 'xuanjang6', name: '奇械造化', faction: '玄匠盟', type: '技能', rarity: '常见', cost: 1, background: '妙手偶得，奇机自出。工匠之道，在于化腐朽为神奇。', skill: '从牌库检索1张【装备】牌加入手牌；若手牌中有装备，抽1。' },
-    { id: 'xuanjang7', name: '大匠造物', faction: '玄匠盟', type: '角色', rarity: '史诗', cost: 5, attack: 3, hp: 4, background: '大匠不示人以璞，示人以器。器成，则天下皆知其能。', skill: '登场：将1张【装备】牌直接装备上；被动：你每打出装备牌，造成2点伤害。' },
+    { id: 'xuanjang7', name: '大匠造物', faction: '玄匠盟', type: '角色', rarity: '史诗', cost: 5, attack: 2, hp: 4, background: '大匠不示人以璞，示人以器。器成，则天下皆知其能。', skill: '登场：将1张【装备】牌直接装备上；被动：你每打出装备牌，造成2点伤害。' },
     { id: 'xuanjang8', name: '铸甲精钢', faction: '玄匠盟', type: '装备', rarity: '稀有', cost: 3, shield: 3, background: '精钢百炼，甲胄如山；虽千军万马，亦难寸进。', skill: '装备：你受到的伤害-2；若本次受到的伤害来自【事件】牌，改为-3。' },
     { id: 'xuanjang9', name: '轮轴连动', faction: '玄匠盟', type: '事件', rarity: '常见', cost: 2, background: '一轴连百轮，一动百动。机关之妙，在此一环。', skill: '若你场上有装备，连锁触发其效果一次；获得【护持2】。' },
     { id: 'xuanjang10', name: '机关总成', faction: '玄匠盟', type: '场地', rarity: '传说', cost: 5, background: '千机合而为一，方成大器。一动，天下皆动。', skill: '场地：你每打出装备牌，令敌方随机1名角色受到1点伤害；你有3件及以上装备时，每回合额外造成2点伤害。' },
@@ -242,5 +242,19 @@ export const CARDS: CardData[] = [
     { id: 'choutian8', name: '死局重排', faction: '筹天阁', type: '事件', rarity: '稀有', cost: 3, background: '看似死局，却可重排；一子落处，柳暗花明。', skill: '将你的弃牌堆洗回牌库；抽3；令对手将手牌随机置入其牌库（对手重抽等量）。' },
     { id: 'choutian9', name: '推演图表', faction: '筹天阁', type: '装备', rarity: '稀有', cost: 2, background: '图表在手，预知先行；算无遗策，方可决胜千里。', skill: '装备：你每回合抽牌时，可看到抽到的牌是什么再决定要不要（弃掉则对手不知）；每次弃掉抽到的牌，对手受1点伤害。' },
     { id: 'choutian10', name: '天罗地网', faction: '筹天阁', type: '场地', rarity: '传说', cost: 6, background: '天罗地网，无处可逃；算尽天下，唯漏一心。', skill: '场地：你每预测1张对手将使用的牌类型（每回合开始时选择），若猜中，对手该牌效果-50%；猜中3次后，对手的1张牌被永久封闭直到对局结束。' },
+
+    // ====== 通用（四门派文档并入）======
+    { id: 'xinglvxuezi', name: '行旅学子', faction: '通用', type: '角色', rarity: '常见', cost: 1, attack: 1, hp: 2, background: '行旅四方，兼听并记，所学皆可为用。', skill: '无效果。' },
+    { id: 'xiangyishuli', name: '乡议书吏', faction: '通用', type: '角色', rarity: '常见', cost: 2, attack: 2, hp: 2, background: '乡议之间，执笔成文，守拙而不失衡。', skill: '若置于旁议，进场时抽1张牌，然后弃1张牌。' },
+    { id: 'gongyishouxi', name: '公议守席', faction: '通用', type: '角色', rarity: '常见', cost: 2, attack: 2, hp: 2, background: '守席不争先，重在稳其位、定其论。', skill: '若置于主议，本回合 +1 辩锋。' },
+    { id: 'anqianzhijian', name: '案前执简', faction: '通用', type: '角色', rarity: '常见', cost: 3, attack: 3, hp: 2, background: '案前执简，词章有据，进退有度。', skill: '无效果。' },
+    { id: 'liangduanhengliang', name: '两端衡量', faction: '通用', type: '事件', rarity: '常见', cost: 1, background: '衡量两端，求其可行，先定轻重后决胜负。', skill: '一张己方立论本回合 +1 辩锋。' },
+    { id: 'gengxierlun', name: '更席而论', faction: '通用', type: '事件', rarity: '常见', cost: 1, background: '更席不改旨，换位只为取势。', skill: '将一张己方立论移到另一个议位。' },
+    { id: 'shoushuchengwen', name: '收束成文', faction: '通用', type: '事件', rarity: '常见', cost: 2, background: '论至要处，当收其锋，成其章。', skill: '抽2张牌，然后弃1张牌。' },
+    { id: 'bozaquwu', name: '驳杂去芜', faction: '通用', type: '事件', rarity: '常见', cost: 2, background: '去其芜杂，留其主干，方能见真义。', skill: '一张敌方立论本回合 -1 辩锋。' },
+    { id: 'pangzhengboyin', name: '旁征博引', faction: '通用', type: '事件', rarity: '稀有', cost: 3, background: '博引旁征，证据自成链，辩势随之而起。', skill: '一张己方立论本回合 +1 辩锋、+1 根基。' },
+    { id: 'gonglunchengshi', name: '公论成势', faction: '通用', type: '事件', rarity: '稀有', cost: 4, background: '公论既成，势不可逆；守其主议，便可再进一步。', skill: '若你本回合赢得主议，且该主议上的己方立论本回合未发生移动，额外 +1 大势。每回合最多使用1张。' },
+    { id: 'shouchengzhiyi', name: '守成之议', faction: '通用', type: '角色', rarity: '常见', cost: 3, attack: 2, hp: 3, background: '守成之议，贵在稳心稳局，不求一时锋芒。', skill: '进场时，若置于主议，+1 根基。' },
+    { id: 'jiantingzeming', name: '兼听则明', faction: '通用', type: '事件', rarity: '稀有', cost: 4, background: '兼听可明，偏听则暗；先广闻，后定断。', skill: '抽2张牌；然后一张己方立论 +1 根基。' },
 ];
 

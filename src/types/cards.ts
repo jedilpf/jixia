@@ -1,4 +1,4 @@
-export type CardType = 'skill' | 'event' | 'field' | 'gear' | 'character' | 'counter';
+﻿export type CardType = 'skill' | 'event' | 'field' | 'gear' | 'character' | 'counter';
 export type HeroPowerType = 'summon' | 'damage' | 'armor' | 'draw';
 
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';

@@ -1,4 +1,4 @@
-import { HeroPowerType, RarityZh, KeywordType, Keyword } from './cards';
+﻿import { HeroPowerType, RarityZh, KeywordType, Keyword } from './cards';
 
 export interface Buffs {
     huchi: number;

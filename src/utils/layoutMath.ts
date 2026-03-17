@@ -1,4 +1,4 @@
-// 手牌姿态类型
+﻿// 手牌姿态类型
 export type HandPose = {
     x: number;
     y: number;   // anchor y：player=底边基线，enemy=顶边基线

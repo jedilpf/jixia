@@ -1,4 +1,4 @@
-export type SelectionType = 'none' | 'card' | 'minion' | 'hero' | 'target' | 'hero_power';
+﻿export type SelectionType = 'none' | 'card' | 'minion' | 'hero' | 'target' | 'hero_power';
 
 import { PlayerId } from './battle';
 

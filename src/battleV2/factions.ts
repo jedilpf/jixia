@@ -1,4 +1,4 @@
-import type { SceneBias } from './types';
+﻿import type { SceneBias } from './types';
 
 export type FactionHook =
   | 'OnJudgement'

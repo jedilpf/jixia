@@ -1,4 +1,4 @@
-/**
+﻿/**
  * cards.ts — battleV2 战斗副牌
  *
  * 规则：
@@ -12,6 +12,11 @@
 import { DebateCard, Side } from './types';
 import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, FRAMEWORK_FACTION_NAMES, pickSceneBiasFromRoutePreference, resolveFactionForCards, toFrameworkFactionName } from './factions';
 import { CARDS, CardData } from '@/data/showcaseCards';
+import {
+  DEFAULT_CARD_POOL_CONFIG,
+  DEFAULT_DECK_BUILD_DEFAULTS,
+  normalizeEnabledFactions,
+} from './meta';
 
 // ── 已有美术资源的卡牌 id 白名单 ─────────────────────────────────────
 const ART_EXISTS = new Set([
@@ -43,9 +48,15 @@ const STARTER_IDS: string[] = [
   'baima',  'mingshi',  'tongyi',  'cifeng', 'guibian',
 ];
 
-const DEFAULT_GUEST_COUNT = 6;
-const DEFAULT_COMMON_COUNT = 8;
-const DEFAULT_FRAMEWORK_DECK_SIZE = 24;
+const DEFAULT_GUEST_COUNT = Math.max(
+  0,
+  Math.floor(
+    (DEFAULT_DECK_BUILD_DEFAULTS.deckSize
+      - DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount
+      - DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount)
+    / Math.max(1, DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount)
+  )
+);
 
 export interface CreateStarterDeckOptions {
   // 兼容老逻辑：不传时仍使用 20 张固定 Starter
@@ -53,7 +64,11 @@ export interface CreateStarterDeckOptions {
   // 新逻辑：16 门派兼容框架
   mainFaction?: string;
   guestFactions?: string[];
+  enabledFactions?: string[];
+  genericCardIds?: string[];
   guestCount?: number;
+  mainFactionCardCount?: number;
+  guestFactionCardCount?: number;
   includeCommons?: number;
   deckSize?: number;
   forceClassicStarter?: boolean;
@@ -161,27 +176,55 @@ function createClassicStarterDeck(side: Side): DebateCard[] {
 function getDeckIdsForFactionFramework(
   mainFaction: string,
   guestFactions: string[],
+  mainFactionCardCount: number,
+  guestFactionCardCount: number,
   commonCount: number,
-  deckSize: number
+  deckSize: number,
+  genericCardIds: string[],
+  enabledFactions: string[]
 ): string[] {
   const mainShowcaseFaction = resolveFactionForCards(mainFaction);
-  const mainIds = getStableFactionCards(mainShowcaseFaction).slice(0, 10).map((c) => c.id);
+  const enabledShowcaseFactions = new Set(
+    normalizeEnabledFactions(enabledFactions).map((faction) => resolveFactionForCards(faction))
+  );
+  const isFactionEnabled = (faction: string): boolean =>
+    enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
+
+  const mainIds = getStableFactionCards(mainShowcaseFaction)
+    .filter((card) => isFactionEnabled(card.faction))
+    .slice(0, Math.max(0, mainFactionCardCount))
+    .map((c) => c.id);
 
   const guestShowcaseFactions = dedupePreserveOrder(
     guestFactions.map((f) => resolveFactionForCards(f)).filter((f) => f && f !== mainShowcaseFaction)
-  ).filter((f) => (CARDS_BY_FACTION[f]?.length ?? 0) > 0);
+  ).filter((f) => (CARDS_BY_FACTION[f]?.length ?? 0) > 0 && isFactionEnabled(f));
 
-  // 每个客派贡献 1 张代表牌
-  const guestIds = guestShowcaseFactions
-    .map((faction) => getStableFactionCards(faction)[0]?.id)
-    .filter((id): id is string => Boolean(id));
+  // 每个客派按配置贡献若干张代表牌
+  const guestIds = guestShowcaseFactions.flatMap((faction) =>
+    getStableFactionCards(faction)
+      .slice(0, Math.max(0, guestFactionCardCount))
+      .map((card) => card.id)
+  );
 
   const selectedIds = dedupePreserveOrder([...mainIds, ...guestIds]);
 
-  const commonsPool = CARDS
+  const configuredCommonPool = dedupePreserveOrder(genericCardIds)
+    .map((id) => SHOWCASE_MAP[id]?.id)
+    .filter((id): id is string => Boolean(id))
+    .filter((id) => !selectedIds.includes(id))
+    .filter((id) => {
+      const card = SHOWCASE_MAP[id];
+      return card ? isFactionEnabled(card.faction) : false;
+    });
+  const fallbackCommonPool = CARDS
     .filter((card) => !selectedIds.includes(card.id))
-    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
-  const commonIds = commonsPool.slice(0, Math.max(0, commonCount)).map((c) => c.id);
+    .filter((card) => isFactionEnabled(card.faction))
+    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
+    .map((card) => card.id);
+  const commonsPool = configuredCommonPool.length > 0
+    ? configuredCommonPool
+    : fallbackCommonPool;
+  const commonIds = commonsPool.slice(0, Math.max(0, commonCount));
 
   const baseIds = dedupePreserveOrder([...selectedIds, ...commonIds]);
   if (baseIds.length === 0) return [];
@@ -214,13 +257,30 @@ export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions
   if (!useFramework) return createClassicStarterDeck(side);
 
   const mainFaction = toFrameworkFactionName(options?.mainFaction ?? CORE_FACTION_NAMES[0]);
+  const enabledFactions = normalizeEnabledFactions(options?.enabledFactions ?? DEFAULT_CARD_POOL_CONFIG.enabledFactions);
+  const genericCardIds = options?.genericCardIds ?? DEFAULT_CARD_POOL_CONFIG.genericCardIds;
+  const mainFactionCardCount = options?.mainFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount;
+  const guestFactionCardCount = options?.guestFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount;
+  const commonCount = options?.includeCommons ?? DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount;
+  const deckSize = options?.deckSize ?? DEFAULT_DECK_BUILD_DEFAULTS.deckSize;
+  const computedGuestCount = Math.max(
+    0,
+    Math.floor((deckSize - mainFactionCardCount - commonCount) / Math.max(1, guestFactionCardCount))
+  );
   const guestFactions = options?.guestFactions?.length
     ? options.guestFactions.map((f) => toFrameworkFactionName(f))
-    : rollGuestFactions(mainFaction, options?.guestCount ?? DEFAULT_GUEST_COUNT);
-  const commonCount = options?.includeCommons ?? DEFAULT_COMMON_COUNT;
-  const deckSize = options?.deckSize ?? DEFAULT_FRAMEWORK_DECK_SIZE;
+    : rollGuestFactions(mainFaction, options?.guestCount ?? computedGuestCount);
 
-  const ids = getDeckIdsForFactionFramework(mainFaction, guestFactions, commonCount, deckSize);
+  const ids = getDeckIdsForFactionFramework(
+    mainFaction,
+    guestFactions,
+    mainFactionCardCount,
+    guestFactionCardCount,
+    commonCount,
+    deckSize,
+    genericCardIds,
+    enabledFactions
+  );
   const deck: DebateCard[] = [];
   ids.forEach((id, idx) => {
     const src = SHOWCASE_MAP[id];

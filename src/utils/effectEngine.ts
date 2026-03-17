@@ -1,4 +1,4 @@
-import { GameState, PlayerId, CharacterInstance, PlayerState } from '@/types';
+﻿import { GameState, PlayerId, CharacterInstance, PlayerState } from '@/types';
 import { drawCard, createLogEntry } from './gameLogic';
 
 // ==================== 文本效果解析与执行 ====================

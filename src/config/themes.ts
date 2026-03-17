@@ -1,4 +1,4 @@
-export type ThemeId = 'ancient-gold' | 'ink-wash' | 'jade-emerald';
+﻿export type ThemeId = 'ancient-gold' | 'ink-wash' | 'jade-emerald';
 
 export interface ThemeColors {
   id: ThemeId;

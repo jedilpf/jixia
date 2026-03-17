@@ -1,4 +1,4 @@
-export interface BBox {
+﻿export interface BBox {
   x: number;
   y: number;
   w: number;

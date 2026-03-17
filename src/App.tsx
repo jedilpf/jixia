@@ -1,47 +1,86 @@
-import { useEffect, useRef, useState } from 'react';
-import { BattleFrameV2 } from '@/components/BattleFrameV2';
+﻿import { useEffect, useRef, useState } from 'react';
+import BattleFrameV2 from '@/components/BattleFrameV2';
 import { BattleSetup } from '@/components/BattleSetup';
 import { MainMenu, AppSettings, BrightnessOverlay } from '@/components/MainMenu';
 import { TransitionScreen } from '@/components/TransitionScreen';
 import { CharactersView } from '@/components/CharactersView';
 import { CardShowcase } from '@/components/CardShowcase';
+import { PreBattleFlow, PreBattleResult } from '@/components/PreBattleFlow';
+import { GameErrorBoundary } from '@/components/GameErrorBoundary';
+import { AppStoreProvider } from '@/app/store';
+import { MvpFlowShell } from '@/ui/screens/MvpFlowShell';
 import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
-type GameScreen = 'menu' | 'transition' | 'battle_setup' | 'battle' | 'collection' | 'characters';
+type GameScreen =
+  | 'menu'
+  | 'transition'
+  | 'battle_setup'
+  | 'pre_battle'
+  | 'battle'
+  | 'collection'
+  | 'characters';
 
 function App() {
+  const useMvpFlow =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('newFlow') === '1';
+
+  if (useMvpFlow) {
+    return (
+      <ThemeProvider>
+        <div className="relative h-dvh w-full overflow-hidden bg-[#0f0d0a] text-[#f0ddbb]">
+          <AppStoreProvider>
+            <MvpFlowShell />
+          </AppStoreProvider>
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  const isElectronRuntime =
+    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
   const [hasStarted, setHasStarted] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [screen, setScreen] = useState<GameScreen>('menu');
   const [battleFadeIn, setBattleFadeIn] = useState(false);
   const [selectedArenaId, setSelectedArenaId] = useState<ArenaId>('jixia');
   const [battleSessionKey, setBattleSessionKey] = useState(1);
+  const [preBattleResult, setPreBattleResult] = useState<PreBattleResult | null>(null);
+  const [screenRecoveryKey, setScreenRecoveryKey] = useState(0);
 
   const audioHallRef = useRef<HTMLAudioElement | null>(null);
   const audioBattleRef = useRef<HTMLAudioElement | null>(null);
+  const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
   useEffect(() => {
-    audioHallRef.current = new Audio('assets/bgm-hall.mp3');
+    if (isElectronRuntime) return;
+    audioHallRef.current = new Audio(asset('assets/bgm-hall.mp3'));
     audioHallRef.current.loop = true;
 
-    audioBattleRef.current = new Audio('assets/bgm-battle.mp3');
+    audioBattleRef.current = new Audio(asset('assets/bgm-battle.mp3'));
     audioBattleRef.current.loop = true;
 
     return () => {
       audioHallRef.current?.pause();
       audioBattleRef.current?.pause();
     };
-  }, []);
+  }, [isElectronRuntime]);
 
   useEffect(() => {
+    if (isElectronRuntime) return;
     if (!audioHallRef.current || !audioBattleRef.current) return;
     if (!hasStarted && !isFadingOut) return;
 
-    uiAudio.loadCustomSound('card-hover', '/assets/卡牌声音.mp3');
+    uiAudio.loadCustomSound('card-hover', asset('assets/卡牌声音.mp3'));
 
-    if (screen === 'menu' || screen === 'characters' || screen === 'collection' || screen === 'battle_setup') {
+    if (
+      screen === 'menu' ||
+      screen === 'characters' ||
+      screen === 'collection' ||
+      screen === 'battle_setup' ||
+      screen === 'pre_battle'
+    ) {
       audioBattleRef.current.pause();
       audioBattleRef.current.currentTime = 0;
       audioHallRef.current.play().catch(console.warn);
@@ -58,7 +97,7 @@ function App() {
       audioHallRef.current.currentTime = 0;
       audioBattleRef.current.play().catch(console.warn);
     }
-  }, [screen, hasStarted, isFadingOut]);
+  }, [screen, hasStarted, isFadingOut, isElectronRuntime]);
 
   const [settings, setSettings] = useState<AppSettings>({
     masterVolume: 0.8,
@@ -73,6 +112,7 @@ function App() {
   };
 
   useEffect(() => {
+    if (isElectronRuntime) return;
     if (settings.fullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((error) => console.log('Fullscreen failed', error));
     } else if (!settings.fullscreen && document.fullscreenElement) {
@@ -80,17 +120,33 @@ function App() {
     }
 
     uiAudio.init();
-    uiAudio.loadCustomSound('card-hover', '/assets/卡牌声音.mp3');
-  }, [settings.fullscreen]);
+    uiAudio.loadCustomSound('card-hover', asset('assets/卡牌声音.mp3'));
+  }, [settings.fullscreen, isElectronRuntime]);
 
   useEffect(() => {
+    const handleWindowError = (event: ErrorEvent) => {
+      console.error('[window:error]', event.message, event.error);
+    };
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('[window:unhandledrejection]', event.reason);
+    };
+    window.addEventListener('error', handleWindowError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => {
+      window.removeEventListener('error', handleWindowError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isElectronRuntime) return;
     const bgmVolume = settings.masterVolume * settings.bgmVolume;
     const sfxVolume = settings.masterVolume * settings.sfxVolume;
 
     if (audioHallRef.current) audioHallRef.current.volume = bgmVolume;
     if (audioBattleRef.current) audioBattleRef.current.volume = bgmVolume;
     uiAudio.setVolume(sfxVolume);
-  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume]);
+  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume, isElectronRuntime]);
 
   const handleStartGame = () => setScreen('transition');
 
@@ -99,6 +155,13 @@ function App() {
   };
 
   const handleStartBattle = () => {
+    setPreBattleResult(null);
+    setBattleFadeIn(false);
+    setScreen('pre_battle');
+  };
+
+  const handlePreBattleComplete = (result: PreBattleResult) => {
+    setPreBattleResult(result);
     setBattleFadeIn(true);
     setBattleSessionKey((k) => k + 1);
     setScreen('battle');
@@ -110,12 +173,18 @@ function App() {
 
   const handleBackToMenu = () => {
     setBattleFadeIn(false);
+    setPreBattleResult(null);
     setScreen('menu');
   };
 
   const handleReselectArena = () => {
     setBattleFadeIn(false);
+    setPreBattleResult(null);
     setScreen('battle_setup');
+  };
+
+  const retryCurrentScreen = () => {
+    setScreenRecoveryKey((k) => k + 1);
   };
 
   if (!hasStarted) {
@@ -155,37 +224,78 @@ function App() {
         />
       ) : null}
 
-      {screen === 'transition' ? <TransitionScreen onComplete={handleTransitionComplete} /> : null}
+      {screen === 'transition' ? (
+        <GameErrorBoundary
+          key={`transition-${screenRecoveryKey}`}
+          screenName="transition"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <TransitionScreen onComplete={handleTransitionComplete} />
+        </GameErrorBoundary>
+      ) : null}
 
       {screen === 'battle_setup' ? (
-        <BattleSetup
-          selectedArenaId={selectedArenaId}
-          onSelectArena={setSelectedArenaId}
-          onStartBattle={handleStartBattle}
-          onBackMenu={handleBackToMenu}
-        />
+        <GameErrorBoundary
+          key={`battle-setup-${screenRecoveryKey}`}
+          screenName="battle_setup"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <BattleSetup
+            selectedArenaId={selectedArenaId}
+            onSelectArena={setSelectedArenaId}
+            onStartBattle={handleStartBattle}
+            onBackMenu={handleBackToMenu}
+          />
+        </GameErrorBoundary>
+      ) : null}
+
+      {screen === 'pre_battle' ? (
+        <GameErrorBoundary
+          key={`pre-battle-${screenRecoveryKey}`}
+          screenName="pre_battle"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <PreBattleFlow
+            arenaId={selectedArenaId}
+            onCancel={handleReselectArena}
+            onComplete={handlePreBattleComplete}
+          />
+        </GameErrorBoundary>
       ) : null}
 
       {screen === 'battle' ? (
-        <div className="relative h-full w-full">
-          <BattleFrameV2
-            key={battleSessionKey}
-            arenaId={selectedArenaId}
-            onMenu={handleBackToMenu}
-            onReselectArena={handleReselectArena}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              pointerEvents: 'none',
-              background: '#000',
-              opacity: battleFadeIn ? 1 : 0,
-              transition: battleFadeIn ? 'none' : 'opacity 0.8s ease-out',
-              zIndex: 100,
-            }}
-          />
-        </div>
+        <GameErrorBoundary
+          key={`battle-${battleSessionKey}-${screenRecoveryKey}`}
+          screenName="battle"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <div className="relative h-full w-full">
+            <BattleFrameV2
+              key={battleSessionKey}
+              arenaId={selectedArenaId}
+              forcedTopicId={preBattleResult?.topicId}
+              playerMainFaction={preBattleResult?.playerFaction}
+              enemyMainFaction={preBattleResult?.enemyFaction}
+              onMenu={handleBackToMenu}
+              onReselectArena={handleReselectArena}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                background: '#000',
+                opacity: battleFadeIn ? 1 : 0,
+                transition: battleFadeIn ? 'none' : 'opacity 0.8s ease-out',
+                zIndex: 100,
+              }}
+            />
+          </div>
+        </GameErrorBoundary>
       ) : null}
 
       {screen === 'collection' ? <CardShowcase onBack={handleBackToMenu} /> : null}

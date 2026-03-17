@@ -1,4 +1,4 @@
-import { Card } from './cards';
+﻿import { Card } from './cards';
 import { Hero, CharacterInstance, FieldInstance } from './instances';
 
 export type PlayerId = 'player' | 'enemy';

@@ -1,4 +1,4 @@
-class UIAudioManager {
+﻿class UIAudioManager {
     private static instance: UIAudioManager;
     private ctx: AudioContext | null = null;
     private masterGain: GainNode | null = null;

@@ -1,4 +1,4 @@
-import { BBox } from '@/types/layout';
+﻿import { BBox } from '@/types/layout';
 
 // ==================== 类型定义 ====================
 

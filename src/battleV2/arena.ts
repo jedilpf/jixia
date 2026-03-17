@@ -1,4 +1,4 @@
-import { ArenaId } from './types';
+﻿import { ArenaId } from './types';
 
 export interface ArenaDefinition {
   id: ArenaId;

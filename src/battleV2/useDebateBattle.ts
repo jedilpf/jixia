@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useReducer } from 'react';
-import { battleReducer, createInitialBattleState, CreateBattleStateOptions } from './engine';
-import { DebateBattleState, PlanSlot, SeatId, TargetableSlot } from './types';
+﻿﻿﻿﻿import { useEffect, useMemo, useReducer } from 'react';
+import { battleReducer, createInitialBattleState, CreateBattleStateOptions, getPublicSubmitInfo, getRevealData } from './engine';
+import { DebateBattleState, PlanSlot, SeatId, TargetableSlot, Zone, PublicSubmitInfo, RevealData } from './types';
 
 export interface DebateBattleController {
   state: DebateBattleState;
@@ -9,6 +9,11 @@ export interface DebateBattleController {
   setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => void;
   lockPublic: () => void;
   lockSecret: () => void;
+  submitCard: (cardId: string, zone: Zone, useToken: boolean) => void;
+  pass: () => void;
+  confirmSubmit: () => void;
+  getEnemyPublicInfo: () => PublicSubmitInfo;
+  getRevealDataState: () => RevealData | null;
 }
 
 export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattleController {
@@ -52,6 +57,11 @@ export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattl
       setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => dispatch({ type: 'SET_TARGET_SEAT', slot, seatId }),
       lockPublic: () => dispatch({ type: 'LOCK_PUBLIC' }),
       lockSecret: () => dispatch({ type: 'LOCK_SECRET' }),
+      submitCard: (cardId: string, zone: Zone, useToken: boolean) => dispatch({ type: 'SUBMIT_CARD', cardId, zone, useToken }),
+      pass: () => dispatch({ type: 'PASS' }),
+      confirmSubmit: () => dispatch({ type: 'CONFIRM_SUBMIT' }),
+      getEnemyPublicInfo: () => getPublicSubmitInfo(state.enemy),
+      getRevealDataState: () => getRevealData(state),
     }),
     [state]
   );
