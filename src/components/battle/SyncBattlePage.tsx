@@ -1,4 +1,4 @@
-﻿﻿﻿﻿import React, { useEffect } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿import React, { useEffect } from 'react';
 import { useSyncBattle } from '@/hooks/useSyncBattle';
 import SyncBattleUI from './SyncBattleUI';
 import { BattleBoardSync } from './BattleBoardSync';
