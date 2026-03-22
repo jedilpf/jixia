@@ -2,9 +2,12 @@
 
 interface HomeScreenProps {
   onStart: () => void;
+  onStartLocal: () => void;
+  onRules?: () => void;
+  onDevTest?: () => void;
 }
 
-export function HomeScreen({ onStart }: HomeScreenProps) {
+export function HomeScreen({ onStart, onStartLocal, onRules, onDevTest }: HomeScreenProps) {
   return (
     <div
       className="relative flex h-full items-center justify-center overflow-hidden"
@@ -24,24 +27,70 @@ export function HomeScreen({ onStart }: HomeScreenProps) {
             围绕中央议题，在主议与旁议中提交牌组组合。每 3 轮将触发一次议题引爆判定，
             争夺方向优势与大势胜机。
           </p>
-          <button
-            type="button"
-            className="mt-10 rounded-lg border px-8 py-3 text-base font-semibold transition"
-            style={{
-              borderColor: '#b88a53',
-              background: PRE_BATTLE_COLORS.button,
-              color: '#f6e4c3',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = PRE_BATTLE_COLORS.buttonHover;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = PRE_BATTLE_COLORS.button;
-            }}
-            onClick={onStart}
-          >
-            开始对战
-          </button>
+          <div className="mt-10 grid max-w-[480px] grid-cols-2 gap-3">
+            <button
+              type="button"
+              className="rounded-lg border px-6 py-3 text-base font-semibold transition"
+              style={{
+                borderColor: '#b88a53',
+                background: PRE_BATTLE_COLORS.button,
+                color: '#f6e4c3',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = PRE_BATTLE_COLORS.buttonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = PRE_BATTLE_COLORS.button;
+              }}
+              onClick={onStart}
+            >
+              开始对战
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border px-6 py-3 text-base font-semibold transition"
+              style={{
+                borderColor: '#b88a53',
+                background: PRE_BATTLE_COLORS.button,
+                color: '#f6e4c3',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = PRE_BATTLE_COLORS.buttonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = PRE_BATTLE_COLORS.button;
+              }}
+              onClick={onStartLocal}
+            >
+              本地双人
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border px-6 py-2 text-sm font-semibold transition disabled:opacity-45"
+              style={{
+                borderColor: 'rgba(184,136,84,0.45)',
+                background: PRE_BATTLE_COLORS.panelSoft,
+                color: '#d4bf99',
+              }}
+              onClick={() => onRules?.()}
+              disabled={!onRules}
+            >
+              规则说明
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border px-6 py-2 text-sm font-semibold transition disabled:opacity-45"
+              style={{
+                borderColor: 'rgba(184,136,84,0.45)',
+                background: PRE_BATTLE_COLORS.panelSoft,
+                color: '#d4bf99',
+              }}
+              onClick={() => onDevTest?.()}
+              disabled={!onDevTest}
+            >
+              开发测试入口
+            </button>
+          </div>
         </div>
 
         <div className="relative w-[300px] overflow-hidden rounded-xl border" style={{ borderColor: 'rgba(184,136,84,0.45)' }}>

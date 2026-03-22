@@ -6,9 +6,17 @@ interface FactionPickScreenProps {
   options: string[];
   lockedFactionId: string | null;
   onConfirm: (factionId: string) => void;
+  title?: string;
+  subtitle?: string;
 }
 
-export function FactionPickScreen({ options, lockedFactionId, onConfirm }: FactionPickScreenProps) {
+export function FactionPickScreen({
+  options,
+  lockedFactionId,
+  onConfirm,
+  title = '门派抉择',
+  subtitle = '从本局可选门派中确认你的论道阵营',
+}: FactionPickScreenProps) {
   const [selected, setSelected] = useState<string | null>(lockedFactionId);
   const factionMap = useMemo(() => new Map(FACTIONS.map((f) => [f.id, f])), []);
 
@@ -27,8 +35,8 @@ export function FactionPickScreen({ options, lockedFactionId, onConfirm }: Facti
         className="relative w-[980px] rounded-2xl border p-6"
         style={{ borderColor: PRE_BATTLE_COLORS.border, background: PRE_BATTLE_COLORS.panel }}
       >
-        <h2 className="text-2xl font-bold tracking-[0.06em]" style={{ color: PRE_BATTLE_COLORS.textMain }}>门派抉择</h2>
-        <p className="mt-2 text-sm" style={{ color: PRE_BATTLE_COLORS.textMuted }}>从本局可选门派中确认你的论道阵营</p>
+        <h2 className="text-2xl font-bold tracking-[0.06em]" style={{ color: PRE_BATTLE_COLORS.textMain }}>{title}</h2>
+        <p className="mt-2 text-sm" style={{ color: PRE_BATTLE_COLORS.textMuted }}>{subtitle}</p>
 
         <div className="mt-5 grid grid-cols-2 gap-4">
           {options.map((id) => {

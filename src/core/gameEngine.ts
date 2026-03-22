@@ -99,6 +99,15 @@ function createEmptyPlayer(id: PlayerId, name: string, config: GameConfig): Play
   };
 }
 
+function createDefaultLocalBattleMeta() {
+  return {
+    currentActingPlayerId: 'player' as PlayerId,
+    pendingHandover: false,
+    handVisibilityOwnerId: null as PlayerId | null,
+    setupStep: 'idle' as const,
+  };
+}
+
 function buildFactionDeck(factionId: string, ownerId: PlayerId, config: GameConfig): CardInstance[] {
   const factionCards = CARDS.filter((card) => card.factionId === factionId);
   const neutralCards = CARDS.filter((card) => card.factionId === 'neutral');
@@ -193,6 +202,7 @@ function dominantDirectionFromWinner(
 export function createInitialGameState(config: GameConfig = DEFAULT_GAME_CONFIG): GameState {
   return {
     screen: 'home',
+    gameMode: 'single_ai',
     round: 0,
     activePlayerId: 'player',
     winnerId: null,
@@ -224,6 +234,7 @@ export function createInitialGameState(config: GameConfig = DEFAULT_GAME_CONFIG)
     },
     availableIssueIds: ISSUES.map((i) => i.id),
     selectedIssuePreviewIds: [],
+    localBattleMeta: createDefaultLocalBattleMeta(),
     config,
     seededAt: Date.now(),
   };
@@ -244,6 +255,7 @@ export function startMatchFlow(state: GameState): GameState {
   const next = {
     ...state,
     screen: 'match' as const,
+    gameMode: 'single_ai' as const,
     selectedIssuePreviewIds: issueIds,
     issueState: createIssueState(chosenIssue, state.config.issueTriggerThreshold, state.config.burstCheckEvery),
     supportScore: {
@@ -263,9 +275,118 @@ export function startMatchFlow(state: GameState): GameState {
       player: { ...state.players.player, factionId: null },
       enemy: { ...state.players.enemy, factionId: null },
     },
+    localBattleMeta: createDefaultLocalBattleMeta(),
   };
 
   return appendLog(next, `匹配开始，中央议题种子：${chosenIssue.seedPrompt}`);
+}
+
+export function startLocalPvpFlow(state: GameState): GameState {
+  const issueIds = randomPick(
+    state.availableIssueIds.length ? state.availableIssueIds : ISSUES.map((i) => i.id),
+    state.config.issueCandidateCount,
+  );
+
+  const chosenIssue = pickIssueDefinition(issueIds[0]);
+  const allFactionIds = FACTIONS.map((f) => f.id);
+  const playerFactions = randomPick(allFactionIds, state.config.factionChoiceCount);
+  const enemyFactions = randomPick(allFactionIds, state.config.factionChoiceCount);
+
+  const next = {
+    ...state,
+    screen: 'local_setup' as const,
+    gameMode: 'local_pvp' as const,
+    selectedIssuePreviewIds: issueIds,
+    issueState: createIssueState(chosenIssue, state.config.issueTriggerThreshold, state.config.burstCheckEvery),
+    supportScore: {
+      player: 0,
+      enemy: 0,
+    },
+    factionResonance: {
+      player: 0,
+      enemy: 0,
+    },
+    offeredFactionIds: {
+      player: playerFactions,
+      enemy: enemyFactions,
+    },
+    players: {
+      ...state.players,
+      player: { ...state.players.player, factionId: null },
+      enemy: { ...state.players.enemy, factionId: null },
+    },
+    localBattleMeta: {
+      currentActingPlayerId: 'player' as PlayerId,
+      pendingHandover: false,
+      handVisibilityOwnerId: null as PlayerId | null,
+      setupStep: 'idle' as const,
+    },
+  };
+
+  return appendLog(next, `本地双人准备开始，中央议题种子：${chosenIssue.seedPrompt}`);
+}
+
+export function localBeginFactionPick(state: GameState): GameState {
+  if (state.gameMode !== 'local_pvp') return state;
+  return {
+    ...state,
+    screen: 'faction_pick',
+    localBattleMeta: {
+      ...state.localBattleMeta,
+      setupStep: 'player1_pick',
+    },
+  };
+}
+
+export function localMarkHandoverToPlayer2(state: GameState): GameState {
+  if (state.gameMode !== 'local_pvp') return state;
+  return {
+    ...state,
+    screen: 'local_handover',
+    localBattleMeta: {
+      ...state.localBattleMeta,
+      setupStep: 'handover_to_player2',
+    },
+  };
+}
+
+export function localEnterPlayer2Pick(state: GameState): GameState {
+  if (state.gameMode !== 'local_pvp') return state;
+  return {
+    ...state,
+    screen: 'faction_pick',
+    localBattleMeta: {
+      ...state.localBattleMeta,
+      setupStep: 'player2_pick',
+    },
+  };
+}
+
+export function localEnterLoading(state: GameState): GameState {
+  if (state.gameMode !== 'local_pvp') return state;
+  return {
+    ...state,
+    screen: 'loading',
+    localBattleMeta: {
+      ...state.localBattleMeta,
+      setupStep: 'ready',
+      currentActingPlayerId: 'player',
+      pendingHandover: false,
+      handVisibilityOwnerId: null,
+    },
+  };
+}
+
+export function localConfirmHandover(state: GameState): GameState {
+  if (state.gameMode !== 'local_pvp') return state;
+  return {
+    ...state,
+    localBattleMeta: {
+      ...state.localBattleMeta,
+      pendingHandover: false,
+      handVisibilityOwnerId: state.localBattleMeta.currentActingPlayerId,
+    },
+  };
 }
 
 export function openTopicPreview(state: GameState): GameState {
@@ -366,6 +487,16 @@ export function startBattle(state: GameState): GameState {
       player,
       enemy,
     },
+    localBattleMeta:
+      state.gameMode === 'local_pvp'
+        ? {
+            ...state.localBattleMeta,
+            currentActingPlayerId: 'player',
+            pendingHandover: true,
+            handVisibilityOwnerId: null,
+            setupStep: 'ready',
+          }
+        : createDefaultLocalBattleMeta(),
   };
 
   return appendLog(next, `对局开始：${playerFaction} vs ${enemyFaction}，中央议题：${issueDef.seedPrompt}`);
@@ -436,9 +567,19 @@ export function playCardToZone(
     },
   };
 
+  const actorLabel =
+    state.gameMode === 'local_pvp'
+      ? playerId === 'player'
+        ? '玩家1'
+        : '玩家2'
+      : playerId === 'player'
+        ? '我方'
+        : '对手';
+  const cardLabel = state.gameMode === 'local_pvp' ? '一张牌' : card.name;
+
   return appendLog(
     next,
-    `${playerId === 'player' ? '我方' : '对手'}暗辩提交 ${card.name} 至${zone === 'main' ? '主议' : '旁议'}（${nextPlayer.cardsPlayedThisTurn}/${state.battle.maxCardsPerTurn}）`,
+    `${actorLabel}暗辩提交${cardLabel}至${zone === 'main' ? '主议' : '旁议'}（${nextPlayer.cardsPlayedThisTurn}/${state.battle.maxCardsPerTurn}）`,
   );
 }
 
@@ -601,6 +742,14 @@ export function resolveRound(state: GameState): GameState {
           winnerId === 'draw' ? '本局平局' : `${winnerId === 'player' ? '我方' : '对手'}获得胜利`,
         ],
       },
+      localBattleMeta:
+        state.gameMode === 'local_pvp'
+          ? {
+              ...state.localBattleMeta,
+              pendingHandover: false,
+              handVisibilityOwnerId: null,
+            }
+          : state.localBattleMeta,
     };
   }
 
@@ -639,8 +788,25 @@ export function resolveRound(state: GameState): GameState {
       logs: [
         ...state.battle.logs,
         ...roundLogs,
-        `进入第 ${nextRound} 回合，${nextActive === 'player' ? '我方' : '对手'}行动`,
+        `进入第 ${nextRound} 回合，${
+          state.gameMode === 'local_pvp'
+            ? nextActive === 'player'
+              ? '玩家1'
+              : '玩家2'
+            : nextActive === 'player'
+              ? '我方'
+              : '对手'
+        }行动`,
       ],
     },
+    localBattleMeta:
+      state.gameMode === 'local_pvp'
+        ? {
+            ...state.localBattleMeta,
+            currentActingPlayerId: nextActive,
+            pendingHandover: true,
+            handVisibilityOwnerId: null,
+          }
+        : state.localBattleMeta,
   };
 }

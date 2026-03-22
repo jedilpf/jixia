@@ -1,11 +1,15 @@
 ﻿export type ScreenId =
   | 'home'
   | 'match'
+  | 'local_setup'
+  | 'local_handover'
   | 'topic_preview'
   | 'faction_pick'
   | 'loading'
   | 'battle'
   | 'result';
+
+export type GameMode = 'single_ai' | 'local_pvp';
 
 export type PlayerId = 'player' | 'enemy';
 export type IssueDirectionId = 'ritual' | 'economy' | 'strategy';
@@ -139,8 +143,16 @@ export interface GameConfig {
   issueCandidateCount: number;
 }
 
+export interface LocalBattleMeta {
+  currentActingPlayerId: PlayerId;
+  pendingHandover: boolean;
+  handVisibilityOwnerId: PlayerId | null;
+  setupStep: 'idle' | 'player1_pick' | 'handover_to_player2' | 'player2_pick' | 'ready';
+}
+
 export interface GameState {
   screen: ScreenId;
+  gameMode: GameMode;
   round: number;
   activePlayerId: PlayerId;
   winnerId: PlayerId | 'draw' | null;
@@ -152,6 +164,7 @@ export interface GameState {
   offeredFactionIds: Record<PlayerId, string[]>;
   availableIssueIds: IssueId[];
   selectedIssuePreviewIds: IssueId[];
+  localBattleMeta: LocalBattleMeta;
   config: GameConfig;
   seededAt: number;
 }
