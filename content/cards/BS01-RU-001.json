@@ -1,29 +1,29 @@
 {
-  "id": "BS01-RU-004",
-  "name": "讲席清规",
+  "id": "BS01-RU-001",
+  "name": "礼序问辩",
   "faction": "儒家",
   "rarity": "common",
-  "type": "field",
-  "cost": 3,
-  "rules_text": "获得【护持3】；抽1。",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "令敌方获得【怀疑1】；抽1。",
   "keyword_ids": [
-    "护持"
+    "怀疑"
   ],
   "mechanic_ids": [
     "MEC-CORE-ORDER",
-    "MEC-CORE-DEFENSE"
+    "MEC-CORE-DRAW"
   ],
   "lore_anchor_ids": [
     "ANC-FACTION-002",
     "ANC-CONTENT-002"
   ],
   "provenance": {
-    "batch_id": "BATCH-20260322-10R1",
+    "batch_id": "BATCH-20260322-01",
     "models_used": [
-      "Codex"
+      "ChatGPT"
     ],
     "canon_version": "0.1.0",
-    "seed": "20260322-10"
+    "seed": "42"
   },
   "status": "draft"
 }

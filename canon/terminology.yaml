@@ -1,0 +1,44 @@
+version: 0.1.0
+updated_at: 2026-03-22
+owner: design-editor
+
+registered_terms:
+  - term: 护持
+    definition: 抵消即将受到的伤害，直到数值耗尽。
+  - term: 怀疑
+    definition: 降低行动稳定性的负面状态。
+  - term: 清明
+    definition: 用于描述净化与稳定状态的正面标记。
+  - term: 反制
+    definition: 在对方牌结算前打断或改写效果。
+  - term: 净化
+    definition: 移除负面状态或异常效果。
+  - term: 论场
+    definition: 对局的主要结算舞台与状态环境。
+
+allowed_card_types:
+  - spell
+  - minion
+  - field
+  - weapon
+
+allowed_rarities:
+  - common
+  - rare
+  - epic
+  - legendary
+
+allowed_rule_tokens:
+  - 抽
+  - 弃
+  - 造成
+  - 回复
+  - 获得
+  - 选择
+  - 本回合
+  - 下回合
+  - 结算
+
+notes:
+  - 新术语必须先登记再使用。
+  - 术语冲突先修术语，不直接改卡。

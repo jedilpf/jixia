@@ -41,3 +41,8 @@ typescript-errors.txt
 /node_modules
 /screenshots
 /test-results
+
+# Review bundle artifacts (generated copies, not source of truth)
+review_bundle_*/
+review_bundle_*.zip
+review_bundle_*.zip.sha256.txt

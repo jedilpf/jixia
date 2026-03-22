@@ -1,29 +1,29 @@
 {
-  "id": "BS01-MO-003",
-  "name": "机关木鸢",
+  "id": "BS01-MO-001",
+  "name": "兼守同盟",
   "faction": "墨家",
   "rarity": "common",
-  "type": "weapon",
+  "type": "spell",
   "cost": 2,
-  "rules_text": "造成2点伤害；施加【怀疑+1】。",
+  "rules_text": "获得【护持2】；抽1。",
   "keyword_ids": [
-    "怀疑"
+    "护持"
   ],
   "mechanic_ids": [
-    "MEC-CORE-COUNTER",
-    "MEC-CORE-ORDER"
+    "MEC-CORE-DEFENSE",
+    "MEC-CORE-DRAW"
   ],
   "lore_anchor_ids": [
     "ANC-FACTION-001",
     "ANC-RULE-002"
   ],
   "provenance": {
-    "batch_id": "BATCH-20260322-10R1",
+    "batch_id": "BATCH-20260322-01",
     "models_used": [
-      "Codex"
+      "ChatGPT"
     ],
     "canon_version": "0.1.0",
-    "seed": "20260322-10"
+    "seed": "42"
   },
   "status": "draft"
 }

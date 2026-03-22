@@ -1,22 +1,24 @@
 {
   "id": "BS01-RU-002",
-  "name": "????",
-  "faction": "??",
+  "name": "温言立论",
+  "faction": "儒家",
   "rarity": "common",
   "type": "spell",
-  "cost": 2,
-  "rules_text": "?1??????????1?",
-  "keyword_ids": [],
+  "cost": 1,
+  "rules_text": "施加【怀疑+1】；抽1。",
+  "keyword_ids": [
+    "怀疑"
+  ],
   "mechanic_ids": [
-    "MEC-CORE-DRAW",
-    "MEC-CORE-ORDER"
+    "MEC-CORE-ORDER",
+    "MEC-CORE-COUNTER"
   ],
   "lore_anchor_ids": [
     "ANC-FACTION-002",
     "ANC-RULE-002"
   ],
   "provenance": {
-    "batch_id": "BATCH-20260322-10",
+    "batch_id": "BATCH-20260322-10R1",
     "models_used": [
       "Codex"
     ],
