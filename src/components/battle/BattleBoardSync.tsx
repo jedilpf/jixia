@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useCallback } from 'react';
 import { CharacterInstance } from '@/types/instances';
 import { SyncPhase } from '@/types/syncBattle';
 import { MinionCard } from './MinionCard';
@@ -18,6 +18,11 @@ interface BattleBoardSyncProps {
   scale?: number;
 }
 
+interface AttackerInfo {
+  row: 'front' | 'back';
+  col: number;
+}
+
 export const BattleBoardSync: React.FC<BattleBoardSyncProps> = ({
   playerBoard,
   enemyBoard,
@@ -27,6 +32,37 @@ export const BattleBoardSync: React.FC<BattleBoardSyncProps> = ({
   scale = 1,
 }) => {
   const isInteractionAllowed = currentPhase === 'settle3';
+  const [selectedAttacker, setSelectedAttacker] = useState<AttackerInfo | null>(null);
+
+  const hasEnemyMinions = useCallback((board: BoardLayout): boolean => {
+    return board.front.some(minion => minion !== null) || board.back.some(minion => minion !== null);
+  }, []);
+
+  const enemyHasMinions = hasEnemyMinions(enemyBoard);
+
+  const handleMinionClick = useCallback((row: 'front' | 'back', col: number, side: 'player' | 'enemy') => {
+    if (!onAttack || !isInteractionAllowed) return;
+
+    if (side === 'player') {
+      const playerMinion = playerBoard[row][col];
+      if (!playerMinion || playerMinion.hasAttacked) return;
+
+      if (!enemyHasMinions) {
+        onAttack({ row, col }, 'hero');
+      } else {
+        setSelectedAttacker({ row, col });
+      }
+    } else if (side === 'enemy' && selectedAttacker) {
+      onAttack(selectedAttacker, { row, col });
+      setSelectedAttacker(null);
+    }
+  }, [onAttack, isInteractionAllowed, playerBoard, enemyBoard, enemyHasMinions, selectedAttacker]);
+
+  const handleBoardClick = useCallback((e: React.MouseEvent) => {
+    if (selectedAttacker && e.target === e.currentTarget) {
+      setSelectedAttacker(null);
+    }
+  }, [selectedAttacker]);
 
   const renderRow = (
     row: (CharacterInstance | null)[],
@@ -35,26 +71,31 @@ export const BattleBoardSync: React.FC<BattleBoardSyncProps> = ({
   ) => {
     return (
       <div className={`board-row ${rowType}-row ${side}-row`}>
-        {row.map((minion, col) => (
-          <div key={col} className="board-slot">
-            {minion ? (
-              <MinionCard
-                minion={minion}
-                isEnemy={side === 'enemy'}
-                canAttack={isPlayerTurn && side === 'player' && !minion.hasAttacked && isInteractionAllowed}
-                onClick={() => {
-                  if (onAttack && isInteractionAllowed) {
-                    onAttack({ row: rowType, col }, 'hero');
-                  }
-                }}
-              />
-            ) : (
-              <div className="empty-slot-simple">
-                <span className="slot-label">{rowType === 'front' ? '入世' : '出世'}</span>
-              </div>
-            )}
-          </div>
-        ))}
+        {row.map((minion, col) => {
+          const isSelected = selectedAttacker?.row === rowType && selectedAttacker?.col === col;
+          const isTargetable = side === 'enemy' && selectedAttacker !== null;
+
+          return (
+            <div key={col} className="board-slot">
+              {minion ? (
+                <MinionCard
+                  minion={minion}
+                  isEnemy={side === 'enemy'}
+                  canAttack={isPlayerTurn && side === 'player' && !minion.hasAttacked && isInteractionAllowed}
+                  isSelected={isSelected}
+                  onClick={() => handleMinionClick(rowType, col, side)}
+                />
+              ) : (
+                <div
+                  className={`empty-slot-simple ${isTargetable ? 'targetable' : ''}`}
+                  onClick={() => handleMinionClick(rowType, col, side)}
+                >
+                  <span className="slot-label">{rowType === 'front' ? '入世' : '出世'}</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -74,7 +115,10 @@ export const BattleBoardSync: React.FC<BattleBoardSyncProps> = ({
   };
 
   return (
-    <div className="battle-board-sync" style={{ transform: `scale(${scale})` }}>
+    <div className="battle-board-sync" style={{ transform: `scale(${scale})` }} onClick={handleBoardClick}>
+      {selectedAttacker && (
+        <div className="attack-hint">请选择攻击目标（敌方随从）</div>
+      )}
       <div className="board-section enemy-section">
         <div className="section-label">敌方出世席</div>
         {renderRow(enemyBoard.back, 'back', 'enemy')}

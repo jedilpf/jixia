@@ -1,0 +1,29 @@
+{
+  "id": "BS01-MO-004",
+  "name": "????",
+  "faction": "??",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "???????4?????????6??",
+  "keyword_ids": [
+    "??"
+  ],
+  "mechanic_ids": [
+    "MEC-CORE-DEFENSE",
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-FACTION-001",
+    "ANC-CONTENT-002"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260322-10",
+    "models_used": [
+      "Codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "20260322-10"
+  },
+  "status": "draft"
+}

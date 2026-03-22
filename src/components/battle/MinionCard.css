@@ -1,0 +1,16 @@
+/* MinionCard 组件样式 */
+
+@keyframes minion-glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.minion-card-glow {
+  animation: minion-glow 2s ease-in-out infinite;
+}

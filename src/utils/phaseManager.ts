@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import {
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import {
   SyncPhase,
   SyncGameState,
   PlayerSyncState,
@@ -17,6 +17,7 @@ export class PhaseManager {
   private phaseHistory: PhaseTransition[] = [];
   private onPhaseChange?: (transition: PhaseTransition) => void;
   private onSettlement?: (layer: number, items: SettlementItem[]) => void;
+  private isTransitioning = false;
 
   constructor() {
     this.syncState = this.createInitialSyncState();
@@ -236,30 +237,35 @@ export class PhaseManager {
   }
 
   tick(): void {
+    if (this.isTransitioning) {
+      return;
+    }
     if (this.isPhaseExpired()) {
       this.autoLockUnlockedPlayers();
+      this.isTransitioning = true;
       this.advancePhase();
+      this.isTransitioning = false;
     }
   }
 
   private autoLockUnlockedPlayers(): void {
     const currentPhase = this.syncState.currentPhase;
-    
+
     if (currentPhase === 'debate') {
-      if (!this.syncState.playerSync.isLocked) {
+      if (!this.syncState.playerSync.isLocked && !this.syncState.playerSync.debateAction) {
         this.syncState.playerSync.debateAction = { type: 'pass' };
         this.syncState.playerSync.isLocked = true;
       }
-      if (!this.syncState.enemySync.isLocked) {
+      if (!this.syncState.enemySync.isLocked && !this.syncState.enemySync.debateAction) {
         this.syncState.enemySync.debateAction = { type: 'pass' };
         this.syncState.enemySync.isLocked = true;
       }
     } else if (currentPhase === 'secret') {
-      if (!this.syncState.playerSync.isLocked) {
+      if (!this.syncState.playerSync.isLocked && !this.syncState.playerSync.secretAction) {
         this.syncState.playerSync.secretAction = { type: 'pass' };
         this.syncState.playerSync.isLocked = true;
       }
-      if (!this.syncState.enemySync.isLocked) {
+      if (!this.syncState.enemySync.isLocked && !this.syncState.enemySync.secretAction) {
         this.syncState.enemySync.secretAction = { type: 'pass' };
         this.syncState.enemySync.isLocked = true;
       }

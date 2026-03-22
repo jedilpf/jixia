@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { GameState, PlayerId } from '@/types/battle';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { GameState, PlayerId } from '@/types/battle';
 import { CharacterInstance } from '@/types/instances';
 import {
   DebateAction,
@@ -163,7 +163,7 @@ function executeLayer2_MainThesis(game: GameState, items: SettlementItem[]): Gam
 }
 
 function executeLayer3_BoardClash(game: GameState): GameState {
-  const newGame = game;
+  const newGame = JSON.parse(JSON.stringify(game)) as GameState;
 
   const playerFront = newGame.player.board.front;
   const enemyFront = newGame.enemy.board.front;
@@ -209,7 +209,7 @@ function executeLayer4_Secret(game: GameState, items: SettlementItem[]): GameSta
 }
 
 function executeLayer5_TurnEnd(game: GameState): GameState {
-  const newGame = game;
+  const newGame = JSON.parse(JSON.stringify(game)) as GameState;
 
   const processEndTurn = (minion: CharacterInstance | null, playerId: PlayerId) => {
     if (minion && minion.skillDesc) {

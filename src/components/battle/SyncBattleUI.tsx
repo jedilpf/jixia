@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useCallback } from 'react';
 import { SyncPhase, PHASE_NAMES, DebateAction, SecretAction } from '@/types/syncBattle';
 import { Card } from '@/types';
 import './SyncBattleUI.css';
@@ -49,29 +49,29 @@ export const SyncBattleUI: React.FC<SyncBattleUIProps> = ({
     }
   };
 
-  const handlePlayMain = (cardIndex: number) => {
+  const handlePlayMain = useCallback((cardIndex: number) => {
     onDebateAction({ type: 'play_main', cardIndex });
-  };
+  }, [onDebateAction]);
 
-  const handlePlayCounter = (cardIndex: number) => {
+  const handlePlayCounter = useCallback((cardIndex: number) => {
     onDebateAction({ type: 'play_counter', cardIndex });
-  };
+  }, [onDebateAction]);
 
-  const handleWriteBook = (cardIndex: number) => {
+  const handleWriteBook = useCallback((cardIndex: number) => {
     onDebateAction({ type: 'write_book', cardIndex });
-  };
+  }, [onDebateAction]);
 
-  const handlePlaySecret = (cardIndex: number) => {
+  const handlePlaySecret = useCallback((cardIndex: number) => {
     onSecretAction({ type: 'play_secret', cardIndex });
-  };
+  }, [onSecretAction]);
 
-  const handlePass = () => {
+  const handlePass = useCallback(() => {
     if (currentPhase === 'debate') {
       onDebateAction({ type: 'pass' });
     } else if (currentPhase === 'secret') {
       onSecretAction({ type: 'pass' });
     }
-  };
+  }, [currentPhase, onDebateAction, onSecretAction]);
 
   const isDebatePhase = currentPhase === 'debate';
   const isSecretPhase = currentPhase === 'secret';

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect, useCallback, useRef } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, PlayerId } from '@/types';
 import { SyncPhase, DebateAction, SecretAction, SettlementItem } from '@/types/syncBattle';
 import { SyncBattleManager, createSyncBattleManager, SyncGameCallbacks } from '@/utils/syncBattleManager';
@@ -25,7 +25,7 @@ export interface UseSyncBattleResult {
 
 export function useSyncBattle(): UseSyncBattleResult {
   const managerRef = useRef<SyncBattleManager | null>(null);
-  const [, forceUpdate] = useState({});
+  const [, setUpdateCount] = useState(0);
   
   const [game, setGame] = useState<GameState | null>(null);
   const [currentPhase, setCurrentPhase] = useState<SyncPhase>('waiting');
@@ -64,7 +64,7 @@ export function useSyncBattle(): UseSyncBattleResult {
       },
       onStateUpdate: (newGame: GameState) => {
         setGame(newGame);
-        forceUpdate({});
+        setUpdateCount(c => c + 1);
       },
     };
 

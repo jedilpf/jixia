@@ -1,5 +1,7 @@
-﻿import type { CharacterInstance } from '@/types';
+import React, { useState } from 'react';
+import type { CharacterInstance } from '@/types';
 import { rarityColor as showcaseRarityColor } from '@/data/showcaseCards';
+import './MinionCard.css';
 
 interface MinionCardProps {
   minion: CharacterInstance;
@@ -12,7 +14,7 @@ interface MinionCardProps {
   style?: React.CSSProperties;
 }
 
-export function MinionCard({
+export const MinionCard = React.memo(function MinionCard({
   minion,
   isEnemy = false,
   canAttack = false,
@@ -22,6 +24,7 @@ export function MinionCard({
   onPointerDown,
   style,
 }: MinionCardProps) {
+  const [imageError, setImageError] = useState(false);
   const rarity = minion.rarity ?? '常见';
   const rarityColor = showcaseRarityColor[rarity] || showcaseRarityColor['常见'];
   const isLow = minion.hp <= minion.maxHp * 0.35;
@@ -68,14 +71,33 @@ export function MinionCard({
       }}
     >
       {/* 底部全画幅原图 */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `url(assets/cards/${imageId}.jpg)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 20%',
-        opacity: 0.85,
-        zIndex: 0
-      }} />
+      {!imageError ? (
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(assets/cards/${imageId}.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 20%',
+          opacity: 0.85,
+          zIndex: 0
+        }}
+        onError={() => setImageError(true)}
+        />
+      ) : (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: `linear-gradient(135deg, ${rarityColor}33 0%, ${rarityColor}11 100%)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 0
+        }}>
+          <span style={{
+            fontSize: '32px',
+            color: rarityColor,
+            opacity: 0.5
+          }}>牌</span>
+        </div>
+      )}
 
       {/* 渐变遮罩，使底部文字和血条清晰可见 */}
       <div style={{
@@ -196,13 +218,6 @@ export function MinionCard({
         background: `linear-gradient(90deg, transparent, ${rarityColor}55, transparent)`,
         zIndex: 2
       }} />
-
-      <style>{`
-        @keyframes minion-glow {
-          0%,100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.02); }
-        }
-      `}</style>
     </div>
   );
-}
+});
