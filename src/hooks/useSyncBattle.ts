@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect, useCallback, useRef } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, PlayerId } from '@/types';
 import { SyncPhase, DebateAction, SecretAction, SettlementItem } from '@/types/syncBattle';
 import { SyncBattleManager, createSyncBattleManager, SyncGameCallbacks } from '@/utils/syncBattleManager';

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
 import { CharacterInstance } from '@/types/instances';
 import { SyncPhase } from '@/types/syncBattle';
 import { MinionCard } from './MinionCard';

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿import { GameState, PlayerId } from '@/types/battle';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { GameState, PlayerId } from '@/types/battle';
 import { DebateAction, SecretAction, SyncPhase, SettlementItem } from '@/types/syncBattle';
 import { PhaseManager } from './phaseManager';
 import { CommandProcessor, createCommandProcessor, DebateActionCommand, SecretActionCommand, LockDecisionCommand } from './commandSystem';

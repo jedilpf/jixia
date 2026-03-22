@@ -1,119 +1,147 @@
-# 《谋天下·问道百家》项目文档索引
+# 《谋天下·问道百家》项目文档索引 v2.0
 
-## 文档目录结构
+## 一、文档目录结构
 
 ```
 docs/
-├── index.md                          # 文档索引（本文档）
-├── 项目整理方案_v1.md                 # 项目整理方案
-├── 多版本设计文档梳理报告.md           # 多版本文档梳理报告
-├── 项目演示视频字幕文案.md             # 演示视频字幕
+├── index.md                    # 文档索引（本文档）
+├── 文档命名规范_v1.md          # 命名规范
+├── 文档变更记录.md             # 变更历史
+├── 多版本设计文档梳理报告.md   # 版本梳理报告
 │
-├── game-design/                      # 游戏设计文档
-│   ├── 核心战斗规则_v1.2.md          # 核心战斗规则（整合版）
-│   ├── 门派设定全集_v1.2.md          # 门派设定全集（整合版）
-│   ├── 百家争鸣_核心战斗规则规范_v0.2.md  # 原始文档
-│   ├── 战斗机制总说明_v1.md          # 原始文档
-│   ├── 对战系统文档索引.md
-│   ├── 游戏机制深度分析.md
-│   ├── 游戏设计白皮书.md
-│   ├── BALANCE_SUMMARY.md
-│   ├── CARD_BALANCE_CHANGES_V02.md
-│   ├── CARD_BALANCE_EVALUATION.md
-│   ├── CARD_STATS_VISUALIZATION.md
-│   ├── CARD_TEXT_ADAPTATION.md
-│   ├── 首发4个论场完整设定文档_v1.md
-│   ├── 后期开发总策划_基于战斗方式_v1.md
-│   └── 游戏机制分析_现有原型卡整理.md
+├── battle/                     # 战斗系统文档
+│   ├── battle-design-核心规则-v1.2.md
+│   ├── battle-design-门派全集-v1.2.md
+│   ├── battle-design-索引.md
+│   ├── battle-design-机制分析.md
+│   ├── battle-design-明谋暗辩规划-v1.md
+│   ├── battle-spec-同步对战.md
+│   └── dev/
+│       ├── battle-dev-明谋暗辩实现-v2.md
+│       ├── battle-test-集成测试-v1.md
+│       ├── battle-test-验收报告-v1.md
+│       └── battle-guide-游戏机制.md
 │
-├── development/                      # 开发文档
-│   ├── 百家争鸣_项目完整方案_v1.md
-│   ├── 百家争鸣_明谋暗辩_开发实现说明_v2.md
-│   ├── 明谋暗辩_需求分析_v1.md
-│   ├── 明谋暗辩_规划设计_v1.md
-│   ├── 明谋暗辩_开发规划_v1.md
-│   ├── 明谋暗辩_集成测试报告_v1.md
-│   ├── 明谋暗辩_验收交付_v1.md
-│   ├── 知识库-01-项目总览.md
-│   ├── 知识库-02-技术架构.md
-│   ├── 知识库-03-开发进度.md
-│   ├── 知识库-04-游戏机制.md
-│   ├── 知识库-05-开发者指南.md
-│   └── 知识库-06-AI技能说明.md
+├── card/                       # 卡牌系统文档
+│   ├── card-balance-总览.md
+│   ├── card-balance-变更记录-v0.2.md
+│   ├── card-balance-评估.md
+│   ├── card-balance-数据可视化.md
+│   ├── card-design-文本规范.md
+│   └── card-design-原型卡整理.md
 │
-├── ui-design/                        # UI设计文档
-│   ├── 首发战斗界面框架_v1.md
-│   ├── style-pass-bronze-mechanism.md
-│   ├── style-pass-bronze-mechanism.docx
-│   └── 卡牌设计假设与统一视觉规范.docx
+├── faction/                    # 学派系统文档
+│   └── faction-design-门派全集-v1.2.md
 │
-├── specs/                            # 规格文档
-│   └── SYNC_BATTLE_DESIGN.md        # 同步对战设计规格
+├── ui/                         # 用户界面文档
+│   ├── ui-design-战斗界面框架-v1.md
+│   ├── ui-design-稷下风格规范.md
+│   ├── ui-design-稷下风格规范.docx
+│   └── ui-design-卡牌设计规范.docx
 │
-├── design-system/                    # 设计系统
+├── project/                    # 项目管理文档
+│   ├── project-design-完整方案-v1.md
+│   ├── project-design-白皮书.md
+│   ├── project-plan-后期开发-v1.md
+│   ├── project-plan-明谋暗辩-v1.md
+│   ├── project-req-明谋暗辩-v1.md
+│   ├── project-record-开发进度.md
+│   └── analysis/
+│       └── project-analysis-代码分析.md
+│
+├── dev/                        # 开发技术文档
+│   ├── dev-guide-项目总览.md
+│   ├── dev-spec-技术架构.md
+│   ├── dev-guide-开发者指南.md
+│   └── dev-guide-AI技能.md
+│
+├── design-system/             # 设计系统
 │   ├── design-tokens.css
 │   ├── design-tokens.json
 │   └── design-tokens.scss
 │
-├── analysis/                         # 分析报告
-│   └── repo-file-metrics-brief.md
-│
-└── archive/                          # 历史文档（只读）
-    ├── old-versions/                 # 旧版本文档
-    │   ├── 卡牌设计.md
-    │   ├── 卡牌游戏框架审查报告_v1.md
-    │   ├── 优化相关文档...
-    │   └── 开发步骤文档...
-    │
-    └── references/                   # 参考资料
-        ├── 核心信息提取.md
-        ├── 稷下论道_Master_GDD_v1.1.md
-        ├── 稷下策划案.pdf
-        ├── 软著申请材料.md
-        └── 阅读这个项目：...pdf
+└── archive/                    # 归档文档
+    ├── battle-design-历史版本/
+    ├── ui-design-历史版本/
+    ├── old-versions/
+    └── references/
 ```
-
-## 快速导航
-
-### 新开发者入门
-1. 先阅读 [百家争鸣_项目完整方案_v1.md](development/百家争鸣_项目完整方案_v1.md)
-2. 查看 [知识库-01-项目总览.md](development/知识库-01-项目总览.md)
-3. 参考 [知识库-05-开发者指南.md](development/知识库-05-开发者指南.md)
-
-### 游戏设计了解
-1. [核心战斗规则_v1.2.md](game-design/核心战斗规则_v1.2.md) - **推荐**
-2. [门派设定全集_v1.2.md](game-design/门派设定全集_v1.2.md) - **推荐**
-3. [百家争鸣_核心战斗规则规范_v0.2.md](game-design/百家争鸣_核心战斗规则规范_v0.2.md)
-4. [首发4个论场完整设定文档_v1.md](game-design/首发4个论场完整设定文档_v1.md)
-
-### UI设计参考
-1. [首发战斗界面框架_v1.md](ui-design/首发战斗界面框架_v1.md)
-2. [style-pass-bronze-mechanism.md](ui-design/style-pass-bronze-mechanism.md)
-
-### 同步对战系统
-1. [SYNC_BATTLE_DESIGN.md](specs/SYNC_BATTLE_DESIGN.md)
-2. [百家争鸣_明谋暗辩_开发实现说明_v2.md](development/百家争鸣_明谋暗辩_开发实现说明_v2.md)
 
 ---
 
-## 版本说明
+## 二、快速导航
 
-### 当前版本：v1.2
-
-核心文档已整合为以下两个主文档：
+### 2.1 游戏设计师入口
 
 | 文档 | 说明 |
 |------|------|
-| 核心战斗规则_v1.2.md | 整合版核心战斗规则，包含全局规则、游戏流程、论场系统 |
-| 门派设定全集_v1.2.md | 整合版门派设定，包含16门派详细设计和卡牌数据 |
+| [battle-design-核心规则-v1.2.md](battle/battle-design-核心规则-v1.2.md) | 核心战斗规则（**推荐**） |
+| [faction-design-门派全集-v1.2.md](faction/faction-design-门派全集-v1.2.md) | 门派设定全集（**推荐**） |
+| [card-balance-总览.md](card/card-balance-总览.md) | 卡牌平衡性总结 |
+| [ui-design-稷下风格规范.md](ui/ui-design-稷下风格规范.md) | 视觉风格规范 |
 
-### 整合来源
+### 2.2 开发者入口
 
-- 4门派版本（首发版）
-- 9门派版本（扩展版）
-- 16门派版本（完整版 v1.2）
+| 文档 | 说明 |
+|------|------|
+| [dev-guide-项目总览.md](dev/dev-guide-项目总览.md) | 项目总览 |
+| [dev-spec-技术架构.md](dev/dev-spec-技术架构.md) | 技术架构 |
+| [dev-guide-开发者指南.md](dev/dev-guide-开发者指南.md) | 开发者指南 |
+| [battle-dev-明谋暗辩实现-v2.md](battle/dev/battle-dev-明谋暗辩实现-v2.md) | 同步对战实现说明 |
 
-详见 [多版本设计文档梳理报告.md](多版本设计文档梳理报告.md)
+### 2.3 项目管理者入口
+
+| 文档 | 说明 |
+|------|------|
+| [project-design-完整方案-v1.md](project/project-design-完整方案-v1.md) | 项目完整方案 |
+| [project-plan-后期开发-v1.md](project/project-plan-后期开发-v1.md) | 后期开发策划 |
+| [project-record-开发进度.md](project/record/project-record-开发进度.md) | 开发进度记录 |
+
+---
+
+## 三、命名规范
+
+### 3.1 命名格式
+
+```
+[模块]-[类型]-[主题关键词]-[版本].扩展名
+```
+
+### 3.2 模块标识
+
+| 标识 | 中文名 |
+|------|--------|
+| battle | 战斗系统 |
+| card | 卡牌系统 |
+| faction | 学派系统 |
+| ui | 用户界面 |
+| project | 项目管理 |
+| dev | 开发技术 |
+
+### 3.3 类型标识
+
+| 标识 | 中文名 |
+|------|--------|
+| design | 设计文档 |
+| spec | 规格文档 |
+| guide | 指南手册 |
+| report | 报告文档 |
+| plan | 规划文档 |
+| req | 需求文档 |
+| record | 记录文档 |
+| balance | 平衡性 |
+
+---
+
+## 四、版本说明
+
+### 当前版本：v1.2
+
+| 版本 | 日期 | 说明 |
+|------|------|------|
+| v1.2 | 2026-03-21 | 整合16门派完整版 |
+| v1.1 | - | 9门派扩展版 |
+| v1.0 | - | 4门派首发版 |
 
 ---
 

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React from 'react';
 import { SyncPhase, PHASE_NAMES, DebateAction, SecretAction } from '@/types/syncBattle';
 import { Card } from '@/types';
 import './SyncBattleUI.css';
