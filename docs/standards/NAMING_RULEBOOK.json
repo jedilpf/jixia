@@ -1,0 +1,433 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://jixia.game/schemas/naming-rules.json",
+  "title": "《谋天下·问道百家》命名规则规则书",
+  "version": "2.0.0",
+  "updated_at": "2026-03-23",
+  "description": "机器可读的命名规范规则定义，供AI系统和自动化工具使用",
+
+  "definitions": {
+    "NamingCase": {
+      "type": "string",
+      "enum": ["camelCase", "PascalCase", "snake_case", "SCREAMING_SNAKE_CASE", "kebab-case"],
+      "description": "命名风格类型"
+    },
+    
+    "Language": {
+      "type": "string",
+      "enum": ["en", "zh", "mixed"],
+      "description": "命名使用的语言"
+    },
+    
+    "ElementType": {
+      "type": "string",
+      "enum": [
+        "variable",
+        "function",
+        "class",
+        "interface",
+        "typeAlias",
+        "enum",
+        "enumMember",
+        "constant",
+        "file_component",
+        "file_util",
+        "file_type",
+        "directory",
+        "css_class",
+        "api_endpoint",
+        "websocket_event",
+        "document",
+        "card_id"
+      ],
+      "description": "代码元素类型"
+    }
+  },
+
+  "rules": {
+    "internal_naming": {
+      "description": "内部命名规则（面向开发者和AI系统）",
+      
+      "variable": {
+        "case": "camelCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[a-z][a-zA-Z0-9]*$",
+          "boolean_prefix": ["is", "has", "can", "should", "will"],
+          "array_suffix": ["s", "List", "Array"],
+          "map_suffix": ["Map", "ById", "ByIndex"]
+        },
+        "examples": {
+          "valid": ["playerHealth", "currentRound", "isSelected", "hasShield", "cardIds"],
+          "invalid": ["PlayerHealth", "current_round", "selected", "card_array"]
+        },
+        "ai_prompt": "Variables must use camelCase, start with lowercase letter, and use descriptive names. Boolean variables should use 'is', 'has', 'can', 'should', or 'will' prefix."
+      },
+      
+      "function": {
+        "case": "camelCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[a-z][a-zA-Z0-9]*$",
+          "required_prefix": {
+            "getter": ["get", "fetch", "load", "read"],
+            "setter": ["set", "update", "write"],
+            "calculator": ["calculate", "compute", "determine"],
+            "validator": ["validate", "check", "is", "can"],
+            "converter": ["convert", "transform", "to"],
+            "creator": ["create", "make", "new", "build"],
+            "deleter": ["delete", "remove", "clear", "destroy"],
+            "handler": ["handle", "process", "resolve"],
+            "trigger": ["trigger", "fire", "emit", "dispatch"]
+          }
+        },
+        "examples": {
+          "valid": ["getPlayerHealth", "calculateDamage", "handleCardClick", "createBattleState"],
+          "invalid": ["PlayerHealth", "get_player_health", "doSomething", "click"]
+        },
+        "ai_prompt": "Functions must use camelCase and start with a verb that describes the action. Common prefixes: get, set, calculate, validate, handle, create, remove, update."
+      },
+      
+      "class": {
+        "case": "PascalCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][a-zA-Z0-9]*$",
+          "suffix": {
+            "manager": ["Manager", "Controller", "Handler"],
+            "service": ["Service", "Provider", "Factory"],
+            "state": ["State", "Context", "Store"],
+            "util": ["Util", "Helper", "Utils"]
+          }
+        },
+        "examples": {
+          "valid": ["BattleEngine", "CardResolver", "PlayerStateManager", "LocalBattleController"],
+          "invalid": ["battleEngine", "Battle_Engine", "battle_engine"]
+        },
+        "ai_prompt": "Classes must use PascalCase, start with uppercase letter. Use descriptive nouns that represent the entity or responsibility."
+      },
+      
+      "interface": {
+        "case": "PascalCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][a-zA-Z0-9]*$",
+          "optional_prefix": "I",
+          "suffix": ["State", "Config", "Props", "Options", "Data", "Result"]
+        },
+        "examples": {
+          "valid": ["GameState", "BattleState", "ICardResolver", "CardConfig"],
+          "invalid": ["gameState", "Igame_State", "battle_state"]
+        },
+        "ai_prompt": "Interfaces must use PascalCase. Can optionally prefix with 'I' for public interfaces. Use descriptive nouns ending with State, Config, Props, Options, Data, or Result."
+      },
+      
+      "typeAlias": {
+        "case": "PascalCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "examples": {
+          "valid": ["CardId", "PlayerIndex", "BattlePhase", "CardResolver"],
+          "invalid": ["cardId", "CARD_ID", "card_id"]
+        },
+        "ai_prompt": "Type aliases must use PascalCase, matching the naming convention of interfaces."
+      },
+      
+      "enum": {
+        "case": "PascalCase",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "examples": {
+          "valid": ["BattlePhase", "CardType", "Faction"],
+          "invalid": ["battlePhase", "BATTLE_PHASE", "battle_phase"]
+        },
+        "ai_prompt": "Enums must use PascalCase for the enum name."
+      },
+      
+      "enumMember": {
+        "case": "SCREAMING_SNAKE_CASE",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][A-Z0-9_]*$"
+        },
+        "examples": {
+          "valid": ["HIDDEN_SUBMIT", "REVEAL", "RESOLUTION"],
+          "invalid": ["hiddenSubmit", "Hidden_Submit", "hidden_submit"]
+        },
+        "ai_prompt": "Enum members must use SCREAMING_SNAKE_CASE (all uppercase with underscores)."
+      },
+      
+      "constant": {
+        "case": "SCREAMING_SNAKE_CASE",
+        "language": "en",
+        "patterns": {
+          "valid": "^[A-Z][A-Z0-9_]*$"
+        },
+        "examples": {
+          "valid": ["MAX_HAND_SIZE", "DEFAULT_PLAYER_MANA", "BATTLE_PHASE_DURATION"],
+          "invalid": ["maxHandSize", "Max_Hand_Size", "max_hand_size"]
+        },
+        "ai_prompt": "Constants must use SCREAMING_SNAKE_CASE (all uppercase with underscores)."
+      },
+      
+      "file_component": {
+        "case": "PascalCase",
+        "language": "en",
+        "extension": ".tsx",
+        "patterns": {
+          "valid": "^[A-Z][a-zA-Z0-9]+\\.tsx$"
+        },
+        "examples": {
+          "valid": ["BattleFrame.tsx", "CardView.tsx", "EndTurnButton.tsx"],
+          "invalid": ["battleFrame.tsx", "battle-frame.tsx", "Battle_Frame.tsx"]
+        },
+        "ai_prompt": "React component files must use PascalCase with .tsx extension."
+      },
+      
+      "file_util": {
+        "case": "kebab-case",
+        "language": "en",
+        "extension": ".ts",
+        "patterns": {
+          "valid": "^[a-z][a-z0-9-]*\\.ts$"
+        },
+        "examples": {
+          "valid": ["battle-engine.ts", "card-resolver.ts", "phase-manager.ts"],
+          "invalid": ["BattleEngine.ts", "battle_engine.ts", "battleEngine.ts"]
+        },
+        "ai_prompt": "Utility and logic files must use kebab-case with .ts extension."
+      },
+      
+      "directory": {
+        "case": "kebab-case",
+        "language": "en",
+        "patterns": {
+          "valid": "^[a-z][a-z0-9-]*$"
+        },
+        "examples": {
+          "valid": ["components", "battle-system", "card-resolver"],
+          "invalid": ["Components", "battle_system", "battleSystem"]
+        },
+        "ai_prompt": "Directories must use kebab-case (lowercase with hyphens)."
+      },
+      
+      "css_class": {
+        "case": "kebab-case",
+        "language": "en",
+        "patterns": {
+          "valid": "^[a-z][a-z0-9-]*$",
+          "block_element_modifier": {
+            "pattern": "^[a-z]+(-[a-z]+)*(__[a-z]+(-[a-z]+)*)?(-[a-z]+(-[a-z]+)*)?$",
+            "description": "BEM naming: block__element--modifier"
+          }
+        },
+        "examples": {
+          "valid": [".card-container", ".battle-frame", ".card__title", ".button--primary"],
+          "invalid": [".cardContainer", ".Card_Container", ".card_container"]
+        },
+        "ai_prompt": "CSS classes must use kebab-case. BEM naming convention is recommended: block__element--modifier."
+      }
+    },
+    
+    "external_naming": {
+      "description": "外部命名规则（面向用户和非技术人员）",
+      
+      "ui_text": {
+        "language": "zh",
+        "principles": [
+          "简洁性：文本简短有力",
+          "一致性：相同功能使用相同术语",
+          "专业性：使用游戏领域术语",
+          "友好性：语气亲切但不随意"
+        ],
+        "button_text": {
+          "max_length": 6,
+          "recommended_length": "2-4个汉字",
+          "examples": {
+            "valid": ["开始对战", "本地双人", "鸣金", "认输"],
+            "invalid": ["点击此处开始对战", "开始一场精彩的对战"]
+          }
+        },
+        "tooltip_text": {
+          "structure": "[动作/状态] + [原因/结果]",
+          "examples": {
+            "valid": ["法力不足 - 需要3点法力", "请将设备交给玩家2"],
+            "invalid": ["你现在的法力值不够用"]
+          }
+        },
+        "ai_prompt": "UI text should be in Chinese, concise (2-4 characters for buttons), and use consistent game terminology."
+      },
+      
+      "api_endpoint": {
+        "case": "kebab-case",
+        "language": "en",
+        "pattern": "/api/v{version}/{resource}",
+        "resource_naming": "plural, kebab-case",
+        "examples": {
+          "valid": [
+            "GET /api/v1/cards",
+            "POST /api/v1/battles",
+            "GET /api/v1/player-stats"
+          ],
+          "invalid": [
+            "GET /api/v1/getCards",
+            "GET /api/v1/card",
+            "GET /api/v1/playerStats"
+          ]
+        },
+        "ai_prompt": "API endpoints must use kebab-case for resources, plural form, and follow RESTful conventions. No verbs in URL paths."
+      },
+      
+      "websocket_event": {
+        "case": "snake_case",
+        "language": "en",
+        "pattern": "{resource}_{action}",
+        "examples": {
+          "valid": ["battle_join", "card_play", "turn_end"],
+          "invalid": ["battleJoin", "PlayCard", "end-turn"]
+        },
+        "ai_prompt": "WebSocket events must use snake_case with format: resource_action."
+      },
+      
+      "error_message": {
+        "code_format": "E{category}{sequence}",
+        "categories": {
+          "E0xx": "通用错误",
+          "E1xx": "卡牌相关错误",
+          "E2xx": "战斗相关错误",
+          "E3xx": "网络相关错误",
+          "E4xx": "验证相关错误"
+        },
+        "structure": {
+          "code": "string",
+          "message": "string (用户可读)",
+          "details": "string (可选详细信息)"
+        },
+        "examples": {
+          "valid": {
+            "code": "E101",
+            "message": "卡牌不存在",
+            "details": "未找到ID为 {cardId} 的卡牌"
+          }
+        },
+        "ai_prompt": "Error messages must have a code (E{category}{sequence}), a user-friendly message in Chinese, and optional details."
+      }
+    },
+    
+    "document_naming": {
+      "description": "文档命名规则",
+      "pattern": "{module}-{type}-{topic}-{version}.{ext}",
+      "modules": {
+        "battle": "战斗系统",
+        "card": "卡牌系统",
+        "faction": "学派系统",
+        "ui": "用户界面",
+        "project": "项目管理",
+        "dev": "开发文档",
+        "standards": "标准规范"
+      },
+      "types": {
+        "design": "设计文档",
+        "spec": "规格文档",
+        "guide": "指南手册",
+        "report": "报告文档",
+        "record": "记录文档"
+      },
+      "examples": {
+        "valid": [
+          "battle-design-核心规则-v1.2.md",
+          "card-spec-卡牌数据格式.md",
+          "ui-guide-界面开发指南-v1.md"
+        ],
+        "invalid": [
+          "核心战斗规则.md",
+          "Battle Design Core Rules.md",
+          "battle_design_核心规则.md"
+        ]
+      },
+      "ai_prompt": "Documents must follow pattern: {module}-{type}-{topic}-{version}.{ext}. Module and type use English, topic uses Chinese."
+    },
+    
+    "card_id": {
+      "description": "卡牌ID命名规则",
+      "pattern": "{series}-{type}-{number}",
+      "series": {
+        "BS01": "百家争鸣基础系列",
+        "XP01": "扩展包1"
+      },
+      "types": {
+        "MO": "随从 (Minion)",
+        "RU": "法术 (Rune/Spell)",
+        "WP": "武器 (Weapon)",
+        "FD": "领域 (Field)"
+      },
+      "number_format": "3-digit zero-padded",
+      "examples": {
+        "valid": ["BS01-MO-001", "BS01-RU-005", "XP01-WP-003"],
+        "invalid": ["BS01-MO-1", "bs01-mo-001", "BS01_MO_001"]
+      },
+      "ai_prompt": "Card IDs must follow pattern: {series}-{type}-{number}. Series and type are uppercase, number is 3-digit zero-padded."
+    }
+  },
+
+  "terminology_mapping": {
+    "description": "游戏术语内外部映射",
+    "internal_to_external": {
+      "mana": "用度",
+      "health": "生命",
+      "shield": "护持",
+      "momentum": "大势",
+      "mainQueue": "主议",
+      "sideQueue": "旁议",
+      "hiddenSubmit": "暗辩",
+      "reveal": "明辩"
+    },
+    "faction_names": {
+      "confucianism": "儒家",
+      "legalism": "法家",
+      "mohism": "墨家",
+      "daoism": "道家",
+      "military": "兵家",
+      "logicians": "名家",
+      "yin-yang": "阴阳家",
+      "diplomats": "纵横家",
+      "agriculturalists": "农家",
+      "miscellaneous": "杂家"
+    }
+  },
+
+  "validation": {
+    "description": "命名验证规则",
+    "tools": ["eslint", "custom-script"],
+    "eslint_rules": {
+      "camelcase": "error",
+      "@typescript-eslint/naming-convention": "error"
+    },
+    "custom_validations": [
+      "file-naming-check",
+      "document-naming-check",
+      "api-endpoint-check"
+    ]
+  },
+
+  "metadata": {
+    "author": "AI Assistant",
+    "created_at": "2026-03-23",
+    "changelog": [
+      {
+        "version": "2.0.0",
+        "date": "2026-03-23",
+        "changes": "全面重构，增加机器可读格式和AI提示"
+      },
+      {
+        "version": "1.0.0",
+        "date": "2026-03-21",
+        "changes": "初始版本"
+      }
+    ]
+  }
+}
