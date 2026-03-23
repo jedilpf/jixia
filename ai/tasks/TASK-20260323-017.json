@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260323-017",
+  "goal": "修复 npm run build 在 Windows 下异常退出（-1073740791）的问题，优先处理源码中的异常 BOM/隐藏字符并恢复稳定构建。",
+  "constraints": [
+    "只做构建稳定性修复，不改游戏规则或业务逻辑。",
+    "优先做最小改动：编码清洗与构建配置/脚本层修复。",
+    "修改后必须实测 npm run build 与 npm run typecheck。",
+    "仅在允许路径内改动。"
+  ],
+  "deliverables": [
+    "清洗含异常 BOM 的源文件",
+    "若需要则补充构建稳定性脚本",
+    "提交可复现的验证结果"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "scripts",
+    "package.json",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-017.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-017.json"
+  ],
+  "status": "draft"
+}

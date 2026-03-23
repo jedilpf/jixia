@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿export type Side = 'player' | 'enemy';
+export type Side = 'player' | 'enemy';
 
 export type DebatePhase = 'ming_bian' | 'an_mou' | 'reveal' | 'resolve' | 'finished';
 

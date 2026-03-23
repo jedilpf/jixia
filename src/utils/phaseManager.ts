@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import {
+import {
   SyncPhase,
   SyncGameState,
   PlayerSyncState,

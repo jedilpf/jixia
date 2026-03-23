@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { CharacterInstance } from './instances';
+import { CharacterInstance } from './instances';
 import { Card } from './cards';
 import { PlayerId } from './battle';
 

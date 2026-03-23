@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import { battleReducer, createInitialBattleState, CreateBattleStateOptions, getPublicSubmitInfo, getRevealData } from './engine';
 import { DebateBattleState, PlanSlot, SeatId, TargetableSlot, Zone, PublicSubmitInfo, RevealData } from './types';
 
