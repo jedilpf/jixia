@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260323-018",
+  "goal": "将游戏前端交互回退到2026-03-22版本风格，撤回本地双人MVP首版在UI与流程上的改动（以提交5d5017f前状态为准）。",
+  "constraints": [
+    "仅回退本地双人相关的前端状态与页面文件，不动文档体系。",
+    "以ed584e6（5d5017f的父提交）作为回退基线。",
+    "保留当前可构建能力（build-safe脚本不回退）。",
+    "修改后必须可通过 typecheck 与 build。"
+  ],
+  "deliverables": [
+    "回退5d5017f影响的src文件到ed584e6版本",
+    "删除5d5017f新增的本地双人专用组件/页面文件",
+    "验证 npm run typecheck 与 npm run build 通过"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-018.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-018.json"
+  ],
+  "status": "draft"
+}
