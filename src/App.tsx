@@ -23,12 +23,8 @@ type GameScreen =
   | 'characters';
 
 function App() {
-  // Product policy (2026-03-23):
-  // - New MVP flow is the default runtime.
-  // - Legacy flow is preserved for regression only and can be opened via `?legacyFlow=1`.
-  const forceLegacyFlow =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('legacyFlow') === '1';
-  const useMvpFlow = !forceLegacyFlow;
+  const useMvpFlow =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('newFlow') === '1';
 
   if (useMvpFlow) {
     return (
@@ -44,7 +40,7 @@ function App() {
 
   const isElectronRuntime =
     typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
-  const [hasStarted, setHasStarted] = useState(true);
+  const [hasStarted, setHasStarted] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [screen, setScreen] = useState<GameScreen>('menu');
   const [battleFadeIn, setBattleFadeIn] = useState(false);
@@ -191,17 +187,26 @@ function App() {
     setScreenRecoveryKey((k) => k + 1);
   };
 
+  const handleEnterFromSplash = () => {
+    if (isFadingOut) return;
+    setIsFadingOut(true);
+
+    // Keep playback tied to a user gesture so browser autoplay policies do not block it.
+    if (!isElectronRuntime && audioHallRef.current) {
+      audioHallRef.current.currentTime = 0;
+      audioHallRef.current.play().catch(console.warn);
+    }
+
+    setTimeout(() => setHasStarted(true), 1000);
+  };
+
   if (!hasStarted) {
     return (
       <div
         className={`fixed inset-0 z-[9999] flex cursor-pointer select-none flex-col items-center justify-center bg-black text-[#d4a520] transition-opacity duration-1000 ease-in-out ${
           isFadingOut ? 'pointer-events-none opacity-0' : 'opacity-100'
         }`}
-        onClick={() => {
-          if (isFadingOut) return;
-          setIsFadingOut(true);
-          setTimeout(() => setHasStarted(true), 1000);
-        }}
+        onClick={handleEnterFromSplash}
       >
         <div className="mb-8 animate-pulse font-serif text-4xl tracking-[0.3em] drop-shadow-[0_0_20px_rgba(212,165,32,0.8)]">
           谋天下：问道百家
