@@ -19,7 +19,7 @@
 │   │   ├── DOCUMENT_ORGANIZATION_STANDARD.md
 │   │   ├── NAMING_CONVENTION_FRAMEWORK.md
 │   │   ├── NAMING_RULEBOOK.json
-│   │   └── QUICK_REFERENCE_GUIDE.md
+│   │   └── standards-guide-quick-reference.md
 │   │
 │   ├── battle/                    # 战斗系统文档
 │   │   ├── design/                # 设计文档

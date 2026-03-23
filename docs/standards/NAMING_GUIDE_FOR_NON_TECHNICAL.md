@@ -263,7 +263,7 @@ v2    大版本更新
 
 | 文档 | 位置 |
 |------|------|
-| 快速参考指南 | `docs/standards/QUICK_REFERENCE_GUIDE.md` |
+| 快速参考指南 | `docs/standards/standards-guide-quick-reference.md` |
 | 完整命名规范 | `docs/standards/NAMING_CONVENTION_FRAMEWORK.md` |
 | 文档组织规范 | `docs/standards/DOCUMENT_ORGANIZATION_STANDARD.md` |
 

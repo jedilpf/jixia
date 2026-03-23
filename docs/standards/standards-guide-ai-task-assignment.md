@@ -3,7 +3,7 @@
 ## 文档说明
 
 本文档定义了多AI模型协作的任务分配体系，以v1.0版本为基准。
-本文件为规范命名主文件；旧文件名 `AI_TASK_ASSIGNMENT_GUIDE.md` 目前保留用于兼容历史引用。
+本文件为规范命名主文件；旧文件名 `AI_TASK_ASSIGNMENT_GUIDE.md` 已下线。
 
 ---
 

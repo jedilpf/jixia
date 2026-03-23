@@ -25,7 +25,7 @@
 | NAMING_CONVENTION_FRAMEWORK.md | 733行 | 已发布 |
 | NAMING_RULEBOOK.json | 433行 | 已发布 |
 | IMPLEMENTATION_PLAN.md | 454行 | 已发布 |
-| QUICK_REFERENCE_GUIDE.md | 244行 | 已发布 |
+| standards-guide-quick-reference.md | 244行 | 已发布 |
 | NAMING_GUIDE_FOR_NON_TECHNICAL.md | 339行 | 已发布 |
 
 ---
@@ -55,7 +55,7 @@
 | 编号 | 问题描述 | 所在文档 | 影响范围 | 严重程度 |
 |------|----------|----------|----------|----------|
 | L-001 | 部分示例代码缺少完整上下文 | NAMING_CONVENTION_FRAMEWORK.md | 理解困难 | 低 |
-| L-002 | 快速参考指南缺少打印优化版本 | QUICK_REFERENCE_GUIDE.md | 打印不便 | 低 |
+| L-002 | 快速参考指南缺少打印优化版本 | standards-guide-quick-reference.md | 打印不便 | 低 |
 | L-003 | 非技术人员指南缺少视频教程链接 | NAMING_GUIDE_FOR_NON_TECHNICAL.md | 学习方式单一 | 低 |
 | L-004 | 变更记录格式未标准化 | 所有文档 | 一致性问题 | 低 |
 

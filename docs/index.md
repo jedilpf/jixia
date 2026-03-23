@@ -12,10 +12,11 @@
 | [命名规范框架](standards/NAMING_CONVENTION_FRAMEWORK.md) | 内部/外部命名双层体系 | v2.0 |
 | [命名规则书(JSON)](standards/NAMING_RULEBOOK.json) | 机器可读的命名规则定义 | v2.0 |
 | [实施计划](standards/IMPLEMENTATION_PLAN.md) | 命名规范执行方案 | v1.0 |
-| [快速参考指南](standards/QUICK_REFERENCE_GUIDE.md) | 团队速查手册 | v1.0 |
+| [快速参考指南](standards/standards-guide-quick-reference.md) | 团队速查手册 | v1.0 |
 | [非技术人员指南](standards/NAMING_GUIDE_FOR_NON_TECHNICAL.md) | 面向非编程岗位的入门指南 | v1.0 |
 | [自我审查评估报告](standards/SELF_REVIEW_REPORT.md) | 项目评估与改进方案 | v1.0 |
-| [AI任务分配指南](standards/AI_TASK_ASSIGNMENT_GUIDE.md) | 多AI协作工作流程 | v1.0 |
+| [AI任务分配指南](standards/standards-guide-ai-task-assignment.md) | 多AI协作工作流程 | v1.0 |
+| [风格一致性审查](standards/standards-review-style-consistency.md) | 文档风格一致性审查记录 | v1.0 |
 
 ---
 
@@ -137,7 +138,7 @@
 | 角色 | 推荐阅读 |
 |------|----------|
 | 新成员 | [非技术人员指南](standards/NAMING_GUIDE_FOR_NON_TECHNICAL.md) → [项目总览](dev/dev-guide-项目总览.md) |
-| 开发者 | [快速参考指南](standards/QUICK_REFERENCE_GUIDE.md) → [开发者指南](dev/dev-guide-开发者指南.md) |
+| 开发者 | [快速参考指南](standards/standards-guide-quick-reference.md) → [开发者指南](dev/dev-guide-开发者指南.md) |
 | 设计师 | [核心规则](battle/battle-design-核心规则-v1.2.md) → [门派全集](faction/faction-design-门派全集-v1.2.md) |
 | 项目经理 | [实施计划](standards/IMPLEMENTATION_PLAN.md) → [开发进度](project/record/project-record-开发进度.md) |
 
@@ -146,7 +147,7 @@
 | 任务 | 推荐阅读 |
 |------|----------|
 | 创建新文档 | [文档组织规范](standards/DOCUMENT_ORGANIZATION_STANDARD.md) |
-| 命名新文件 | [快速参考指南](standards/QUICK_REFERENCE_GUIDE.md) |
+| 命名新文件 | [快速参考指南](standards/standards-guide-quick-reference.md) |
 | 理解战斗系统 | [核心规则](battle/battle-design-核心规则-v1.2.md) |
 | 开发新功能 | [技术架构](dev/dev-spec-技术架构.md) |
 

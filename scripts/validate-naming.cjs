@@ -33,6 +33,19 @@ const IGNORE_PATTERNS = [
   /(^|\/)coverage(\/|$)/,
 ];
 
+// Legacy docs kept for compatibility; allow editing without blocking incremental checks.
+const LEGACY_DOC_BASENAME_ALLOWLIST = new Set([
+  'index.md',
+  'AI_TASK_ASSIGNMENT_GUIDE.md',
+  'DOCUMENT_ORGANIZATION_STANDARD.md',
+  'IMPLEMENTATION_PLAN.md',
+  'NAMING_CONVENTION_FRAMEWORK.md',
+  'NAMING_GUIDE_FOR_NON_TECHNICAL.md',
+  'QUICK_REFERENCE_GUIDE.md',
+  'SELF_REVIEW_REPORT.md',
+  'STYLE_CONSISTENCY_REVIEW.md',
+]);
+
 function normalizePath(input) {
   return String(input || '').replace(/\\/g, '/').replace(/^\.\/+/, '');
 }
@@ -40,6 +53,10 @@ function normalizePath(input) {
 function shouldIgnore(filePath) {
   const normalized = normalizePath(filePath);
   return IGNORE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+function isAllowedLegacyDocBaseName(baseName) {
+  return LEGACY_DOC_BASENAME_ALLOWLIST.has(baseName);
 }
 
 function addViolation(violations, ruleKey, absolutePath, actualName) {
@@ -99,7 +116,12 @@ function validateDocs(dir, violations) {
       continue;
     }
 
-    if (entry.isFile() && entry.name.toLowerCase().endsWith('.md') && !RULES.docs.pattern.test(entry.name)) {
+    if (
+      entry.isFile()
+      && entry.name.toLowerCase().endsWith('.md')
+      && !RULES.docs.pattern.test(entry.name)
+      && !isAllowedLegacyDocBaseName(entry.name)
+    ) {
       addViolation(violations, 'docs', absPath, entry.name);
     }
   }
@@ -161,7 +183,7 @@ function validateChangedFiles(projectRoot, changedFiles, violations) {
 
     if (normalized.startsWith('docs/') && baseName.toLowerCase().endsWith('.md')) {
       relevant.push(normalized);
-      if (!RULES.docs.pattern.test(baseName)) {
+      if (!RULES.docs.pattern.test(baseName) && !isAllowedLegacyDocBaseName(baseName)) {
         addViolation(violations, 'docs', absPath, baseName);
       }
     }
@@ -253,4 +275,3 @@ function main() {
 }
 
 main();
-

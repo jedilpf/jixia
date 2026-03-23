@@ -442,7 +442,7 @@ git reset --hard naming-refactor-backup
 | 命名规范框架 | docs/standards/NAMING_CONVENTION_FRAMEWORK.md | ✅ |
 | 命名规则书(JSON) | docs/standards/NAMING_RULEBOOK.json | ✅ |
 | 实施计划 | docs/standards/IMPLEMENTATION_PLAN.md | ✅ |
-| 快速参考指南 | docs/standards/QUICK_REFERENCE_GUIDE.md | 待创建 |
+| 快速参考指南 | docs/standards/standards-guide-quick-reference.md | 已创建 |
 | 验证脚本 | scripts/validate-naming.cjs | 待创建 |
 
 ---
