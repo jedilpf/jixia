@@ -41,7 +41,8 @@ Invoke-Git -GitArgs @("rev-parse", "--is-inside-work-tree")
 $repoRoot = (& git rev-parse --show-toplevel).Trim()
 Set-Location $repoRoot
 
-$workingTreeDirty = (& git status --porcelain).Trim()
+$statusOutput = & git status --porcelain
+$workingTreeDirty = if ($null -eq $statusOutput) { "" } else { ($statusOutput | Out-String).Trim() }
 if ($Execute -and $workingTreeDirty) {
   throw "Working tree is not clean. Commit or stash changes before running with -Execute."
 }
