@@ -1,0 +1,79 @@
+name: Large File Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  check-large-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Block oversized files in changed diff
+        env:
+          MAX_FILE_SIZE_MB: "20"
+          WARN_FILE_SIZE_MB: "5"
+        run: |
+          set -euo pipefail
+
+          max_bytes=$((MAX_FILE_SIZE_MB * 1024 * 1024))
+          warn_bytes=$((WARN_FILE_SIZE_MB * 1024 * 1024))
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            base_sha="${{ github.event.pull_request.base.sha }}"
+            head_sha="${{ github.event.pull_request.head.sha }}"
+          else
+            base_sha="${{ github.event.before }}"
+            head_sha="${{ github.sha }}"
+            if [[ "$base_sha" == "0000000000000000000000000000000000000000" ]]; then
+              base_sha="$(git rev-list --max-parents=0 "$head_sha" | tail -n 1)"
+            fi
+          fi
+
+          echo "Checking changed files from $base_sha to $head_sha"
+
+          mapfile -d '' changed_files < <(git diff --name-only --diff-filter=AMR -z "$base_sha" "$head_sha")
+
+          if [[ "${#changed_files[@]}" -eq 0 ]]; then
+            echo "No added/modified files to check."
+            exit 0
+          fi
+
+          fail_count=0
+          warn_count=0
+
+          for file in "${changed_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              continue
+            fi
+
+            size_bytes=$(stat -c%s "$file")
+
+            if (( size_bytes > max_bytes )); then
+              size_mb=$(awk "BEGIN { printf \"%.2f\", $size_bytes/1024/1024 }")
+              echo "::error file=$file::File is ${size_mb}MB, larger than ${MAX_FILE_SIZE_MB}MB limit."
+              fail_count=$((fail_count + 1))
+            elif (( size_bytes > warn_bytes )); then
+              size_mb=$(awk "BEGIN { printf \"%.2f\", $size_bytes/1024/1024 }")
+              echo "::warning file=$file::File is ${size_mb}MB (over ${WARN_FILE_SIZE_MB}MB warning threshold)."
+              warn_count=$((warn_count + 1))
+            fi
+          done
+
+          echo "Large-file guard summary: errors=$fail_count warnings=$warn_count"
+
+          if (( fail_count > 0 )); then
+            echo "Use Git LFS / GitHub Releases / artifacts for large binaries."
+            exit 1
+          fi
