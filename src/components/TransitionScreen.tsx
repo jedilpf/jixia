@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface TransitionScreenProps {
   onComplete: () => void;
@@ -201,7 +201,19 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
             pointerEvents: 'none',
           }}
         >
-          场景切换中...
+          <div className="transition-fallback">
+            <div className="fallback-gear fallback-gear-1" />
+            <div className="fallback-gear fallback-gear-2" />
+            <div className="fallback-gear fallback-gear-3" />
+            <div className="fallback-particle fallback-particle-1" />
+            <div className="fallback-particle fallback-particle-2" />
+            <div className="fallback-particle fallback-particle-3" />
+            <div className="fallback-particle fallback-particle-4" />
+            <div className="fallback-particle fallback-particle-5" />
+            <div className="fallback-ember fallback-ember-1" />
+            <div className="fallback-ember fallback-ember-2" />
+            <div className="fallback-ember fallback-ember-3" />
+          </div>
         </div>
       )}
 
@@ -239,6 +251,79 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
           0%,100% { opacity: 0.3; }
           50% { opacity: 0.85; }
         }
+        @keyframes gear-rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes particle-rise {
+          0% { opacity: 1; transform: translateY(0) scale(1); }
+          100% { opacity: 0; transform: translateY(-120px) scale(0.3); }
+        }
+        @keyframes ember-glow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        .transition-fallback {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          background: radial-gradient(circle at 30% 30%, rgba(170,35,28,0.28), transparent 45%),
+                      radial-gradient(circle at 78% 75%, rgba(230,110,62,0.22), transparent 45%),
+                      linear-gradient(120deg, #170807 0%, #3a0f0c 45%, #120505 100%);
+        }
+        .fallback-gear {
+          position: absolute;
+          border-radius: 50%;
+          border: 3px solid #d4a520;
+          opacity: 0.5;
+          animation: gear-rotate 4s linear infinite;
+        }
+        .fallback-gear-1 {
+          width: 140px;
+          height: 140px;
+          top: -40px;
+          left: -40px;
+          animation-duration: 6s;
+        }
+        .fallback-gear-2 {
+          width: 100px;
+          height: 100px;
+          bottom: 5%;
+          right: -25px;
+          animation-duration: 4s;
+          animation-direction: reverse;
+        }
+        .fallback-gear-3 {
+          width: 70px;
+          height: 70px;
+          top: 35%;
+          left: 15%;
+          animation-duration: 3s;
+        }
+        .fallback-particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: #E85D04;
+          border-radius: 50%;
+          box-shadow: 0 0 6px #E85D04;
+        }
+        .fallback-particle-1 { top: 75%; left: 20%; animation: particle-rise 2.5s ease-out infinite; }
+        .fallback-particle-2 { top: 80%; left: 45%; animation: particle-rise 2s ease-out infinite 0.3s; }
+        .fallback-particle-3 { top: 70%; left: 65%; animation: particle-rise 2.2s ease-out infinite 0.6s; }
+        .fallback-particle-4 { top: 85%; left: 30%; animation: particle-rise 1.8s ease-out infinite 0.9s; }
+        .fallback-particle-5 { top: 78%; left: 55%; animation: particle-rise 2.8s ease-out infinite 1.2s; }
+        .fallback-ember {
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          background: radial-gradient(circle, #E85D04, #8B2635);
+          border-radius: 50%;
+          box-shadow: 0 0 12px #E85D04, 0 0 24px rgba(232,93,4,0.5);
+        }
+        .fallback-ember-1 { top: 60%; left: 25%; animation: ember-glow 2s ease-in-out infinite; }
+        .fallback-ember-2 { top: 45%; right: 30%; animation: ember-glow 1.5s ease-in-out infinite 0.5s; }
+        .fallback-ember-3 { bottom: 35%; left: 40%; animation: ember-glow 2.5s ease-in-out infinite 1s; }
       `}</style>
     </div>
   );
