@@ -27,14 +27,39 @@ function Invoke-Git {
 
 function Ensure-GitFilterRepo {
   & git filter-repo --version *> $null
-  if ($LASTEXITCODE -ne 0) {
-    throw @"
+  if ($LASTEXITCODE -eq 0) {
+    return
+  }
+
+  $cmd = Get-Command git-filter-repo -ErrorAction SilentlyContinue
+  if ($cmd -and $cmd.Source) {
+    $scriptsDir = Split-Path -Parent $cmd.Source
+    $env:Path = "$env:Path;$scriptsDir"
+    & git filter-repo --version *> $null
+    if ($LASTEXITCODE -eq 0) {
+      return
+    }
+  }
+
+  $pythonUserScripts = Get-ChildItem -Path "$env:LOCALAPPDATA\\Packages" -Directory -Filter "PythonSoftwareFoundation.Python.*" -ErrorAction SilentlyContinue |
+    ForEach-Object { Join-Path $_.FullName "LocalCache\\local-packages\\Python313\\Scripts" } |
+    Where-Object { Test-Path $_ } |
+    Select-Object -First 1
+
+  if ($pythonUserScripts) {
+    $env:Path = "$env:Path;$pythonUserScripts"
+    & git filter-repo --version *> $null
+    if ($LASTEXITCODE -eq 0) {
+      return
+    }
+  }
+
+  throw @"
 Missing git-filter-repo.
 Install one of these first:
   1) python -m pip install git-filter-repo
   2) pipx install git-filter-repo
 "@
-  }
 }
 
 Invoke-Git -GitArgs @("rev-parse", "--is-inside-work-tree")
