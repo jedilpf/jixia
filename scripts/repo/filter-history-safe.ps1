@@ -77,6 +77,12 @@ if (-not $Execute) {
 
 Ensure-GitFilterRepo
 
+$remoteUrlOutput = & git remote get-url $RemoteName 2>$null
+$remoteUrl = if ($null -eq $remoteUrlOutput) { "" } else { ($remoteUrlOutput | Out-String).Trim() }
+if (-not $remoteUrl) {
+  throw "Cannot find remote '$RemoteName' before rewrite."
+}
+
 Write-Host "Step 1/3: Creating mirror backup..."
 & git clone --mirror "$repoRoot" "$backupMirror"
 if ($LASTEXITCODE -ne 0) {
@@ -96,9 +102,10 @@ foreach ($glob in $DropPathGlobs) {
 $filterArgs += "--invert-paths"
 Invoke-Git -GitArgs $filterArgs
 
-$remoteUrl = (& git remote get-url $RemoteName).Trim()
-if (-not $remoteUrl) {
-  throw "Cannot find remote '$RemoteName'."
+$remoteAfterRewrite = & git remote get-url $RemoteName 2>$null
+if ($LASTEXITCODE -ne 0 -or -not $remoteAfterRewrite) {
+  Write-Host "Remote '$RemoteName' was removed by filter-repo; re-adding it."
+  Invoke-Git -GitArgs @("remote", "add", $RemoteName, $remoteUrl)
 }
 
 Write-Host "Step 3/3: Local rewrite complete."
