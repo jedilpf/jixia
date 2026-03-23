@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260323-022",
+  "goal": "将议题选择从开局前流程改为战斗过程中插入选择，保持现有框架与界面结构不删除，确保明辩/暗策链路可继续运行。",
+  "constraints": [
+    "不删除现有大厅、图鉴、人物志与战斗框架，仅做最小增量调整。",
+    "PreBattleFlow 不再执行议题投票，不得影响门派选择与进入战斗链路。",
+    "battleV2 在对局内新增议题选择窗口（含超时兜底），并阻止未选议题时继续回合操作。",
+    "保留并验证明辩/暗策阶段切换与结算链路。",
+    "仅在允许路径内修改。"
+  ],
+  "deliverables": [
+    "战前移除议题选择，战中插入议题选择",
+    "议题超时自动选择兜底",
+    "明辩/暗策链路保持可运行",
+    "通过 typecheck 与 build"
+  ],
+  "allowed_write_paths": [
+    "public",
+    "src",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-022.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-022.json"
+  ],
+  "status": "draft"
+}

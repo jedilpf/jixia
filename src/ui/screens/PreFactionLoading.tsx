@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PRE_BATTLE_COLORS } from '@/ui/screens/visualAssets';
 
 interface PreFactionLoadingProps {

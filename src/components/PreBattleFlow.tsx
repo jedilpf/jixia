@@ -6,8 +6,8 @@ import { ArenaId } from '@/battleV2/types';
 type FlowStep = 'matching' | 'topic_vote' | 'topic_result' | 'sect_draft' | 'loading';
 
 export interface PreBattleResult {
-  topicId: string;
-  topicTitle: string;
+  topicId?: string;
+  topicTitle?: string;
   playerFaction: string;
   enemyFaction: string;
 }
@@ -125,8 +125,9 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
   useEffect(() => {
     if (step !== 'matching') return undefined;
     const timer = window.setTimeout(() => {
-      setStep('topic_vote');
-      setTopicSecondsLeft(15);
+      // Topic selection is now moved into battle; pre-battle skips topic vote.
+      setStep('sect_draft');
+      setSectSecondsLeft(20);
     }, 2400);
     return () => window.clearTimeout(timer);
   }, [step]);
@@ -231,11 +232,11 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
 
     const doneTimer = window.setTimeout(() => {
       if (completedRef.current) return;
-      if (!resolvedTopic || !playerSectName || !enemySectName) return;
+      if (!playerSectName || !enemySectName) return;
       completedRef.current = true;
       onComplete({
-        topicId: resolvedTopic.id,
-        topicTitle: resolvedTopic.title,
+        topicId: resolvedTopic?.id,
+        topicTitle: resolvedTopic?.title,
         playerFaction: playerSectName,
         enemyFaction: enemySectName,
       });
@@ -245,7 +246,7 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
       window.clearInterval(progressTimer);
       window.clearTimeout(doneTimer);
     };
-  }, [step, onComplete, resolvedTopic, playerSectName, enemySectName]);
+  }, [step, onComplete, resolvedTopic?.id, resolvedTopic?.title, playerSectName, enemySectName]);
 
   const lockTopicChoice = () => {
     if (playerTopicId) return;

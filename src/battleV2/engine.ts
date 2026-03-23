@@ -30,7 +30,7 @@ import {
   LANE_NAMES,
 } from './laneSystem';
 import { DEFAULT_DECK_BUILD_DEFAULTS } from './meta';
-import { getTopicById, getTopicEffectMultiplier, pickTopicDefinition } from './topics';
+import { getTopicById, getTopicConfig, getTopicEffectMultiplier } from './topics';
 
 export const PHASE_DURATION: Record<Exclude<DebatePhase, 'finished'>, number> = {
   ming_bian: 25,
@@ -38,6 +38,9 @@ export const PHASE_DURATION: Record<Exclude<DebatePhase, 'finished'>, number> = 
   reveal: 3,
   resolve: 6,
 };
+
+const TOPIC_SELECTION_ROUND = 2;
+const TOPIC_SELECTION_SECONDS = 12;
 
 export const SEAT_LABEL: Record<SeatId, string> = {
   xian_sheng: '先声席',
@@ -86,7 +89,7 @@ interface ResolveContext {
   targetSeat?: SeatId;
   damageModifier?: number;
   arenaId: ArenaId;
-  topicId: string;
+  topicId: string | null;
 }
 
 function makeLog(round: number, text: string): BattleLog {
@@ -108,6 +111,25 @@ function shuffleArray<T>(arr: T[]): T[] {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+function randomPick<T>(list: T[], count: number): T[] {
+  if (count <= 0) return [];
+  const pool = [...list];
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, Math.min(count, pool.length));
+}
+
+function randomPickWithRepeat<T>(list: T[], count: number): T[] {
+  if (count <= 0 || list.length === 0) return [];
+  const pool: T[] = [];
+  while (pool.length < count) {
+    pool.push(...list);
+  }
+  return randomPick(pool, count);
 }
 
 function drawCards(player: BattlePlayer, count: number): void {
@@ -187,12 +209,52 @@ function createPlayer(
   return player;
 }
 
-function pickTopic(forcedTopicId?: string) {
-  if (forcedTopicId) {
-    const forced = getTopicById(forcedTopicId);
-    if (forced) return forced;
+function pickTopicOptions(count: number, forcedTopicId?: string): string[] {
+  const allTopicIds = getTopicConfig().topics.map((topic) => topic.id);
+  const shuffled = randomPickWithRepeat(allTopicIds, Math.max(count, allTopicIds.length));
+  const options = shuffled.slice(0, Math.max(1, Math.min(count, shuffled.length)));
+
+  if (forcedTopicId && !options.includes(forcedTopicId)) {
+    options[0] = forcedTopicId;
   }
-  return pickTopicDefinition();
+
+  return options;
+}
+
+function isTopicSelectionWindow(state: DebateBattleState): boolean {
+  return state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';
+}
+
+function applyTopicSelection(
+  state: DebateBattleState,
+  topicId: string,
+  reason: 'player' | 'timeout',
+): boolean {
+  if (!state.topicSelectionPending) return false;
+  if (!state.topicOptions.includes(topicId)) return false;
+
+  const topic = getTopicById(topicId);
+  if (!topic) return false;
+
+  state.activeTopicId = topic.id;
+  state.activeTopic = topic.title;
+  state.topicSelectionPending = false;
+  state.topicSelectionSecondsLeft = null;
+  state.logs.push(
+    makeLog(
+      state.round,
+      reason === 'player'
+        ? `当前议题已锁定：${topic.title}`
+        : `议题选择超时，系统自动锁定：${topic.title}`,
+    ),
+  );
+  return true;
+}
+
+function applyAutoTopicSelection(state: DebateBattleState): boolean {
+  const fallback = randomPick(state.topicOptions, 1)[0];
+  if (!fallback) return false;
+  return applyTopicSelection(state, fallback, 'timeout');
 }
 
 export function createInitialBattleState(options?: CreateBattleStateOptions): DebateBattleState {
@@ -250,20 +312,32 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const auditLine = useFactionFramework
     ? `[R1] faction-setup player=${playerMainFaction} guest=[${playerGuestFactions.join(',')}] enemy=${enemyMainFaction} guest=[${enemyGuestFactions.join(',')}]`
     : `[R1] classic-setup arena=${arenaId}`;
-  const topic = pickTopic(options?.forcedTopicId);
+  const forcedTopic = options?.forcedTopicId ? getTopicById(options.forcedTopicId) : undefined;
+  const topic = forcedTopic ?? null;
+  const topicOptions = pickTopicOptions(3, forcedTopic?.id);
+  const topicSelectionPending = topic === null;
 
   return {
     round: 1,
     maxRounds: MAX_ROUNDS,
     phase: 'ming_bian',
     secondsLeft: PHASE_DURATION.ming_bian,
-    activeTopicId: topic.id,
-    activeTopic: topic.title,
+    activeTopicId: topic?.id ?? null,
+    activeTopic: topic?.title ?? '',
+    topicSelectionPending,
+    topicSelectionRound: TOPIC_SELECTION_ROUND,
+    topicSelectionSecondsLeft: null,
+    topicOptions,
     arenaId,
     arenaName: arena.name,
     player: createPlayer('player', '我方', initialHuYin, playerDeckOptions),
     enemy: createPlayer('enemy', '敌方', initialHuYin, enemyDeckOptions),
-    logs: [makeLog(1, startLog)],
+    logs: [
+      makeLog(1, startLog),
+      ...(topicSelectionPending
+        ? [makeLog(1, `议题将在第 ${TOPIC_SELECTION_ROUND} 回合开始前由玩家选择`)]
+        : []),
+    ],
     resolveFeed: [],
     internalAudit: [auditLine],
     winner: null,
@@ -470,7 +544,7 @@ function resolveCardEffect(ctx: ResolveContext): void {
 
   const seat = targetSeat ?? 'zhu_bian';
   const seatLabel = SEAT_LABEL[seat];
-  const effectMultiplier = getTopicEffectMultiplier(topicId, card);
+  const effectMultiplier = topicId ? getTopicEffectMultiplier(topicId, card) : 1;
   const weightedEffectValue = scaleEffectValue(card.effectValue, effectMultiplier);
 
   switch (card.effectKind) {
@@ -1098,6 +1172,22 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
   switch (action.type) {
     case 'TICK': {
       if (next.phase === 'finished') return next;
+      if (isTopicSelectionWindow(next)) {
+        if (next.topicSelectionSecondsLeft === null) {
+          next.topicSelectionSecondsLeft = TOPIC_SELECTION_SECONDS;
+          next.logs.push(makeLog(next.round, '本回合先确定议题后再进入明辩出牌'));
+          return next;
+        }
+
+        if (next.topicSelectionSecondsLeft > 0) {
+          next.topicSelectionSecondsLeft -= 1;
+        }
+
+        if (next.topicSelectionSecondsLeft <= 0) {
+          applyAutoTopicSelection(next);
+        }
+        return next;
+      }
       next.secondsLeft -= 1;
       if (next.secondsLeft === 5 && (next.phase === 'ming_bian' || next.phase === 'an_mou')) {
         const phaseName = next.phase === 'ming_bian' ? '明辩' : '暗策';
@@ -1117,8 +1207,15 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       return next;
     }
 
+    case 'SELECT_TOPIC': {
+      if (!isTopicSelectionWindow(next)) return next;
+      applyTopicSelection(next, action.topicId, 'player');
+      return next;
+    }
+
     case 'PLAN_CARD': {
       if (next.phase === 'finished') return next;
+      if (isTopicSelectionWindow(next)) return next;
       if (action.slot === 'secret' && next.phase !== 'an_mou') return next;
       if (action.slot !== 'secret' && next.phase !== 'ming_bian') return next;
       if (action.slot === 'secret' && next.player.plan.lockedSecret) return next;
@@ -1128,6 +1225,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'PLAN_WRITING': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'ming_bian' || next.player.plan.lockedPublic) return next;
       updateWriting(next.player, action.cardId);
       return next;
@@ -1135,6 +1233,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
 
     case 'SET_TARGET_SEAT': {
       if (next.phase === 'finished') return next;
+      if (isTopicSelectionWindow(next)) return next;
       if (action.slot === 'main' && (next.phase !== 'ming_bian' || next.player.plan.lockedPublic)) return next;
       if (action.slot === 'secret' && (next.phase !== 'an_mou' || next.player.plan.lockedSecret)) return next;
       setTargetSeat(next.player, action.slot, action.seatId);
@@ -1142,6 +1241,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'LOCK_PUBLIC': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'ming_bian') return next;
       next.player.plan.lockedPublic = true;
       next.logs.push(makeLog(next.round, '我方已提前结束明辩'));
@@ -1155,6 +1255,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'LOCK_SECRET': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'an_mou') return next;
       next.player.plan.lockedSecret = true;
       next.logs.push(makeLog(next.round, '我方已提前结束暗策'));
@@ -1168,6 +1269,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'AI_AUTO_PLAN': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase === 'ming_bian' && !next.enemy.plan.lockedPublic) {
         aiPlanForMingBian(next);
         if (canMoveToAnMou(next)) {
@@ -1183,6 +1285,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'SUBMIT_CARD': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'ming_bian' && next.phase !== 'an_mou') return next;
       const card = next.player.hand.find(c => c.id === action.cardId);
       if (!card) return next;
@@ -1205,6 +1308,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'PASS': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'ming_bian' && next.phase !== 'an_mou') return next;
       next.player.submitAction = {
         type: 'pass',
@@ -1217,6 +1321,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'CONFIRM_SUBMIT': {
+      if (isTopicSelectionWindow(next)) return next;
       if (next.phase === 'ming_bian') {
         next.player.plan.lockedPublic = true;
         if (!next.enemy.plan.lockedPublic) {
@@ -1238,6 +1343,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'AI_AUTO_SUBMIT': {
+      if (isTopicSelectionWindow(next)) return next;
       if ((next.phase === 'ming_bian' || next.phase === 'an_mou') && !next.enemy.plan.lockedPublic) {
         aiAutoSubmit(next);
         if (next.phase === 'ming_bian' && canMoveToAnMou(next)) {
@@ -1250,6 +1356,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
     }
 
     case 'ADVANCE_PHASE': {
+      if (isTopicSelectionWindow(next)) return next;
       advancePhase(next);
       return next;
     }

@@ -114,8 +114,12 @@ export interface DebateBattleState {
   maxRounds: number;
   phase: DebatePhase;
   secondsLeft: number;
-  activeTopicId: string;
+  activeTopicId: string | null;
   activeTopic: string;
+  topicSelectionPending: boolean;
+  topicSelectionRound: number;
+  topicSelectionSecondsLeft: number | null;
+  topicOptions: string[];
   arenaId: ArenaId;
   arenaName: string;
   player: BattlePlayer;
@@ -186,6 +190,7 @@ export interface SettlementResult {
 
 export type BattleAction =
   | { type: 'TICK' }
+  | { type: 'SELECT_TOPIC'; topicId: string }
   | { type: 'PLAN_CARD'; slot: PlanSlot; cardId: string | null }
   | { type: 'PLAN_WRITING'; cardId: string | null }
   | { type: 'SET_TARGET_SEAT'; slot: TargetableSlot; seatId: SeatId }

@@ -18,6 +18,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
+import { getTopicById } from '@/battleV2/topics';
 import {
   ArenaId,
   SeatId,
@@ -68,7 +69,7 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
   // ═══════════════════════════════════════════════════════════
-  const { state, planCard, setTargetSeat, lockPublic, lockSecret } = useDebateBattle({
+  const { state, selectTopic, planCard, setTargetSeat, lockPublic, lockSecret } = useDebateBattle({
     arenaId,
     forcedTopicId,
     playerMainFaction,
@@ -77,6 +78,13 @@ export default function BattleFrameV2({
 
   const { phase, player, logs } = state;
   const isFinished = phase === 'finished';
+  const isTopicSelectionWindow =
+    state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';
+  const topicOptions = useMemo(() => {
+    return state.topicOptions
+      .map((topicId) => getTopicById(topicId))
+      .filter((topic): topic is NonNullable<ReturnType<typeof getTopicById>> => Boolean(topic));
+  }, [state.topicOptions]);
 
   // ═══════════════════════════════════════════════════════════
   // 本地UI状态
@@ -95,6 +103,7 @@ export default function BattleFrameV2({
   // 卡牌选择处理
   // ═══════════════════════════════════════════════════════════
   const handleSelectCard = useCallback((cardId: string | null) => {
+    if (isTopicSelectionWindow) return;
     setSelectedCardId(cardId);
     if (cardId) {
       // 自动判断是明论还是暗策
@@ -109,12 +118,13 @@ export default function BattleFrameV2({
     } else {
       setSelectedAction(null);
     }
-  }, [phase, player.hand, player.plan.lockedPublic, player.plan.lockedSecret]);
+  }, [isTopicSelectionWindow, phase, player.hand, player.plan.lockedPublic, player.plan.lockedSecret]);
 
   // ═══════════════════════════════════════════════════════════
   // 席位选择处理
   // ═══════════════════════════════════════════════════════════
   const handleSelectSeat = useCallback((seat: SeatId) => {
+    if (isTopicSelectionWindow) return;
     if (!selectedCardId || !selectedAction) return;
 
     if (selectedAction === 'main') {
@@ -122,12 +132,13 @@ export default function BattleFrameV2({
     } else if (selectedAction === 'secret') {
       setTargetSeat('secret', seat);
     }
-  }, [selectedCardId, selectedAction, setTargetSeat]);
+  }, [isTopicSelectionWindow, selectedCardId, selectedAction, setTargetSeat]);
 
   // ═══════════════════════════════════════════════════════════
   // 确认出牌
   // ═══════════════════════════════════════════════════════════
   const handleConfirm = useCallback(() => {
+    if (isTopicSelectionWindow) return;
     if (!selectedCardId || !selectedAction) return;
 
     const slot: 'main' | 'secret' = selectedAction;
@@ -136,7 +147,7 @@ export default function BattleFrameV2({
     // 清空选择
     setSelectedCardId(null);
     setSelectedAction(null);
-  }, [selectedCardId, selectedAction, planCard]);
+  }, [isTopicSelectionWindow, selectedCardId, selectedAction, planCard]);
 
   // ═══════════════════════════════════════════════════════════
   // 取消选择
@@ -150,12 +161,20 @@ export default function BattleFrameV2({
   // 结束回合
   // ═══════════════════════════════════════════════════════════
   const handleEndTurn = useCallback(() => {
+    if (isTopicSelectionWindow) return;
     if (phase === 'ming_bian') {
       lockPublic();
     } else if (phase === 'an_mou') {
       lockSecret();
     }
-  }, [phase, lockPublic, lockSecret]);
+  }, [isTopicSelectionWindow, phase, lockPublic, lockSecret]);
+
+  const handleSelectTopic = useCallback(
+    (topicId: string) => {
+      selectTopic(topicId);
+    },
+    [selectTopic],
+  );
 
   // ═══════════════════════════════════════════════════════════
   // 社交功能
@@ -292,6 +311,37 @@ export default function BattleFrameV2({
         onConfirm={handleExitConfirm}
         onCancel={handleExitCancel}
       />
+
+      {isTopicSelectionWindow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+          <div className="w-full max-w-4xl rounded-2xl border-2 border-[#c9952a] bg-gradient-to-b from-[#1a1510] to-[#0d0b08] p-5 md:p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold tracking-wide text-[#f0ddb1]">选择本局议题</h3>
+                <p className="mt-1 text-sm text-[#b8a88a]">
+                  第 {state.round} 回合触发。确定后继续明辩与暗策流程。
+                </p>
+              </div>
+              <div className="rounded border border-[#8b6e44] bg-[#322717] px-3 py-1 text-sm text-[#ffd48a]">
+                自动选择倒计时 {state.topicSelectionSecondsLeft ?? '--'}s
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              {topicOptions.map((topic) => (
+                <button
+                  key={topic.id}
+                  onClick={() => handleSelectTopic(topic.id)}
+                  className="rounded-xl border border-[#5c4d3a] bg-[#1f1a12]/70 p-4 text-left transition hover:border-[#d4af65] hover:bg-[#2a2116]"
+                >
+                  <div className="text-base text-[#f7dfb0]">{topic.title}</div>
+                  <p className="mt-2 text-xs leading-5 text-[#c6d3df]">{topic.summary ?? '无摘要'}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════
           战斗结束遮罩
