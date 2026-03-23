@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260323-023",
+  "goal": "搭建后端 P1 骨架：提供健康检查、AI 建局接口、Socket 基础连接、请求日志与统一错误处理中间件。",
+  "constraints": [
+    "仅做后端骨架与最小联调能力，不改动现有战斗规则实现。",
+    "不实现联网匹配、账号系统、数据库持久化。",
+    "新增代码放在 server/ 目录，前端仅保持零侵入。",
+    "若需求信息缺失，使用保守默认值并在 open_questions.md 记录。"
+  ],
+  "deliverables": [
+    "server 目录下可运行的 Express + Socket.IO 骨架",
+    "GET /health 健康检查接口",
+    "POST /api/v1/matches/ai 建局接口（内存态）",
+    "请求日志中间件与统一错误处理中间件",
+    "package.json 新增后端启动脚本与依赖"
+  ],
+  "allowed_write_paths": [
+    "server",
+    "package.json",
+    "package-lock.json",
+    "ai/tasks",
+    "ai/out",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-023.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260323-023.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-023.json"
+  ],
+  "status": "draft"
+}
