@@ -4,184 +4,253 @@ const path = require('path');
 const RULES = {
   components: {
     pattern: /^[A-Z][a-zA-Z0-9]*\.tsx$/,
-    description: 'React组件文件应使用PascalCase.tsx格式',
+    description: 'React component files should use PascalCase.tsx',
   },
   utils: {
     pattern: /^[a-z][a-z0-9-]*\.ts$/,
-    description: '工具文件应使用kebab-case.ts格式',
+    description: 'Utility files should use kebab-case.ts',
   },
   types: {
     pattern: /^[a-z][a-z0-9-]*\.ts$/,
-    description: '类型文件应使用kebab-case.ts格式',
-  },
-  styles: {
-    pattern: /^[a-z][a-z0-9-]*\.(css|scss|module\.css)$/,
-    description: '样式文件应使用kebab-case.css格式',
+    description: 'Type files should use kebab-case.ts',
   },
   docs: {
     pattern: /^[a-z]+-[a-z]+-.+\.md$/,
-    description: '文档应使用{模块}-{类型}-{主题}.md格式',
+    description: 'Docs should use {module}-{type}-{topic}.md',
   },
   directories: {
     pattern: /^[a-z][a-z0-9-]*$/,
-    description: '目录应使用kebab-case格式',
+    description: 'Directories should use kebab-case',
   },
 };
 
 const IGNORE_PATTERNS = [
-  /node_modules/,
-  /\.git/,
-  /dist/,
-  /build/,
-  /\.next/,
-  /coverage/,
+  /(^|\/)node_modules(\/|$)/,
+  /(^|\/)\.git(\/|$)/,
+  /(^|\/)dist(\/|$)/,
+  /(^|\/)build(\/|$)/,
+  /(^|\/)\.next(\/|$)/,
+  /(^|\/)coverage(\/|$)/,
 ];
 
+function normalizePath(input) {
+  return String(input || '').replace(/\\/g, '/').replace(/^\.\/+/, '');
+}
+
 function shouldIgnore(filePath) {
-  return IGNORE_PATTERNS.some(pattern => pattern.test(filePath));
+  const normalized = normalizePath(filePath);
+  return IGNORE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+function addViolation(violations, ruleKey, absolutePath, actualName) {
+  violations.push({
+    rule: ruleKey,
+    path: absolutePath,
+    actual: actualName,
+    expected: RULES[ruleKey].description,
+  });
 }
 
 function validateDirectory(dir, ruleKey, violations) {
   if (!fs.existsSync(dir)) {
-    console.log(`  ⚠️ 目录不存在: ${dir}`);
     return;
   }
 
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
   const rule = RULES[ruleKey];
   if (!rule) return;
 
-  const items = fs.readdirSync(dir);
-
-  items.forEach(item => {
-    const itemPath = path.join(dir, item);
-    
-    if (shouldIgnore(itemPath)) return;
-
-    const stat = fs.statSync(itemPath);
-
-    if (stat.isDirectory()) {
-      if (ruleKey === 'directories' || ruleKey === 'components') {
-        if (!RULES.directories.pattern.test(item)) {
-          violations.push({
-            type: 'directory',
-            path: itemPath,
-            rule: 'directories',
-            expected: RULES.directories.description,
-            actual: item,
-          });
-        }
-      }
-      
-      if (ruleKey === 'components' || ruleKey === 'utils') {
-        validateDirectory(itemPath, ruleKey, violations);
-      }
-    } else if (stat.isFile()) {
-      if (!rule.pattern.test(item)) {
-        violations.push({
-          type: 'file',
-          path: itemPath,
-          rule: ruleKey,
-          expected: rule.description,
-          actual: item,
-        });
-      }
+  for (const entry of entries) {
+    const absPath = path.join(dir, entry.name);
+    if (shouldIgnore(absPath)) {
+      continue;
     }
-  });
+
+    if (entry.isDirectory()) {
+      if ((ruleKey === 'components' || ruleKey === 'utils') && !RULES.directories.pattern.test(entry.name)) {
+        addViolation(violations, 'directories', absPath, entry.name);
+      }
+      if (ruleKey === 'components' || ruleKey === 'utils') {
+        validateDirectory(absPath, ruleKey, violations);
+      }
+      continue;
+    }
+
+    if (entry.isFile() && !rule.pattern.test(entry.name)) {
+      addViolation(violations, ruleKey, absPath, entry.name);
+    }
+  }
 }
 
 function validateDocs(dir, violations) {
   if (!fs.existsSync(dir)) {
-    console.log(`  ⚠️ 目录不存在: ${dir}`);
     return;
   }
 
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-
-  items.forEach(item => {
-    const itemPath = path.join(dir, item.name);
-    
-    if (shouldIgnore(itemPath)) return;
-
-    if (item.isDirectory()) {
-      validateDocs(itemPath, violations);
-    } else if (item.name.endsWith('.md')) {
-      if (!RULES.docs.pattern.test(item.name)) {
-        violations.push({
-          type: 'document',
-          path: itemPath,
-          rule: 'docs',
-          expected: RULES.docs.description,
-          actual: item.name,
-        });
-      }
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const absPath = path.join(dir, entry.name);
+    if (shouldIgnore(absPath)) {
+      continue;
     }
-  });
+
+    if (entry.isDirectory()) {
+      validateDocs(absPath, violations);
+      continue;
+    }
+
+    if (entry.isFile() && entry.name.toLowerCase().endsWith('.md') && !RULES.docs.pattern.test(entry.name)) {
+      addViolation(violations, 'docs', absPath, entry.name);
+    }
+  }
 }
 
-function generateReport(violations) {
-  console.log('\n' + '='.repeat(60));
-  console.log('命名规范验证报告');
-  console.log('='.repeat(60));
-  console.log(`验证时间: ${new Date().toLocaleString('zh-CN')}`);
-  console.log(`违规数量: ${violations.length}`);
-  console.log('='.repeat(60));
+function readFilesFromFileList(fileListPath) {
+  if (!fileListPath) return [];
+  if (!fs.existsSync(fileListPath)) return [];
+  const raw = fs.readFileSync(fileListPath, 'utf8');
+  return raw
+    .split(/\r?\n/)
+    .map((line) => normalizePath(line))
+    .filter(Boolean);
+}
+
+function readFilesFromInline(filesArg) {
+  if (!filesArg) return [];
+  return String(filesArg)
+    .split(',')
+    .map((item) => normalizePath(item))
+    .filter(Boolean);
+}
+
+function validateChangedFiles(projectRoot, changedFiles, violations) {
+  const relevant = [];
+
+  for (const rel of changedFiles) {
+    const normalized = normalizePath(rel);
+    if (shouldIgnore(normalized)) continue;
+
+    const absPath = path.resolve(projectRoot, normalized);
+    if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) continue;
+
+    const baseName = path.basename(normalized);
+
+    if (normalized.startsWith('src/components/')) {
+      relevant.push(normalized);
+      if (!RULES.components.pattern.test(baseName)) {
+        addViolation(violations, 'components', absPath, baseName);
+      }
+      continue;
+    }
+
+    if (normalized.startsWith('src/utils/')) {
+      relevant.push(normalized);
+      if (!RULES.utils.pattern.test(baseName)) {
+        addViolation(violations, 'utils', absPath, baseName);
+      }
+      continue;
+    }
+
+    if (normalized.startsWith('src/types/')) {
+      relevant.push(normalized);
+      if (!RULES.types.pattern.test(baseName)) {
+        addViolation(violations, 'types', absPath, baseName);
+      }
+      continue;
+    }
+
+    if (normalized.startsWith('docs/') && baseName.toLowerCase().endsWith('.md')) {
+      relevant.push(normalized);
+      if (!RULES.docs.pattern.test(baseName)) {
+        addViolation(violations, 'docs', absPath, baseName);
+      }
+    }
+  }
+
+  return relevant;
+}
+
+function getArgValue(flag) {
+  const idx = process.argv.indexOf(flag);
+  if (idx === -1) return null;
+  return process.argv[idx + 1] || null;
+}
+
+function printReport(violations, modeLabel, relevantCount) {
+  console.log('\n============================================================');
+  console.log('Naming Convention Validation Report');
+  console.log('============================================================');
+  console.log(`Mode: ${modeLabel}`);
+  if (typeof relevantCount === 'number') {
+    console.log(`Relevant files: ${relevantCount}`);
+  }
+  console.log(`Violations: ${violations.length}`);
+  console.log('============================================================');
 
   if (violations.length === 0) {
-    console.log('\n✅ 所有文件命名符合规范！\n');
+    console.log('\nPASS: no naming violations.\n');
     return;
   }
 
-  const groupedViolations = {};
-  violations.forEach(v => {
-    if (!groupedViolations[v.rule]) {
-      groupedViolations[v.rule] = [];
+  const grouped = new Map();
+  for (const violation of violations) {
+    if (!grouped.has(violation.rule)) {
+      grouped.set(violation.rule, []);
     }
-    groupedViolations[v.rule].push(v);
-  });
+    grouped.get(violation.rule).push(violation);
+  }
 
-  console.log('\n❌ 发现以下命名违规:\n');
+  console.log('\nFound naming violations:\n');
+  for (const [rule, items] of grouped.entries()) {
+    console.log(`[${rule}] (${items.length})`);
+    console.log(`  Rule: ${items[0].expected}`);
+    for (const item of items) {
+      console.log(`  - ${item.actual}`);
+      console.log(`    ${item.path}`);
+    }
+    console.log('');
+  }
+}
 
-  Object.entries(groupedViolations).forEach(([rule, items]) => {
-    console.log(`\n【${rule}】(${items.length}个违规)`);
-    console.log(`  规则: ${items[0].expected}`);
-    console.log('  违规文件:');
-    items.forEach((item, index) => {
-      console.log(`    ${index + 1}. ${item.actual}`);
-      console.log(`       路径: ${item.path}`);
-    });
-  });
+function runFullScan(projectRoot) {
+  const violations = [];
+  validateDirectory(path.join(projectRoot, 'src/components'), 'components', violations);
+  validateDirectory(path.join(projectRoot, 'src/utils'), 'utils', violations);
+  validateDirectory(path.join(projectRoot, 'src/types'), 'types', violations);
+  validateDocs(path.join(projectRoot, 'docs'), violations);
+  printReport(violations, 'full', null);
+  return violations.length === 0 ? 0 : 1;
+}
 
-  console.log('\n' + '-'.repeat(60));
-  console.log('建议修复步骤:');
-  console.log('1. 查看上述违规文件列表');
-  console.log('2. 参考 docs/standards/NAMING_CONVENTION_FRAMEWORK.md');
-  console.log('3. 使用 docs/standards/QUICK_REFERENCE_GUIDE.md 快速参考');
-  console.log('4. 重命名后重新运行此脚本验证');
-  console.log('-'.repeat(60) + '\n');
+function runChangedScan(projectRoot, changedFiles) {
+  const violations = [];
+  const relevant = validateChangedFiles(projectRoot, changedFiles, violations);
+
+  if (relevant.length === 0) {
+    console.log('\nNaming check: no relevant changed files, skip.\n');
+    return 0;
+  }
+
+  printReport(violations, 'changed-only', relevant.length);
+  return violations.length === 0 ? 0 : 1;
 }
 
 function main() {
-  console.log('\n🔍 开始验证命名规范...\n');
-
-  const violations = [];
   const projectRoot = process.cwd();
 
-  console.log('验证目录:');
-  console.log(`  - ${path.join(projectRoot, 'src/components')}`);
-  validateDirectory(path.join(projectRoot, 'src/components'), 'components', violations);
+  const filesFileArg = getArgValue('--files-file');
+  const filesArg = getArgValue('--files');
 
-  console.log(`  - ${path.join(projectRoot, 'src/utils')}`);
-  validateDirectory(path.join(projectRoot, 'src/utils'), 'utils', violations);
+  const changedFromFile = readFilesFromFileList(filesFileArg);
+  const changedFromInline = readFilesFromInline(filesArg);
+  const changedFiles = [...new Set([...changedFromFile, ...changedFromInline])];
 
-  console.log(`  - ${path.join(projectRoot, 'src/types')}`);
-  validateDirectory(path.join(projectRoot, 'src/types'), 'types', violations);
+  const exitCode = changedFiles.length > 0
+    ? runChangedScan(projectRoot, changedFiles)
+    : runFullScan(projectRoot);
 
-  console.log(`  - ${path.join(projectRoot, 'docs')}`);
-  validateDocs(path.join(projectRoot, 'docs'), violations);
-
-  generateReport(violations);
-
-  process.exit(violations.length > 0 ? 1 : 0);
+  process.exit(exitCode);
 }
 
 main();
+

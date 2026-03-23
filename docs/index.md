@@ -15,6 +15,7 @@
 | [快速参考指南](standards/QUICK_REFERENCE_GUIDE.md) | 团队速查手册 | v1.0 |
 | [非技术人员指南](standards/NAMING_GUIDE_FOR_NON_TECHNICAL.md) | 面向非编程岗位的入门指南 | v1.0 |
 | [自我审查评估报告](standards/SELF_REVIEW_REPORT.md) | 项目评估与改进方案 | v1.0 |
+| [AI任务分配指南](standards/AI_TASK_ASSIGNMENT_GUIDE.md) | 多AI协作工作流程 | v1.0 |
 
 ---
 
