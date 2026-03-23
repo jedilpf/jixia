@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260323-013",
+  "goal": "对当前项目做一次全量审查，输出是否存在问题、问题等级、影响范围与修复优先级。",
+  "constraints": [
+    "必须基于代码与自动化检查结果，不可主观猜测。",
+    "审查要覆盖：入口路由、战斗主线、编码可读性、构建与门禁状态。",
+    "若发现不明确项，使用 UNKNOWN 并在回答中明确标注。",
+    "不得修改业务逻辑代码，本任务仅审查。"
+  ],
+  "deliverables": [
+    "一份按严重级别排序的审查结论（终端回复）"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "docs",
+    "review",
+    "open_questions.md",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-013.json",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-013.json"
+  ],
+  "status": "draft"
+}

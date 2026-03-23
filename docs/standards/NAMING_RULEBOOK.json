@@ -386,6 +386,16 @@
       "hiddenSubmit": "暗辩",
       "reveal": "明辩"
     },
+    "external_to_internal": {
+      "用度": "mana",
+      "生命": "health",
+      "护持": "shield",
+      "大势": "momentum",
+      "主议": "mainQueue",
+      "旁议": "sideQueue",
+      "暗辩": "hiddenSubmit",
+      "明辩": "reveal"
+    },
     "faction_names": {
       "confucianism": "儒家",
       "legalism": "法家",
@@ -397,6 +407,18 @@
       "diplomats": "纵横家",
       "agriculturalists": "农家",
       "miscellaneous": "杂家"
+    },
+    "faction_names_reverse": {
+      "儒家": "confucianism",
+      "法家": "legalism",
+      "墨家": "mohism",
+      "道家": "daoism",
+      "兵家": "military",
+      "名家": "logicians",
+      "阴阳家": "yin-yang",
+      "纵横家": "diplomats",
+      "农家": "agriculturalists",
+      "杂家": "miscellaneous"
     }
   },
 

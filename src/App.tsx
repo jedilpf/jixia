@@ -23,8 +23,12 @@ type GameScreen =
   | 'characters';
 
 function App() {
-  const useMvpFlow =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('newFlow') === '1';
+  // Product policy (2026-03-23):
+  // - New MVP flow is the default runtime.
+  // - Legacy flow is preserved for regression only and can be opened via `?legacyFlow=1`.
+  const forceLegacyFlow =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('legacyFlow') === '1';
+  const useMvpFlow = !forceLegacyFlow;
 
   if (useMvpFlow) {
     return (

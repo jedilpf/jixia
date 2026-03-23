@@ -14,6 +14,7 @@
 | [实施计划](standards/IMPLEMENTATION_PLAN.md) | 命名规范执行方案 | v1.0 |
 | [快速参考指南](standards/QUICK_REFERENCE_GUIDE.md) | 团队速查手册 | v1.0 |
 | [非技术人员指南](standards/NAMING_GUIDE_FOR_NON_TECHNICAL.md) | 面向非编程岗位的入门指南 | v1.0 |
+| [自我审查评估报告](standards/SELF_REVIEW_REPORT.md) | 项目评估与改进方案 | v1.0 |
 
 ---
 
