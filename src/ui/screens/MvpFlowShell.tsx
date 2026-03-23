@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { TransitionScreen } from '@/components/TransitionScreen';
 import {
@@ -7,6 +7,7 @@ import {
   HomeScreen,
   LoadingScreen,
   MatchScreen,
+  PreFactionLoading,
   ResultScreen,
   TopicScreen,
 } from '@/ui/screens';
@@ -15,6 +16,7 @@ export function MvpFlowShell() {
   const { state, dispatch } = useAppStore();
   const [showTransition, setShowTransition] = useState(false);
   const [pendingMatchStart, setPendingMatchStart] = useState(false);
+  const [showPreFactionLoading, setShowPreFactionLoading] = useState(false);
 
   const beginMatchWithTransition = () => {
     setPendingMatchStart(true);
@@ -29,8 +31,17 @@ export function MvpFlowShell() {
     }
   };
 
+  const handlePreFactionLoadingComplete = () => {
+    setShowPreFactionLoading(false);
+    dispatch({ type: 'OPEN_FACTION_PICK' });
+  };
+
   if (showTransition) {
     return <TransitionScreen onComplete={handleTransitionComplete} />;
+  }
+
+  if (showPreFactionLoading) {
+    return <PreFactionLoading onComplete={handlePreFactionLoadingComplete} minDisplayMs={2000} />;
   }
 
   if (state.screen === 'home') {
@@ -45,7 +56,9 @@ export function MvpFlowShell() {
     return (
       <TopicScreen
         topicIds={state.selectedIssuePreviewIds}
-        onContinue={() => dispatch({ type: 'OPEN_FACTION_PICK' })}
+        onContinue={() => {
+          setShowPreFactionLoading(true);
+        }}
       />
     );
   }

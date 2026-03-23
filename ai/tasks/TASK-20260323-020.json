@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260323-020",
+  "goal": "对当前已修复版本执行全项目阅读，并产出可视化项目总览文档（结构图、流程图、模块关系图），供人工与AI快速理解。",
+  "constraints": [
+    "仅新增/更新文档，不修改任何核心游戏逻辑与UI行为。",
+    "可视化内容必须基于仓库真实文件与入口关系，不得臆测。",
+    "优先覆盖 src 当前主链路，标注 src_new 与历史目录为旁路资产。",
+    "仅在允许路径内写入。"
+  ],
+  "deliverables": [
+    "一份可读的项目可视化总览文档（含Mermaid图）",
+    "主入口与运行链路说明",
+    "关键模块职责与依赖关系说明",
+    "给其他AI可直接复用的阅读顺序建议"
+  ],
+  "allowed_write_paths": [
+    "docs",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-020.json",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-020.json"
+  ],
+  "status": "draft"
+}
