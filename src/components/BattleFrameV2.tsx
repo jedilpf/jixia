@@ -16,11 +16,12 @@
  *   - 消息/表情浮层
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
 import { getTopicById } from '@/battleV2/topics';
 import {
   ArenaId,
+  DebateCard,
   SeatId,
 } from '@/battleV2/types';
 
@@ -38,8 +39,42 @@ import {
   ExitConfirmModal,
 } from './battle';
 
+interface ChatMessage {
+  id: string;
+  sender: 'player' | 'enemy' | 'system';
+  content: string;
+  type: 'emoji' | 'text';
+  timestamp: number;
+}
+
+function pickRandom<T>(list: T[]): T {
+  return list[Math.floor(Math.random() * list.length)] ?? list[0];
+}
+
+function makeChatId(): string {
+  return `chat_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+}
+
+function createChatReply(playerMessage: string, emoji?: string): { content: string; type: 'emoji' | 'text' } {
+  const emojiReplies = ['👍', '👌', '😄', '😏', '👏', '🎯', '⚡'];
+  const neutralReplies = ['收到。', '这步有意思。', '继续。', '我看到了。', '你很有想法。'];
+  const pressureReplies = ['差一点。', '这回合要紧了。', '你想抢节奏？', '我会回应。'];
+
+  if (emoji) {
+    return { content: pickRandom(emojiReplies), type: 'emoji' };
+  }
+
+  const lower = playerMessage.toLowerCase();
+  if (lower.includes('厉害') || lower.includes('精彩') || lower.includes('nice')) {
+    return { content: pickRandom(['彼此彼此。', '你也很强。', '继续来。']), type: 'text' };
+  }
+  if (lower.includes('好险') || lower.includes('危险')) {
+    return { content: pickRandom(pressureReplies), type: 'text' };
+  }
+  return { content: pickRandom(neutralReplies), type: 'text' };
+}
+
 // 所有可用卡牌（用于图鉴）
-import { TEST_CARDS_V01 } from '@/battleV2/testCards';
 
 // ═══════════════════════════════════════════════════════════════
 // Props
@@ -177,17 +212,84 @@ export default function BattleFrameV2({
   );
 
   // ═══════════════════════════════════════════════════════════
-  // 社交功能
+  // 社交功能 - 聊天消息状态
   // ═══════════════════════════════════════════════════════════
-  const handleSendMessage = useCallback((message: string) => {
-    console.log('发送消息:', message);
-    // TODO: 实现消息发送逻辑
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const aiResponseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setChatMessages([
+      {
+        id: makeChatId(),
+        sender: 'enemy' as const,
+        content: '准备好了就开始吧。',
+        type: 'text' as const,
+        timestamp: Date.now(),
+      },
+    ]);
+    return () => {
+      if (aiResponseTimerRef.current) {
+        clearTimeout(aiResponseTimerRef.current);
+      }
+    };
   }, []);
 
-  const handleSendEmoji = useCallback((emoji: string) => {
-    console.log('发送表情:', emoji);
-    // TODO: 实现表情发送逻辑
+  const triggerAIResponse = useCallback((playerMessage: string, emoji?: string) => {
+    if (aiResponseTimerRef.current) {
+      clearTimeout(aiResponseTimerRef.current);
+    }
+
+    aiResponseTimerRef.current = setTimeout(() => {
+      const response = createChatReply(playerMessage, emoji);
+      setChatMessages((prev) => {
+        const next = [
+          ...prev,
+          {
+            id: makeChatId(),
+            sender: 'enemy' as const,
+            content: response.content,
+            type: response.type as ChatMessage['type'],
+            timestamp: Date.now(),
+          },
+        ];
+        return next.slice(-50);
+      });
+    }, 800 + Math.random() * 1200);
   }, []);
+
+  const handleSendMessage = useCallback((message: string) => {
+    setChatMessages((prev) => {
+      const next = [
+        ...prev,
+        {
+          id: makeChatId(),
+          sender: 'player' as const,
+          content: message,
+          type: 'text' as const,
+          timestamp: Date.now(),
+        },
+      ];
+      return next.slice(-50);
+    });
+    triggerAIResponse(message);
+  }, [triggerAIResponse]);
+
+  const handleSendEmoji = useCallback((emoji: string) => {
+    setChatMessages((prev) => {
+      const next = [
+        ...prev,
+        {
+          id: makeChatId(),
+          sender: 'player' as const,
+          content: emoji,
+          type: 'emoji' as const,
+          timestamp: Date.now(),
+        },
+      ];
+      return next.slice(-50);
+    });
+    triggerAIResponse('', emoji);
+  }, [triggerAIResponse]);
 
   // ═══════════════════════════════════════════════════════════
   // 退出确认处理
@@ -211,8 +313,41 @@ export default function BattleFrameV2({
   // 图鉴数据
   // ═══════════════════════════════════════════════════════════
   const allCards = useMemo(() => {
-    return TEST_CARDS_V01;
-  }, []);
+    const pooled: DebateCard[] = [
+      ...state.player.hand,
+      ...state.player.deck,
+      ...state.player.discard,
+      ...state.player.writings,
+      ...state.enemy.hand,
+      ...state.enemy.deck,
+      ...state.enemy.discard,
+      ...state.enemy.writings,
+    ];
+
+    const unique = new Map<string, DebateCard>();
+    for (const card of pooled) {
+      const key = `${card.name}|${card.type}|${card.cost}|${card.description ?? ''}|${card.faction ?? ''}`;
+      if (!unique.has(key)) {
+        unique.set(key, {
+          ...card,
+          id: key,
+        });
+      }
+    }
+
+    return Array.from(unique.values()).sort((a, b) => (
+      a.cost - b.cost || a.name.localeCompare(b.name, 'zh-Hans-CN')
+    ));
+  }, [
+    state.player.hand,
+    state.player.deck,
+    state.player.discard,
+    state.player.writings,
+    state.enemy.hand,
+    state.enemy.deck,
+    state.enemy.discard,
+    state.enemy.writings,
+  ]);
 
   // ═══════════════════════════════════════════════════════════
   // 渲染
@@ -303,6 +438,7 @@ export default function BattleFrameV2({
         onClose={() => setIsChatFloatOpen(false)}
         onSendMessage={handleSendMessage}
         onSendEmoji={handleSendEmoji}
+        messages={chatMessages}
       />
 
       {/* 退出确认对话框 */}
