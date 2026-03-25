@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260325-048",
+  "goal": "Stabilize mainline governance by converging to a single default entry flow, documenting the current baseline, removing tracked cache/backup artifacts, and making lint checks blocking in CI.",
+  "constraints": [
+    "Do not delete gameplay/content assets casually; only remove tracked cache/backup artifacts that are already covered by .gitignore policy.",
+    "Keep legacy battle implementation accessible via explicit query parameter for regression, but not as default flow.",
+    "Do not broaden into feature work, visual polish, or gameplay-rule expansion."
+  ],
+  "deliverables": [
+    "App default entry is MvpFlowShell, while legacy flow is only enabled via ?legacyFlow=1.",
+    "docs/current-baseline.md defines the current single default mainline, legacy access path, and card/data source baseline.",
+    "Tracked .vite/deps and backups snapshot artifacts are removed from git tracking.",
+    "PR lint checks in workflow files are blocking (no continue-on-error)."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/App.tsx",
+    "docs",
+    ".github/workflows",
+    ".vite",
+    "backups",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-048.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-048.json",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-048.json"
+  ],
+  "status": "draft"
+}

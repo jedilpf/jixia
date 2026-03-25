@@ -22,6 +22,9 @@
 - Collection list and detail views should share the same ordered active-card source (`ACTIVE_COLLECTION_CARDS`) instead of each screen deriving its own order.
 - Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
 - Battle presentation components should resolve card art, frame art, and battle backgrounds through `getCardImageUrl` / `getAssetUrl` instead of raw `assets/...` strings or id whitelists, so migrated ids and packaged base paths stay consistent.
+- Default application entry should be MVP flow (`MvpFlowShell`), while legacy flow should be opt-in via `?legacyFlow=1` for regression only.
+- CI lint checks should be blocking in PR workflows to prevent style and naming drift from entering mainline.
+- Cache/temporary artifacts listed in `.gitignore` (notably `.vite/` and `backups/`) should remain untracked in git.
 
 ## Working preferences
 - Favor small, reviewable diffs.

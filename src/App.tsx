@@ -24,10 +24,10 @@ type GameScreen =
   | 'characters';
 
 function App() {
-  const useMvpFlow =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('newFlow') === '1';
+  const useLegacyFlow =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('legacyFlow') === '1';
 
-  if (useMvpFlow) {
+  if (!useLegacyFlow) {
     return (
       <ThemeProvider>
         <div className="relative h-dvh w-full overflow-hidden bg-[#0f0d0a] text-[#f0ddbb]">

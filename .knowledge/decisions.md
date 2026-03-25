@@ -77,6 +77,16 @@
 - Why: Raw `assets/...` strings and whitelist-based jpg guesses drifted from migrated card ids and from packaged/electron base-path behavior, causing battle visuals to lag behind the collection fixes.
 - Consequence: Battle presentation surfaces should consume helper-generated URLs, while existing card/content files remain untouched.
 
+### 2026-03-25
+- Decision: Converge app entry to MVP-by-default and keep legacy flow behind explicit query `?legacyFlow=1`.
+- Why: Dual-entry defaults caused collaboration drift and made "current mainline" ambiguous during implementation and review.
+- Consequence: Normal runs and acceptance should target MVP flow first; legacy route remains available only for explicit regression checks.
+
+### 2026-03-25
+- Decision: Make PR lint checks blocking and remove tracked cache/backup artifacts covered by `.gitignore`.
+- Why: Non-blocking lint and tracked generated caches increased mainline entropy and made repository hygiene rules ineffective.
+- Consequence: Lint failures now stop PR validation, and `.vite/` / `backups/` artifacts are kept out of tracked source history.
+
 ## Format
 For future entries, use:
 - Decision:
