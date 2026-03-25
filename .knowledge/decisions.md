@@ -72,6 +72,11 @@
 - Why: Grid grouping by explicit faction order and detail paging by raw `ACTIVE_CARDS` order produced inconsistent navigation and made the collection feel unstable.
 - Consequence: Collection screens should use shared ordered exports (`COLLECTION_CARDS`, `ACTIVE_COLLECTION_CARDS`) whenever navigation or grouping order matters.
 
+### 2026-03-25
+- Decision: Replace remaining battle presentation asset literals with shared asset helpers, including battleV2 card art lookup.
+- Why: Raw `assets/...` strings and whitelist-based jpg guesses drifted from migrated card ids and from packaged/electron base-path behavior, causing battle visuals to lag behind the collection fixes.
+- Consequence: Battle presentation surfaces should consume helper-generated URLs, while existing card/content files remain untouched.
+
 ## Format
 For future entries, use:
 - Decision:

@@ -3,8 +3,7 @@
  *
  * 规则：
  *  - 使用 cardsSource 统一数据源（content/cards -> generated/cardsRuntime）。
- *  - 图路径 = `assets/cards/${id}.jpg`；若实际文件不存在，返回 undefined，
- *    调用方可回退到按卡型提供的默认图。
+ *  - 卡图路径统一走 shared asset helper，兼容迁移后的 BS01/LEG-SC id。
  *  - 首发 Starter 牌库：从"礼心殿"和"名相府"两个门派各取5张（共10种），
  *    每张复制2份凑成 20 张完整牌库。
  */
@@ -12,24 +11,15 @@
 import { DebateCard, Side } from './types';
 import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, FRAMEWORK_FACTION_NAMES, pickSceneBiasFromRoutePreference, resolveFactionForCards, toFrameworkFactionName } from './factions';
 import { ACTIVE_CARDS, type CardData } from '@/data/cardsSource';
+import { getCardImageUrl } from '@/utils/assets';
 import {
   DEFAULT_CARD_POOL_CONFIG,
   DEFAULT_DECK_BUILD_DEFAULTS,
   normalizeEnabledFactions,
 } from './meta';
 
-// ── 已有美术资源的卡牌 id 白名单 ─────────────────────────────────────
-const ART_EXISTS = new Set([
-  'wenyan', 'zhuduchao', 'jiangxi', 'sishi', 'libian',
-  'tiequan', 'duanjian', 'jianyin', 'juwentang', 'chilin',
-  'yunxiu', 'baoyi', 'dansha', 'taiqing', 'hebu',
-  'liannuju', 'jimu', 'chengfang', 'jianshi', 'qianji',
-  'jingqi', 'zhange', 'bingshu', 'fengjun', 'poji',
-  'baima', 'mingshi', 'tongyi', 'cifeng', 'guibian',
-]);
-
-export function artPathForId(id: string): string | undefined {
-  return ART_EXISTS.has(id) ? `assets/cards/${id}.jpg` : undefined;
+export function artPathForId(id: string, cardName?: string): string {
+  return getCardImageUrl(id, cardName);
 }
 
 // ── 从 ACTIVE_CARDS 按 id 查找对应的设定 ─────────────────────────────
@@ -140,7 +130,7 @@ function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
     cost: Math.max(1, src.cost <= 3 ? src.cost : Math.round(src.cost / 2)),
     effectKind: typeMap[src.type] ?? 'draw',
     effectValue: src.attack ?? src.shield ?? (src.hp ? Math.ceil(src.hp / 2) : 1),
-    art: artPathForId(src.id),
+    art: artPathForId(src.id, src.name),
     prologue: src.background,
     description: src.skill,
     faction: frameworkFaction,

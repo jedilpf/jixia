@@ -21,6 +21,7 @@
 - Legacy cards may need an explicit `display_type` field in `content/cards` so generated collection data can preserve user-facing labels like `事件` and `反制` while keeping structured runtime `type` values constrained.
 - Collection list and detail views should share the same ordered active-card source (`ACTIVE_COLLECTION_CARDS`) instead of each screen deriving its own order.
 - Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
+- Battle presentation components should resolve card art, frame art, and battle backgrounds through `getCardImageUrl` / `getAssetUrl` instead of raw `assets/...` strings or id whitelists, so migrated ids and packaged base paths stay consistent.
 
 ## Working preferences
 - Favor small, reviewable diffs.

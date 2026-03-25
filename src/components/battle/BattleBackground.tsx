@@ -2,6 +2,8 @@
 // Skill: ui-theme-designer + ui-animation-designer + style-pass-bronze-mechanism
 // 应用稷下青铜机关城主题：炉火光晕 + 齿轮装饰 + 铜绿纹理 + 战场分割线
 
+import { getAssetUrl } from '@/utils/assets';
+
 interface BattleBackgroundProps {
     scale: number;
     containerWidth: number;
@@ -106,7 +108,7 @@ export function BattleBackground({ scale, containerWidth, containerHeight }: Bat
             {/* ── 层0：战场背景图 ── */}
             <div style={{
                 position: 'absolute', inset: 0,
-                backgroundImage: 'url(assets/bg-battle.png)',
+                backgroundImage: `url(${getAssetUrl('assets/bg-battle.png')})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',

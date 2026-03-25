@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { CharacterInstance } from '@/types';
-import { rarityColor as showcaseRarityColor } from '@/data/showcaseCards';
+import { rarityColor as showcaseRarityColor } from '@/data/cardsSource';
+import { getAssetUrl, getCardImageUrl } from '@/utils/assets';
 import './MinionCard.css';
 
 interface MinionCardProps {
@@ -24,10 +25,12 @@ export const MinionCard = React.memo(function MinionCard({
   onPointerDown,
   style,
 }: MinionCardProps) {
-  const [imageError, setImageError] = useState(false);
   const rarity = minion.rarity ?? '常见';
   const rarityColor = showcaseRarityColor[rarity] || showcaseRarityColor['常见'];
   const isLow = minion.hp <= minion.maxHp * 0.35;
+  const attackIcon = getAssetUrl('assets/attack.png');
+  const hpIcon = getAssetUrl('assets/hp.png');
+  const artworkUrl = getCardImageUrl(minion.cardId, minion.name);
 
   // 边框颜色：保持通透感，仅用微弱的阴影或轻微抬升表达状态
   const borderColor = isSelected
@@ -43,9 +46,6 @@ export const MinionCard = React.memo(function MinionCard({
     : canAttack
       ? '0 4px 12px rgba(232, 93, 4, 0.2)'
       : '0 4px 12px rgba(0,0,0,0.3)';
-
-  // 提取原始卡牌的图片 ID
-  const imageId = minion.cardId.startsWith('deck_') ? minion.cardId.split('_').pop() : minion.cardId;
 
   return (
     <div
@@ -71,33 +71,20 @@ export const MinionCard = React.memo(function MinionCard({
       }}
     >
       {/* 底部全画幅原图 */}
-      {!imageError ? (
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `url(assets/cards/${imageId}.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 20%',
+      <img
+        src={artworkUrl}
+        alt={minion.name}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center 20%',
           opacity: 0.85,
-          zIndex: 0
+          zIndex: 0,
         }}
-        onError={() => setImageError(true)}
-        />
-      ) : (
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: `linear-gradient(135deg, ${rarityColor}33 0%, ${rarityColor}11 100%)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 0
-        }}>
-          <span style={{
-            fontSize: '32px',
-            color: rarityColor,
-            opacity: 0.5
-          }}>牌</span>
-        </div>
-      )}
+      />
 
       {/* 渐变遮罩，使底部文字和血条清晰可见 */}
       <div style={{
@@ -177,7 +164,7 @@ export const MinionCard = React.memo(function MinionCard({
       }}>
         {/* 攻击力 */}
         <div className="relative flex flex-col items-center justify-center w-[1.8vw] min-w-[20px] max-w-[28px] aspect-square">
-          <img src="assets/attack.png" alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+          <img src={attackIcon} alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
           <span className="relative z-10 font-bold text-white leading-none mt-[10%]"
             style={{ fontSize: 'clamp(10px, 1.5vw, 16px)', textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>
             {minion.atk}
@@ -185,7 +172,7 @@ export const MinionCard = React.memo(function MinionCard({
         </div>
         {/* 血量 */}
         <div className="relative flex flex-col items-center justify-center w-[1.4vw] min-w-[16px] max-w-[22px] aspect-square mt-[2px]">
-          <img src="assets/hp.png" alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+          <img src={hpIcon} alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
           <span className="relative z-10 font-bold text-white leading-none mt-[10%]"
             style={{ fontSize: 'clamp(10px, 1.2vw, 14px)', textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>
             {minion.hp}
