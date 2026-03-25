@@ -46,3 +46,7 @@ typescript-errors.txt
 review_bundle_*/
 review_bundle_*.zip
 review_bundle_*.zip.sha256.txt
+review/
+
+# Archived source trees (not active mainline)
+src_new/

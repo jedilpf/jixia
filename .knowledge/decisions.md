@@ -107,6 +107,21 @@
 - Why: The current Windows sandbox environment blocks test-runner subprocess spawning (`spawn EPERM`) under default isolation.
 - Consequence: Test execution remains deterministic and CI/local verification can run from the compiled test index without subprocess isolation.
 
+### 2026-03-25
+- Decision: Formalize long-running delivery guardrails and omission audits as repository standards documents.
+- Why: Stable output in this project depends on preventing hidden content, drifting data ownership, and unverifiable handoffs; keeping that rule only in chat is too fragile.
+- Consequence: Future migrations, catalog work, and cross-module cleanup tasks should follow `docs/standards/standards-guide-stable-delivery-v1.md` and `docs/standards/standards-checklist-omission-audit-v1.md`, and reviewers can use the checklist as a repeatable acceptance aid.
+
+### 2026-03-25
+- Decision: Converge to a single active app entry (`src/App.tsx -> MvpFlowShell`) and remove query-parameter flow splitting from active entry behavior.
+- Why: Dual-entry runtime branching keeps ownership ambiguous and causes collaborators to patch the wrong flow.
+- Consequence: Legacy UI/battle stacks stay as archive/regression code only; active implementation and acceptance target the MVP entry path.
+
+### 2026-03-25
+- Decision: Explicitly classify `.vite/`, `backups/`, `review/`, `review_bundle_*/`, and `src_new/` as non-mainline boundary directories.
+- Why: These directories create cognitive noise and increase accidental edits when treated as active project scope.
+- Consequence: Mainline work, review, and AI task scopes should avoid these directories unless a task explicitly targets cleanup/archive operations.
+
 ## Format
 For future entries, use:
 - Decision:

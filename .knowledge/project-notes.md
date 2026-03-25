@@ -33,6 +33,9 @@
 - `src_new/` should remain archived from tracked mainline; new implementation work should target `src/` + MVP flow modules only.
 - Repo-local skill `.agents/skills/jixia-workflow-guard/` is the project-specific shortcut for task-packet discipline, mainline guardrails, verification order, and dirty-worktree-safe gating.
 - The most useful installed global companion skills for this repository are `$develop-web-game`, `$playwright`, `$gh-fix-ci`, and `$security-best-practices`.
+- Long-running migrations, catalog recovery, and cross-module cleanup work should reference `docs/standards/standards-guide-stable-delivery-v1.md` plus `docs/standards/standards-checklist-omission-audit-v1.md` so "stable output" and "nothing hidden/missing" are checked by process, not memory.
+- Active app entry is now fixed to `src/App.tsx -> MvpFlowShell` with no query-based flow split in the active path; legacy flows remain code-level references only.
+- Active-mainline boundary excludes `.vite/`, `backups/`, `review/`, `review_bundle_*/`, and `src_new/`; these should not be treated as primary implementation scope.
 
 ## Working preferences
 - Favor small, reviewable diffs.

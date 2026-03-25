@@ -163,3 +163,16 @@
 ---
 
 **最后更新**: 2026-03-23 | **版本**: 2.0.0
+
+---
+
+## Long-Term Stability
+| Document | Description | Version |
+|------|------|------|
+| [Stable Delivery Guardrail](standards/standards-guide-stable-delivery-v1.md) | Repository-level guardrail for long-running, low-drift execution and handoff | v1 |
+| [Omission Audit Checklist](standards/standards-checklist-omission-audit-v1.md) | Checklist for hidden content, duplicate visibility, source drift, and verification gaps | v1 |
+
+## Mainline Baseline
+| Document | Description | Version |
+|------|------|------|
+| [Current Baseline](current-baseline.md) | Single active frontend entry, battle mainline, card source of truth, and legacy/archive boundaries | 2026-03-25 |
