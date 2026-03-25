@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260325-053",
+  "goal": "Create a repository-local Codex skill that codifies this project's task-packet, verification, and mainline-guard workflow, and summarize how the newly installed global skills fit into daily usage.",
+  "constraints": [
+    "Keep the custom skill narrow and practical for this repository.",
+    "Prefer repository-local skill files under .agents/skills so future collaborators inherit the workflow.",
+    "Do not modify product code or gameplay behavior."
+  ],
+  "deliverables": [
+    "A new repo-local skill under .agents/skills with usable metadata and concise instructions.",
+    "A short usage note tying the installed global skills to this repository workflow.",
+    "Validation of the created skill structure."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".agents/skills",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-053.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-053.json"
+  ],
+  "status": "draft"
+}

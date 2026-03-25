@@ -31,6 +31,8 @@
 - In sandboxed Windows runs where Node test subprocess spawning is restricted, run tests with `node --test --test-isolation=none` against the compiled index entry to avoid `spawn EPERM`.
 - Test-specific asset path behavior should be isolated through `tests/stubs/assets.ts` rather than changing runtime asset helpers.
 - `src_new/` should remain archived from tracked mainline; new implementation work should target `src/` + MVP flow modules only.
+- Repo-local skill `.agents/skills/jixia-workflow-guard/` is the project-specific shortcut for task-packet discipline, mainline guardrails, verification order, and dirty-worktree-safe gating.
+- The most useful installed global companion skills for this repository are `$develop-web-game`, `$playwright`, `$gh-fix-ci`, and `$security-best-practices`.
 
 ## Working preferences
 - Favor small, reviewable diffs.
