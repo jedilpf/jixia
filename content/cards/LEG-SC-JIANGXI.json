@@ -1,29 +1,28 @@
 {
-    "id":  "LEG-SC-JIANGXI",
-    "name":  "讲席清规",
-    "faction":  "礼心殿",
-    "rarity":  "common",
-    "type":  "field",
-    "cost":  2,
-    "rules_text":  "你每回合第1次使用【技能】牌时，抽1；回合末若你本回合未使用牌，获得【护持3】。",
-    "keyword_ids":  [
-
-                    ],
-    "mechanic_ids":  [
-                         "MEC-CORE-TEMPO"
-                     ],
-    "lore_anchor_ids":  [
-                            "ANC-WORLD-001",
-                            "ANC-RULE-001"
-                        ],
-    "provenance":  {
-                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
-                       "models_used":  [
-                                           "codex"
-                                       ],
-                       "canon_version":  "0.1.0",
-                       "seed":  "legacy-migration"
-                   },
-    "status":  "archived",
-    "notes":  "legacy_source=showcase; legacy_id=jiangxi; migrated_at=2026-03-24; superseded_by=BS01-RU-004; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+  "id": "LEG-SC-JIANGXI",
+  "name": "讲席清规",
+  "faction": "礼心殿",
+  "rarity": "common",
+  "type": "field",
+  "cost": 2,
+  "rules_text": "你每回合第1次使用【技能】牌时，抽1；回合末若你本回合未使用牌，获得【护持3】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=showcase; legacy_id=jiangxi; migrated_at=2026-03-24; superseded_by=BS01-RU-004; archived_reason=active_catalog_duplicate; archived_at=2026-03-25",
+  "display_type": "场地"
 }

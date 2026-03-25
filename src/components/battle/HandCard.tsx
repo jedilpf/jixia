@@ -1,6 +1,7 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { Card, CharacterCard } from '@/types';
-import { rarityColor, typeColor } from '@/data/showcaseCards';
+import { getCardImageUrl, rarityColor, typeColor } from '@/data/cardsSource';
+import { getAssetUrl } from '@/utils/assets';
 
 interface HandCardProps {
   card: Card;
@@ -40,11 +41,19 @@ export function HandCard({
   const [isHovered, setIsHovered] = useState(false);
   const [showText, setShowText] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
+  const bellSound = getAssetUrl('assets/bell-sound.mp3');
+  const cardBackImage = getAssetUrl('assets/card-back.png');
+  const cardFrameImage = getAssetUrl('assets/card-frame.png');
+  const costImage = getAssetUrl('assets/cost.png');
+  const hpImage = getAssetUrl('assets/hp.png');
+  const attackImage = getAssetUrl('assets/attack.png');
+  const textBgImage = getAssetUrl('assets/text-bg.png');
+  const bellImage = getAssetUrl('assets/bell.png');
 
   // 播放编钟音效
   const playBellSound = () => {
     try {
-      const audio = new Audio('assets/bell-sound.mp3');
+      const audio = new Audio(bellSound);
       audio.volume = 0.6;
       audio.play();
     } catch (e) {
@@ -122,7 +131,7 @@ export function HandCard({
           transform: enemyTransform,
           transformOrigin: 'center bottom',
           borderRadius: `${6 * scale}px`,
-          backgroundImage: `url(assets/card-back.png)`,
+          backgroundImage: `url(${cardBackImage})`,
           backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           boxShadow: 'none', // 移除所有阴影/边框感
@@ -171,7 +180,7 @@ export function HandCard({
         <div
           className="w-[90%] h-[90%]"
           style={{
-            backgroundImage: `url(assets/cards/${card.id.split('_').pop()}.jpg)`,
+            backgroundImage: `url(${getCardImageUrl(card.id, card.name)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -182,7 +191,7 @@ export function HandCard({
       <div
         className="absolute inset-0 bg-no-repeat z-10 pointer-events-none"
         style={{
-          backgroundImage: `url(assets/card-frame.png)`,
+          backgroundImage: `url(${cardFrameImage})`,
           backgroundSize: '100% 100%',
           backgroundPosition: 'center'
         }}
@@ -215,7 +224,7 @@ export function HandCard({
           height: `${34 * fx}px`
         }}
       >
-        <img src="assets/cost.png" alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+        <img src={costImage} alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
         <span className="relative z-10 font-bold text-[#f5e6b8] leading-none"
           style={{ fontSize: `${15 * fx}px`, textShadow: '0 1px 3px rgba(0,0,0,0.9)', marginBottom: `${1 * fx}px` }}>
           {card.cost}
@@ -229,7 +238,7 @@ export function HandCard({
           {/* 生命 */}
           <div className="flex flex-col items-center justify-center relative"
             style={{ width: `${36 * fx}px`, height: `${36 * fx}px` }}>
-            <img src="assets/hp.png" alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+            <img src={hpImage} alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
             <span className="relative z-10 font-bold text-white leading-none mt-1"
               style={{ fontSize: `${15 * fx}px`, textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>
               {(card as CharacterCard).hp ?? 0}
@@ -238,7 +247,7 @@ export function HandCard({
           {/* 攻击 */}
           <div className="flex flex-col items-center justify-center relative"
             style={{ width: `${46 * fx}px`, height: `${46 * fx}px` }}>
-            <img src="assets/attack.png" alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+            <img src={attackImage} alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
             <span className="relative z-10 font-bold text-white leading-none mt-1"
               style={{ fontSize: `${20 * fx}px`, textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>
               {(card as CharacterCard).atk ?? 0}
@@ -259,7 +268,7 @@ export function HandCard({
           pointerEvents: isDetailVisible ? 'auto' : 'none',
         }}
       >
-        <div className="absolute inset-0 drop-shadow-2xl" style={{ backgroundImage: `url(assets/text-bg.png)`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+        <div className="absolute inset-0 drop-shadow-2xl" style={{ backgroundImage: `url(${textBgImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
 
         <div className="relative z-10 flex flex-col custom-scrollbar font-serif h-full overflow-y-auto"
           style={{
@@ -347,7 +356,7 @@ export function HandCard({
         }}
       >
         <img
-          src="assets/bell.png"
+          src={bellImage}
           alt="查看详情"
           className={`w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${isShaking ? 'animate-ring' : ''}`}
         />

@@ -1,5 +1,15 @@
 import { useMemo, useState } from 'react';
-import { ACTIVE_CARDS, CARDS, getCardImageUrl, rarityColor, typeColor, type CardData } from '@/data/cardsSource';
+import {
+    ACTIVE_COLLECTION_CARDS,
+    COLLECTION_CARDS,
+    COLLECTION_FACTION_ORDER,
+    getActiveCollectionIndexById,
+    getCardImageUrl,
+    getCollectionFactionName,
+    rarityColor,
+    typeColor,
+    type CardData,
+} from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getAssetUrl } from '@/utils/assets';
 
@@ -9,7 +19,6 @@ interface CardGridProps {
 }
 
 type VisibilityFilter = 'all' | 'active' | 'locked';
-type CatalogCard = CardData & { catalogOrder: number; displayFaction: string };
 
 const STATUS_LABEL: Record<CardData['status'], string> = {
     active: '已开放',
@@ -18,35 +27,6 @@ const STATUS_LABEL: Record<CardData['status'], string> = {
     rework: '重做中',
     archived: '归档',
 };
-
-const FACTION_DISPLAY_MAP: Record<string, string> = {
-    礼心殿: '儒家',
-    玄匠盟: '墨家',
-};
-
-const FACTION_ORDER: string[] = [
-    '儒家',
-    '墨家',
-    '衡戒廷',
-    '归真观',
-    '九阵堂',
-    '名相府',
-    '司天台',
-    '游策阁',
-    '万农坊',
-    '兼采楼',
-    '天工坊',
-    '两仪署',
-    '杏林馆',
-    '稗言社',
-    '养真院',
-    '筹天阁',
-    '通用',
-];
-
-function toDisplayFaction(rawFaction: string): string {
-    return FACTION_DISPLAY_MAP[rawFaction] ?? rawFaction;
-}
 
 function lockLabel(status: CardData['status']): string {
     return STATUS_LABEL[status] ?? '未开放';
@@ -59,7 +39,7 @@ function matchVisibility(card: CardData, filter: VisibilityFilter): boolean {
 }
 
 function orderFactions(factions: string[]): string[] {
-    const rank = new Map<string, number>(FACTION_ORDER.map((name, index) => [name, index]));
+    const rank = new Map<string, number>(COLLECTION_FACTION_ORDER.map((name, index) => [name, index]));
     return [...factions].sort((a, b) => {
         const ai = rank.has(a) ? rank.get(a)! : Number.MAX_SAFE_INTEGER;
         const bi = rank.has(b) ? rank.get(b)! : Number.MAX_SAFE_INTEGER;
@@ -69,23 +49,12 @@ function orderFactions(factions: string[]): string[] {
 }
 
 export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
-    const catalogCards = useMemo<CatalogCard[]>(
-        () => CARDS
-            .filter((card) => card.status !== 'archived')
-            .map((card, index) => ({
-                ...card,
-                catalogOrder: index,
-                displayFaction: toDisplayFaction(card.faction),
-            })),
-        []
-    );
-
     const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('active');
     const [factionFilter, setFactionFilter] = useState('全部');
 
     const availableFactions = useMemo(
-        () => orderFactions(Array.from(new Set(catalogCards.map((card) => card.displayFaction)))),
-        [catalogCards]
+        () => orderFactions(Array.from(new Set(COLLECTION_CARDS.map((card) => getCollectionFactionName(card.faction))))),
+        []
     );
 
     const factionOptions = useMemo(
@@ -94,14 +63,14 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
     );
 
     const visibleCards = useMemo(
-        () => catalogCards
+        () => COLLECTION_CARDS
             .filter((card) => matchVisibility(card, visibilityFilter))
-            .filter((card) => factionFilter === '全部' ? true : card.displayFaction === factionFilter),
-        [catalogCards, visibilityFilter, factionFilter]
+            .filter((card) => factionFilter === '全部' ? true : getCollectionFactionName(card.faction) === factionFilter),
+        [visibilityFilter, factionFilter]
     );
 
     const visibleFactions = useMemo(
-        () => orderFactions(Array.from(new Set(visibleCards.map((card) => card.displayFaction)))),
+        () => orderFactions(Array.from(new Set(visibleCards.map((card) => getCollectionFactionName(card.faction))))),
         [visibleCards]
     );
 
@@ -131,7 +100,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
                     问道百家 · 卡牌图鉴
                 </div>
                 <div className="w-52 text-right text-[#d4a520]/70 font-serif text-sm">
-                    已开放 {ACTIVE_CARDS.length} / 总计 {catalogCards.length}
+                    已开放 {ACTIVE_COLLECTION_CARDS.length} / 总计 {COLLECTION_CARDS.length}
                 </div>
             </div>
 
@@ -177,8 +146,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
                 ) : (
                     visibleFactions.map((faction) => {
                         const factionCards = visibleCards
-                            .filter((card) => card.displayFaction === faction)
-                            .sort((a, b) => a.catalogOrder - b.catalogOrder);
+                            .filter((card) => getCollectionFactionName(card.faction) === faction);
 
                         return (
                             <div key={faction} className="mb-10 w-full">
@@ -191,7 +159,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                                     {factionCards.map((card) => {
                                         const isActive = card.status === 'active';
-                                        const activeIndex = ACTIVE_CARDS.findIndex((item) => item.id === card.id);
+                                        const activeIndex = getActiveCollectionIndexById(card.id);
                                         const canOpen = isActive && activeIndex >= 0;
 
                                         return (

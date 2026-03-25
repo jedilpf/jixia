@@ -12,6 +12,7 @@ import { MvpFlowShell } from '@/ui/screens/MvpFlowShell';
 import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { getAssetUrl } from '@/utils/assets';
 
 type GameScreen =
   | 'menu'
@@ -38,8 +39,6 @@ function App() {
     );
   }
 
-  const isElectronRuntime =
-    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
   const [hasStarted, setHasStarted] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [screen, setScreen] = useState<GameScreen>('menu');
@@ -51,28 +50,25 @@ function App() {
 
   const audioHallRef = useRef<HTMLAudioElement | null>(null);
   const audioBattleRef = useRef<HTMLAudioElement | null>(null);
-  const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
   useEffect(() => {
-    if (isElectronRuntime) return;
-    audioHallRef.current = new Audio(asset('assets/bgm-hall.mp3'));
+    audioHallRef.current = new Audio(getAssetUrl('assets/bgm-hall.mp3'));
     audioHallRef.current.loop = true;
 
-    audioBattleRef.current = new Audio(asset('assets/bgm-battle.mp3'));
+    audioBattleRef.current = new Audio(getAssetUrl('assets/bgm-battle.mp3'));
     audioBattleRef.current.loop = true;
 
     return () => {
       audioHallRef.current?.pause();
       audioBattleRef.current?.pause();
     };
-  }, [isElectronRuntime]);
+  }, []);
 
   useEffect(() => {
-    if (isElectronRuntime) return;
     if (!audioHallRef.current || !audioBattleRef.current) return;
     if (!hasStarted && !isFadingOut) return;
 
-    uiAudio.loadCustomSound('card-hover', asset('assets/卡牌声音.mp3'));
+    uiAudio.loadCustomSound('card-hover', getAssetUrl('assets/卡牌声音.mp3'));
 
     if (
       screen === 'menu' ||
@@ -97,7 +93,7 @@ function App() {
       audioHallRef.current.currentTime = 0;
       audioBattleRef.current.play().catch(console.warn);
     }
-  }, [screen, hasStarted, isFadingOut, isElectronRuntime]);
+  }, [screen, hasStarted, isFadingOut]);
 
   const [settings, setSettings] = useState<AppSettings>({
     masterVolume: 0.8,
@@ -112,7 +108,6 @@ function App() {
   };
 
   useEffect(() => {
-    if (isElectronRuntime) return;
     if (settings.fullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((error) => console.log('Fullscreen failed', error));
     } else if (!settings.fullscreen && document.fullscreenElement) {
@@ -120,8 +115,8 @@ function App() {
     }
 
     uiAudio.init();
-    uiAudio.loadCustomSound('card-hover', asset('assets/卡牌声音.mp3'));
-  }, [settings.fullscreen, isElectronRuntime]);
+    uiAudio.loadCustomSound('card-hover', getAssetUrl('assets/卡牌声音.mp3'));
+  }, [settings.fullscreen]);
 
   useEffect(() => {
     const handleWindowError = (event: ErrorEvent) => {
@@ -139,14 +134,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isElectronRuntime) return;
     const bgmVolume = settings.masterVolume * settings.bgmVolume;
     const sfxVolume = settings.masterVolume * settings.sfxVolume;
 
     if (audioHallRef.current) audioHallRef.current.volume = bgmVolume;
     if (audioBattleRef.current) audioBattleRef.current.volume = bgmVolume;
     uiAudio.setVolume(sfxVolume);
-  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume, isElectronRuntime]);
+  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume]);
 
   const handleStartGame = () => setScreen('transition');
 
@@ -189,10 +183,11 @@ function App() {
 
   const handleEnterFromSplash = () => {
     if (isFadingOut) return;
+    uiAudio.init();
     setIsFadingOut(true);
 
     // Keep playback tied to a user gesture so browser autoplay policies do not block it.
-    if (!isElectronRuntime && audioHallRef.current) {
+    if (audioHallRef.current) {
       audioHallRef.current.currentTime = 0;
       audioHallRef.current.play().catch(console.warn);
     }

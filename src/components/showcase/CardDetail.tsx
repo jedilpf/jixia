@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ACTIVE_CARDS, getCardImageUrl, rarityColor, typeColor } from '@/data/cardsSource';
+import { ACTIVE_COLLECTION_CARDS, getCardImageUrl, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getAssetUrl } from '@/utils/assets';
 
@@ -27,7 +27,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         }
     }, [currentIndex]);
 
-    const card = ACTIVE_CARDS[currentIndex];
+    const card = ACTIVE_COLLECTION_CARDS[currentIndex];
     if (!card) return null;
     const frameImage = getAssetUrl('assets/card-frame.png');
     const costImage = getAssetUrl('assets/cost.png');
@@ -83,7 +83,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
 
             {/* 卡牌计数 */}
             <div className="absolute top-6 right-6 z-50 text-[#d4a520]/60 text-sm font-serif tracking-widest">
-                {currentIndex + 1} / {ACTIVE_CARDS.length}
+                {currentIndex + 1} / {ACTIVE_COLLECTION_CARDS.length}
             </div>
 
             {/* 左翻页按钮 */}
@@ -248,7 +248,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
 
             {/* 底部缩略图导航廊 */}
             <div ref={scrollContainerRef} className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] max-w-5xl overflow-x-auto flex items-center gap-3 z-50 px-4 py-2 custom-scrollbar" style={{ whiteSpace: 'nowrap' }}>
-                {ACTIVE_CARDS.map((c, i) => {
+                {ACTIVE_COLLECTION_CARDS.map((c, i) => {
                     const isSelected = i === currentIndex;
                     return (
                         <button

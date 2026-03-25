@@ -1,29 +1,28 @@
 {
-    "id":  "LEG-SC-SISHI",
-    "name":  "司史执笔",
-    "faction":  "礼心殿",
-    "rarity":  "rare",
-    "type":  "minion",
-    "cost":  3,
-    "rules_text":  "登场：抽2；选择1项：对敌方施加【怀疑+1（2回合）】；或令友方获得【护持4】。",
-    "keyword_ids":  [
-
-                    ],
-    "mechanic_ids":  [
-                         "MEC-CORE-TEMPO"
-                     ],
-    "lore_anchor_ids":  [
-                            "ANC-WORLD-001",
-                            "ANC-RULE-001"
-                        ],
-    "provenance":  {
-                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
-                       "models_used":  [
-                                           "codex"
-                                       ],
-                       "canon_version":  "0.1.0",
-                       "seed":  "legacy-migration"
-                   },
-    "status":  "archived",
-    "notes":  "legacy_source=showcase; legacy_id=sishi; migrated_at=2026-03-24; superseded_by=BS01-RU-005; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+  "id": "LEG-SC-SISHI",
+  "name": "司史执笔",
+  "faction": "礼心殿",
+  "rarity": "rare",
+  "type": "minion",
+  "cost": 3,
+  "rules_text": "登场：抽2；选择1项：对敌方施加【怀疑+1（2回合）】；或令友方获得【护持4】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=showcase; legacy_id=sishi; migrated_at=2026-03-24; superseded_by=BS01-RU-005; archived_reason=active_catalog_duplicate; archived_at=2026-03-25",
+  "display_type": "角色"
 }

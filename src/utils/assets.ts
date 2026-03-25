@@ -35,12 +35,28 @@ export function getAssetUrl(assetPath: string): string {
   return `${import.meta.env.BASE_URL}${normalized}`;
 }
 
-function resolveCardImageId(cardId: string, cardName?: string): string | null {
-  if (BS01_ID_TO_LEGACY_IMAGE_ID[cardId]) {
-    return BS01_ID_TO_LEGACY_IMAGE_ID[cardId];
+function unwrapCardId(cardId: string): string {
+  const deckMatch = /^deck_\d+_(.+)$/.exec(cardId);
+  if (deckMatch?.[1]) {
+    return deckMatch[1];
   }
 
-  const legacyShowcaseMatch = /^LEG-SC-(.+)$/i.exec(cardId);
+  const battleMatch = /^[a-z0-9]+-(?:c|f)\d+-(.+)$/i.exec(cardId);
+  if (battleMatch?.[1]) {
+    return battleMatch[1];
+  }
+
+  return cardId;
+}
+
+function resolveCardImageId(cardId: string, cardName?: string): string | null {
+  const canonicalId = unwrapCardId(cardId);
+
+  if (BS01_ID_TO_LEGACY_IMAGE_ID[canonicalId]) {
+    return BS01_ID_TO_LEGACY_IMAGE_ID[canonicalId];
+  }
+
+  const legacyShowcaseMatch = /^LEG-SC-(.+)$/i.exec(canonicalId);
   if (legacyShowcaseMatch?.[1]) {
     return legacyShowcaseMatch[1].toLowerCase();
   }
@@ -50,8 +66,8 @@ function resolveCardImageId(cardId: string, cardName?: string): string | null {
   }
 
   // 旧图 id 本身（如 wenyan / xingpan）直接兼容。
-  if (/^[a-z0-9_-]+$/i.test(cardId)) {
-    return cardId.toLowerCase();
+  if (/^[a-z0-9_-]+$/i.test(canonicalId)) {
+    return canonicalId.toLowerCase();
   }
 
   return null;

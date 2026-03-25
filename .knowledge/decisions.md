@@ -62,6 +62,16 @@
 - Why: Legacy sources use mixed naming (`儒家/礼心殿`, `墨家/玄匠盟`), and raw string comparison allowed the same card to be imported twice.
 - Consequence: Re-running legacy migration now skips already represented cards, and structure validation catches future user-visible duplicates before runtime generation.
 
+### 2026-03-25
+- Decision: Preserve legacy user-facing card categories through optional `display_type` metadata in `content/cards`, and let runtime generation prefer it over raw structured `type` when building collection-facing card data.
+- Why: Legacy `事件` and `反制` cards were being flattened into `技能`, which made the catalog lose intended design semantics even though the structured source still needed constrained runtime types.
+- Consequence: Legacy/source-migrated cards can stay structurally valid for tooling while the collection UI and other readers still see the intended visible type labels.
+
+### 2026-03-25
+- Decision: Share collection ordering through `cardsSource.ts` exports instead of letting grid/detail views each derive their own active-card order.
+- Why: Grid grouping by explicit faction order and detail paging by raw `ACTIVE_CARDS` order produced inconsistent navigation and made the collection feel unstable.
+- Consequence: Collection screens should use shared ordered exports (`COLLECTION_CARDS`, `ACTIVE_COLLECTION_CARDS`) whenever navigation or grouping order matters.
+
 ## Format
 For future entries, use:
 - Decision:

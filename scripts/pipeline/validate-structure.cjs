@@ -20,6 +20,7 @@ const REQUIRED_FIELDS = [
 const ALLOWED_TYPES = new Set(['spell', 'minion', 'field', 'weapon']);
 const ALLOWED_RARITIES = new Set(['common', 'rare', 'epic', 'legendary']);
 const ALLOWED_STATUS = new Set(['active', 'planned', 'draft', 'rework', 'archived']);
+const ALLOWED_DISPLAY_TYPES = new Set(['技能', '事件', '场地', '装备', '角色', '反制']);
 const FACTION_ALIAS_MAP = {
   礼心殿: '儒家',
   儒家: '儒家',
@@ -131,6 +132,12 @@ function main() {
 
     if (!ALLOWED_STATUS.has(data.status)) {
       push(errors, relativePath, `status must be one of ${Array.from(ALLOWED_STATUS).join(', ')}`);
+    }
+
+    if ('display_type' in data) {
+      if (typeof data.display_type !== 'string' || !ALLOWED_DISPLAY_TYPES.has(data.display_type.trim())) {
+        push(errors, relativePath, `display_type must be one of ${Array.from(ALLOWED_DISPLAY_TYPES).join(', ')}`);
+      }
     }
 
     const catalogKey = visibleCatalogKey(data);

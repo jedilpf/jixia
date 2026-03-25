@@ -25,5 +25,6 @@
     "canon_version": "0.1.0",
     "seed": "20260322-10"
   },
-  "status": "active"
+  "status": "active",
+  "display_type": "角色"
 }

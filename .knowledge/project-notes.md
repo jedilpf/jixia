@@ -18,6 +18,9 @@
 - UI sound initialization should not be disabled by runtime-flavor checks; initialize `uiAudio` on user gesture and keep playback path logic shared across web/electron packaging.
 - Archived duplicate ledger cards should remain in `content/cards` for history, but normal collection views should exclude `status=archived` so users do not see repeated cards.
 - Legacy catalog migration and duplicate validation should normalize faction aliases (e.g. `儒家/礼心殿`, `墨家/玄匠盟`) before comparing card identity, otherwise the same card can be imported twice under different naming schemes.
+- Legacy cards may need an explicit `display_type` field in `content/cards` so generated collection data can preserve user-facing labels like `事件` and `反制` while keeping structured runtime `type` values constrained.
+- Collection list and detail views should share the same ordered active-card source (`ACTIVE_COLLECTION_CARDS`) instead of each screen deriving its own order.
+- Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
 
 ## Working preferences
 - Favor small, reviewable diffs.

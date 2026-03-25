@@ -1,0 +1,36 @@
+{
+  "task_id": "TASK-20260325-045",
+  "goal": "Preserve legacy catalog display types, align collection detail navigation order with collection grouping, and unify battle card asset paths/audio with the shared asset helpers without changing mainline entry behavior.",
+  "constraints": [
+    "Do not delete card assets or historical card files; preserve existing source-of-truth in content/cards.",
+    "Keep runtime/gameplay card consumption on active cards only.",
+    "Preserve the existing App entry behavior, including the optional newFlow branch, while fixing audio path/runtime initialization drift."
+  ],
+  "deliverables": [
+    "Legacy cards keep their original user-facing type labels such as 事件 and 反制 in generated catalog data.",
+    "Collection grid and detail navigation use the same active-card order.",
+    "Battle hand card images and bell audio use shared asset helpers instead of ad-hoc asset strings.",
+    "App audio initialization/path handling is unified without removing the current newFlow entry gate."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "content/cards",
+    "scripts",
+    "src/App.tsx",
+    "src/components",
+    "src/data",
+    "src/generated",
+    "src/utils",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-045.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-045.json",
+    "node scripts/pipeline/validate-structure.cjs",
+    "npm run cards:runtime",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-045.json"
+  ],
+  "status": "draft"
+}

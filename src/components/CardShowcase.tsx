@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ACTIVE_CARDS } from '@/data/cardsSource';
+import { ACTIVE_COLLECTION_CARDS } from '@/data/cardsSource';
 import { CardGrid } from '@/components/showcase/CardGrid';
 import { CardDetail } from '@/components/showcase/CardDetail';
 
@@ -23,14 +23,14 @@ export function CardShowcase({ onBack }: { onBack: () => void }) {
         setTimeout(() => {
             setCurrentIndex(prev =>
                 dir === 'next'
-                    ? (prev + 1) % ACTIVE_CARDS.length
-                    : (prev - 1 + ACTIVE_CARDS.length) % ACTIVE_CARDS.length
+                    ? (prev + 1) % ACTIVE_COLLECTION_CARDS.length
+                    : (prev - 1 + ACTIVE_COLLECTION_CARDS.length) % ACTIVE_COLLECTION_CARDS.length
             );
             setSlideDir(null);
         }, 200);
     };
 
-    if (ACTIVE_CARDS.length === 0) {
+    if (ACTIVE_COLLECTION_CARDS.length === 0) {
         return (
             <div className="w-full h-full min-h-screen flex flex-col items-center justify-center bg-[#0a0f18] text-[#d4a520] gap-4">
                 <div className="text-xl font-serif tracking-widest">当前暂无已开放卡牌</div>

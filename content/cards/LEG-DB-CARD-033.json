@@ -1,29 +1,28 @@
 {
-    "id":  "LEG-DB-CARD-033",
-    "name":  "司辰使",
-    "faction":  "司天台",
-    "rarity":  "rare",
-    "type":  "minion",
-    "cost":  2,
-    "rules_text":  "登场：获得【气势+1】；回合开始：若你有气势，抽1；当你失去气势时，回复2点生命。",
-    "keyword_ids":  [
-
-                    ],
-    "mechanic_ids":  [
-                         "MEC-CORE-TEMPO"
-                     ],
-    "lore_anchor_ids":  [
-                            "ANC-WORLD-001",
-                            "ANC-RULE-001"
-                        ],
-    "provenance":  {
-                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
-                       "models_used":  [
-                                           "codex"
-                                       ],
-                       "canon_version":  "0.1.0",
-                       "seed":  "legacy-migration"
-                   },
-    "status":  "archived",
-    "notes":  "legacy_source=cardsDB; legacy_id=card_033; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-SICHEN; archived_reason=legacy_source_duplicate; archived_at=2026-03-25"
+  "id": "LEG-DB-CARD-033",
+  "name": "司辰使",
+  "faction": "司天台",
+  "rarity": "rare",
+  "type": "minion",
+  "cost": 2,
+  "rules_text": "登场：获得【气势+1】；回合开始：若你有气势，抽1；当你失去气势时，回复2点生命。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=cardsDB; legacy_id=card_033; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-SICHEN; archived_reason=legacy_source_duplicate; archived_at=2026-03-25",
+  "display_type": "角色"
 }

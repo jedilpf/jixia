@@ -1,29 +1,28 @@
 {
-    "id":  "LEG-SC-JIMU",
-    "name":  "机关木鸢",
-    "faction":  "玄匠盟",
-    "rarity":  "common",
-    "type":  "weapon",
-    "cost":  2,
-    "rules_text":  "查看敌方随机1张手牌；本回合你对其造成的伤害+1。",
-    "keyword_ids":  [
-
-                    ],
-    "mechanic_ids":  [
-                         "MEC-CORE-TEMPO"
-                     ],
-    "lore_anchor_ids":  [
-                            "ANC-WORLD-001",
-                            "ANC-RULE-001"
-                        ],
-    "provenance":  {
-                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
-                       "models_used":  [
-                                           "codex"
-                                       ],
-                       "canon_version":  "0.1.0",
-                       "seed":  "legacy-migration"
-                   },
-    "status":  "archived",
-    "notes":  "legacy_source=showcase; legacy_id=jimu; migrated_at=2026-03-24; superseded_by=BS01-MO-003; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+  "id": "LEG-SC-JIMU",
+  "name": "机关木鸢",
+  "faction": "玄匠盟",
+  "rarity": "common",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "查看敌方随机1张手牌；本回合你对其造成的伤害+1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=showcase; legacy_id=jimu; migrated_at=2026-03-24; superseded_by=BS01-MO-003; archived_reason=active_catalog_duplicate; archived_at=2026-03-25",
+  "display_type": "装备"
 }

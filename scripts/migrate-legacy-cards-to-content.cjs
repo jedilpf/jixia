@@ -46,6 +46,14 @@ const FACTION_ALIAS_MAP = {
   玄匠盟: '墨家',
   墨家: '墨家',
 };
+const DISPLAY_TYPE_MAP = {
+  技能: '技能',
+  事件: '事件',
+  反制: '反制',
+  角色: '角色',
+  场地: '场地',
+  装备: '装备',
+};
 
 function readJson(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
@@ -72,6 +80,10 @@ function toAllowedType(rawType) {
 
 function toAllowedRarity(rawRarity) {
   return RARITY_MAP[rawRarity] || 'common';
+}
+
+function toDisplayType(rawType) {
+  return DISPLAY_TYPE_MAP[rawType] || '技能';
 }
 
 function normalizeFaction(rawFaction) {
@@ -201,6 +213,7 @@ function toContentCard(entry, usedIds) {
     faction: entry.faction,
     rarity: toAllowedRarity(entry.rarity),
     type: toAllowedType(entry.type),
+    display_type: toDisplayType(entry.type),
     cost: normalizeCost(entry.cost),
     rules_text: entry.rulesText,
     keyword_ids: [],

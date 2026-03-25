@@ -33,6 +33,13 @@ function mapType(type) {
   return TYPE_ZH_MAP[type] || '技能';
 }
 
+function pickDisplayType(card) {
+  if (typeof card.display_type === 'string' && card.display_type.trim().length > 0) {
+    return card.display_type.trim();
+  }
+  return mapType(card.type);
+}
+
 function pickBackground(card) {
   if (Array.isArray(card.lore_anchor_ids) && card.lore_anchor_ids.length > 0) {
     return `锚点: ${card.lore_anchor_ids.join(' / ')}`;
@@ -72,7 +79,7 @@ function toRuntimeCard(card) {
     id: card.id,
     name: card.name,
     faction: mapFaction(card.faction),
-    type: mapType(card.type),
+    type: pickDisplayType(card),
     rarity: mapRarity(card.rarity),
     background: pickBackground(card),
     skill: card.rules_text,

@@ -1,29 +1,28 @@
 {
-    "id":  "LEG-DB-CARD-035",
-    "name":  "天象更迭",
-    "faction":  "司天台",
-    "rarity":  "epic",
-    "type":  "field",
-    "cost":  2,
-    "rules_text":  "场地：每回合开始进行一次判定——若为“阴”，敌方受到2点伤害；若为“阳”，你获得【护持2】；你每回合第1次触发判定时，额外抽1。",
-    "keyword_ids":  [
-
-                    ],
-    "mechanic_ids":  [
-                         "MEC-CORE-TEMPO"
-                     ],
-    "lore_anchor_ids":  [
-                            "ANC-WORLD-001",
-                            "ANC-RULE-001"
-                        ],
-    "provenance":  {
-                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
-                       "models_used":  [
-                                           "codex"
-                                       ],
-                       "canon_version":  "0.1.0",
-                       "seed":  "legacy-migration"
-                   },
-    "status":  "archived",
-    "notes":  "legacy_source=cardsDB; legacy_id=card_035; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-TIANXIANG; archived_reason=legacy_source_duplicate; archived_at=2026-03-25"
+  "id": "LEG-DB-CARD-035",
+  "name": "天象更迭",
+  "faction": "司天台",
+  "rarity": "epic",
+  "type": "field",
+  "cost": 2,
+  "rules_text": "场地：每回合开始进行一次判定——若为“阴”，敌方受到2点伤害；若为“阳”，你获得【护持2】；你每回合第1次触发判定时，额外抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=cardsDB; legacy_id=card_035; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-TIANXIANG; archived_reason=legacy_source_duplicate; archived_at=2026-03-25",
+  "display_type": "场地"
 }
