@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-JIUZHEN10",
+  "name": "八卦阵图",
+  "faction": "九阵堂",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "场地：敌方每回合第1次使用牌后，令其获得【失序+1】；你每回合第1次造成伤害，该伤害+2。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=jiuzhen10; migrated_at=2026-03-24"
+}

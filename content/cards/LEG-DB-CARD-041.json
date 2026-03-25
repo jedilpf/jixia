@@ -1,0 +1,29 @@
+{
+    "id":  "LEG-DB-CARD-041",
+    "name":  "春耕起垄",
+    "faction":  "万农坊",
+    "rarity":  "common",
+    "type":  "spell",
+    "cost":  2,
+    "rules_text":  "获得【护持4】；回合末若你本回合未造成伤害，回复2点生命。",
+    "keyword_ids":  [
+
+                    ],
+    "mechanic_ids":  [
+                         "MEC-CORE-TEMPO"
+                     ],
+    "lore_anchor_ids":  [
+                            "ANC-WORLD-001",
+                            "ANC-RULE-001"
+                        ],
+    "provenance":  {
+                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
+                       "models_used":  [
+                                           "codex"
+                                       ],
+                       "canon_version":  "0.1.0",
+                       "seed":  "legacy-migration"
+                   },
+    "status":  "archived",
+    "notes":  "legacy_source=cardsDB; legacy_id=card_041; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-CHUNGGENG; archived_reason=legacy_source_duplicate; archived_at=2026-03-25"
+}

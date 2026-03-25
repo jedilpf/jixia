@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-LIANHENG",
+  "name": "连横之契",
+  "faction": "游策阁",
+  "rarity": "common",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "装备：你每回合第1次使用【事件】时抽1；若该事件为非本门派牌，额外获得【护持1】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=lianheng; migrated_at=2026-03-24"
+}

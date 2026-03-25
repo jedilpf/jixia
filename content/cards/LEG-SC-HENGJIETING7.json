@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-HENGJIETING7",
+  "name": "廷尉执法",
+  "faction": "衡戒廷",
+  "rarity": "epic",
+  "type": "minion",
+  "cost": 5,
+  "rules_text": "登场：令敌方所有角色获得【沉默（1回合）】；每回合你使用【反制】后，该角色攻击+1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=hengjieting7; migrated_at=2026-03-24"
+}

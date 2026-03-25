@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-LIANGYI1",
+  "name": "阴阳交泰",
+  "faction": "两仪署",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "选择一项：对一个单位造成3点伤害，或为你回复3点底蕴。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=liangyi1; migrated_at=2026-03-24"
+}

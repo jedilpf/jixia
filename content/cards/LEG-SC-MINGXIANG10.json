@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-MINGXIANG10",
+  "name": "名相倒推",
+  "faction": "名相府",
+  "rarity": "epic",
+  "type": "field",
+  "cost": 4,
+  "rules_text": "场地：每当你使用【反制】成功，抽1；你每回合第1次使用技能或反制，费用-1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=mingxiang10; migrated_at=2026-03-24"
+}

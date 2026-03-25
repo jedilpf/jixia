@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-YOUCE10",
+  "name": "纵横天下",
+  "faction": "游策阁",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "场地：双方每打出1张牌，你抽0.5张（每2张时实际抽1）；你每回合使用不同门派的牌，额外抽1（每回合限1次）。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=youce10; migrated_at=2026-03-24"
+}

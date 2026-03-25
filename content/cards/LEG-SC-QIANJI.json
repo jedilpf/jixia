@@ -1,0 +1,29 @@
+{
+    "id":  "LEG-SC-QIANJI",
+    "name":  "千机壁垒",
+    "faction":  "玄匠盟",
+    "rarity":  "epic",
+    "type":  "field",
+    "cost":  4,
+    "rules_text":  "场地：你打出的【装备】进入场上时，令其持有者获得【护持2】；敌方每回合第1次对你造成的伤害-2。",
+    "keyword_ids":  [
+
+                    ],
+    "mechanic_ids":  [
+                         "MEC-CORE-TEMPO"
+                     ],
+    "lore_anchor_ids":  [
+                            "ANC-WORLD-001",
+                            "ANC-RULE-001"
+                        ],
+    "provenance":  {
+                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
+                       "models_used":  [
+                                           "codex"
+                                       ],
+                       "canon_version":  "0.1.0",
+                       "seed":  "legacy-migration"
+                   },
+    "status":  "archived",
+    "notes":  "legacy_source=showcase; legacy_id=qianji; migrated_at=2026-03-24; superseded_by=BS01-MO-006; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-LIANGYI10",
+  "name": "太极图式",
+  "faction": "两仪署",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "场地：你每受到1点伤害，获得【护持0.5】（每2点累积为1护持）；你每回复1点底蕴，额外造成0.5点伤害（同上取整）。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=liangyi10; migrated_at=2026-03-24"
+}

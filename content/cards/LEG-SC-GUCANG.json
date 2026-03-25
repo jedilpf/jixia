@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-GUCANG",
+  "name": "谷仓封藏",
+  "faction": "万农坊",
+  "rarity": "common",
+  "type": "field",
+  "cost": 3,
+  "rules_text": "场地：每回合一次，回合结束时若你本回合抽过牌，则再抽1；当你底蕴低于一半时，获得【护持6】并摧毁此场地。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=gucang; migrated_at=2026-03-24"
+}

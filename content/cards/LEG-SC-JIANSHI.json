@@ -1,0 +1,29 @@
+{
+    "id":  "LEG-SC-JIANSHI",
+    "name":  "兼济匠师",
+    "faction":  "玄匠盟",
+    "rarity":  "rare",
+    "type":  "minion",
+    "cost":  4,
+    "rules_text":  "登场：从牌库检索1张【装备】加入手牌；你接下来2回合内打出的装备牌费用-1。",
+    "keyword_ids":  [
+
+                    ],
+    "mechanic_ids":  [
+                         "MEC-CORE-TEMPO"
+                     ],
+    "lore_anchor_ids":  [
+                            "ANC-WORLD-001",
+                            "ANC-RULE-001"
+                        ],
+    "provenance":  {
+                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
+                       "models_used":  [
+                                           "codex"
+                                       ],
+                       "canon_version":  "0.1.0",
+                       "seed":  "legacy-migration"
+                   },
+    "status":  "archived",
+    "notes":  "legacy_source=showcase; legacy_id=jianshi; migrated_at=2026-03-24; superseded_by=BS01-MO-005; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+}

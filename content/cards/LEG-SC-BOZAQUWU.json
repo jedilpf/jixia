@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-BOZAQUWU",
+  "name": "驳杂去芜",
+  "faction": "通用",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "一张敌方立论本回合 -1 辩锋。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=bozaquwu; migrated_at=2026-03-24"
+}

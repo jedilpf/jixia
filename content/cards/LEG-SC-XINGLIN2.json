@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-XINGLIN2",
+  "name": "以毒攻毒",
+  "faction": "杏林馆",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "牺牲友方角色3点底蕴，对敌方主将造成4点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xinglin2; migrated_at=2026-03-24"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-JUWENTANG",
+  "name": "鞫问堂",
+  "faction": "衡戒廷",
+  "rarity": "common",
+  "type": "field",
+  "cost": 2,
+  "rules_text": "每当敌方使用【技能】牌，其受到1点伤害；若其本回合已受伤，额外+1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=juwentang; migrated_at=2026-03-24"
+}

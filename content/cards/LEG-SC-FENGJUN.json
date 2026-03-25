@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-FENGJUN",
+  "name": "锋将·破军",
+  "faction": "九阵堂",
+  "rarity": "epic",
+  "type": "minion",
+  "cost": 5,
+  "rules_text": "主动：对敌单体造成5点伤害；若其底蕴低于一半，再造成+2。被动：你击败目标时，获得【学识+1】并抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=fengjun; migrated_at=2026-03-24"
+}

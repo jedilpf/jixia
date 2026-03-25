@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-YANGZHEN9",
+  "name": "玉液金丹",
+  "faction": "养真院",
+  "rarity": "rare",
+  "type": "weapon",
+  "cost": 3,
+  "rules_text": "装备：你每回合开始回复1点底蕴；若你本回合末比回合初多回复了3点以上底蕴，额外抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=yangzhen9; migrated_at=2026-03-24"
+}

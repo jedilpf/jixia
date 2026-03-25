@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-TIEQUAN",
+  "name": "铁券禁令",
+  "faction": "衡戒廷",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 3,
+  "rules_text": "敌方下回合不能抽牌；若其仍触发抽牌效果，则改为随机弃1张手牌。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=tiequan; migrated_at=2026-03-24"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-GONGLUNCHENGSHI",
+  "name": "公论成势",
+  "faction": "通用",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 4,
+  "rules_text": "若你本回合赢得主议，且该主议上的己方立论本回合未发生移动，额外 +1 大势。每回合最多使用1张。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=gonglunchengshi; migrated_at=2026-03-24"
+}

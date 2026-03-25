@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-JIANAI3",
+  "name": "融通百技",
+  "faction": "兼采楼",
+  "rarity": "epic",
+  "type": "minion",
+  "cost": 5,
+  "rules_text": "登场：从牌库检索3张不同类型的牌，选1张加入手牌；被动：你每使用不同类型的牌，获得【学识+1】；学识每达2，抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=jianai3; migrated_at=2026-03-24"
+}

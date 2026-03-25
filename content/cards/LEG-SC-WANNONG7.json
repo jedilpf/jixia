@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-WANNONG7",
+  "name": "田间老农",
+  "faction": "万农坊",
+  "rarity": "rare",
+  "type": "minion",
+  "cost": 3,
+  "rules_text": "被动：你每回合结束若底蕴未满，回复2点；若底蕴为最大值，抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=wannong7; migrated_at=2026-03-24"
+}

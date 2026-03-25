@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-LIANGYI7",
+  "name": "法师太保",
+  "faction": "两仪署",
+  "rarity": "rare",
+  "type": "minion",
+  "cost": 4,
+  "rules_text": "登场：选择阴或阳——阴：对敌造成5点伤害；阳：回复5点底蕴。被动：每回合交替触发两项效果。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=liangyi7; migrated_at=2026-03-24"
+}

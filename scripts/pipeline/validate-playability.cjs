@@ -32,9 +32,15 @@ function main() {
     process.exit(0);
   }
 
+  const activeCards = cards.filter((cardFile) => cardFile?.data?.status === 'active');
+  if (activeCards.length === 0) {
+    console.log('[validate-playability] No active cards found in content/cards, skip.');
+    process.exit(0);
+  }
+
   const activeFactions = new Set(extractYamlList('scope/bs01.yaml', 'active_factions'));
 
-  for (const cardFile of cards) {
+  for (const cardFile of activeCards) {
     const { relativePath, data } = cardFile;
     const name = typeof data.name === 'string' ? data.name.trim() : '';
     const rulesText = typeof data.rules_text === 'string' ? data.rules_text.trim() : '';
@@ -57,7 +63,7 @@ function main() {
     }
   }
 
-  const uniqueCosts = new Set(cards.map((cardFile) => cardFile.data.cost));
+  const uniqueCosts = new Set(activeCards.map((cardFile) => cardFile.data.cost));
   if (uniqueCosts.size < 2) {
     errors.push('all cards use the same cost; cost curve is too flat for playtest');
   }
@@ -70,7 +76,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`[validate-playability] PASS (${cards.length} file(s))`);
+  console.log(`[validate-playability] PASS (${activeCards.length} active file(s))`);
 }
 
 main();

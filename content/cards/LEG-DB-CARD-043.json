@@ -1,0 +1,29 @@
+{
+    "id":  "LEG-DB-CARD-043",
+    "name":  "谷仓封藏",
+    "faction":  "万农坊",
+    "rarity":  "common",
+    "type":  "field",
+    "cost":  2,
+    "rules_text":  "场地：每回合一次，回合结束时若你本回合抽过牌，则再抽1；当你生命低于一半时，获得【护持6】并摧毁此场地。",
+    "keyword_ids":  [
+
+                    ],
+    "mechanic_ids":  [
+                         "MEC-CORE-TEMPO"
+                     ],
+    "lore_anchor_ids":  [
+                            "ANC-WORLD-001",
+                            "ANC-RULE-001"
+                        ],
+    "provenance":  {
+                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
+                       "models_used":  [
+                                           "codex"
+                                       ],
+                       "canon_version":  "0.1.0",
+                       "seed":  "legacy-migration"
+                   },
+    "status":  "archived",
+    "notes":  "legacy_source=cardsDB; legacy_id=card_043; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-GUCANG; archived_reason=legacy_source_duplicate; archived_at=2026-03-25"
+}

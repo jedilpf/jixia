@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-BAIYAN2",
+  "name": "三人成虎",
+  "faction": "稗言社",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 3,
+  "rules_text": "选择一个敌方，对其施加【怀疑】状态（随之失去准确目标）。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=baiyan2; migrated_at=2026-03-24"
+}

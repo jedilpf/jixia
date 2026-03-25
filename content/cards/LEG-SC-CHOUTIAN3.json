@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-CHOUTIAN3",
+  "name": "奇门遁甲",
+  "faction": "筹天阁",
+  "rarity": "common",
+  "type": "field",
+  "cost": 3,
+  "rules_text": "你每回合可以选择一次，移动一名友方角色的位置。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=choutian3; migrated_at=2026-03-24"
+}

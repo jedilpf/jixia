@@ -8,22 +8,23 @@ const TARGETS = {
 };
 
 const rootDir = path.resolve(__dirname, '..');
-const sourcePath = path.join(rootDir, 'src', 'data', 'showcaseCards.ts');
+const sourceDir = path.join(rootDir, 'content', 'cards');
 const outputPath = path.join(rootDir, 'scripts', 'expansion-template.json');
 
-function parseCardsFromSource(sourceText) {
-  const cards = [];
-  const cardRegex = /\{[^{}]*id:\s*'([^']+)'[^{}]*faction:\s*'([^']+)'[^{}]*cost:\s*(\d+)[^{}]*\}/g;
-  let match = cardRegex.exec(sourceText);
-  while (match) {
-    cards.push({
-      id: match[1],
-      faction: match[2],
-      cost: Number(match[3]),
-    });
-    match = cardRegex.exec(sourceText);
-  }
-  return cards;
+function loadCardsFromContent() {
+  if (!fs.existsSync(sourceDir)) return [];
+  const files = fs.readdirSync(sourceDir).filter((name) => name.endsWith('.json'));
+  return files
+    .map((name) => {
+      const full = path.join(sourceDir, name);
+      const data = JSON.parse(fs.readFileSync(full, 'utf8'));
+      return {
+        id: data.id,
+        faction: data.faction,
+        cost: Number.isFinite(data.cost) ? Number(data.cost) : 1,
+      };
+    })
+    .filter((card) => typeof card.id === 'string' && typeof card.faction === 'string');
 }
 
 function pickFactionCards(cards, cardsPerFaction) {
@@ -69,14 +70,9 @@ function pickGenericCards(cards, usedIds, genericCardCount) {
 }
 
 function main() {
-  if (!fs.existsSync(sourcePath)) {
-    throw new Error(`Source file not found: ${sourcePath}`);
-  }
-
-  const sourceText = fs.readFileSync(sourcePath, 'utf8');
-  const cards = parseCardsFromSource(sourceText);
+  const cards = loadCardsFromContent();
   if (!cards.length) {
-    throw new Error('No cards parsed from showcaseCards.ts');
+    throw new Error('No cards parsed from content/cards');
   }
 
   const { factionDecks, usedIds, factionOrder } = pickFactionCards(cards, TARGETS.cardsPerFaction);
@@ -84,7 +80,7 @@ function main() {
 
   const payload = {
     generatedAt: new Date().toISOString(),
-    source: path.relative(rootDir, sourcePath).replace(/\\/g, '/'),
+    source: path.relative(rootDir, sourceDir).replace(/\\/g, '/'),
     targets: TARGETS,
     selectedFactions: factionOrder,
     factions: factionDecks,

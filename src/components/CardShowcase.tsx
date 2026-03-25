@@ -1,5 +1,5 @@
-﻿import { useState } from 'react';
-import { CARDS } from '@/data/showcaseCards';
+import { useState } from 'react';
+import { ACTIVE_CARDS } from '@/data/cardsSource';
 import { CardGrid } from '@/components/showcase/CardGrid';
 import { CardDetail } from '@/components/showcase/CardDetail';
 
@@ -23,12 +23,26 @@ export function CardShowcase({ onBack }: { onBack: () => void }) {
         setTimeout(() => {
             setCurrentIndex(prev =>
                 dir === 'next'
-                    ? (prev + 1) % CARDS.length
-                    : (prev - 1 + CARDS.length) % CARDS.length
+                    ? (prev + 1) % ACTIVE_CARDS.length
+                    : (prev - 1 + ACTIVE_CARDS.length) % ACTIVE_CARDS.length
             );
             setSlideDir(null);
         }, 200);
     };
+
+    if (ACTIVE_CARDS.length === 0) {
+        return (
+            <div className="w-full h-full min-h-screen flex flex-col items-center justify-center bg-[#0a0f18] text-[#d4a520] gap-4">
+                <div className="text-xl font-serif tracking-widest">当前暂无已开放卡牌</div>
+                <button
+                    onClick={onBack}
+                    className="px-6 py-2 bg-black/40 border border-[#d4a520]/40 rounded-full hover:bg-black/60 transition-all"
+                >
+                    返回主界面
+                </button>
+            </div>
+        );
+    }
 
     if (viewMode === 'grid') {
         return <CardGrid onBack={onBack} onSelectCard={handleSelectCard} />;

@@ -1,0 +1,27 @@
+{
+  "id": "LEG-DB-CARD-049",
+  "name": "综览天下",
+  "faction": "兼采楼",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 2,
+  "rules_text": "场地：每回合开始，随机揭示敌方1张手牌；该牌本回合不可使用。你每回合第1次抽牌时，额外抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=cardsDB; legacy_id=card_049; migrated_at=2026-03-24"
+}

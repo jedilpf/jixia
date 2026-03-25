@@ -1,6 +1,7 @@
-﻿import React, { useState } from 'react';
-import { CARDS, rarityColor, typeColor } from '@/data/showcaseCards';
+import React, { useState } from 'react';
+import { ACTIVE_CARDS, getCardImageUrl, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
+import { getAssetUrl } from '@/utils/assets';
 
 interface CardDetailProps {
     currentIndex: number;
@@ -26,7 +27,16 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         }
     }, [currentIndex]);
 
-    const card = CARDS[currentIndex];
+    const card = ACTIVE_CARDS[currentIndex];
+    if (!card) return null;
+    const frameImage = getAssetUrl('assets/card-frame.png');
+    const costImage = getAssetUrl('assets/cost.png');
+    const hpImage = getAssetUrl('assets/hp.png');
+    const attackImage = getAssetUrl('assets/attack.png');
+    const shieldImage = getAssetUrl('assets/shield.png');
+    const textBgImage = getAssetUrl('assets/text-bg.png');
+    const bellImage = getAssetUrl('assets/bell.png');
+    const bellSound = getAssetUrl('assets/bell-sound.mp3');
     const rarityBadgeColor = rarityColor[card.rarity] || '#9ca3af';
     const typeBadgeColor = typeColor[card.type] || '#374151';
     const isCharacter = card.type === '角色';
@@ -34,7 +44,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
     // 播放编钟音效
     const playBellSound = () => {
         try {
-            const audio = new Audio('assets/bell-sound.mp3');
+            const audio = new Audio(bellSound);
             audio.volume = 0.6;
             audio.play();
         } catch (e) {
@@ -73,7 +83,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
 
             {/* 卡牌计数 */}
             <div className="absolute top-6 right-6 z-50 text-[#d4a520]/60 text-sm font-serif tracking-widest">
-                {currentIndex + 1} / {CARDS.length}
+                {currentIndex + 1} / {ACTIVE_CARDS.length}
             </div>
 
             {/* 左翻页按钮 */}
@@ -108,7 +118,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                     <div
                         className="w-[90%] h-[90%]"
                         style={{
-                            backgroundImage: `url(assets/cards/${card.id}.jpg)`,
+                            backgroundImage: `url(${getCardImageUrl(card.id, card.name)})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                         }}
@@ -118,7 +128,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                 {/* 边框贴图叠加层 */}
                 <div
                     className="absolute inset-0 bg-no-repeat z-10 pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
-                    style={{ backgroundImage: `url(assets/card-frame.png)`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}
+                    style={{ backgroundImage: `url(${frameImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}
                 />
 
                 {/* 顶部中央卡牌名称 (画卷标题位置) */}
@@ -138,7 +148,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                 {/* 费用徽章 */}
                 {/* 往中心靠近使用更大的正数，如 `left-4`, `left-5`  */}
                 <div className="absolute top-6 left-5 z-30 w-[54px] h-[54px] flex flex-col items-center justify-center rounded-full cursor-pointer transition-transform duration-300 hover:scale-125 hover:drop-shadow-[0_0_12px_rgba(212,165,32,0.8)]">
-                    <img src="assets/cost.png" alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]" />
+                    <img src={costImage} alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]" />
                     <span className="relative z-10 text-[22px] font-bold text-[#f5e6b8] leading-none mb-0.5" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 6px rgba(212,165,32,0.6)' }}>
                         {card.cost}
                     </span>
@@ -150,12 +160,12 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                     <div className="absolute top-6 right-5 z-30 flex flex-col items-center gap-1" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }}>
                         {/* 生命 */}
                         <div className="w-[60px] h-[60px] flex flex-col items-center justify-center relative cursor-pointer transition-transform duration-300 hover:scale-125 hover:drop-shadow-[0_0_12px_rgba(0,255,0,0.6)]">
-                            <img src="assets/hp.png" alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+                            <img src={hpImage} alt="hp" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                             <span className="relative z-10 text-[24px] font-bold text-white leading-none mt-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>{card.hp ?? 0}</span>
                         </div>
                         {/* 攻击 */}
                         <div className="w-[78px] h-[78px] flex flex-col items-center justify-center relative cursor-pointer transition-transform duration-300 hover:scale-125 hover:drop-shadow-[0_0_12px_rgba(255,50,50,0.6)]">
-                            <img src="assets/attack.png" alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+                            <img src={attackImage} alt="attack" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                             <span className="relative z-10 text-[32px] font-bold text-white leading-none mt-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>{card.attack ?? 0}</span>
                         </div>
                     </div>
@@ -165,7 +175,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                 {!isCharacter && card.shield !== undefined && (
                     <div className="absolute top-6 right-5 z-30 flex flex-col items-center gap-1" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }}>
                         <div className="w-[60px] h-[60px] flex flex-col items-center justify-center relative">
-                            <img src="assets/shield.png" alt="shield" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+                            <img src={shieldImage} alt="shield" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                             <span className="relative z-10 text-[24px] font-bold text-white leading-none mt-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}>{card.shield}</span>
                         </div>
                     </div>
@@ -179,7 +189,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                     className="absolute bottom-[12px] left-[12px] right-[12px] z-30 flex flex-col justify-end transition-all duration-500 ease-out overflow-hidden"
                     style={{ height: showText ? '72%' : '0%', opacity: showText ? 1 : 0 }}
                 >
-                    <div className="absolute inset-0 pointer-events-none drop-shadow-2xl" style={{ backgroundImage: `url(assets/text-bg.png)`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+                    <div className="absolute inset-0 pointer-events-none drop-shadow-2xl" style={{ backgroundImage: `url(${textBgImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
                     <div className="relative z-10 px-16 pt-14 pb-20 flex flex-col gap-2.5 h-full overflow-y-auto custom-scrollbar font-serif">
                         <div className="flex items-start justify-between border-b pb-2.5 border-stone-800/30 relative">
                             <div className="flex flex-col gap-1">
@@ -229,7 +239,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                     style={{ width: '88px', height: '88px', bottom: '32px', right: '32px', zIndex: 40 }}
                 >
                     <img
-                        src="assets/bell.png"
+                        src={bellImage}
                         alt="查看详情"
                         className={`w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${isShaking ? 'animate-ring' : ''}`}
                     />
@@ -238,7 +248,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
 
             {/* 底部缩略图导航廊 */}
             <div ref={scrollContainerRef} className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] max-w-5xl overflow-x-auto flex items-center gap-3 z-50 px-4 py-2 custom-scrollbar" style={{ whiteSpace: 'nowrap' }}>
-                {CARDS.map((c, i) => {
+                {ACTIVE_CARDS.map((c, i) => {
                     const isSelected = i === currentIndex;
                     return (
                         <button
@@ -254,7 +264,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                                 </span>
                             ) : (
                                 <img
-                                    src={`assets/cards/${c.id}.jpg`}
+                                    src={getCardImageUrl(c.id, c.name)}
                                     alt={c.name}
                                     className="w-full h-full object-cover"
                                 />

@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-XUANJANG6",
+  "name": "奇械造化",
+  "faction": "玄匠盟",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 1,
+  "rules_text": "从牌库检索1张【装备】牌加入手牌；若手牌中有装备，抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xuanjang6; migrated_at=2026-03-24"
+}

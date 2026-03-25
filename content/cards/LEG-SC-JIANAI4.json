@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-JIANAI4",
+  "name": "学贯通匠",
+  "faction": "兼采楼",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "查看牌库顶5张，选2张加入手牌，其余置回；若这2张类型不同，获得【护持2】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=jianai4; migrated_at=2026-03-24"
+}

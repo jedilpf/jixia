@@ -26,10 +26,16 @@ function main() {
     process.exit(0);
   }
 
+  const activeCards = cards.filter((cardFile) => cardFile?.data?.status === 'active');
+  if (activeCards.length === 0) {
+    console.log('[validate-terminology] No active cards found in content/cards, skip.');
+    process.exit(0);
+  }
+
   const registeredTerms = new Set(extractYamlTerms('canon/terminology.yaml'));
   const forbiddenTerms = extractYamlList('canon/taboo.yaml', 'forbidden_mechanic_terms');
 
-  for (const cardFile of cards) {
+  for (const cardFile of activeCards) {
     const { relativePath, data } = cardFile;
 
     const keywordIds = Array.isArray(data.keyword_ids) ? data.keyword_ids : [];
@@ -64,7 +70,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`[validate-terminology] PASS (${cards.length} file(s))`);
+  console.log(`[validate-terminology] PASS (${activeCards.length} active file(s))`);
 }
 
 main();

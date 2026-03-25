@@ -1,0 +1,29 @@
+{
+    "id":  "LEG-SC-WENYAN",
+    "name":  "温言立论",
+    "faction":  "礼心殿",
+    "rarity":  "common",
+    "type":  "spell",
+    "cost":  1,
+    "rules_text":  "抽1；若你本回合已使用过本门派牌，改为抽2。",
+    "keyword_ids":  [
+
+                    ],
+    "mechanic_ids":  [
+                         "MEC-CORE-TEMPO"
+                     ],
+    "lore_anchor_ids":  [
+                            "ANC-WORLD-001",
+                            "ANC-RULE-001"
+                        ],
+    "provenance":  {
+                       "batch_id":  "BATCH-20260324-LEGACY-MIGRATION",
+                       "models_used":  [
+                                           "codex"
+                                       ],
+                       "canon_version":  "0.1.0",
+                       "seed":  "legacy-migration"
+                   },
+    "status":  "archived",
+    "notes":  "legacy_source=showcase; legacy_id=wenyan; migrated_at=2026-03-24; superseded_by=BS01-RU-002; archived_reason=active_catalog_duplicate; archived_at=2026-03-25"
+}

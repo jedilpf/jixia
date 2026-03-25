@@ -1,0 +1,38 @@
+{
+  "task_id": "TASK-20260324-043",
+  "goal": "Define content/cards as the single card-catalog source, batch migrate legacy cards from showcase/cardsDB into content/cards as planned, and make collection UI default to active while rendering non-active cards as locked/grey.",
+  "constraints": [
+    "Do not delete card assets; migrate and downgrade by status.",
+    "Keep runtime/gameplay card consumption on active cards only.",
+    "Preserve minimal, reviewable diffs in existing architecture."
+  ],
+  "deliverables": [
+    "Legacy cards from src/data/showcaseCards.ts and src/data/cardsDB.json migrated into content/cards with status planned.",
+    "src/data/cardsSource.ts no longer depends on showcase/cardsDB as active source.",
+    "Collection UI defaults to active cards and presents non-active cards as grey/locked with '未开放' labeling.",
+    "Validation/build scripts aligned with status-based lifecycle handling."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "content/cards",
+    "scripts",
+    "src/App.tsx",
+    "src/utils",
+    "src/data",
+    "src/generated",
+    "src/components",
+    "src/battleV2",
+    "docs",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260324-043.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260324-043.json",
+    "node scripts/pipeline/validate-structure.cjs",
+    "npm run cards:runtime",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260324-043.json"
+  ],
+  "status": "draft"
+}

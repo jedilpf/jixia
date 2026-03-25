@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-YANGZHEN8",
+  "name": "节欲保元",
+  "faction": "养真院",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "净化全部负面状态；回复4点底蕴；本回合你的下一次受伤-3。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=yangzhen8; migrated_at=2026-03-24"
+}

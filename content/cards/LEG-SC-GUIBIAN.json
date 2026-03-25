@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-GUIBIAN",
+  "name": "诡辩连环",
+  "faction": "名相府",
+  "rarity": "epic",
+  "type": "spell",
+  "cost": 5,
+  "rules_text": "连续进行3次：随机对1个敌方造成2点伤害；若目标已有负面状态，则改为3点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=guibian; migrated_at=2026-03-24"
+}

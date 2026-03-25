@@ -1,0 +1,38 @@
+{
+  "task_id": "TASK-20260325-044",
+  "goal": "Audit and resolve duplicated card-catalog entries so collection views no longer show repeated cards across active/planned and duplicate legacy sources.",
+  "constraints": [
+    "Do not delete card assets or historical card files; preserve duplicate history via status/notes where needed.",
+    "Keep runtime/gameplay card consumption on active cards only.",
+    "Preserve minimal, reviewable diffs in existing architecture."
+  ],
+  "deliverables": [
+    "Duplicate legacy catalog entries are downgraded so normal collection views no longer show repeated cards.",
+    "Collection UI defaults to active cards and excludes archived duplicates from normal filters.",
+    "Legacy migration logic avoids re-importing duplicate cards from showcase/cardsDB into content/cards.",
+    "Catalog validation catches user-visible duplicate cards before regeneration/finalize."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "content/cards",
+    "scripts",
+    "src/App.tsx",
+    "src/utils",
+    "src/data",
+    "src/components",
+    "src/battleV2",
+    "src/generated",
+    "docs",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-044.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-044.json",
+    "node scripts/pipeline/validate-structure.cjs",
+    "npm run cards:runtime",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-044.json"
+  ],
+  "status": "draft"
+}

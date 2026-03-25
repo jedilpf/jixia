@@ -1,0 +1,27 @@
+{
+  "id": "LEG-SC-MENGSHU",
+  "name": "盟书",
+  "faction": "游策阁",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "双方各抽1；你获得【护持3】；若敌方抽到【装备】，则其本回合不能使用装备。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=mengshu; migrated_at=2026-03-24"
+}
