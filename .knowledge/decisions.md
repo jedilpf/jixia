@@ -87,6 +87,16 @@
 - Why: Non-blocking lint and tracked generated caches increased mainline entropy and made repository hygiene rules ineffective.
 - Consequence: Lint failures now stop PR validation, and `.vite/` / `backups/` artifacts are kept out of tracked source history.
 
+### 2026-03-25
+- Decision: Keep `npm test` on CommonJS-compiled test output and normalize compiled imports via `scripts/pipeline/prepare-test-dist.cjs`.
+- Why: ESM test output introduced extension/alias runtime issues in Node test runner (`import.meta` compile constraints, unresolved `@/` aliases, and directory target execution mismatch on Windows).
+- Consequence: Test compilation uses `tsconfig.test.json` with CJS settings, and preparation script handles alias rewrite plus `tests/index.js` bootstrap so `node --test .tmp/test-dist/tests` remains stable.
+
+### 2026-03-25
+- Decision: Complete `src_new/` archive convergence by removing tracked `src_new/**` files from active git history on mainline branch.
+- Why: Keeping a second unmaintained source tree tracked in parallel keeps entry ownership ambiguous and increases accidental edit risk.
+- Consequence: Active implementation scope is `src/` mainline only; legacy `src_new` content remains accessible through history when needed.
+
 ## Format
 For future entries, use:
 - Decision:

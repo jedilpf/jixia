@@ -25,6 +25,9 @@
 - Default application entry should be MVP flow (`MvpFlowShell`), while legacy flow should be opt-in via `?legacyFlow=1` for regression only.
 - CI lint checks should be blocking in PR workflows to prevent style and naming drift from entering mainline.
 - Cache/temporary artifacts listed in `.gitignore` (notably `.vite/` and `backups/`) should remain untracked in git.
+- Node test execution should use the compiled `.tmp/test-dist` output with a preparation step that rewrites unresolved `@/` requires and generates a directory entry file, so `node --test .tmp/test-dist/tests` runs reliably on Windows shells.
+- Test-specific asset path behavior should be isolated through `tests/stubs/assets.ts` rather than changing runtime asset helpers.
+- `src_new/` should remain archived from tracked mainline; new implementation work should target `src/` + MVP flow modules only.
 
 ## Working preferences
 - Favor small, reviewable diffs.

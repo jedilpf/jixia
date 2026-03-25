@@ -6,6 +6,7 @@
 - Legacy flow is regression-only and can be opened with query param:
   - `?legacyFlow=1`
 - Legacy files remain for comparison and fallback, but are not the default product path.
+- `src_new/` legacy experiment tree is archived out of tracked mainline and should not be used as an active development target.
 
 ## 2) Battle Mainline
 
@@ -32,6 +33,8 @@
   - `npm run typecheck`
   - `npm test`
   - `npm run gate:daily`
+- Test runtime note:
+  - `npm test` compiles TypeScript tests to `.tmp/test-dist` and then runs `scripts/pipeline/prepare-test-dist.cjs` to normalize alias imports and generate a directory entry for Node test runner.
 - PR checks:
   - `gate:daily`
   - `typecheck`

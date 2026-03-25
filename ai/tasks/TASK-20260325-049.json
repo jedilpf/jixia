@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260325-049",
+  "goal": "Stabilize the testing gate and complete legacy src_new archive convergence by fixing test TypeScript module settings and committing tracked src_new deletions as an explicit archive step.",
+  "constraints": [
+    "Do not delete gameplay/content assets; only handle tracked legacy src_new source-tree removal and test pipeline config.",
+    "Keep changes focused on test compilation/runtime and mainline convergence documentation.",
+    "Do not introduce new dependencies or feature changes."
+  ],
+  "deliverables": [
+    "npm test runs successfully in current repository environment.",
+    "Tracked src_new files are removed from git in a dedicated convergence step.",
+    "Baseline/knowledge docs reflect src_new archive status and test gate expectations."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "tsconfig.test.json",
+    "scripts",
+    "tests",
+    "docs",
+    ".knowledge",
+    "package.json",
+    "src_new"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-049.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-049.json",
+    "npm run typecheck",
+    "npm test",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-049.json"
+  ],
+  "status": "draft"
+}
