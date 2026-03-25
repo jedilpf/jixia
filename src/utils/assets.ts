@@ -35,6 +35,21 @@ export function getAssetUrl(assetPath: string): string {
   return `${import.meta.env.BASE_URL}${normalized}`;
 }
 
+export function asset(assetPath: string): string {
+  return getAssetUrl(assetPath);
+}
+
+export function getAudioAssetUrl(fileName: string): string {
+  const normalized = fileName.replace(/^\/+/, '');
+  const assetPath = normalized.startsWith('assets/') ? normalized : `assets/${normalized}`;
+  return getAssetUrl(assetPath);
+}
+
+export function getCharacterImageUrl(characterId: string, stand = false): string {
+  const folder = stand ? 'stand/' : '';
+  return getAssetUrl(`assets/chars/${folder}${characterId}.png`);
+}
+
 function unwrapCardId(cardId: string): string {
   const deckMatch = /^deck_\d+_(.+)$/.exec(cardId);
   if (deckMatch?.[1]) {

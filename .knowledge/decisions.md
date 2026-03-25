@@ -122,6 +122,16 @@
 - Why: These directories create cognitive noise and increase accidental edits when treated as active project scope.
 - Consequence: Mainline work, review, and AI task scopes should avoid these directories unless a task explicitly targets cleanup/archive operations.
 
+### 2026-03-25
+- Decision: Move audio bootstrap responsibility to active `App` flow and remove runtime-flavor dependency from initialization behavior.
+- Why: UI feedback should not disappear in Electron-like runtimes due to early-return branches; audio init and base volume belong to active entry infrastructure.
+- Consequence: `src/App.tsx` now initializes `uiAudio`, applies baseline volume, and preloads hover SFX through shared asset helpers without runtime checks.
+
+### 2026-03-25
+- Decision: Standardize screen-level media URL generation on `src/utils/assets.ts` helper functions.
+- Why: Repeated local `asset()` path builders drift over time and make audio/image behavior inconsistent across screens and packaging targets.
+- Consequence: Transition and pre-battle visual asset modules now resolve media via shared helpers, reducing path strategy fragmentation.
+
 ## Format
 For future entries, use:
 - Decision:

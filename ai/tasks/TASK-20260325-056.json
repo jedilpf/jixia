@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260325-056",
+  "goal": "P1 infrastructure fix: remove Electron-style audio init blocking from active flow behavior and unify audio/image asset path usage through shared helpers.",
+  "constraints": [
+    "Do not add new gameplay features or alter battle rules.",
+    "Keep changes focused on audio initialization/feedback reliability and asset path consistency.",
+    "Prefer minimal diffs in active mainline files; do not revive legacy entry flow."
+  ],
+  "deliverables": [
+    "Active app flow initializes uiAudio and baseline SFX volume without runtime-flavor early returns.",
+    "Shared asset helper usage is standardized for screen-level media path building.",
+    "Audio manager avoids redundant custom sound fetch/decode and handles initialization safely."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/App.tsx",
+    "src/utils/assets.ts",
+    "src/utils/audioManager.ts",
+    "src/components/TransitionScreen.tsx",
+    "src/ui/screens/visualAssets.ts",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-056.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-056.json"
+  ],
+  "status": "draft"
+}

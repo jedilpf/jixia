@@ -137,17 +137,31 @@
 
     // 加载并播放自定义音频文件（放在 public/assets/ 中的 mp3 等）
     private customSounds: Record<string, AudioBuffer> = {};
+    private customSoundLoads: Partial<Record<string, Promise<void>>> = {};
 
     public async loadCustomSound(name: string, url: string) {
+        this.init();
         if (!this.ctx) return;
-        try {
-            const resp = await fetch(url);
-            const arrayBuf = await resp.arrayBuffer();
-            const audio = await this.ctx.decodeAudioData(arrayBuf);
-            this.customSounds[name] = audio;
-        } catch (e) {
-            console.warn(`[uiAudio] failed to load ${url}`, e);
+        if (this.customSounds[name]) return;
+        if (this.customSoundLoads[name]) {
+            await this.customSoundLoads[name];
+            return;
         }
+
+        this.customSoundLoads[name] = (async () => {
+            try {
+                const resp = await fetch(url);
+                const arrayBuf = await resp.arrayBuffer();
+                const audio = await this.ctx!.decodeAudioData(arrayBuf);
+                this.customSounds[name] = audio;
+            } catch (e) {
+                console.warn(`[uiAudio] failed to load ${url}`, e);
+            } finally {
+                delete this.customSoundLoads[name];
+            }
+        })();
+
+        await this.customSoundLoads[name];
     }
 
     public playCustomSound(name: string, volume = 1.0) {

@@ -1,5 +1,7 @@
-﻿export function asset(path: string): string {
-  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+import { getAssetUrl, getCardImageUrl, getCharacterImageUrl } from '@/utils/assets';
+
+export function asset(path: string): string {
+  return getAssetUrl(path);
 }
 
 export const PRE_BATTLE_COLORS = {
@@ -12,38 +14,38 @@ export const PRE_BATTLE_COLORS = {
   buttonHover: '#844b25',
 };
 
-export const PRE_BATTLE_BACKGROUND = asset('/assets/bg-main1.png');
+export const PRE_BATTLE_BACKGROUND = getAssetUrl('assets/bg-main1.png');
 
 export const FACTION_PORTRAIT_MAP: Record<string, string> = {
-  confucian: asset('/assets/chars/stand/kongqiu.png'),
-  legalist: asset('/assets/chars/stand/hanfeizi.png'),
-  daoist: asset('/assets/chars/stand/zhuangzi.png'),
-  mohist: asset('/assets/chars/stand/mozi.png'),
-  strategist: asset('/assets/chars/stand/sunwu.png'),
-  diplomat: asset('/assets/chars/stand/guiguzi.png'),
-  logician: asset('/assets/chars/stand/huishi.png'),
-  eclectic: asset('/assets/chars/stand/xuxing.png'),
-  agronomist: asset('/assets/chars/stand/xuxing.png'),
-  yin_yang: asset('/assets/chars/stand/zouyan.png'),
-  novelist: asset('/assets/chars/huishi.png'),
-  healer: asset('/assets/chars/luban.png'),
-  musician: asset('/assets/chars/kongqiu.png'),
-  calendar: asset('/assets/chars/zouyan.png'),
-  ritualist: asset('/assets/chars/kongqiu.png'),
-  merchant: asset('/assets/chars/guiguzi.png'),
+  confucian: getCharacterImageUrl('kongqiu', true),
+  legalist: getCharacterImageUrl('hanfeizi', true),
+  daoist: getCharacterImageUrl('zhuangzi', true),
+  mohist: getCharacterImageUrl('mozi', true),
+  strategist: getCharacterImageUrl('sunwu', true),
+  diplomat: getCharacterImageUrl('guiguzi', true),
+  logician: getCharacterImageUrl('huishi', true),
+  eclectic: getCharacterImageUrl('xuxing', true),
+  agronomist: getCharacterImageUrl('xuxing', true),
+  yin_yang: getCharacterImageUrl('zouyan', true),
+  novelist: getCharacterImageUrl('huishi'),
+  healer: getCharacterImageUrl('luban'),
+  musician: getCharacterImageUrl('kongqiu'),
+  calendar: getCharacterImageUrl('zouyan'),
+  ritualist: getCharacterImageUrl('kongqiu'),
+  merchant: getCharacterImageUrl('guiguzi'),
 };
 
 export function getFactionPortrait(factionId: string | null | undefined): string {
-  if (!factionId) return asset('/assets/card-back.png');
-  return FACTION_PORTRAIT_MAP[factionId] ?? asset('/assets/card-back.png');
+  if (!factionId) return getAssetUrl('assets/card-back.png');
+  return FACTION_PORTRAIT_MAP[factionId] ?? getAssetUrl('assets/card-back.png');
 }
 
 export const ISSUE_ART_MAP: Record<string, string> = {
-  state_priority: asset('/assets/cards/libian.jpg'),
-  crisis_response: asset('/assets/cards/zhange.jpg'),
-  public_will: asset('/assets/cards/youshuo.jpg'),
+  state_priority: getCardImageUrl('libian', '礼辩同归'),
+  crisis_response: getCardImageUrl('zhange', '战鼓催锋'),
+  public_will: getCardImageUrl('youshuo', '游说之辞'),
 };
 
 export function getIssueArt(issueId: string): string {
-  return ISSUE_ART_MAP[issueId] ?? asset('/assets/text-bg.png');
+  return ISSUE_ART_MAP[issueId] ?? getAssetUrl('assets/text-bg.png');
 }

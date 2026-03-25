@@ -36,6 +36,8 @@
 - Long-running migrations, catalog recovery, and cross-module cleanup work should reference `docs/standards/standards-guide-stable-delivery-v1.md` plus `docs/standards/standards-checklist-omission-audit-v1.md` so "stable output" and "nothing hidden/missing" are checked by process, not memory.
 - Active app entry is now fixed to `src/App.tsx -> MvpFlowShell` with no query-based flow split in the active path; legacy flows remain code-level references only.
 - Active-mainline boundary excludes `.vite/`, `backups/`, `review/`, `review_bundle_*/`, and `src_new/`; these should not be treated as primary implementation scope.
+- Active mainline should bootstrap UI audio in `src/App.tsx` without runtime-flavor early returns, then let UI components call `uiAudio.playHover/playClick` safely.
+- Asset URL building for screen-level media should use shared helpers in `src/utils/assets.ts` (`getAssetUrl`, `getAudioAssetUrl`, `getCardImageUrl`, `getCharacterImageUrl`) instead of ad-hoc local `asset()` implementations.
 
 ## Working preferences
 - Favor small, reviewable diffs.
