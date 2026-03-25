@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260325-047",
+  "goal": "Unify remaining direct asset literals in tracked mainline presentation screens to shared asset path helpers without changing gameplay behavior or deleting content.",
+  "constraints": [
+    "Do not delete any card/image/audio/content assets.",
+    "Do not modify gameplay rules, card data semantics, or deck composition.",
+    "Keep diffs minimal and limited to tracked mainline UI files."
+  ],
+  "deliverables": [
+    "CharactersView uses shared asset path helper for background and stand image URLs.",
+    "PreFactionLoading uses shared asset path helper for background URL.",
+    "Task passes typecheck and task scope/finalize gates."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/components/CharactersView.tsx",
+    "src/ui/screens/PreFactionLoading.tsx",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-047.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-047.json",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-047.json"
+  ],
+  "status": "draft"
+}

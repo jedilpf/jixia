@@ -1,5 +1,6 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { uiAudio } from '@/utils/audioManager';
+import { getAssetUrl } from '@/utils/assets';
 
 const CHARACTERS = [
     {
@@ -196,9 +197,9 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
         : CHARACTERS.filter(c => c.school === activeSchool);
 
     const selectedChar = CHARACTERS.find(c => c.id === selectedCharId) || CHARACTERS[0];
-    const bgImgSrc = `assets/chars/${selectedChar.id}.png`;
+    const bgImgSrc = getAssetUrl(`assets/chars/${selectedChar.id}.png`);
     const standImgSrc = HAS_STAND.has(selectedChar.id)
-        ? `assets/chars/stand/${selectedChar.id}.png`
+        ? getAssetUrl(`assets/chars/stand/${selectedChar.id}.png`)
         : null;
 
     const handleCharSelect = (id: string) => {
