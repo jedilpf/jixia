@@ -97,6 +97,16 @@
 - Why: Keeping a second unmaintained source tree tracked in parallel keeps entry ownership ambiguous and increases accidental edit risk.
 - Consequence: Active implementation scope is `src/` mainline only; legacy `src_new` content remains accessible through history when needed.
 
+### 2026-03-25
+- Decision: Enforce gallery identity de-duplication using normalized keys (`display-faction + normalized-name`) with status-preference selection.
+- Why: During legacy/source convergence, exact-string duplicate checks can miss near-identical card identities and cause perceived repeat cards across gallery visibility states.
+- Consequence: Collection views keep one preferred non-archived representative per visible identity (favoring active cards), while source files remain untouched.
+
+### 2026-03-25
+- Decision: Run Node tests with `--test-isolation=none` in the default `npm test` script for this repository.
+- Why: The current Windows sandbox environment blocks test-runner subprocess spawning (`spawn EPERM`) under default isolation.
+- Consequence: Test execution remains deterministic and CI/local verification can run from the compiled test index without subprocess isolation.
+
 ## Format
 For future entries, use:
 - Decision:

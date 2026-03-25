@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260325-050",
+  "goal": "Audit and harden card catalog duplicate handling so collection visibility never shows repeated card identities across active/locked views, without deleting any card assets.",
+  "constraints": [
+    "Do not delete card files or media assets.",
+    "Keep runtime/battle logic unchanged; scope is catalog data shaping and validation.",
+    "Prefer minimal diffs and preserve existing source-of-truth at content/cards."
+  ],
+  "deliverables": [
+    "Collection data pipeline applies defensive de-duplication for display identities.",
+    "Structure validation catches fuzzy duplicate visible identities (faction alias + normalized name).",
+    "Automated test verifies collection identity uniqueness on generated card data."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/data",
+    "scripts/pipeline",
+    "tests",
+    ".knowledge",
+    "package.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-050.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-050.json",
+    "npm run typecheck",
+    "npm test",
+    "npm run validate:structure",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-050.json"
+  ],
+  "status": "draft"
+}

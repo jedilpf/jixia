@@ -37,18 +37,30 @@ function normalizeFaction(faction) {
   return FACTION_ALIAS_MAP[raw] || raw;
 }
 
+function normalizeCatalogName(name) {
+  if (typeof name !== 'string') {
+    return '';
+  }
+  return name
+    .trim()
+    .replace(/[\s\u3000]+/g, '')
+    .replace(/[，。、“”‘’：；！？,.!?:;·—-]/g, '')
+    .toLowerCase();
+}
+
 function visibleCatalogKey(data) {
   if (data.status === 'archived') {
     return null;
   }
-  if (typeof data.name !== 'string' || data.name.trim() === '') {
+  const normalizedName = normalizeCatalogName(data.name);
+  if (!normalizedName) {
     return null;
   }
   const normalizedFaction = normalizeFaction(data.faction);
   if (!normalizedFaction) {
     return null;
   }
-  return `${normalizedFaction}::${data.name.trim()}`;
+  return `${normalizedFaction}::${normalizedName}`;
 }
 
 function main() {

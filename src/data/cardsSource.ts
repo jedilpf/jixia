@@ -66,10 +66,55 @@ function compareCollectionCards(a: CardData, b: CardData): number {
   return (SOURCE_ORDER_BY_ID.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (SOURCE_ORDER_BY_ID.get(b.id) ?? Number.MAX_SAFE_INTEGER);
 }
 
-export const COLLECTION_CARDS: CardData[] = CARDS
-  .filter((card) => card.status !== 'archived')
-  .slice()
-  .sort(compareCollectionCards);
+const COLLECTION_STATUS_PRIORITY: Record<CardStatus, number> = {
+  active: 0,
+  planned: 1,
+  draft: 2,
+  rework: 3,
+  archived: 4,
+};
+
+function normalizeCollectionName(name: string): string {
+  return name
+    .trim()
+    .replace(/[\s\u3000]+/g, '')
+    .replace(/[，。、“”‘’：；！？,.!?:;·—-]/g, '')
+    .toLowerCase();
+}
+
+function getCollectionIdentityKey(card: CardData): string {
+  const faction = getCollectionFactionName(card.faction).trim();
+  const normalizedName = normalizeCollectionName(card.name);
+  if (!faction || !normalizedName) {
+    return `id::${card.id}`;
+  }
+  return `${faction}::${normalizedName}`;
+}
+
+function compareCollectionPreference(a: CardData, b: CardData): number {
+  const priorityA = COLLECTION_STATUS_PRIORITY[a.status] ?? Number.MAX_SAFE_INTEGER;
+  const priorityB = COLLECTION_STATUS_PRIORITY[b.status] ?? Number.MAX_SAFE_INTEGER;
+  if (priorityA !== priorityB) {
+    return priorityA - priorityB;
+  }
+  return compareCollectionCards(a, b);
+}
+
+function dedupeCollectionCards(cards: CardData[]): CardData[] {
+  const byIdentity = new Map<string, CardData>();
+  for (const card of cards) {
+    const key = getCollectionIdentityKey(card);
+    const existing = byIdentity.get(key);
+    if (!existing || compareCollectionPreference(card, existing) < 0) {
+      byIdentity.set(key, card);
+    }
+  }
+  return [...byIdentity.values()].sort(compareCollectionCards);
+}
+
+export const COLLECTION_CARDS: CardData[] = dedupeCollectionCards(
+  CARDS.filter((card) => card.status !== 'archived')
+);
 
 export const ACTIVE_COLLECTION_CARDS: CardData[] = COLLECTION_CARDS.filter((card) => card.status === 'active');
 

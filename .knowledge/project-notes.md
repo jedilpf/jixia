@@ -20,12 +20,15 @@
 - Legacy catalog migration and duplicate validation should normalize faction aliases (e.g. `儒家/礼心殿`, `墨家/玄匠盟`) before comparing card identity, otherwise the same card can be imported twice under different naming schemes.
 - Legacy cards may need an explicit `display_type` field in `content/cards` so generated collection data can preserve user-facing labels like `事件` and `反制` while keeping structured runtime `type` values constrained.
 - Collection list and detail views should share the same ordered active-card source (`ACTIVE_COLLECTION_CARDS`) instead of each screen deriving its own order.
+- Collection rendering should defensively de-duplicate non-archived cards by normalized identity (`display-faction + normalized-name`) with status priority (`active > planned > draft > rework`) so near-duplicate legacy entries cannot appear twice in gallery views.
+- Duplicate validation should normalize card names (trim + remove spaces/punctuation + lowercase) in addition to faction alias mapping; exact-string-only checks are not enough for migration-era data.
 - Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
 - Battle presentation components should resolve card art, frame art, and battle backgrounds through `getCardImageUrl` / `getAssetUrl` instead of raw `assets/...` strings or id whitelists, so migrated ids and packaged base paths stay consistent.
 - Default application entry should be MVP flow (`MvpFlowShell`), while legacy flow should be opt-in via `?legacyFlow=1` for regression only.
 - CI lint checks should be blocking in PR workflows to prevent style and naming drift from entering mainline.
 - Cache/temporary artifacts listed in `.gitignore` (notably `.vite/` and `backups/`) should remain untracked in git.
 - Node test execution should use the compiled `.tmp/test-dist` output with a preparation step that rewrites unresolved `@/` requires and generates a directory entry file, so `node --test .tmp/test-dist/tests` runs reliably on Windows shells.
+- In sandboxed Windows runs where Node test subprocess spawning is restricted, run tests with `node --test --test-isolation=none` against the compiled index entry to avoid `spawn EPERM`.
 - Test-specific asset path behavior should be isolated through `tests/stubs/assets.ts` rather than changing runtime asset helpers.
 - `src_new/` should remain archived from tracked mainline; new implementation work should target `src/` + MVP flow modules only.
 

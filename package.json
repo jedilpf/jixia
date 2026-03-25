@@ -12,7 +12,7 @@
     "test:clean": "node -e \"require('fs').rmSync('.tmp/test-dist',{ recursive: true, force: true })\"",
     "test:build": "npm run test:clean && tsc -p tsconfig.test.json",
     "test:prepare": "node scripts/pipeline/prepare-test-dist.cjs",
-    "test": "npm run test:build && npm run test:prepare && node --test .tmp/test-dist/tests",
+    "test": "npm run test:build && npm run test:prepare && node --test --test-isolation=none .tmp/test-dist/tests/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "typecheck": "tsc --noEmit",
