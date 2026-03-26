@@ -142,6 +142,11 @@
 - Why: Directly using `content/cards` in active catalog flow caused visible card shrinkage and mismatched user perception; battleV2 and图鉴 needed a single visible source immediately.
 - Consequence: `src/data/cardsSource.ts` now re-exports adapter-backed cards for both battleV2 and collection UI, while `content/cards` remains retained ledger/migration data for later convergence.
 
+### 2026-03-26
+- Decision: Treat query-based entry toggles (`newFlow`, `legacyFlow`) as deprecated history, and keep active entry as a strict single path (`src/App.tsx -> MvpFlowShell`).
+- Why: Documentation and implementation drift around query toggles repeatedly caused collaborators to patch the wrong path.
+- Consequence: Active docs should describe one default entry only; query-based split instructions belong to archive/history docs.
+
 ## Format
 For future entries, use:
 - Decision:

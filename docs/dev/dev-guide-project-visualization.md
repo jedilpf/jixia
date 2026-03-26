@@ -6,9 +6,9 @@
 
 ## 1. 一句话理解项目
 
-这是一个以“百家争鸣”为题材的卡牌对战项目，当前仓库存在 **双运行链路**：
-- 链路 A（默认）：旧版大厅 UI + 新版 `battleV2` 战斗机制（当前主试玩路径）
-- 链路 B（可选）：`?newFlow=1` 触发的 `MvpFlowShell` 状态机流程（`core` + `app/reducer`）
+这是一个以“百家争鸣”为题材的卡牌对战项目，当前仓库采用 **单运行入口**：
+- 唯一入口：`src/App.tsx -> MvpFlowShell`
+- 当前战斗主线：`src/battleV2`（由 MvpFlowShell 驱动）
 
 ## 2. 入口与运行路径可视化
 
@@ -16,25 +16,11 @@
 flowchart TD
   A[index.html] --> B[src/main.tsx]
   B --> C[src/App.tsx]
-
-  C --> D{URL参数 newFlow=1 ?}
-
-  D -- 否(默认) --> E[旧大厅链路]
-  E --> E1[点击入场页 + 大厅音乐]
-  E1 --> E2[MainMenu]
-  E2 --> E3[CardShowcase / CharactersView]
-  E2 --> E4[TransitionScreen]
-  E4 --> E5[BattleSetup]
-  E5 --> E6[PreBattleFlow]
-  E6 --> E7[BattleFrameV2]
-  E7 --> E8[battleV2/useDebateBattle + battleV2/engine]
-
-  D -- 是 --> F[MVP链路]
-  F --> F1[AppStoreProvider + useReducer]
-  F1 --> F2[MvpFlowShell]
-  F2 --> F3[Home -> Match -> Topic -> FactionPick]
-  F3 --> F4[Loading -> BattleScreen -> Result]
-  F4 --> F5[core/gameEngine + core/*]
+  C --> D[MvpFlowShell]
+  D --> E[AppStoreProvider + useReducer]
+  E --> F[Home -> Match -> Topic -> FactionPick]
+  F --> G[Loading -> BattleScreen -> Result]
+  G --> H[battleV2/useDebateBattle + battleV2/engine]
 ```
 
 ## 3. 架构分层图
@@ -108,39 +94,39 @@ graph LR
 | `src/core/` | 6 | 规则状态机（MVP链路） |
 | `src/ui/` | 16 | MVP屏幕与组件 |
 | `src/data/` | 9 | 游戏数据配置 |
-| `src_new/` | 80 | 旁路/探索代码（非当前主入口） |
+| `src_new/` | 80 | 归档/探索代码（非当前主入口） |
 | `scripts/` | 26 | 构建、门禁、流水线脚本 |
 | `docs/` | 89 | 文档体系 |
 
 ## 5. 关键文件清单（建议先读）
 
 1. `src/main.tsx`：前端启动入口。
-2. `src/App.tsx`：全局路由分流点（默认旧大厅链路 + `newFlow` MVP 链路）。
-3. `src/components/MainMenu.tsx`：旧大厅 UI（顶部系统栏、人物志、图鉴入口）。
-4. `src/components/BattleSetup.tsx` + `src/components/PreBattleFlow.tsx`：战前流程。
-5. `src/components/BattleFrameV2.tsx`：默认战斗界面容器。
-6. `src/battleV2/useDebateBattle.ts` + `src/battleV2/engine.ts`：默认战斗机制。
-7. `src/ui/screens/MvpFlowShell.tsx` + `src/app/reducer.ts` + `src/core/gameEngine.ts`：MVP链路核心。
-8. `src/data/game/*`：卡牌/门派/议题/参数配置。
+2. `src/App.tsx`：当前唯一入口（直接进入 `MvpFlowShell`）。
+3. `src/ui/screens/MvpFlowShell.tsx`：MVP流程壳层。
+4. `src/battleV2/useDebateBattle.ts` + `src/battleV2/engine.ts`：当前战斗主线核心。
+5. `src/components/BattleFrameV2.tsx`：战斗界面容器。
+6. `src/data/cardsSource.ts` + `src/data/catalogAdapter.ts`：图鉴/战斗统一卡源读取口径。
+7. `src/data/showcaseCards.ts`：当前活跃卡牌数据输入。
+8. `src/data/game/*`：门派/议题/参数配置。
 
 ## 6. 给其他 AI 的推荐阅读顺序
 
 ```text
 Step 1: src/main.tsx
 Step 2: src/App.tsx
-Step 3: src/components/MainMenu.tsx + CardShowcase.tsx + CharactersView.tsx
-Step 4: src/components/BattleSetup.tsx + PreBattleFlow.tsx
-Step 5: src/components/BattleFrameV2.tsx
-Step 6: src/battleV2/useDebateBattle.ts + src/battleV2/engine.ts
-Step 7: （可选分支）src/ui/screens/MvpFlowShell.tsx + src/app/* + src/core/*
+Step 3: src/ui/screens/MvpFlowShell.tsx + src/app/*
+Step 4: src/components/BattleFrameV2.tsx
+Step 5: src/battleV2/useDebateBattle.ts + src/battleV2/engine.ts
+Step 6: src/data/cardsSource.ts + src/data/catalogAdapter.ts + src/data/showcaseCards.ts
+Step 7: （如需）src/components/MainMenu.tsx + CardShowcase.tsx + CharactersView.tsx
 Step 8: src/data/game/*
 ```
 
 ## 7. 当前结构审查结论（针对“可视化理解”）
 
-- 当前项目不是单一架构，而是“旧大厅表现层 + 新旧并行战斗/状态链路”。
-- 真正线上试玩默认走 `App.tsx` 的旧大厅链路；`newFlow=1` 属于并行链路。
-- `src_new/` 与 `misc/` 内容较多，但并非当前主入口，阅读时应避免误判为主链。
+- 当前项目主入口已收口为单链路：`src/App.tsx -> MvpFlowShell`。
+- 当前战斗主线为 `battleV2`，图鉴与战斗卡源由 `cardsSource + catalogAdapter` 对齐。
+- `src_new/` 与归档目录不属于活主线，阅读时应避免误判为当前实现范围。
 
 ## 8. 已知风险提示（不改代码，仅提示）
 

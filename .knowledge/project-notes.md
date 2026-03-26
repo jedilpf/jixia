@@ -41,6 +41,7 @@
 - PR validation is treated as a blocking gate: run `gate:daily`, `typecheck`, `test`, and blocking `lint:ci` in workflow so regressions are intercepted before merge without legacy-archive noise.
 - Current convergence baseline (2026-03-26): battleV2 and collection/gallery should read cards from `src/data/showcaseCards.ts` through `src/data/catalogAdapter.ts` + `src/data/cardsSource.ts` to keep runtime and catalog visibility aligned during收口.
 - `content/cards/*.json` remains a retained ledger/migration asset set in this stage, but it is not the active battle/gallery read source for this收口阶段.
+- The active app entry policy is now single-path only (`src/App.tsx -> MvpFlowShell`); `newFlow`/`legacyFlow` query toggles are legacy history and must not be reintroduced in active entry behavior.
 
 ## Working preferences
 - Favor small, reviewable diffs.

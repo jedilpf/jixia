@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260326-060",
+  "goal": "Converge active documentation wording to single-entry baseline by removing stale newFlow split references from active docs.",
+  "constraints": [
+    "No product feature changes.",
+    "Only documentation and task packet files can be modified.",
+    "Do not rewrite archive docs unless necessary."
+  ],
+  "deliverables": [
+    "Active docs no longer describe newFlow=1 as active entry behavior.",
+    "Current baseline wording remains consistent across key active docs."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/AI-mainline-policy.md",
+    "docs/dev/dev-guide-project-visualization.md",
+    "docs/current-baseline.md",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260326-060.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260326-060.json"
+  ],
+  "status": "done"
+}
