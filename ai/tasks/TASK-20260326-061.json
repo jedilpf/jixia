@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260326-061",
+  "goal": "Finish remaining convergence wording cleanup for active docs/knowledge to match single-entry baseline.",
+  "constraints": [
+    "No product feature changes.",
+    "Only docs/knowledge/task packet files can be modified.",
+    "Keep archive/history docs untouched unless explicitly required."
+  ],
+  "deliverables": [
+    "Active visualization HTML no longer describes newFlow split as active behavior.",
+    "Consolidation checklist marks completed single-entry item accordingly.",
+    "Project notes remove/supersede contradictory old entry-toggle wording."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/dev/dev-view-project-visualization.html",
+    "docs/project/plan/project-plan-github-issue-checklist-7day-consolidation-v1.md",
+    ".knowledge/project-notes.md",
+    ".knowledge/decisions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260326-061.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260326-061.json"
+  ],
+  "status": "done"
+}

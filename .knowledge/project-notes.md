@@ -22,9 +22,9 @@
 - Collection list and detail views should share the same ordered active-card source (`ACTIVE_COLLECTION_CARDS`) instead of each screen deriving its own order.
 - Collection rendering should defensively de-duplicate non-archived cards by normalized identity (`display-faction + normalized-name`) with status priority (`active > planned > draft > rework`) so near-duplicate legacy entries cannot appear twice in gallery views.
 - Duplicate validation should normalize card names (trim + remove spaces/punctuation + lowercase) in addition to faction alias mapping; exact-string-only checks are not enough for migration-era data.
-- Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
+- [superseded] Main app audio/path fixes should preserve the existing `newFlow` branch gate unless the entry-mainline decision is explicitly revisited.
 - Battle presentation components should resolve card art, frame art, and battle backgrounds through `getCardImageUrl` / `getAssetUrl` instead of raw `assets/...` strings or id whitelists, so migrated ids and packaged base paths stay consistent.
-- Default application entry should be MVP flow (`MvpFlowShell`), while legacy flow should be opt-in via `?legacyFlow=1` for regression only.
+- [superseded] Default application entry should be MVP flow (`MvpFlowShell`), while legacy flow should be opt-in via `?legacyFlow=1` for regression only.
 - CI lint checks should be blocking in PR workflows to prevent style and naming drift from entering mainline.
 - Cache/temporary artifacts listed in `.gitignore` (notably `.vite/` and `backups/`) should remain untracked in git.
 - Node test execution should use the compiled `.tmp/test-dist` output with a preparation step that rewrites unresolved `@/` requires and generates a directory entry file, so `node --test .tmp/test-dist/tests` runs reliably on Windows shells.

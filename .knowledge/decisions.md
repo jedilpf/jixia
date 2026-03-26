@@ -147,6 +147,11 @@
 - Why: Documentation and implementation drift around query toggles repeatedly caused collaborators to patch the wrong path.
 - Consequence: Active docs should describe one default entry only; query-based split instructions belong to archive/history docs.
 
+### 2026-03-26
+- Decision: Mark pre-convergence notes about `newFlow`/`legacyFlow` as superseded in project notes instead of deleting them.
+- Why: We need current guidance to be unambiguous while preserving historical traceability.
+- Consequence: Readers get single-entry instructions by default, and old wording remains visibly deprecated for audit context.
+
 ## Format
 For future entries, use:
 - Decision:

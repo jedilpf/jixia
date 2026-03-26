@@ -28,15 +28,10 @@
 flowchart TD
   A[index.html] --> B[src/main.tsx]
   B --> C[src/App.tsx]
-  C --> D{newFlow=1 ?}
-  D -- 否 --> E[旧大厅默认链路]
-  E --> E1[MainMenu]
-  E1 --> E2[图鉴/人物志]
-  E1 --> E3[Transition -> BattleSetup -> PreBattleFlow]
-  E3 --> E4[BattleFrameV2 -> battleV2/engine]
-  D -- 是 --> F[MVP链路]
-  F --> F1[MvpFlowShell]
-  F1 --> F2[app/reducer + core/gameEngine]
+  C --> D[MvpFlowShell]
+  D --> E[app/reducer + core/gameEngine]
+  E --> F[BattleFrameV2]
+  F --> G[battleV2/engine]
     </pre>
   </div>
 
