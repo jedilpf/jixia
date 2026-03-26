@@ -1,4 +1,4 @@
-﻿// 稀有度颜色映射
+// 稀有度颜色映射
 export const rarityColor: Record<string, string> = {
     '常见': '#9ca3af',
     '稀有': '#60a5fa',
@@ -35,7 +35,7 @@ export const CARDS: CardData[] = [
     { id: 'wenyan', name: '温言立论', faction: '礼心殿', type: '技能', rarity: '常见', cost: 1, background: '言不急则理自明，笑里藏锋亦不伤人。青灯一盏，足压满堂躁气。', skill: '抽1；若你本回合已使用过本门派牌，改为抽2。' },
     { id: 'zhuduchao', name: '竹牍抄录', faction: '礼心殿', type: '事件', rarity: '常见', cost: 2, background: '抄一段旧文，便得一线新路。字落竹纹，心亦随之安定。', skill: '从牌库检索1张【技能】牌加入手牌；然后弃1张牌。' },
     { id: 'jiangxi', name: '讲席清规', faction: '礼心殿', type: '场地', rarity: '常见', cost: 2, shield: 3, background: '讲席之上，清规如绳；入其门者，先收浮躁。几行规约，胜过千句喝止。', skill: '你每回合第1次使用【技能】牌时，抽1；回合末若你本回合未使用牌，获得【护持3】。' },
-    { id: 'sishi', name: '司史执笔', faction: '礼心殿', type: '角色', rarity: '稀有', cost: 3, attack: 2, hp: 4, background: '司史不争一时胜负，只记千年是非。笔落之处，便是人心的据证。', skill: '登场：抽2；选择1项：对敌方施加【怀疑+1（2回合）】；或令友方获得【护持4】。' },
+    { id: 'sishi', name: '司史执笔', faction: '礼心殿', type: '角色', rarity: '稀有', cost: 3, attack: 2, hp: 4, background: '司史不争一时胜负，只记千年是非。笔落之处，便是人心的据证。', skill: '登场：抽1；选择1项：对敌方施加【怀疑+1（2回合）】；或令友方获得【护持4】。' },
     { id: 'libian', name: '礼辩同归', faction: '礼心殿', type: '事件', rarity: '史诗', cost: 4, shield: 2, background: '礼起则群心不乱，辩正则万事可行。揖让之间，锋芒尽收。', skill: '双方各抽1；本回合你造成的伤害+2，且你获得【护持2】。' },
     // ====== 衡戒廷 ======
     { id: 'tiequan', name: '铁券禁令', faction: '衡戒廷', type: '事件', rarity: '稀有', cost: 3, background: '铁券一下，百口噤声；禁令既出，寸步难行。法不待情，唯待执行。', skill: '敌方下回合不能抽牌；若其仍触发抽牌效果，则改为随机弃1张手牌。' },

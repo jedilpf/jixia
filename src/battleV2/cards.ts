@@ -2,39 +2,29 @@
  * cards.ts — battleV2 战斗副牌
  *
  * 规则：
- *  - 使用 showcaseCards.ts 中的真实设定卡作为数据源，保持卡名/设定/门派一对一对应。
- *  - 图路径 = `assets/cards/${id}.jpg`；若实际文件不存在，返回 undefined，
- *    调用方可回退到按卡型提供的默认图。
+ *  - 使用 cardsSource 统一数据源（content/cards -> generated/cardsRuntime）。
+ *  - 卡图路径统一走 shared asset helper，兼容迁移后的 BS01/LEG-SC id。
  *  - 首发 Starter 牌库：从"礼心殿"和"名相府"两个门派各取5张（共10种），
  *    每张复制2份凑成 20 张完整牌库。
  */
 
 import { DebateCard, Side } from './types';
 import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, FRAMEWORK_FACTION_NAMES, pickSceneBiasFromRoutePreference, resolveFactionForCards, toFrameworkFactionName } from './factions';
-import { CARDS, CardData } from '@/data/showcaseCards';
+import { ACTIVE_CARDS, type CardData } from '@/data/cardsSource';
+import { getCardImageUrl } from '@/utils/assets';
 import {
   DEFAULT_CARD_POOL_CONFIG,
   DEFAULT_DECK_BUILD_DEFAULTS,
   normalizeEnabledFactions,
 } from './meta';
 
-// ── 已有美术资源的卡牌 id 白名单 ─────────────────────────────────────
-const ART_EXISTS = new Set([
-  'wenyan', 'zhuduchao', 'jiangxi', 'sishi', 'libian',
-  'tiequan', 'duanjian', 'jianyin', 'juwentang', 'chilin',
-  'yunxiu', 'baoyi', 'dansha', 'taiqing', 'hebu',
-  'liannuju', 'jimu', 'chengfang', 'jianshi', 'qianji',
-  'jingqi', 'zhange', 'bingshu', 'fengjun', 'poji',
-  'baima', 'mingshi', 'tongyi', 'cifeng', 'guibian',
-]);
-
-export function artPathForId(id: string): string | undefined {
-  return ART_EXISTS.has(id) ? `assets/cards/${id}.jpg` : undefined;
+export function artPathForId(id: string, cardName?: string): string {
+  return getCardImageUrl(id, cardName);
 }
 
-// ── 从 CARDS 按 id 查找对应的设定 ────────────────────────────────────
-const SHOWCASE_MAP: Record<string, CardData> = Object.fromEntries(CARDS.map((c) => [c.id, c]));
-const CARDS_BY_FACTION: Record<string, CardData[]> = CARDS.reduce((acc, card) => {
+// ── 从 ACTIVE_CARDS 按 id 查找对应的设定 ─────────────────────────────
+const SHOWCASE_MAP: Record<string, CardData> = Object.fromEntries(ACTIVE_CARDS.map((c) => [c.id, c]));
+const CARDS_BY_FACTION: Record<string, CardData[]> = ACTIVE_CARDS.reduce((acc, card) => {
   if (!acc[card.faction]) acc[card.faction] = [];
   acc[card.faction].push(card);
   return acc;
@@ -46,6 +36,10 @@ const CARDS_BY_FACTION: Record<string, CardData[]> = CARDS.reduce((acc, card) =>
 const STARTER_IDS: string[] = [
   'wenyan', 'zhuduchao', 'jiangxi', 'sishi', 'libian',
   'baima',  'mingshi',  'tongyi',  'cifeng', 'guibian',
+];
+const STARTER_FALLBACK_NAMES: string[] = [
+  '温言立论', '竹牍抄录', '讲席清规', '司史执笔', '礼辩同归',
+  '兼守同盟', '连弩匣', '机关木鸢', '城防尺牍', '千机壁垒',
 ];
 
 const DEFAULT_GUEST_COUNT = Math.max(
@@ -111,7 +105,7 @@ const SIGNATURE_SLOT_BY_ID = buildSignatureSlotMap();
 const CORE_FACTION_SET = new Set(CORE_FACTION_NAMES);
 
 function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
-  // 映射 showcaseCards 类型 → DebateCard effectKind
+  // 映射图鉴类型文本 -> DebateCard effectKind
   type EffectKind = DebateCard['effectKind'];
   const typeMap: Record<string, EffectKind> = {
     '技能': 'draw',
@@ -136,7 +130,7 @@ function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
     cost: Math.max(1, src.cost <= 3 ? src.cost : Math.round(src.cost / 2)),
     effectKind: typeMap[src.type] ?? 'draw',
     effectValue: src.attack ?? src.shield ?? (src.hp ? Math.ceil(src.hp / 2) : 1),
-    art: artPathForId(src.id),
+    art: artPathForId(src.id, src.name),
     prologue: src.background,
     description: src.skill,
     faction: frameworkFaction,
@@ -158,19 +152,46 @@ function buildCardId(side: Side, copy: number, id: string): string {
   return `${side}-c${copy}-${id}`;
 }
 
+function resolveClassicStarterIds(): string[] {
+  const presetIds = STARTER_IDS.filter((id) => Boolean(SHOWCASE_MAP[id]));
+  if (presetIds.length >= 6) return presetIds.slice(0, 10);
+
+  const nameBasedIds = STARTER_FALLBACK_NAMES
+    .map((name) => ACTIVE_CARDS.find((card) => card.name === name)?.id)
+    .filter((id): id is string => Boolean(id));
+
+  const factionFallbackIds = ACTIVE_CARDS
+    .filter((card) => card.faction === '礼心殿' || card.faction === '玄匠盟')
+    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
+    .map((card) => card.id);
+
+  const universalFallbackIds = [...ACTIVE_CARDS]
+    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
+    .map((card) => card.id);
+
+  return dedupePreserveOrder([
+    ...presetIds,
+    ...nameBasedIds,
+    ...factionFallbackIds,
+    ...universalFallbackIds,
+  ]).slice(0, 10);
+}
+
 function createClassicStarterDeck(side: Side): DebateCard[] {
   const deck: DebateCard[] = [];
-  const copies = 2; // 每种卡2份
+  const starterIds = resolveClassicStarterIds();
+  if (starterIds.length === 0) return deck;
+  const copies = Math.max(2, Math.ceil(20 / starterIds.length));
 
   for (let copy = 0; copy < copies; copy += 1) {
-    for (const id of STARTER_IDS) {
+    for (const id of starterIds) {
       const base = showcaseToDebateCard(id);
       if (!base) continue;
       deck.push({ ...base, id: buildCardId(side, copy, id) });
     }
   }
 
-  return deck;
+  return deck.slice(0, 20);
 }
 
 function getDeckIdsForFactionFramework(
@@ -216,7 +237,7 @@ function getDeckIdsForFactionFramework(
       const card = SHOWCASE_MAP[id];
       return card ? isFactionEnabled(card.faction) : false;
     });
-  const fallbackCommonPool = CARDS
+  const fallbackCommonPool = ACTIVE_CARDS
     .filter((card) => !selectedIds.includes(card.id))
     .filter((card) => isFactionEnabled(card.faction))
     .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
