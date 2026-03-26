@@ -1,10 +1,11 @@
-﻿import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
+import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
 
 interface HomeScreenProps {
   onStart: () => void;
+  onStoryMode?: () => void;
 }
 
-export function HomeScreen({ onStart }: HomeScreenProps) {
+export function HomeScreen({ onStart, onStoryMode }: HomeScreenProps) {
   return (
     <div
       className="relative flex h-full items-center justify-center overflow-hidden"
@@ -42,6 +43,28 @@ export function HomeScreen({ onStart }: HomeScreenProps) {
           >
             开始对战
           </button>
+          {onStoryMode && (
+            <button
+              type="button"
+              className="mt-4 rounded-lg border px-8 py-3 text-base font-semibold transition"
+              style={{
+                borderColor: 'rgba(139,115,85,0.6)',
+                background: 'rgba(26,26,46,0.8)',
+                color: '#D4C5A9',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#E85D04';
+                e.currentTarget.style.color = '#E85D04';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(139,115,85,0.6)';
+                e.currentTarget.style.color = '#D4C5A9';
+              }}
+              onClick={onStoryMode}
+            >
+              剧情模式
+            </button>
+          )}
         </div>
 
         <div className="relative w-[300px] overflow-hidden rounded-xl border" style={{ borderColor: 'rgba(184,136,84,0.45)' }}>

@@ -9,6 +9,7 @@ import {
   MatchScreen,
   ResultScreen,
   TopicScreen,
+  StoryScreen,
 } from '@/ui/screens';
 
 export function MvpFlowShell() {
@@ -34,7 +35,12 @@ export function MvpFlowShell() {
   }
 
   if (state.screen === 'home') {
-    return <HomeScreen onStart={beginMatchWithTransition} />;
+    return (
+      <HomeScreen
+        onStart={beginMatchWithTransition}
+        onStoryMode={() => dispatch({ type: 'NAVIGATE', screen: 'story' })}
+      />
+    );
   }
 
   if (state.screen === 'match') {
@@ -87,6 +93,10 @@ export function MvpFlowShell() {
         }}
       />
     );
+  }
+
+  if (state.screen === 'story') {
+    return <StoryScreen />;
   }
 
   return <ResultScreen state={state} onRestart={() => dispatch({ type: 'RESET_GAME' })} />;
