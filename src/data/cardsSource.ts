@@ -1,19 +1,20 @@
+import { rarityColor, typeColor } from './showcaseCards';
 import {
-  CARDS as GENERATED_CARDS,
+  ACTIVE_CARDS as ADAPTER_ACTIVE_CARDS,
+  CARDS as ADAPTER_CARDS,
   CARD_SOURCE_INFO,
-  rarityColor,
-  typeColor,
+  NON_ACTIVE_CARDS as ADAPTER_NON_ACTIVE_CARDS,
   type CardData,
   type CardStatus,
-} from '@/generated/cardsRuntime';
+} from './catalogAdapter';
 import { getCardImageUrl } from '@/utils/assets';
 
 export type { CardData, CardStatus };
 export { getCardImageUrl, rarityColor, typeColor };
 
-export const CARDS: CardData[] = GENERATED_CARDS;
-export const ACTIVE_CARDS: CardData[] = CARDS.filter((card) => card.status === 'active');
-export const NON_ACTIVE_CARDS: CardData[] = CARDS.filter((card) => card.status !== 'active');
+export const CARDS: CardData[] = ADAPTER_CARDS;
+export const ACTIVE_CARDS: CardData[] = ADAPTER_ACTIVE_CARDS;
+export const NON_ACTIVE_CARDS: CardData[] = ADAPTER_NON_ACTIVE_CARDS;
 
 const COLLECTION_FACTION_DISPLAY_MAP: Record<string, string> = {
   礼心殿: '儒家',

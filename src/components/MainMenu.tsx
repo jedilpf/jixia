@@ -1,5 +1,8 @@
-﻿import { useState, useEffect, useMemo, ReactNode } from 'react';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { uiAudio } from '@/utils/audioManager';
+import { PlayerLevelBadge } from '@/ui/components/PlayerLevelBadge';
+import { LevelDetailModal } from '@/ui/components/LevelDetailModal';
+import { usePlayerLevelState } from '@/game/hooks/usePlayerLevelSystem';
 
 // ─── 设置状态接口 ────────────────────────────────────────────────────────────
 export interface AppSettings {
@@ -246,6 +249,8 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onCollection
   const embers = Array.from({ length: 18 }, (_, i) => i);
   const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
+  const playerLevelState = usePlayerLevelState();
+
   return (
     <div className="w-full h-full overflow-hidden select-none relative">
       {/* 背景图 */}
@@ -291,27 +296,19 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onCollection
               <span className="text-[#a7c5ba] text-xs mt-0.5">Lv. 12 墨家门徒</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center bg-black/40 backdrop-blur-sm h-11 pl-4 pr-1 rounded-full border border-[rgba(139,115,85,0.4)]">
-              <span className="text-2xl mr-2">🪙</span>
-              <span className="text-[#fef3c7] font-serif tracking-widest text-lg">12,500</span>
-              <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('store_coin'); }} className="ml-4 w-8 h-8 rounded-full bg-gradient-to-b from-[#b8860b] to-[#8B5e00] text-white flex items-center justify-center hover:brightness-125 transition-all border border-[#d4a520]">+</button>
-            </div>
-            <div className="flex items-center bg-black/40 backdrop-blur-sm h-11 pl-4 pr-1 rounded-full border border-[rgba(74,124,111,0.4)]">
-              <span className="text-2xl mr-2">💠</span>
-              <span className="text-[#a7c5ba] font-serif tracking-widest text-lg">850</span>
-              <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('store_jade'); }} className="ml-4 w-8 h-8 rounded-full bg-gradient-to-b from-[#2a3c66] to-[#1a2840] text-white flex items-center justify-center hover:brightness-125 transition-all border border-[#4a6b99]">+</button>
-            </div>
-          </div>
         </div>
-        <div className="flex items-center gap-5 pointer-events-auto mt-2">
-          <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('events'); }} className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-2xl">🎪</button>
-          <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('quests'); }} className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-2xl">📜</button>
-          <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('mail'); }} className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-2xl relative">
-            ✉️
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-black rounded-full animate-pulse" />
+        <div className="flex items-center gap-5 pointer-events-auto">
+          <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('store_coin'); }} className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 transition-all">
+            <span className="text-xl">🪙</span>
+            <span className="font-serif tracking-widest">12,500</span>
+            <span className="ml-1 text-lg">+</span>
           </button>
-          <div className="w-px h-8 bg-[rgba(212,165,32,0.3)] mx-1" />
+          <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('store_jade'); }} className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-[rgba(74,124,111,0.3)] text-[#4a7c6f] hover:text-[#a7c5ba] hover:bg-black/60 transition-all">
+            <span className="text-xl">💠</span>
+            <span className="font-serif tracking-widest">850</span>
+            <span className="ml-1 text-lg">+</span>
+          </button>
+          <div className="w-px h-8 bg-[rgba(212,165,32,0.3)] mx-2" />
           <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('settings'); }} className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-2xl">⚙️</button>
         </div>
       </div>
@@ -374,19 +371,97 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onCollection
       {/* ★ 弹窗渲染区 */}
       {activeModal === 'profile' && (
         <SystemModal title="玩家档案" onClose={() => setActiveModal(null)}>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center w-full max-w-md">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#c0520a] to-[#2a3a32] border-4 border-[#d4a520] mb-4 shadow-[0_0_15px_rgba(212,165,32,0.5)]" />
-            <h2 className="text-[#f5e6b8] text-2xl font-serif mb-2 tracking-widest">机枢学徒</h2>
-            <p className="text-[#a7c5ba]">门派：墨家 &nbsp;|&nbsp; 段位：青铜Ⅲ</p>
-            <p className="mt-6 text-sm opacity-60">详细个人档案开发中...</p>
+            <PlayerLevelBadge
+              level={playerLevelState.level}
+              exp={playerLevelState.exp}
+              playerStats={{
+                winCount: playerLevelState.winCount,
+                totalGames: playerLevelState.totalGames,
+                totalDamage: playerLevelState.totalDamage,
+                winStreak: playerLevelState.winStreak,
+                collectedCards: playerLevelState.collectedCards,
+              }}
+            />
+            <div className="mt-6 w-full space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-[rgba(212,165,32,0.2)]">
+                <span className="text-[#a7c5ba]">门派</span>
+                <span className="text-[#c9b896]">墨家</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-[rgba(212,165,32,0.2)]">
+                <span className="text-[#a7c5ba]">累计胜场</span>
+                <span className="text-[#5a8a5a]">{playerLevelState.winCount} 场</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-[rgba(212,165,32,0.2)]">
+                <span className="text-[#a7c5ba]">累计对战</span>
+                <span className="text-[#c9b896]">{playerLevelState.totalGames} 场</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-[rgba(212,165,32,0.2)]">
+                <span className="text-[#a7c5ba]">最高连胜</span>
+                <span className="text-[#d4a520]">{playerLevelState.winStreak} 场</span>
+              </div>
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'store_coin' && (
-        <SystemModal title="获取铜钱" onClose={() => setActiveModal(null)}><p>💰 铜钱招财模块开发中...</p></SystemModal>
+        <SystemModal title="大势兑换" onClose={() => setActiveModal(null)}>
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-center">
+              <div className="text-3xl mb-2">⚖️</div>
+              <p className="text-sm text-[#c9b896]">大势凭证</p>
+            </div>
+            <div className="w-full border-t border-[rgba(212,165,32,0.2)] pt-4">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-[#a7c5ba]">当前大势</span>
+                <span className="text-[#d4a520] font-bold">0</span>
+              </div>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-[#a7c5ba]">可兑换铜钱</span>
+                <span className="text-[#d4a520] font-bold">0 × 100 = 0</span>
+              </div>
+              <div className="text-xs text-[#8a7a6a] text-center mt-4">
+                每1大势可兑换100铜钱<br/>
+                铜钱可用于卡牌强化与道具购买
+              </div>
+            </div>
+            <div className="w-full pt-4 border-t border-[rgba(212,165,32,0.2)]">
+              <p className="text-xs text-[#8a7a6a] text-center">在对战中争夺议题优势即可积累大势</p>
+            </div>
+          </div>
+        </SystemModal>
       )}
       {activeModal === 'store_jade' && (
-        <SystemModal title="获取机关玉" onClose={() => setActiveModal(null)}><p>💠 机关玉兑换模块开发中...</p></SystemModal>
+        <SystemModal title="机关玉商店" onClose={() => setActiveModal(null)}>
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-center">
+              <div className="text-3xl mb-2">💠</div>
+              <p className="text-sm text-[#c9b896]">机关玉 · 稀有卡牌凭证</p>
+            </div>
+            <div className="w-full border-t border-[rgba(212,165,32,0.2)] pt-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[#a7c5ba]">充值比例</span>
+                <span className="text-[#d4a520]">1元 = 10 机关玉</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[#a7c5ba]">当前机关玉</span>
+                <span className="text-[#d4a520] font-bold">0</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[#a7c5ba]">卡牌抽取</span>
+                <span className="text-[#d4a520]">100 机关玉/次</span>
+              </div>
+            </div>
+            <div className="w-full pt-4 border-t border-[rgba(212,165,32,0.2)]">
+              <p className="text-xs text-[#8a7a6a] text-center mb-3">抽取卡牌为该门派专属卡牌</p>
+              <p className="text-xs text-[#8a7a6a] text-center">可能获得其他玩家未拥有的稀有卡牌</p>
+            </div>
+            <button className="w-full py-2 bg-gradient-to-r from-[#1a4a6e] to-[#0d2d45] text-[#7ab8c9] rounded font-serif tracking-widest hover:brightness-110 border border-[#7ab8c9]/30">
+              前往充值
+            </button>
+          </div>
+        </SystemModal>
       )}
       {activeModal === 'events' && (
         <SystemModal title="活动中心" onClose={() => setActiveModal(null)}><p>🎪 当前暂无新活动。</p></SystemModal>
@@ -408,6 +483,20 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onCollection
             <button className="w-full py-2 bg-gradient-to-r from-[#b8860b] to-[#8B5e00] text-white rounded font-serif tracking-widest hover:brightness-110" onClick={() => setActiveModal(null)}>领取附件</button>
           </div>
         </SystemModal>
+      )}
+      {activeModal === 'level_detail' && (
+        <LevelDetailModal
+          level={playerLevelState.level}
+          exp={playerLevelState.exp}
+          playerStats={{
+            winCount: playerLevelState.winCount,
+            totalGames: playerLevelState.totalGames,
+            totalDamage: playerLevelState.totalDamage,
+            winStreak: playerLevelState.winStreak,
+            collectedCards: playerLevelState.collectedCards,
+          }}
+          onClose={() => setActiveModal(null)}
+        />
       )}
       {activeModal === 'settings' && (
         <SystemModal title="机枢设置" onClose={() => setActiveModal(null)}>

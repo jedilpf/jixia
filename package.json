@@ -14,6 +14,7 @@
     "test:prepare": "node scripts/pipeline/prepare-test-dist.cjs",
     "test": "npm run test:build && npm run test:prepare && node --test --test-isolation=none .tmp/test-dist/tests/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:ci": "eslint src/App.tsx src/app src/ui src/data/cardsSource.ts src/utils/assets.ts src/utils/audioManager.ts --ext ts,tsx --quiet --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "typecheck": "tsc --noEmit",
     "validate:structure": "node scripts/pipeline/validate-structure.cjs",

@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260326-058",
+  "goal": "Converge mainline project entry/data/audio/CI according to the user-ordered P0-P2 scope, with no feature expansion.",
+  "constraints": [
+    "Follow the exact user-provided order P0 -> P1 -> P1 -> P2.",
+    "Do not add new gameplay or UI features.",
+    "Keep changes focused on convergence, adapter wiring, and baseline documentation.",
+    "Preserve existing architecture unless required by the listed steps."
+  ],
+  "deliverables": [
+    "Single active app entry and baseline documentation updated.",
+    "battleV2 and collection/gallery read a unified adapter centered on src/data/showcaseCards.ts.",
+    "Explicit faction ordering is retained for collection rendering.",
+    "Electron audio-init bypass is removed in active entry and shared asset helpers remain unified.",
+    "Formal test script and blocking lint status are verified and documented."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/current-baseline.md",
+    "src/data/cardsSource.ts",
+    "src/data/catalogAdapter.ts",
+    "package.json",
+    ".github/workflows/pr-validate.yml",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260326-058.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260326-058.json"
+  ],
+  "status": "done"
+}

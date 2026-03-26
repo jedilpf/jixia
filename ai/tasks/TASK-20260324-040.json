@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260324-040",
+  "goal": "Execute D3-02 entry convergence by removing URL-based dual entry switch and keeping one deterministic default app flow.",
+  "constraints": [
+    "Make minimal code changes only for entry convergence.",
+    "Do not alter battle rules or card logic in this task.",
+    "Keep runtime behavior stable except removal of `newFlow=1` split."
+  ],
+  "deliverables": [
+    "src/App.tsx no longer contains `newFlow=1` branch or `MvpFlowShell` split.",
+    "App default flow remains functional and deterministic.",
+    "A short migration note documenting entry convergence change."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/App.tsx",
+    "docs"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260324-040.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260324-040.json",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260324-040.json"
+  ],
+  "status": "draft"
+}

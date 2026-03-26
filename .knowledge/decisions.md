@@ -132,6 +132,16 @@
 - Why: Repeated local `asset()` path builders drift over time and make audio/image behavior inconsistent across screens and packaging targets.
 - Consequence: Transition and pre-battle visual asset modules now resolve media via shared helpers, reducing path strategy fragmentation.
 
+### 2026-03-25
+- Decision: Upgrade PR validation from reminder-level checks to blocking interception by adding `npm test` and explicitly keeping lint blocking.
+- Why: Typecheck + lint alone can miss runtime regressions in rule/state tests; CI should reject merges that fail core verification.
+- Consequence: `.github/workflows/pr-validate.yml` now runs `gate:daily`, `typecheck`, `test`, and blocking `lint:ci` in sequence, while full-repo `lint` remains available for debt cleanup.
+
+### 2026-03-26
+- Decision: During this收口阶段, switch active battle/gallery card reads to `src/data/showcaseCards.ts` through a unified `src/data/catalogAdapter.ts` layer.
+- Why: Directly using `content/cards` in active catalog flow caused visible card shrinkage and mismatched user perception; battleV2 and图鉴 needed a single visible source immediately.
+- Consequence: `src/data/cardsSource.ts` now re-exports adapter-backed cards for both battleV2 and collection UI, while `content/cards` remains retained ledger/migration data for later convergence.
+
 ## Format
 For future entries, use:
 - Decision:

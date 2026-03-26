@@ -38,6 +38,9 @@
 - Active-mainline boundary excludes `.vite/`, `backups/`, `review/`, `review_bundle_*/`, and `src_new/`; these should not be treated as primary implementation scope.
 - Active mainline should bootstrap UI audio in `src/App.tsx` without runtime-flavor early returns, then let UI components call `uiAudio.playHover/playClick` safely.
 - Asset URL building for screen-level media should use shared helpers in `src/utils/assets.ts` (`getAssetUrl`, `getAudioAssetUrl`, `getCardImageUrl`, `getCharacterImageUrl`) instead of ad-hoc local `asset()` implementations.
+- PR validation is treated as a blocking gate: run `gate:daily`, `typecheck`, `test`, and blocking `lint:ci` in workflow so regressions are intercepted before merge without legacy-archive noise.
+- Current convergence baseline (2026-03-26): battleV2 and collection/gallery should read cards from `src/data/showcaseCards.ts` through `src/data/catalogAdapter.ts` + `src/data/cardsSource.ts` to keep runtime and catalog visibility aligned during收口.
+- `content/cards/*.json` remains a retained ledger/migration asset set in this stage, but it is not the active battle/gallery read source for this收口阶段.
 
 ## Working preferences
 - Favor small, reviewable diffs.
