@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260327-072",
+  "goal": "Codify a mandatory conflict arbitration mechanism in repository entry docs so all AI collaborators follow one dispute-resolution workflow.",
+  "constraints": [
+    "Do not change gameplay logic or runtime behavior.",
+    "Only edit workflow/policy documentation and this task file.",
+    "Conflict handling must require writing a conflict record before implementation.",
+    "If key requirement is unclear, ask user for clarification before editing code/content."
+  ],
+  "deliverables": [
+    "Updated AGENTS.md with mandatory conflict arbitration rule.",
+    "Updated AI_START_HERE.md with quick-start conflict arbitration checkpoint.",
+    "Updated docs/AI-mainline-policy.md with conflict arbitration execution rule.",
+    "New docs template that includes conflict record table, arbitration command template, and decision matrix."
+  ],
+  "allowed_write_paths": [
+    "AGENTS.md",
+    "AI_START_HERE.md",
+    "docs/AI-mainline-policy.md",
+    "docs/standards/conflict-arbitration-template.md",
+    ".knowledge/project-notes.md",
+    ".knowledge/decisions.md",
+    "ai/tasks/TASK-20260327-072.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260327-072.json"
+  ],
+  "status": "draft"
+}
