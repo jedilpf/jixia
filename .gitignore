@@ -27,6 +27,10 @@ dist-ssr
 .vite
 backups/
 test-results/
+.tmp/
+.tmp*/
+.trae/
+.agents/
 .devserver.log
 .devserver.pid
 .tmp-capture.spec.ts

@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260327-074",
+  "goal": "Add repository guardrails to block temporary/cache/noise files from entering main and document this cleanup gate task.",
+  "constraints": [
+    "Do not change gameplay/runtime logic.",
+    "Only modify repository hygiene/CI guard files and this task file.",
+    "Must not include broad destructive cleanup.",
+    "Keep checks focused on preventing noisy files from reaching main."
+  ],
+  "deliverables": [
+    "Updated .gitignore for local temporary/noise paths.",
+    "Added .github/workflows/repo-guard.yml to block forbidden paths in main-bound changes.",
+    "Task metadata for audit trail."
+  ],
+  "allowed_write_paths": [
+    ".gitignore",
+    ".github/workflows/repo-guard.yml",
+    "ai/tasks/TASK-20260327-074.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260327-074.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260327-074.json"
+  ],
+  "status": "draft"
+}
