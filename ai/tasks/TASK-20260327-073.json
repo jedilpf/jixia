@@ -1,0 +1,22 @@
+{
+  "task_id": "TASK-20260327-073",
+  "goal": "Create a push-stream eligibility document that defines file-level evaluation rules and lists current unpushed local changes as whitelist/hold/reject without committing or pushing.",
+  "constraints": [
+    "Do not run git add/commit/push.",
+    "Do not modify gameplay/runtime logic files for this task.",
+    "Only produce documentation and task metadata for review.",
+    "Use current repository working tree as the only inspection source."
+  ],
+  "deliverables": [
+    "A standards document describing push eligibility criteria and review workflow.",
+    "A current unpushed-file classification list (whitelist/hold/reject) with reasons."
+  ],
+  "allowed_write_paths": [
+    "docs/standards",
+    "ai/tasks/TASK-20260327-073.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260327-073.json"
+  ],
+  "status": "draft"
+}
