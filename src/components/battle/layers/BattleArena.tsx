@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { DebateBattleState, DebateCard, SeatId, SeatState } from '@/battleV2/types';
-import { getAssetUrl } from '@/utils/assets';
 
 interface BattleArenaProps {
   state: DebateBattleState;
@@ -19,11 +18,11 @@ const SEAT_CONFIG: Record<SeatId, { name: string; color: string; icon: string }>
 };
 
 const CARD_FRAME_ASSETS: Record<string, string> = {
-  '立论': getAssetUrl('assets/frames/frame-lilun.png'),
-  '策术': getAssetUrl('assets/frames/frame-ceshu.png'),
-  '反诘': getAssetUrl('assets/frames/frame-fanje.png'),
-  '门客': getAssetUrl('assets/frames/frame-menke.png'),
-  '玄章': getAssetUrl('assets/frames/frame-xuanzhang.png'),
+  '立论': 'assets/frames/frame-lilun.png',
+  '策术': 'assets/frames/frame-ceshu.png',
+  '反诘': 'assets/frames/frame-fanje.png',
+  '门客': 'assets/frames/frame-menke.png',
+  '玄章': 'assets/frames/frame-xuanzhang.png',
 };
 
 const UnitPip: React.FC<{

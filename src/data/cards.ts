@@ -11,8 +11,8 @@
     searchCards,
     sortCards,
 } from '@/types';
-import { ACTIVE_CARDS } from './cardsSource';
-import type { CardData } from './cardsSource';
+import { CARDS } from './showcaseCards';
+import type { CardData } from './showcaseCards';
 
 const TYPE_MAP: Record<string, CardType> = {
     '技能': 'skill',
@@ -82,7 +82,7 @@ export function mapShowcaseToBattleCard(data: CardData): Card {
 }
 
 export function mapAllShowcaseCards(): Card[] {
-    return ACTIVE_CARDS.map(mapShowcaseToBattleCard);
+    return CARDS.map(mapShowcaseToBattleCard);
 }
 
 export const ALL_CARDS: Card[] = mapAllShowcaseCards();
@@ -189,10 +189,10 @@ export const createWeaponCard = (
 export const INITIAL_DECK: Card[] = [];
 
 const deckSize = 30;
-const cardCount = ACTIVE_CARDS.length;
+const cardCount = CARDS.length;
 
 for (let i = 0; i < deckSize; i++) {
-    const showcaseCard = ACTIVE_CARDS[i % cardCount];
+    const showcaseCard = CARDS[i % cardCount];
     const battleCard = mapShowcaseToBattleCard(showcaseCard);
     INITIAL_DECK.push({ 
         ...battleCard, 

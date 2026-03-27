@@ -18,17 +18,11 @@ function main() {
     process.exit(0);
   }
 
-  const activeCards = cards.filter((cardFile) => cardFile?.data?.status === 'active');
-  if (activeCards.length === 0) {
-    console.log('[validate-complexity] No active cards found in content/cards, skip.');
-    process.exit(0);
-  }
-
   const maxRulesTextLength = extractYamlNumber('canon/taboo.yaml', 'max_rules_text_length') ?? 25;
   const maxKeywordsPerCard = extractYamlNumber('canon/taboo.yaml', 'max_keywords_per_card') ?? 2;
   const maxRuleSentences = extractYamlNumber('canon/taboo.yaml', 'max_rules_sentences') ?? 2;
 
-  for (const cardFile of activeCards) {
+  for (const cardFile of cards) {
     const { relativePath, data } = cardFile;
     const rulesText = typeof data.rules_text === 'string' ? data.rules_text.trim() : '';
     const keywordIds = Array.isArray(data.keyword_ids) ? data.keyword_ids : [];
@@ -59,7 +53,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`[validate-complexity] PASS (${activeCards.length} active file(s))`);
+  console.log(`[validate-complexity] PASS (${cards.length} file(s))`);
 }
 
 main();

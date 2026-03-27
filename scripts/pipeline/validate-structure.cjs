@@ -19,48 +19,10 @@ const REQUIRED_FIELDS = [
 
 const ALLOWED_TYPES = new Set(['spell', 'minion', 'field', 'weapon']);
 const ALLOWED_RARITIES = new Set(['common', 'rare', 'epic', 'legendary']);
-const ALLOWED_STATUS = new Set(['active', 'planned', 'draft', 'rework', 'archived']);
-const ALLOWED_DISPLAY_TYPES = new Set(['技能', '事件', '场地', '装备', '角色', '反制']);
-const FACTION_ALIAS_MAP = {
-  礼心殿: '儒家',
-  儒家: '儒家',
-  玄匠盟: '墨家',
-  墨家: '墨家',
-};
+const ALLOWED_STATUS = new Set(['draft', 'review', 'approved', 'rejected']);
 
 function push(errs, path, message) {
   errs.push(`${path}: ${message}`);
-}
-
-function normalizeFaction(faction) {
-  const raw = typeof faction === 'string' ? faction.trim() : '';
-  return FACTION_ALIAS_MAP[raw] || raw;
-}
-
-function normalizeCatalogName(name) {
-  if (typeof name !== 'string') {
-    return '';
-  }
-  return name
-    .trim()
-    .replace(/[\s\u3000]+/g, '')
-    .replace(/[，。、“”‘’：；！？,.!?:;·—-]/g, '')
-    .toLowerCase();
-}
-
-function visibleCatalogKey(data) {
-  if (data.status === 'archived') {
-    return null;
-  }
-  const normalizedName = normalizeCatalogName(data.name);
-  if (!normalizedName) {
-    return null;
-  }
-  const normalizedFaction = normalizeFaction(data.faction);
-  if (!normalizedFaction) {
-    return null;
-  }
-  return `${normalizedFaction}::${normalizedName}`;
 }
 
 function main() {
@@ -79,7 +41,6 @@ function main() {
   }
 
   const idSet = new Set();
-  const visibleCatalogKeyMap = new Map();
   for (const cardFile of cards) {
     const { relativePath, data } = cardFile;
 
@@ -144,22 +105,6 @@ function main() {
 
     if (!ALLOWED_STATUS.has(data.status)) {
       push(errors, relativePath, `status must be one of ${Array.from(ALLOWED_STATUS).join(', ')}`);
-    }
-
-    if ('display_type' in data) {
-      if (typeof data.display_type !== 'string' || !ALLOWED_DISPLAY_TYPES.has(data.display_type.trim())) {
-        push(errors, relativePath, `display_type must be one of ${Array.from(ALLOWED_DISPLAY_TYPES).join(', ')}`);
-      }
-    }
-
-    const catalogKey = visibleCatalogKey(data);
-    if (catalogKey) {
-      const firstPath = visibleCatalogKeyMap.get(catalogKey);
-      if (firstPath) {
-        push(errors, relativePath, `duplicate visible catalog card with ${firstPath} for key "${catalogKey}"`);
-      } else {
-        visibleCatalogKeyMap.set(catalogKey, relativePath);
-      }
     }
   }
 

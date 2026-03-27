@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { DebateBattleState, DebateCard } from '@/battleV2/types';
-import { getAssetUrl } from '@/utils/assets';
 
 interface BottomControlsProps {
   state: DebateBattleState;
@@ -25,11 +24,11 @@ const CARD_FRAME_COLORS: Record<string, { border: string; bg: string; glow: stri
 };
 
 const CARD_FRAME_ASSETS: Record<string, string> = {
-  '立论': getAssetUrl('assets/frames/frame-lilun.png'),
-  '策术': getAssetUrl('assets/frames/frame-ceshu.png'),
-  '反诘': getAssetUrl('assets/frames/frame-fanje.png'),
-  '门客': getAssetUrl('assets/frames/frame-menke.png'),
-  '玄章': getAssetUrl('assets/frames/frame-xuanzhang.png'),
+  '立论': 'assets/frames/frame-lilun.png',
+  '策术': 'assets/frames/frame-ceshu.png',
+  '反诘': 'assets/frames/frame-fanje.png',
+  '门客': 'assets/frames/frame-menke.png',
+  '玄章': 'assets/frames/frame-xuanzhang.png',
 };
 
 const HandCard: React.FC<{

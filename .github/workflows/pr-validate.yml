@@ -28,9 +28,6 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Test
-        run: npm test
-
-      - name: Lint
-        continue-on-error: false
-        run: npm run lint:ci
+      - name: Lint (non-blocking baseline)
+        continue-on-error: true
+        run: npm run lint

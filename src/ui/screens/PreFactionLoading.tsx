@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { PRE_BATTLE_COLORS } from '@/ui/screens/visualAssets';
-import { getAssetUrl } from '@/utils/assets';
 
 interface PreFactionLoadingProps {
   onComplete: () => void;
@@ -10,7 +9,6 @@ interface PreFactionLoadingProps {
 export function PreFactionLoading({ onComplete, minDisplayMs = 2000 }: PreFactionLoadingProps) {
   const [progress, setProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
-  const preBattleBg = getAssetUrl('assets/bg-prebattle.jpg');
 
   useEffect(() => {
     const startTime = Date.now();
@@ -35,7 +33,7 @@ export function PreFactionLoading({ onComplete, minDisplayMs = 2000 }: PreFactio
     <div
       className="relative flex h-full items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(122deg, rgba(10,7,4,0.86), rgba(34,18,8,0.8)), url(${preBattleBg})`,
+        backgroundImage: `linear-gradient(122deg, rgba(10,7,4,0.86), rgba(34,18,8,0.8)), url(${'/assets/bg-prebattle.jpg'})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         opacity: fadeOut ? 0 : 1,

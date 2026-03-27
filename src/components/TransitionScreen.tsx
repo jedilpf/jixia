@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getAssetUrl } from '@/utils/assets';
 
 interface TransitionScreenProps {
   onComplete: () => void;
@@ -20,12 +19,13 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
   const [videoFailed, setVideoFailed] = useState(false);
   const [sourceIndex, setSourceIndex] = useState(0);
   const [skipEnabled, setSkipEnabled] = useState(false);
+  const asset = useCallback((path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`, []);
   const videoSources = useMemo(
     () => [
-      getAssetUrl('assets/transition.mp4'),
-      getAssetUrl(encodeURI('素材/fbe7eb1e32979861693d5d7ff6742c3e.mp4')),
+      asset('assets/transition.mp4'),
+      asset(encodeURI('素材/fbe7eb1e32979861693d5d7ff6742c3e.mp4')),
     ],
-    [],
+    [asset],
   );
   const videoSrc = videoSources[sourceIndex] ?? videoSources[0];
 
