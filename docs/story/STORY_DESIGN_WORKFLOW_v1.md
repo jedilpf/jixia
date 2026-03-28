@@ -595,10 +595,10 @@ interface MoralState {
 
 ### 紧急优先级
 
-- [ ] **TASK-001**: 创建 STORY_WORLD_SETTING_v1.md（世界观设定）
-- [ ] **TASK-002**: 更新 STORY_CHARACTERS_v1.md（16门派角色）
-- [ ] **TASK-003**: 设计 STORY_CHAPTERS_v1.md（章节大纲）
-- [ ] **TASK-004**: 编写第一章完整脚本
+- [x] **TASK-001**: 创建 STORY_WORLD_SETTING_v1.md（世界观设定）
+- [x] **TASK-002**: 更新 STORY_CHARACTERS_v1.md（16门派角色）
+- [x] **TASK-003**: 设计 STORY_CHAPTERS_v1.md（章节大纲）
+- [ ] **TASK-004**: 编写第一章完整脚本（进行中，已完成第一节）
 
 ### 中期优先级
 
