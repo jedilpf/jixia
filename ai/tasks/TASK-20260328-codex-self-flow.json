@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260328-codex-self-flow",
+  "goal": "建立并验证 Codex 自用任务流的最小模板，确保后续任务都能快速进入 validate/prompt/finalize 闭环",
+  "constraints": [
+    "仅新增流程文档与任务定义，不改业务逻辑",
+    "必须可通过 ai:task:validate",
+    "必须可生成 ai:prompt 产物"
+  ],
+  "deliverables": [
+    "可复用 task 定义",
+    "对应 prompt 产物",
+    "执行结果日志"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/standards",
+    "docs/project/record"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260328-codex-self-flow.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260328-codex-self-flow.json"
+  ],
+  "status": "ready"
+}
