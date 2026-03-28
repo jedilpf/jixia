@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-BAIYAN3",
+  "name": "道听途说",
+  "faction": "稗言社",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 1,
+  "rules_text": "抽2张牌，然后随机弃置1张。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=baiyan3; migrated_at=2026-03-24",
+  "display_type": "技能"
+}

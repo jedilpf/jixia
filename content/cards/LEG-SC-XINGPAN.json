@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-XINGPAN",
+  "name": "星盘推演",
+  "faction": "司天台",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 1,
+  "rules_text": "查看牌库顶3张，选择1张加入手牌，其余以任意顺序置回；若加入手牌的是【事件】，额外抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xingpan; migrated_at=2026-03-24",
+  "display_type": "技能"
+}

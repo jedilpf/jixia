@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-JIANAI5",
+  "name": "综合推论",
+  "faction": "兼采楼",
+  "rarity": "epic",
+  "type": "spell",
+  "cost": 4,
+  "rules_text": "选择以下全部或部分（每项需弃1张手牌）：抽2；获得【护持4】；对敌单体造成4点伤害；净化1个负面状态。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=jianai5; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

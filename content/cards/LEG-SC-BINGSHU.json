@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-BINGSHU",
+  "name": "兵书残卷",
+  "faction": "九阵堂",
+  "rarity": "rare",
+  "type": "weapon",
+  "cost": 3,
+  "rules_text": "装备：每回合一次，你使用【事件】后抽1；若该事件造成伤害，额外获得【护持1】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=bingshu; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

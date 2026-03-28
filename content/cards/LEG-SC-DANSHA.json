@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-DANSHA",
+  "name": "丹砂小炉",
+  "faction": "归真观",
+  "rarity": "common",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "装备：回合开始时获得【护持1】；你每回合第1次使用【技能】后回复1点底蕴。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=dansha; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

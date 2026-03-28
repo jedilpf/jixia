@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-XINGLIN5",
+  "name": "九针百药",
+  "faction": "杏林馆",
+  "rarity": "legendary",
+  "type": "weapon",
+  "cost": 3,
+  "rules_text": "每当你回复底蕴，抽1张牌；装备者免疫所有负面状态。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xinglin5; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

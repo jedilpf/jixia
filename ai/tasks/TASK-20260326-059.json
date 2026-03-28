@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260326-059",
+  "goal": "Execute and document active-mainline boundary stripping for review artifacts and baseline commands without adding features.",
+  "constraints": [
+    "Do not add product features.",
+    "Do not delete local files; only stop tracking where needed.",
+    "Keep scope limited to baseline documentation and archive-boundary tracking."
+  ],
+  "deliverables": [
+    "Stop tracking review artifacts from active mainline using cached git removal.",
+    "Current baseline doc includes explicit non-destructive archive/stop-tracking command examples."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/current-baseline.md",
+    "review"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260326-059.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260326-059.json"
+  ],
+  "status": "done"
+}

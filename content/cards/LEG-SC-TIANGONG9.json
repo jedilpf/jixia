@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-TIANGONG9",
+  "name": "巨型铁骑",
+  "faction": "天工坊",
+  "rarity": "epic",
+  "type": "spell",
+  "cost": 5,
+  "rules_text": "对所有敌方角色各造成3点伤害；若其中有护盾，穿透1点护盾再造成3点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=tiangong9; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

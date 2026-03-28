@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-CHOUTIAN9",
+  "name": "推演图表",
+  "faction": "筹天阁",
+  "rarity": "rare",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "装备：你每回合抽牌时，可看到抽到的牌是什么再决定要不要（弃掉则对手不知）；每次弃掉抽到的牌，对手受1点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=choutian9; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

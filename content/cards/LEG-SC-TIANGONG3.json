@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-TIANGONG3",
+  "name": "霸道机括",
+  "faction": "天工坊",
+  "rarity": "epic",
+  "type": "field",
+  "cost": 4,
+  "rules_text": "你每打出一张【装备】，对所有敌方造成1点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=tiangong3; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "LEG-DB-CARD-024",
+  "name": "锋将·破军",
+  "faction": "九阵堂",
+  "rarity": "epic",
+  "type": "minion",
+  "cost": 2,
+  "rules_text": "主动：对敌单体造成5点伤害；若其生命低于一半，再造成+2。被动：你击败目标时，获得【气势+1】并抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=cardsDB; legacy_id=card_024; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-FENGJUN; archived_reason=legacy_source_duplicate; archived_at=2026-03-25",
+  "display_type": "角色"
+}

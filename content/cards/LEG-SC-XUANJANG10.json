@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-XUANJANG10",
+  "name": "机关总成",
+  "faction": "玄匠盟",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "场地：你每打出装备牌，令敌方随机1名角色受到1点伤害；你有3件及以上装备时，每回合额外造成2点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xuanjang10; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

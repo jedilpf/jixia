@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-JIANAI6",
+  "name": "博闻强记",
+  "faction": "兼采楼",
+  "rarity": "rare",
+  "type": "weapon",
+  "cost": 3,
+  "rules_text": "装备：你手牌中每有1种不同类型的牌，获得【护持1】（每回合结算）；你的手牌上限+2。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=jianai6; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

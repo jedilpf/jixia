@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "outDir": ".tmp/test-dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@new/*": ["src_new/*"],
+      "@/utils/assets": ["tests/stubs/assets.ts"]
+    },
+    "types": ["node"],
+    "sourceMap": false,
+    "declaration": false
+  },
+  "include": ["src/battleV2/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "dist", "dist_electron", "src_new", "archive", ".tmp"]
+}

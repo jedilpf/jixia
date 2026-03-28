@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-LIXINDIAN8",
+  "name": "六礼备至",
+  "faction": "礼心殿",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "获得【护持3】；你本回合第1次受到伤害时，额外抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=lixindian8; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

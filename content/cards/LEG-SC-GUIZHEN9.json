@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-GUIZHEN9",
+  "name": "炉鼎炼气",
+  "faction": "归真观",
+  "rarity": "common",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "装备：你每打出【技能】牌后回复1点底蕴；若该技能净化过负面，额外回复1点。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=guizhen9; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

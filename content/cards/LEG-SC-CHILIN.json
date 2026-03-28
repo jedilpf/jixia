@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-CHILIN",
+  "name": "一纸敕令",
+  "faction": "衡戒廷",
+  "rarity": "legendary",
+  "type": "spell",
+  "cost": 6,
+  "rules_text": "选择1项：①摧毁所有敌方【装备】；②本回合敌方不能使用牌；③你抽3并获得【护持6】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=chilin; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

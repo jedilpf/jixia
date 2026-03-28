@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-GUIZHEN7",
+  "name": "炼气储真",
+  "faction": "归真观",
+  "rarity": "rare",
+  "type": "minion",
+  "cost": 4,
+  "rules_text": "被动：你每回合结束时若未受伤，回复1底蕴并获得【清明+1】；清明达到5时，清除所有负面状态。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=guizhen7; migrated_at=2026-03-24",
+  "display_type": "角色"
+}

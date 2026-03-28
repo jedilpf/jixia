@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260325-046",
+  "goal": "Unify the remaining battle presentation asset references with shared helpers so migrated card ids, packaged paths, and fallback visuals behave consistently without deleting any existing content.",
+  "constraints": [
+    "Do not delete card assets, legacy source files, or historical card records; improve path resolution only.",
+    "Do not change authoritative gameplay rules or deck composition logic beyond presentation-safe asset lookup adjustments.",
+    "Keep changes scoped to battle presentation and asset helper consistency within the existing app structure."
+  ],
+  "deliverables": [
+    "battleV2 card art lookup uses the shared card image helper instead of hardcoded jpg whitelist paths.",
+    "Battle minion and battle-layer visual assets use shared helper-generated paths instead of raw assets/... strings.",
+    "Any touched battle presentation components preserve existing behavior while improving migrated-id and packaged-path compatibility."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/battleV2",
+    "src/components",
+    "src/utils",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-046.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-046.json",
+    "npm run typecheck",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260325-046.json"
+  ],
+  "status": "draft"
+}

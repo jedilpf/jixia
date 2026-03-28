@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-CHOUTIAN5",
+  "name": "宿命轮盘",
+  "faction": "筹天阁",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "三回合后的回合末，秒杀当前场上底蕴最低的角色。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=choutian5; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

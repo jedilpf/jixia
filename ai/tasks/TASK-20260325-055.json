@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260325-055",
+  "goal": "P0 convergence: remove app entry split logic, formalize a single active mainline baseline, and mark non-mainline directories as boundary/legacy so active development scope is clear.",
+  "constraints": [
+    "Do not add new gameplay or UI features.",
+    "Keep legacy code available as archive/reference; only remove it from active entry/mainline.",
+    "Prefer minimal diffs focused on entry convergence and repository boundary clarity."
+  ],
+  "deliverables": [
+    "Single active app entry in src/App.tsx without query-based flow splitting.",
+    "Updated docs/current-baseline.md with explicit single mainline anchors and legacy/archive directory boundaries.",
+    "Repository boundary updates so .vite/backups/review/src_new are not treated as active mainline development scope."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/App.tsx",
+    "docs/current-baseline.md",
+    "docs/index.md",
+    ".gitignore",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-055.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-055.json"
+  ],
+  "status": "draft"
+}

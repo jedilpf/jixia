@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-TAIQING",
+  "name": "太清符箓",
+  "faction": "归真观",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 3,
+  "rules_text": "净化己方全部负面状态；并令敌方随机1名角色获得【沉默（1回合）】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=taiqing; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

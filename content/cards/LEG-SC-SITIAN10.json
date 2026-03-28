@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-SITIAN10",
+  "name": "七政运转",
+  "faction": "司天台",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 6,
+  "rules_text": "场地：每回合开始进行2次判定，每次阳→对敌造成2点伤害，每次阴→你回复2点底蕴；判定结果不可被改变。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=sitian10; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

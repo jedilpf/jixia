@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-LIANGYI2",
+  "name": "五德轮转",
+  "faction": "两仪署",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 3,
+  "rules_text": "你的下一次伤害翻倍，或下一次治疗翻倍。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=liangyi2; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

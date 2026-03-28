@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jixia Workflow Guard"
+  short_description: "Repository task-packet, mainline, and verification guardrails."
+  default_prompt: "Use $jixia-workflow-guard to execute a scoped repository task safely in this project."

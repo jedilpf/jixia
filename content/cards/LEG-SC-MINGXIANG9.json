@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-MINGXIANG9",
+  "name": "概念穿透",
+  "faction": "名相府",
+  "rarity": "epic",
+  "type": "spell",
+  "cost": 4,
+  "rules_text": "令对手手牌随机弃1张；若其被弃牌为【角色】，额外对敌方主将造成3点伤害。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=mingxiang9; migrated_at=2026-03-24",
+  "display_type": "事件"
+}

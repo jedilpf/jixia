@@ -1,0 +1,28 @@
+{
+  "id": "LEG-DB-CARD-032",
+  "name": "两仪折冲",
+  "faction": "司天台",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "选择1项：①为友方获得【护持6】；②对敌方造成6点伤害。若你本回合已使用过【技能】，两项皆生效（护持与伤害各减半为3）。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "archived",
+  "notes": "legacy_source=cardsDB; legacy_id=card_032; migrated_at=2026-03-24; duplicate_catalog_of=LEG-SC-LIANGYI; archived_reason=legacy_source_duplicate; archived_at=2026-03-25",
+  "display_type": "技能"
+}

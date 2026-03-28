@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-XINGLIN6",
+  "name": "施针问诊",
+  "faction": "杏林馆",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 1,
+  "rules_text": "回复3点底蕴；若你本回合已回复过底蕴，改为回复5点。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=xinglin6; migrated_at=2026-03-24",
+  "display_type": "技能"
+}

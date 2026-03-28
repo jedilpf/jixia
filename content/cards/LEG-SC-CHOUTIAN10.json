@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-CHOUTIAN10",
+  "name": "天罗地网",
+  "faction": "筹天阁",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 6,
+  "rules_text": "场地：你每预测1张对手将使用的牌类型（每回合开始时选择），若猜中，对手该牌效果-50%；猜中3次后，对手的1张牌被永久封闭直到对局结束。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=choutian10; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-YANGZHEN5",
+  "name": "养真丹炉",
+  "faction": "养真院",
+  "rarity": "legendary",
+  "type": "field",
+  "cost": 5,
+  "rules_text": "你每累积失去5点底蕴，便将一张强化效果牌加入手牌。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=yangzhen5; migrated_at=2026-03-24",
+  "display_type": "场地"
+}

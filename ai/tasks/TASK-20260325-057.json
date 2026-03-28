@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260325-057",
+  "goal": "Upgrade CI from reminder-style checks to blocking gates by ensuring formal test execution in PR validation and explicit blocking lint behavior.",
+  "constraints": [
+    "Do not add new product features.",
+    "Keep changes focused on CI gating and verification scripts.",
+    "Preserve existing workflow structure; make minimal, clear tightening changes."
+  ],
+  "deliverables": [
+    "PR validation workflow runs npm test as a blocking step.",
+    "Lint is explicitly documented/configured as blocking in workflow.",
+    "Task packet and durable knowledge updates reflect the CI hardening decision."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".github/workflows/pr-validate.yml",
+    "package.json",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260325-057.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260325-057.json"
+  ],
+  "status": "done"
+}

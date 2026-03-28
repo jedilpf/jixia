@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-YANGZHEN3",
+  "name": "轻身飞举",
+  "faction": "养真院",
+  "rarity": "common",
+  "type": "weapon",
+  "cost": 2,
+  "rules_text": "装备给角色：该角色免疫下一次受到的伤害，且获得【轻盈】。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=yangzhen3; migrated_at=2026-03-24",
+  "display_type": "装备"
+}

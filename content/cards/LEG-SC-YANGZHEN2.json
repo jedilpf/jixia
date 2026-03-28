@@ -1,0 +1,28 @@
+{
+  "id": "LEG-SC-YANGZHEN2",
+  "name": "辟谷服食",
+  "faction": "养真院",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 3,
+  "rules_text": "你下回合不获得随机牌，但减少受到的所有伤害3点。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-TEMPO"
+  ],
+  "lore_anchor_ids": [
+    "ANC-WORLD-001",
+    "ANC-RULE-001"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260324-LEGACY-MIGRATION",
+    "models_used": [
+      "codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "legacy-migration"
+  },
+  "status": "planned",
+  "notes": "legacy_source=showcase; legacy_id=yangzhen2; migrated_at=2026-03-24",
+  "display_type": "事件"
+}
