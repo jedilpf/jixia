@@ -26,6 +26,13 @@ export type StoryFlags = Record<string, boolean | number | string>;
 
 export type Relationships = Record<string, RelationshipChange>;
 
+export interface StoryBattleBridgeState {
+  unlockedFactions: string[];
+  unlockedCards: string[];
+  chapterFlags: string[];
+  lastStoryEndingId?: string;
+}
+
 export interface StoryCondition {
   type: 'stat' | 'flag' | 'relationship' | 'chapter' | 'path';
   target: string;
@@ -101,7 +108,8 @@ export interface StoryEventMap {
   flag_changed: { flagId: string; value: boolean | number | string };
   qte_started: { qteId: string };
   qte_completed: { success: boolean };
-  chapter_completed: { chapterId: string };
+  chapter_completed: { chapterId: string; endingId?: string };
+  bridge_state_changed: { state: StoryBattleBridgeState };
   story_completed: { endingId: string };
   screen_changed: { screen: StoryScreen };
 }

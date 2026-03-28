@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
-import { useAppStore } from '@/app/store';
 
 const STORY_STYLES = {
   container: {
@@ -30,6 +29,29 @@ const STORY_STYLES = {
     color: '#D4A017',
     fontSize: '14px',
     fontWeight: 600,
+  },
+  chapterProgressWrap: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+    minWidth: '180px',
+  },
+  chapterProgressTrack: {
+    height: '6px',
+    background: 'rgba(139,115,85,0.3)',
+    borderRadius: '4px',
+    overflow: 'hidden',
+  },
+  chapterProgressFill: {
+    height: '100%',
+    background: 'linear-gradient(90deg, #8B7355 0%, #D4A017 100%)',
+    borderRadius: '4px',
+    transition: 'width 0.25s ease',
+  },
+  chapterProgressText: {
+    color: '#D4C5A9',
+    fontSize: '12px',
+    opacity: 0.9,
   },
   centerArea: {
     flex: 1,
@@ -93,6 +115,22 @@ const STORY_STYLES = {
     padding: '24px 48px',
     background: 'rgba(15,15,26,0.95)',
     borderTop: '1px solid rgba(139,115,85,0.3)',
+  },
+  choiceImpactHint: {
+    marginTop: '6px',
+    fontSize: '12px',
+    color: '#9db7d6',
+    opacity: 0.9,
+  },
+  latestImpactPanel: {
+    padding: '12px 14px',
+    marginBottom: '14px',
+    borderRadius: '8px',
+    border: '1px solid rgba(90, 140, 180, 0.5)',
+    background: 'rgba(22, 36, 52, 0.6)',
+    color: '#bfd7f3',
+    fontSize: '13px',
+    lineHeight: 1.5,
   },
   choiceButton: {
     width: '100%',
@@ -207,16 +245,76 @@ const FACTION_NAMES: Record<string, string> = {
 
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
 
-export function StoryScreen() {
-  const { dispatch } = useAppStore();
+interface StoryScreenProps {
+  onBack?: () => void;
+}
+
+const STAT_LABELS: Record<string, string> = {
+  fame: '名望',
+  wisdom: '智慧',
+  charm: '魅力',
+  courage: '勇气',
+  insight: '洞察',
+};
+
+function formatDelta(delta: number): string {
+  return delta >= 0 ? `+${delta}` : `${delta}`;
+}
+
+function summarizeEffects(effects: StoryChoice['effects']): string {
+  const parts: string[] = [];
+
+  if (effects.stats) {
+    for (const [stat, delta] of Object.entries(effects.stats)) {
+      if (typeof delta !== 'number' || delta === 0) continue;
+      const label = STAT_LABELS[stat] ?? stat;
+      parts.push(`${label}${formatDelta(delta)}`);
+    }
+  }
+
+  if (effects.relationships) {
+    for (const [target, value] of Object.entries(effects.relationships)) {
+      if (!value) continue;
+      const trust = value.trust ?? 0;
+      const affection = value.affection ?? 0;
+      const total = trust + affection;
+      if (total !== 0) {
+        parts.push(`${FACTION_NAMES[target] ?? target}关系${formatDelta(total)}`);
+      }
+    }
+  }
+
+  if (effects.path) {
+    parts.push(`路线→${effects.path}`);
+  }
+
+  if (effects.flags) {
+    const importantFlags = Object.entries(effects.flags)
+      .filter(([, value]) => value === true)
+      .slice(0, 2)
+      .map(([flag]) => `标记:${flag}`);
+    parts.push(...importantFlags);
+  }
+
+  return parts.slice(0, 4).join(' · ');
+}
+
+function summarizeChoiceEffects(choice: StoryChoice): string {
+  return summarizeEffects(choice.effects);
+}
+
+export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const engine = getStoryEngine();
 
   const [currentNode, setCurrentNode] = useState<StoryNode | undefined>(engine.getCurrentNode());
+  const [availableChoices, setAvailableChoices] = useState<StoryChoice[]>(engine.getAvailableChoices());
   const [dialogueState, setDialogueState] = useState<DialogueState>('typing');
   const [displayedText, setDisplayedText] = useState('');
   const [isHoveredChoice, setIsHoveredChoice] = useState<number | null>(null);
   const [chapter, setChapter] = useState(0);
   const [, setScene] = useState(0);
+  const [chapterProgress, setChapterProgress] = useState(engine.getChapterProgress());
+  const [lastChoiceImpact, setLastChoiceImpact] = useState<string>('');
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
 
@@ -251,12 +349,17 @@ export function StoryScreen() {
         case 'node_changed': {
           const nextNode = engine.getCurrentNode();
           setCurrentNode(nextNode);
+          setAvailableChoices(engine.getAvailableChoices());
           setChapter(engine.getChapter());
           setScene(engine.getScene());
+          setChapterProgress(engine.getChapterProgress());
           startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
           setDialogueState('typing');
           break;
         }
+        case 'choice_made':
+          setLastChoiceImpact(summarizeEffects(event.effects));
+          break;
         case 'relationship_changed':
           setRelationships(engine.getRelationships());
           break;
@@ -267,6 +370,8 @@ export function StoryScreen() {
     });
 
     const initialNode = engine.getCurrentNode();
+    setAvailableChoices(engine.getAvailableChoices());
+    setChapterProgress(engine.getChapterProgress());
     startTyping(initialNode?.content || '', Boolean(initialNode?.choices));
 
     return () => {
@@ -303,8 +408,10 @@ export function StoryScreen() {
   }, [engine]);
 
   const handleBack = useCallback(() => {
-    dispatch({ type: 'NAVIGATE', screen: 'home' });
-  }, [dispatch]);
+    if (onBack) {
+      onBack();
+    }
+  }, [onBack]);
 
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';
@@ -354,6 +461,19 @@ export function StoryScreen() {
             ← 返回
           </button>
           <span style={STORY_STYLES.chapterBadge}>{getChapterLabel()}</span>
+          <div style={STORY_STYLES.chapterProgressWrap}>
+            <div style={STORY_STYLES.chapterProgressTrack}>
+              <div
+                style={{
+                  ...STORY_STYLES.chapterProgressFill,
+                  width: `${Math.round(chapterProgress.ratio * 100)}%`,
+                }}
+              />
+            </div>
+            <span style={STORY_STYLES.chapterProgressText}>
+              章节进度 {chapterProgress.visited}/{chapterProgress.total}
+            </span>
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ color: '#D4C5A9', fontSize: '14px' }}>
@@ -382,9 +502,12 @@ export function StoryScreen() {
         onClick={handleContinue}
       >
         {/* Scene Description */}
-        {currentNode?.type === 'narration' && (
+        {(currentNode?.type === 'narration' || currentNode?.type === 'ending' || currentNode?.type === 'transition') && (
           <div style={STORY_STYLES.sceneDescription}>
             {displayedText}
+            {dialogueState === 'complete' && currentNode?.nextNode && (
+              <div style={STORY_STYLES.continueIndicator}>▼ 点击继续</div>
+            )}
           </div>
         )}
 
@@ -440,7 +563,12 @@ export function StoryScreen() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {currentNode.choices.map((choice, index) => (
+            {lastChoiceImpact && (
+              <div style={STORY_STYLES.latestImpactPanel}>
+                上一步影响：{lastChoiceImpact}
+              </div>
+            )}
+            {availableChoices.map((choice, index) => (
               <button
                 key={choice.id}
                 style={{
@@ -465,8 +593,16 @@ export function StoryScreen() {
                   {String.fromCharCode(65 + index)}
                 </span>
                 <span>{choice.text}</span>
+                <span style={STORY_STYLES.choiceImpactHint}>
+                  {summarizeChoiceEffects(choice)}
+                </span>
               </button>
             ))}
+            {availableChoices.length === 0 && (
+              <div style={STORY_STYLES.latestImpactPanel}>
+                当前没有可执行选项。请回退上一步，或重新读取本章节条件。
+              </div>
+            )}
           </div>
         )}
       </div>

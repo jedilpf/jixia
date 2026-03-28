@@ -209,7 +209,7 @@ export function MvpFlowShell() {
   }
 
   if (state.screen === 'story') {
-    return <StoryScreen />;
+    return <StoryScreen onBack={() => dispatch({ type: 'NAVIGATE', screen: 'home' })} />;
   }
 
   return (

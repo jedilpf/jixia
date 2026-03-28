@@ -9,6 +9,7 @@ import { PreBattleFlow, PreBattleResult } from '@/components/PreBattleFlow';
 import { GameErrorBoundary } from '@/components/GameErrorBoundary';
 import { AppStoreProvider } from '@/app/store';
 import { MvpFlowShell } from '@/ui/screens/MvpFlowShell';
+import { StoryScreen } from '@/ui/screens/StoryScreen';
 import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -20,7 +21,8 @@ type GameScreen =
   | 'pre_battle'
   | 'battle'
   | 'collection'
-  | 'characters';
+  | 'characters'
+  | 'story';
 
 function App() {
   const useMvpFlow =
@@ -170,6 +172,7 @@ function App() {
 
   const handleCollection = () => setScreen('collection');
   const handleCharacters = () => setScreen('characters');
+  const handleStory = () => setScreen('story');
 
   const handleBackToMenu = () => {
     setBattleFadeIn(false);
@@ -228,6 +231,7 @@ function App() {
           settings={settings}
           onSettingsChange={handleSettingsChange}
           onStartGame={handleStartGame}
+          onStory={handleStory}
           onCollection={handleCollection}
           onCharacters={handleCharacters}
         />
@@ -310,6 +314,17 @@ function App() {
       {screen === 'collection' ? <CardShowcase onBack={handleBackToMenu} /> : null}
 
       {screen === 'characters' ? <CharactersView onBack={handleBackToMenu} /> : null}
+
+      {screen === 'story' ? (
+        <GameErrorBoundary
+          key={`story-${screenRecoveryKey}`}
+          screenName="story"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <StoryScreen onBack={handleBackToMenu} />
+        </GameErrorBoundary>
+      ) : null}
       </div>
     </ThemeProvider>
   );

@@ -1237,5 +1237,6 @@ export const PROLOG_NODES: StoryNode[] = [
 
 【存档点】游戏已自动保存`,
     background: 'wendao_hall',
+    nextNode: 'ch_moru_001_n001',
   },
 ];

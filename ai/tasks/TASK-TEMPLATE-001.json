@@ -1,0 +1,105 @@
+{
+  "metadata": {
+    "taskId": "TASK-TEMPLATE-001",
+    "createdAt": "2026-03-28T00:00:00Z",
+    "createdBy": "user",
+    "status": "draft",
+    "priority": "P1|P2|P3"
+  },
+  
+  "goal": {
+    "title": "改进AI对手智能度",
+    "description": "让AI对手的明辩/暗谋阶段决策更具战术性，考虑对手的威胁和己方的防守",
+    "successMetric": "肉眼观察AI作出的决策明显不是随意的；同样阵容下重复游玩，AI决策会变化；AI胜率从接近0提升到20%+"
+  },
+  
+  "scope": {
+    "allowedWritePaths": [
+      "src/battleV2/engine.ts (callAI_AUTO_PLAN函数及相关)",
+      "src/battleV2/laneSystem.ts (评估函数，非数据结构)",
+      "src/battleV2/types.ts (仅新增辅助类型，不改现有结构)"
+    ],
+    "forbiddenPaths": [
+      "src/battleV2/types.ts (现有数据结构禁改)",
+      "src/components/",
+      "src/ui/",
+      "public/",
+      "docs/data-contract.json"
+    ],
+    "canCreateFiles": true,
+    "canDeleteFiles": false
+  },
+  
+  "inputs": {
+    "dependencies": [
+      "docs/data-contract.json (理解Resources和DebateCard结构)",
+      "docs/game-core-loop.md (理解明辩/暗谋/结算流程)",
+      "src/battleV2/engine.ts (现有AI规划代码)",
+      "src/battleV2/laneSystem.ts (控制权计算)"
+    ],
+    "requiredData": {
+      "PlayerState": "Resources: {xinZheng, lingShi, daShi等10种}",
+      "CardThreat": "可以自定义，但必须基于card.power, card.cost, effectKind",
+      "DefenseScore": "评估己方能否在下回合应对对手的威胁"
+    }
+  },
+  
+  "outputs": {
+    "deliverables": [
+      "改进后的 callAI_AUTO_PLAN 函数（ming_bian和an_mou阶段）",
+      "新增辅助函数 evaluateCardThreat() 和 evaluateDefenseNeeds()",
+      "可选：新增或更新 laneSystem.ts 中的评估指标"
+    ],
+    "expectedBehavior": {
+      "input_state": {
+        "playerA": "PlayerState with hand[], seats{}, resources",
+        "playerB": "PlayerState with same structure",
+        "phase": "ming_bian | an_mou"
+      },
+      "output_plan": {
+        "mainCardId": "string (selected from hand)",
+        "secretCardId": "string or null",
+        "reasoning": "AI选择该卡的逻辑（可选，用于debug）"
+      },
+      "example": {
+        "input": "对手出高伤害卡，且己方特定席位血量低",
+        "output": "AI优先选防守卡或heal卡，而非攻击卡"
+      }
+    }
+  },
+  
+  "verification": {
+    "automated": [
+      "npm run typecheck -- src/battleV2/engine.ts",
+      "npm run lint -- src/battleV2/engine.ts src/battleV2/laneSystem.ts",
+      "如有，npm run test (战斗引擎单元测试)"
+    ],
+    "manual": [
+      "启动项目：npm run dev",
+      "进入BattleFrameV2（选阵容→开始对战）",
+      "观察1-2局：AI在ming_bian和an_mou阶段是否考虑对手的威胁（出现明显的防守或进攻偏向）",
+      "对同样的阵容重复游玩3局：观察AI决策是否有变化（不是每次都选同一张卡）",
+      "玩10局：计算AI胜率（期望 > 20%）"
+    ]
+  },
+  
+  "constraints": [
+    "不能改engine.ts之外的battle state结构（Resources, DebateCard, BattlePlayer等都不改）",
+    "AI方案必须在1-2秒内出结果（保持游戏节奏），不能做太复杂的搜索",
+    "新增的评估函数必须有清晰的数值输出（便于理解和调整）",
+    "保持TypeScript严格模式通过"
+  ],
+  
+  "timeline": {
+    "estimatedHours": "12-16",
+    "deadline": "2026-03-31 23:59",
+    "priority": "P1 (阻塞MVP可玩性)"
+  },
+  
+  "handoff": {
+    "assignedTo": "[Codex/Cursor/Claude]",
+    "context": "这是P1优先级任务，完成后可以立刻进入P2工作流系统优化。AI对手的智能度直接影响游戏体验，现在胜率接近0说明规划太无脑了。",
+    "questions": "遇到以下问题请立刻反馈：\n1. 对方没有现成的\"威胁评估函数\"，需要从零写吗？\n2. AI规划时能不能访问对方的hand（现在能吗）？\n3. 结算逻辑中\"三路控制权\"如何纳入评估？",
+    "deliveryFormat": "完成后提交：\n- 改在哪个文件的哪些行\n- 新增了什么函数\n- 自己验收的结果（typecheck通过吗？manual test跑过了吗？）"
+  }
+}

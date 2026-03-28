@@ -8,9 +8,11 @@ import type {
   StorySaveData,
   StorySettings,
   StoryEvent,
+  StoryBattleBridgeState,
 } from './types';
 
 import { PROLOG_NODES } from './data/prolog';
+import { CHAPTER_MORU_001_NODES } from './data/chapterMoru001';
 
 export class StoryEngine {
   private currentNodeId: string = 'prolog_0_1';
@@ -25,9 +27,17 @@ export class StoryEngine {
   private flags: StoryFlags = {};
   private history: Array<{ nodeId: string; choiceId?: string }> = [];
   private completedNodes: Set<string> = new Set();
+  private visitedNodes: Set<string> = new Set();
+  private completedChapters: Set<string> = new Set();
   private chapter: number = 0;
   private scene: number = 0;
+  private currentChapterId: string = 'prolog_0';
   private currentPath: string = 'none';
+  private bridgeState: StoryBattleBridgeState = {
+    unlockedFactions: [],
+    unlockedCards: [],
+    chapterFlags: [],
+  };
 
   private listeners: Set<(event: StoryEvent) => void> = new Set();
   private nodeMap: Map<string, StoryNode> = new Map();
@@ -49,7 +59,12 @@ export class StoryEngine {
   }
 
   private loadNodes() {
-    for (const node of PROLOG_NODES) {
+    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES];
+    for (const node of storyNodes) {
+      if (this.nodeMap.has(node.id)) {
+        console.warn(`StoryEngine: duplicated node id ${node.id} ignored.`);
+        continue;
+      }
       this.nodeMap.set(node.id, node);
     }
   }
@@ -60,6 +75,8 @@ export class StoryEngine {
     } else {
       this.currentNodeId = 'prolog_0_1';
     }
+    this.markNodeVisited(this.currentNodeId);
+    this.syncChapterByNodeId(this.currentNodeId);
     this.emit({ type: 'node_changed', nodeId: this.currentNodeId });
   }
 
@@ -79,13 +96,14 @@ export class StoryEngine {
 
     this.history.push({ nodeId: this.currentNodeId });
     this.currentNodeId = nodeId;
+    this.markNodeVisited(nodeId);
+    this.syncChapterByNodeId(nodeId);
 
     const node = this.getCurrentNode();
     if (node) {
-      if (node.id.startsWith('chapter_1')) this.chapter = 1;
-      if (node.id.startsWith('chapter_2')) this.chapter = 2;
-      if (node.id.startsWith('chapter_3')) this.chapter = 3;
-      if (node.id.startsWith('ending')) this.chapter = 99;
+      if (node.type === 'ending') {
+        this.handleChapterEnding(node.id);
+      }
     }
 
     this.emit({ type: 'node_changed', nodeId });
@@ -106,6 +124,8 @@ export class StoryEngine {
     const lastEntry = this.history.pop();
     if (lastEntry) {
       this.currentNodeId = lastEntry.nodeId;
+      this.markNodeVisited(this.currentNodeId);
+      this.syncChapterByNodeId(this.currentNodeId);
       this.emit({ type: 'node_changed', nodeId: this.currentNodeId });
       return true;
     }
@@ -193,15 +213,19 @@ export class StoryEngine {
 
     if (effects.stats) {
       for (const [stat, delta] of Object.entries(effects.stats)) {
-        this.player[stat as keyof PlayerStats] += delta as number;
+        if (typeof delta !== 'number') continue;
+        this.player[stat as keyof PlayerStats] += delta;
         this.emit({ type: 'stats_changed', changes: { [stat]: delta } });
       }
     }
+
+    let bridgeChanged = false;
 
     if (effects.flags) {
       for (const [flag, value] of Object.entries(effects.flags)) {
         this.flags[flag] = value as boolean | number | string;
         this.emit({ type: 'flag_changed', flagId: flag, value });
+        bridgeChanged = this.syncBridgeStateByFlag(flag, value) || bridgeChanged;
       }
     }
 
@@ -221,6 +245,10 @@ export class StoryEngine {
 
     if (effects.path) {
       this.currentPath = effects.path;
+    }
+
+    if (bridgeChanged) {
+      this.emit({ type: 'bridge_state_changed', state: this.getBridgeState() });
     }
   }
 
@@ -260,6 +288,35 @@ export class StoryEngine {
     return this.scene;
   }
 
+  public getChapterProgress(): {
+    chapterId: string;
+    visited: number;
+    total: number;
+    ratio: number;
+  } {
+    const chapterId = this.currentChapterId;
+    const chapterNodeIds = Array.from(this.nodeMap.keys()).filter((nodeId) =>
+      this.isNodeInChapter(nodeId, chapterId)
+    );
+    const visited = chapterNodeIds.filter((nodeId) => this.visitedNodes.has(nodeId)).length;
+    const total = Math.max(1, chapterNodeIds.length);
+    return {
+      chapterId,
+      visited,
+      total,
+      ratio: Math.min(1, visited / total),
+    };
+  }
+
+  public getBridgeState(): StoryBattleBridgeState {
+    return {
+      unlockedFactions: [...this.bridgeState.unlockedFactions],
+      unlockedCards: [...this.bridgeState.unlockedCards],
+      chapterFlags: [...this.bridgeState.chapterFlags],
+      lastStoryEndingId: this.bridgeState.lastStoryEndingId,
+    };
+  }
+
   public save(): StorySaveData {
     const historyNodeIds = this.history.map(h => h.nodeId);
     const historyChoices = this.history
@@ -295,7 +352,10 @@ export class StoryEngine {
     this.chapter = saveData.progress.chapter;
     this.scene = saveData.progress.scene;
     this.completedNodes = new Set(saveData.progress.completedNodes);
+    this.visitedNodes = new Set(saveData.progress.completedNodes);
+    this.markNodeVisited(this.currentNodeId);
     this.history = saveData.history.choices.map(c => ({ nodeId: c.nodeId, choiceId: c.choiceId }));
+    this.syncChapterByNodeId(this.currentNodeId);
 
     this.emit({ type: 'node_changed', nodeId: this.currentNodeId });
   }
@@ -329,6 +389,97 @@ export class StoryEngine {
 
   public setPath(path: string) {
     this.currentPath = path;
+  }
+
+  private markNodeVisited(nodeId: string) {
+    this.visitedNodes.add(nodeId);
+  }
+
+  private syncChapterByNodeId(nodeId: string) {
+    const chapterMatch = /^(ch_[a-z]+_(\d{3}))_n(\d{3})$/i.exec(nodeId);
+    if (chapterMatch) {
+      this.currentChapterId = chapterMatch[1];
+      this.chapter = Number(chapterMatch[2]);
+      this.scene = Number(chapterMatch[3]);
+      return;
+    }
+
+    const endingMatch = /^ending_(ch_[a-z]+_(\d{3}))_/i.exec(nodeId);
+    if (endingMatch) {
+      this.currentChapterId = endingMatch[1];
+      this.chapter = Number(endingMatch[2]);
+      this.scene = 999;
+      return;
+    }
+
+    if (nodeId.startsWith('prolog_0')) {
+      this.currentChapterId = 'prolog_0';
+      this.chapter = 0;
+      const sceneMatch = /^prolog_0_(\d+)/i.exec(nodeId);
+      this.scene = sceneMatch ? Number(sceneMatch[1]) : 0;
+    }
+  }
+
+  private isNodeInChapter(nodeId: string, chapterId: string): boolean {
+    if (chapterId === 'prolog_0') {
+      return nodeId.startsWith('prolog_0');
+    }
+    return nodeId.startsWith(`${chapterId}_`) || nodeId.startsWith(`ending_${chapterId}_`);
+  }
+
+  private syncBridgeStateByFlag(flag: string, value: unknown): boolean {
+    let changed = false;
+
+    if (flag === 'chosen_faction' && typeof value === 'string' && value !== 'none') {
+      if (!this.bridgeState.unlockedFactions.includes(value)) {
+        this.bridgeState.unlockedFactions.push(value);
+        changed = true;
+      }
+    }
+
+    if (flag.startsWith('unlock_card_') && typeof value === 'string') {
+      if (!this.bridgeState.unlockedCards.includes(value)) {
+        this.bridgeState.unlockedCards.push(value);
+        changed = true;
+      }
+    }
+
+    if (flag.endsWith('_completed') && value === true) {
+      if (!this.bridgeState.chapterFlags.includes(flag)) {
+        this.bridgeState.chapterFlags.push(flag);
+        changed = true;
+      }
+    }
+
+    return changed;
+  }
+
+  private handleChapterEnding(endingId: string) {
+    const match = /^ending_(ch_[a-z]+_\d{3})_/i.exec(endingId);
+    if (!match) return;
+
+    const chapterId = match[1];
+    if (this.completedChapters.has(chapterId)) {
+      return;
+    }
+    this.completedChapters.add(chapterId);
+
+    const chapterFlag = `${chapterId}_done`;
+    if (!this.bridgeState.chapterFlags.includes(chapterFlag)) {
+      this.bridgeState.chapterFlags.push(chapterFlag);
+    }
+
+    this.bridgeState.lastStoryEndingId = endingId;
+
+    const chosenFaction = this.flags['chosen_faction'];
+    if (typeof chosenFaction === 'string' && chosenFaction !== 'none') {
+      if (!this.bridgeState.unlockedFactions.includes(chosenFaction)) {
+        this.bridgeState.unlockedFactions.push(chosenFaction);
+      }
+    }
+
+    this.emit({ type: 'chapter_completed', chapterId, endingId });
+    this.emit({ type: 'bridge_state_changed', state: this.getBridgeState() });
   }
 }
 
