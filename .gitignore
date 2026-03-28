@@ -50,3 +50,7 @@ typescript-errors.txt
 review_bundle_*/
 review_bundle_*.zip
 review_bundle_*.zip.sha256.txt
+
+# Generated tool output
+repomix-output.xml
+repomix-output*.xml
