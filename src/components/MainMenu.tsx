@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo, ReactNode } from 'react';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { uiAudio } from '@/utils/audioManager';
 
 // ─── 设置状态接口 ────────────────────────────────────────────────────────────

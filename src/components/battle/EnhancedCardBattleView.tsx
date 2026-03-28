@@ -1,4 +1,4 @@
-﻿// EnhancedCardBattleView.tsx - 增强版卡牌战斗视图
+// EnhancedCardBattleView.tsx - 增强版卡牌战斗视图
 // 包含拖拽功能、金币系统、回合时间控制UI
 
 import { useState, useRef } from 'react';

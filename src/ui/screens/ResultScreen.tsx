@@ -1,4 +1,4 @@
-﻿import type { GameState } from '@/core/types';
+import type { GameState } from '@/core/types';
 
 interface BattleSettlementSummary {
   settlementKey: string;

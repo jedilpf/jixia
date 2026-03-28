@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FACTIONS } from '@/data/game/factions';
 import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, getFactionPortrait } from '@/ui/screens/visualAssets';
 

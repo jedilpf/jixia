@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import BattleFrameV2 from '@/components/BattleFrameV2';
 import { BattleSetup } from '@/components/BattleSetup';
 import { MainMenu, AppSettings, BrightnessOverlay } from '@/components/MainMenu';

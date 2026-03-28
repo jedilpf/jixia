@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
 import { LevelDetailModal } from '@/ui/components/LevelDetailModal';
 import { PlayerLevelBadge } from '@/ui/components/PlayerLevelBadge';
