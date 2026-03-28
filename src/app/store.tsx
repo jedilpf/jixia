@@ -1,4 +1,12 @@
-﻿import { createContext, useContext, useMemo, useReducer } from 'react';
+﻿/**
+ * @legacy 旧版 AppStore — 仅供 ?newFlow=1 实验路径（MvpFlowShell）使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *
+ * 这是 AppStoreProvider 的实现，通过 ?newFlow=1 URL 参数激活。
+ * 游戏主路径使用的是 useDebateBattle hook（src/battleV2/engine.ts）。
+ */
+import { createContext, useContext, useMemo, useReducer } from 'react';
 import type { Dispatch, PropsWithChildren } from 'react';
 import type { AppAction } from '@/app/actions';
 import { appReducer, createAppInitialState } from '@/app/reducer';

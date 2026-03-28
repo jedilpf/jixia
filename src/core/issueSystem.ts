@@ -1,4 +1,10 @@
-﻿import type { IssueDefinition, IssueDirectionId, IssueState } from '@/core/types';
+﻿/**
+ * @legacy 旧版议题系统 — 仅供 src/core/gameEngine.ts 使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *     新的议题/话题逻辑请在 src/battleV2/ 中实现。
+ */
+import type { IssueDefinition, IssueDirectionId, IssueState } from '@/core/types';
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));

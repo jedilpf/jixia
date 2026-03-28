@@ -1,4 +1,16 @@
-﻿import { resolveBattle } from '@/core/battleResolver';
+﻿/**
+ * @legacy 旧版游戏引擎 — 仅供 ?newFlow=1 实验路径使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *
+ * 当前调用链：
+ *   App.tsx (?newFlow=1) → MvpFlowShell → AppStoreProvider → src/app/store.tsx → src/app/reducer.ts → 此文件
+ *
+ * 游戏主路径使用的是 src/battleV2/engine.ts，请在那里开发新功能。
+ *
+ * 如需了解此引擎的命运决策，参见架构文档（阶段四）。
+ */
+import { resolveBattle } from '@/core/battleResolver';
 import { getNextBattlePhase } from '@/core/phaseMachine';
 import {
   addIssueDirectionScore,

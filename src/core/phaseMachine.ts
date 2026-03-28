@@ -1,4 +1,10 @@
-﻿import type { BattlePhase } from '@/core/types';
+﻿/**
+ * @legacy 旧版阶段状态机 — 仅供 src/core/gameEngine.ts 使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *     新的阶段控制逻辑请在 src/battleV2/engine.ts 中实现。
+ */
+import type { BattlePhase } from '@/core/types';
 
 export const BATTLE_PHASE_ORDER: BattlePhase[] = [
   'round_start',

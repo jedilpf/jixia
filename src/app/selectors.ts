@@ -1,4 +1,10 @@
-﻿import {
+﻿/**
+ * @legacy 旧版 App Selectors — 仅供 src/app/ 旧状态管理层使用
+ *
+ * ⚠️  请勿在此文件中添加新 selector。
+ *     新的 selector 请在 src/battleV2/ 或对应的 hooks 中实现。
+ */
+import {
   selectCanPlayCard,
   selectIssueProgressPercent,
   selectLockedIssue,
