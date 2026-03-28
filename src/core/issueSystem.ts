@@ -1,4 +1,7 @@
-﻿import type { IssueDefinition, IssueDirectionId, IssueState } from '@/core/types';
+﻿/**
+ * @deprecated 第一代议题系统。请使用 src/battleV2/laneSystem.ts。
+ */
+import type { IssueDefinition, IssueDirectionId, IssueState } from '@/core/types';
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));

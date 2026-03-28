@@ -1,4 +1,7 @@
-﻿import type { CardInstance, IssueDirectionId, PlayerId, PlayerState } from '@/core/types';
+﻿/**
+ * @deprecated 第一代战斗结算器。请使用 src/battleV2/engine.ts 中的 resolveRound。
+ */
+import type { CardInstance, IssueDirectionId, PlayerId, PlayerState } from '@/core/types';
 
 export interface ZoneResolveOutcome {
   winner: PlayerId | 'draw';

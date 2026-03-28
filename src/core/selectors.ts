@@ -1,4 +1,7 @@
-﻿import { getBattlePhaseLabel } from '@/core/phaseMachine';
+﻿/**
+ * @deprecated 第一代选择器。请使用 src/battleV2/ 相关模块。
+ */
+import { getBattlePhaseLabel } from '@/core/phaseMachine';
 import { getLeadingDirection } from '@/core/issueSystem';
 import type { GameState, PlayerId } from '@/core/types';
 

@@ -1,4 +1,8 @@
-﻿import { resolveBattle } from '@/core/battleResolver';
+﻿/**
+ * @deprecated 第一代引擎原型。请使用 src/battleV2/engine.ts。
+ * 此文件不再被任何活跃 UI 组件引用，仅作历史参考保留。
+ */
+import { resolveBattle } from '@/core/battleResolver';
 import { getNextBattlePhase } from '@/core/phaseMachine';
 import {
   addIssueDirectionScore,
