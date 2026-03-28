@@ -1,4 +1,10 @@
-﻿import type { CardInstance, IssueDirectionId, PlayerId, PlayerState } from '@/core/types';
+﻿/**
+ * @legacy 旧版战斗结算器 — 仅供 src/core/gameEngine.ts 使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *     新的战斗结算逻辑请在 src/battleV2/engine.ts 中实现。
+ */
+import type { CardInstance, IssueDirectionId, PlayerId, PlayerState } from '@/core/types';
 
 export interface ZoneResolveOutcome {
   winner: PlayerId | 'draw';

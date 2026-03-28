@@ -1,4 +1,10 @@
-﻿import { getBattlePhaseLabel } from '@/core/phaseMachine';
+﻿/**
+ * @legacy 旧版 selectors — 仅供 src/core/ 旧引擎使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *     新的 selectors 请在 src/battleV2/ 中实现。
+ */
+import { getBattlePhaseLabel } from '@/core/phaseMachine';
 import { getLeadingDirection } from '@/core/issueSystem';
 import type { GameState, PlayerId } from '@/core/types';
 

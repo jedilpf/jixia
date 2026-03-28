@@ -1,4 +1,10 @@
-﻿import type { PlayerId, ScreenId } from '@/core/types';
+﻿/**
+ * @legacy 旧版 Actions — 仅供 src/app/reducer.ts 使用
+ *
+ * ⚠️  请勿在此文件中添加新 action。
+ *     新的 action 类型请在 src/battleV2/types.ts 的 BattleAction 中添加。
+ */
+import type { PlayerId, ScreenId } from '@/core/types';
 
 export type AppAction =
   | { type: 'RESET_GAME' }

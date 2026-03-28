@@ -1,3 +1,9 @@
+/**
+ * @legacy 旧版类型定义 — 仅供 src/core/ 旧引擎使用
+ *
+ * ⚠️  请勿在此文件中添加新类型。
+ *     新的类型定义请在 src/battleV2/types.ts 中添加。
+ */
 export type ScreenId =
   | 'home'
   | 'match'

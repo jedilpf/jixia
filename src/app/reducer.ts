@@ -1,4 +1,13 @@
-﻿import type { AppAction } from '@/app/actions';
+﻿/**
+ * @legacy 旧版 App Reducer — 仅供 ?newFlow=1 实验路径使用
+ *
+ * ⚠️  请勿在此文件中添加新功能。
+ *
+ * 调用链：AppStoreProvider (store.tsx) → 此文件 → src/core/gameEngine.ts
+ *
+ * 游戏主路径使用的是 src/battleV2/engine.ts 中的 battleReducer。
+ */
+import type { AppAction } from '@/app/actions';
 import {
   advanceBattlePhase,
   autoLockFaction,
