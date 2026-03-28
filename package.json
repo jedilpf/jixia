@@ -17,6 +17,7 @@
     "validate:terms": "node scripts/pipeline/validate-terminology.cjs",
     "validate:playability": "node scripts/pipeline/validate-playability.cjs",
     "validate:complexity": "node scripts/pipeline/validate-complexity.cjs",
+    "validate:assets": "node scripts/pipeline/validate-assets.cjs",
     "preview:cards": "node scripts/pipeline/generate-cards-preview.cjs",
     "gate:daily": "node scripts/pipeline/gate-daily.cjs",
     "gate:weekly": "node scripts/pipeline/gate-weekly.cjs",

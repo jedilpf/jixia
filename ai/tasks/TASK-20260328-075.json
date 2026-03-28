@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260328-075",
+  "goal": "Promote high-value local-hold artifacts into mainline-safe assets by integrating asset reference validation into pipeline and documenting curation decisions.",
+  "constraints": [
+    "Do not modify gameplay runtime logic.",
+    "Only promote artifacts with direct long-term value (pipeline validation and durable process docs).",
+    "Do not reintroduce temporary reports or raw prompt dumps into tracked files.",
+    "Keep changes small, auditable, and compatible with current gate flow."
+  ],
+  "deliverables": [
+    "scripts/pipeline/validate-assets.cjs restored as tracked validation script",
+    "package.json updated with validate:assets command",
+    "scripts/pipeline/gate-daily.cjs includes validate-assets step",
+    "docs/standards/local-hold curation decision document"
+  ],
+  "allowed_write_paths": [
+    "scripts/pipeline/validate-assets.cjs",
+    "scripts/pipeline/gate-daily.cjs",
+    "package.json",
+    "docs/standards/standards-guide-local-hold-curation-v1.md",
+    "ai/tasks/TASK-20260328-075.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260328-075.json",
+    "npm run validate:assets",
+    "npm run gate:daily"
+  ],
+  "status": "draft"
+}
