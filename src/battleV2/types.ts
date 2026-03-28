@@ -128,6 +128,8 @@ export interface DebateBattleState {
   resolveFeed: string[];
   internalAudit: string[];
   winner: Side | 'draw' | null;
+  _logSeq: number;   // 日志 ID 计数器（内部使用，勿在 UI 渲染）
+  _unitSeq: number;  // 单位 ID 计数器（内部使用，勿在 UI 渲染）
 }
 
 export type PlanSlot = 'main' | 'response' | 'secret';

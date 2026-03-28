@@ -75,9 +75,6 @@ const ALL_SEATS: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
 const MAX_ROUNDS = 99;            // 无固定回合上限，以血量归零结束
 const HERO_MAX_XIN_ZHENG = 20;    // 主辩者初始心证
 
-let logSeq = 0;
-let unitSeq = 0;
-
 interface ResolveContext {
   owner: BattlePlayer;
   rival: BattlePlayer;
@@ -90,11 +87,12 @@ interface ResolveContext {
   damageModifier?: number;
   arenaId: ArenaId;
   topicId: string | null;
+  state: DebateBattleState;
 }
 
-function makeLog(round: number, text: string): BattleLog {
-  logSeq += 1;
-  return { id: `log-${logSeq}`, round, text };
+function makeLog(state: DebateBattleState, round: number, text: string): BattleLog {
+  state._logSeq += 1;
+  return { id: `log-${state._logSeq}`, round, text };
 }
 
 function cloneSeatState(): Record<SeatId, SeatState> {
@@ -242,6 +240,7 @@ function applyTopicSelection(
   state.topicSelectionSecondsLeft = null;
   state.logs.push(
     makeLog(
+      state,
       state.round,
       reason === 'player'
         ? `当前议题已锁定：${topic.title}`
@@ -317,7 +316,7 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const topicOptions = pickTopicOptions(3, forcedTopic?.id);
   const topicSelectionPending = topic === null;
 
-  return {
+  const state: DebateBattleState = {
     round: 1,
     maxRounds: MAX_ROUNDS,
     phase: 'ming_bian',
@@ -332,16 +331,20 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
     arenaName: arena.name,
     player: createPlayer('player', '我方', initialHuYin, playerDeckOptions),
     enemy: createPlayer('enemy', '敌方', initialHuYin, enemyDeckOptions),
-    logs: [
-      makeLog(1, startLog),
-      ...(topicSelectionPending
-        ? [makeLog(1, `议题将在第 ${TOPIC_SELECTION_ROUND} 回合开始前由玩家选择`)]
-        : []),
-    ],
+    logs: [],
     resolveFeed: [],
     internalAudit: [auditLine],
     winner: null,
+    _logSeq: 0,
+    _unitSeq: 0,
   };
+
+  state.logs.push(makeLog(state, 1, startLog));
+  if (topicSelectionPending) {
+    state.logs.push(makeLog(state, 1, `议题将在第 ${TOPIC_SELECTION_ROUND} 回合开始前由玩家选择`));
+  }
+
+  return state;
 }
 
 export function isCardAllowedForSlot(slot: PlanSlot, cardType: CardTypeV2): boolean {
@@ -505,13 +508,13 @@ function applyDamageToLane(target: SeatState, targetResources: Resources, damage
   return remain;
 }
 
-function summonUnit(player: BattlePlayer, card: DebateCard, seat: SeatId, layer: 'front' | 'back'): boolean {
+function summonUnit(state: DebateBattleState, player: BattlePlayer, card: DebateCard, seat: SeatId, layer: 'front' | 'back'): boolean {
   const slot = player.seats[seat];
   if (slot[layer]) return false;
-  unitSeq += 1;
+  state._unitSeq += 1;
   const power = Math.max(1, card.effectValue);
   const unit: SeatUnit = {
-    id: `unit-${player.side}-${unitSeq}`,
+    id: `unit-${player.side}-${state._unitSeq}`,
     name: card.name,
     power,
     hp: power + 1,
@@ -539,7 +542,7 @@ function scaleEffectValue(baseValue: number, multiplier: number): number {
 }
 
 function resolveCardEffect(ctx: ResolveContext): void {
-  const { owner, rival, card, round, logs, feed, layerLabel, targetSeat, damageModifier = 0, arenaId, topicId } = ctx;
+  const { owner, rival, card, round, logs, feed, layerLabel, targetSeat, damageModifier = 0, arenaId, topicId, state } = ctx;
   if (!card) return;
 
   const seat = targetSeat ?? 'zhu_bian';
@@ -551,7 +554,7 @@ function resolveCardEffect(ctx: ResolveContext): void {
     case 'damage': {
       const amount = Math.max(0, weightedEffectValue + owner.resources.zhengLi + damageModifier);
       if (amount <= 0) {
-        logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》被完全化解`));
+        logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》被完全化解`));
         pushResolveFeed(feed, `${owner.name}${layerLabel} ${card.name} 被化解`);
         break;
       }
@@ -559,59 +562,59 @@ function resolveCardEffect(ctx: ResolveContext): void {
       const targetLane = rival.seats[seat];
       const frontHpBefore = targetLane.front?.hp ?? 0;
       applyDamageToLane(targetLane, rival.resources, amount);
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》对${seatLabel}造成 ${amount} 压力`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》对${seatLabel}造成 ${amount} 压力`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} ${card.name} -> ${seatLabel} ${amount}`);
 
       if (arenaId === 'huode' && frontHpBefore > 0 && amount > frontHpBefore) {
         applyHeroDamage(rival.resources, 1);
-        logs.push(makeLog(round, `火德论坛·穿席余烬触发：${rival.name}额外承受 1 心证伤害`));
+        logs.push(makeLog(state, round, `火德论坛·穿席余烬触发：${rival.name}额外承受 1 心证伤害`));
         pushResolveFeed(feed, `火德论坛：穿席余烬 +1 心证`);
       }
       break;
     }
     case 'shield': {
       owner.resources.huYin += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 护印`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 护印`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 护印 +${weightedEffectValue}`);
       break;
     }
     case 'draw': {
       drawCards(owner, weightedEffectValue);
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》抽牌 ${weightedEffectValue}`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》抽牌 ${weightedEffectValue}`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 抽牌 +${weightedEffectValue}`);
       break;
     }
     case 'zhengli': {
       owner.resources.zhengLi += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 证立`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 证立`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 证立 +${weightedEffectValue}`);
       break;
     }
     case 'shixu': {
       rival.resources.shiXu += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》使对手失序 +${weightedEffectValue}`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》使对手失序 +${weightedEffectValue}`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 对手失序 +${weightedEffectValue}`);
       break;
     }
     case 'summon_front': {
       const summonCard = weightedEffectValue === card.effectValue ? card : { ...card, effectValue: weightedEffectValue };
-      const target = summonUnit(owner, summonCard, seat, 'front') ? seat : firstAvailableSeat(owner, 'front');
+      const target = summonUnit(state, owner, summonCard, seat, 'front') ? seat : firstAvailableSeat(owner, 'front');
       if (!target) break;
       if (target !== seat) {
-        summonUnit(owner, summonCard, target, 'front');
+        summonUnit(state, owner, summonCard, target, 'front');
       }
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}前席登场`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}前席登场`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 前席登场 -> ${SEAT_LABEL[target]}`);
       break;
     }
     case 'summon_back': {
       const summonCard = weightedEffectValue === card.effectValue ? card : { ...card, effectValue: weightedEffectValue };
-      const target = summonUnit(owner, summonCard, seat, 'back') ? seat : firstAvailableSeat(owner, 'back');
+      const target = summonUnit(state, owner, summonCard, seat, 'back') ? seat : firstAvailableSeat(owner, 'back');
       if (!target) break;
       if (target !== seat) {
-        summonUnit(owner, summonCard, target, 'back');
+        summonUnit(state, owner, summonCard, target, 'back');
       }
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}后席登场`));
+      logs.push(makeLog(state, round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}后席登场`));
       pushResolveFeed(feed, `${owner.name}${layerLabel} 后席登场 -> ${SEAT_LABEL[target]}`);
       break;
     }
@@ -625,7 +628,7 @@ function pickPlannedCard(player: BattlePlayer, cardId: string | null): DebateCar
   return getCardFromHand(player, cardId);
 }
 
-function applyWriting(player: BattlePlayer, logs: BattleLog[], feed: string[], round: number, arenaId: ArenaId): void {
+function applyWriting(player: BattlePlayer, logs: BattleLog[], feed: string[], round: number, arenaId: ArenaId, state: DebateBattleState): void {
   const writingId = player.plan.writingCardId;
   if (!writingId) return;
   const idx = player.hand.findIndex((card) => card.id === writingId);
@@ -639,18 +642,18 @@ function applyWriting(player: BattlePlayer, logs: BattleLog[], feed: string[], r
   player.resources.wenMai += 1;
   player.resources.maxLingShi = Math.min(10, player.resources.maxLingShi + 1);
 
-  logs.push(makeLog(round, `${player.name}执行着书《${card.name}》，文脉 +1`));
+  logs.push(makeLog(state, round, `${player.name}执行着书《${card.name}》，文脉 +1`));
   pushResolveFeed(feed, `${player.name} 着书 ${card.name}，文脉 +1`);
 
   if (arenaId === 'cangshu' && wasFirstWriting) {
     player.resources.huYin += 1;
-    logs.push(makeLog(round, `藏书秘阁触发：${player.name}首次着书额外获得 1 护印`));
+    logs.push(makeLog(state, round, `藏书秘阁触发：${player.name}首次着书额外获得 1 护印`));
     pushResolveFeed(feed, '藏书秘阁：首次着书 护印 +1');
   }
 
   if (arenaId === 'cangshu' && hadAtLeastOneWriting) {
     player.resources.xinZheng = Math.min(HERO_MAX_XIN_ZHENG, player.resources.xinZheng + 1);
-    logs.push(makeLog(round, `藏书秘阁触发：${player.name}着书回复 1 心证`));
+    logs.push(makeLog(state, round, `藏书秘阁触发：${player.name}着书回复 1 心证`));
     pushResolveFeed(feed, '藏书秘阁：着书后回复 1 心证');
   }
 }
@@ -669,7 +672,8 @@ function resolveSeatBattle(
   logs: BattleLog[],
   feed: string[],
   round: number,
-  arenaId: ArenaId
+  arenaId: ArenaId,
+  state: DebateBattleState
 ): void {
   ALL_SEATS.forEach((seat) => {
     const pSeat = player.seats[seat];
@@ -681,13 +685,13 @@ function resolveSeatBattle(
 
     if (pPower > 0) {
       applyDamageToLane(eSeat, enemy.resources, pPower);
-      logs.push(makeLog(round, `我方${SEAT_LABEL[seat]}争鸣造成 ${pPower} 压力`));
+      logs.push(makeLog(state, round, `我方${SEAT_LABEL[seat]}争鸣造成 ${pPower} 压力`));
       pushResolveFeed(feed, `我方${SEAT_LABEL[seat]}争鸣 ${pPower}`);
     }
 
     if (ePower > 0) {
       applyDamageToLane(pSeat, player.resources, ePower);
-      logs.push(makeLog(round, `敌方${SEAT_LABEL[seat]}争鸣造成 ${ePower} 压力`));
+      logs.push(makeLog(state, round, `敌方${SEAT_LABEL[seat]}争鸣造成 ${ePower} 压力`));
       pushResolveFeed(feed, `敌方${SEAT_LABEL[seat]}争鸣 ${ePower}`);
     }
   });
@@ -715,13 +719,13 @@ function beginNewRound(state: DebateBattleState): void {
     const bonus = state.player.resources.wenMai;
     state.player.resources.wenMai = 0;
     state.player.resources.lingShi = Math.min(state.player.resources.maxLingShi, state.player.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：我方获得 ${bonus} 灵势`));
+    state.logs.push(makeLog(state, state.round, `左路立势：我方获得 ${bonus} 灵势`));
   }
   if (state.enemy.resources.wenMai > 0) {
     const bonus = state.enemy.resources.wenMai;
     state.enemy.resources.wenMai = 0;
     state.enemy.resources.lingShi = Math.min(state.enemy.resources.maxLingShi, state.enemy.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：敌方获得 ${bonus} 灵势`));
+    state.logs.push(makeLog(state, state.round, `左路立势：敌方获得 ${bonus} 灵势`));
   }
   
   state.player.resources.lingShi = state.player.resources.maxLingShi;
@@ -757,6 +761,7 @@ function resolveRound(state: DebateBattleState): void {
     layerLabel: '应对',
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
   resolveCardEffect({
     owner: state.enemy,
@@ -768,6 +773,7 @@ function resolveRound(state: DebateBattleState): void {
     layerLabel: '应对',
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
 
   let playerMainDamageModifier = 0;
@@ -787,12 +793,12 @@ function resolveRound(state: DebateBattleState): void {
 
   if (state.arenaId === 'jixia' && pMain && !state.player.plan.writingCardId) {
     state.player.resources.zhengLi += 1;
-    logs.push(makeLog(round, '稷下学宫触发：我方首次立论且未着书，证立 +1'));
+    logs.push(makeLog(state, round, '稷下学宫触发：我方首次立论且未着书，证立 +1'));
     feed.push('稷下学宫：我方证立 +1');
   }
   if (state.arenaId === 'jixia' && eMain && !state.enemy.plan.writingCardId) {
     state.enemy.resources.zhengLi += 1;
-    logs.push(makeLog(round, '稷下学宫触发：敌方首次立论且未着书，证立 +1'));
+    logs.push(makeLog(state, round, '稷下学宫触发：敌方首次立论且未着书，证立 +1'));
     feed.push('稷下学宫：敌方证立 +1');
   }
 
@@ -808,6 +814,7 @@ function resolveRound(state: DebateBattleState): void {
     damageModifier: playerMainDamageModifier,
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
   resolveCardEffect({
     owner: state.enemy,
@@ -821,10 +828,11 @@ function resolveRound(state: DebateBattleState): void {
     damageModifier: enemyMainDamageModifier,
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
 
   feed.push('【层3】三席争鸣');
-  resolveSeatBattle(state.player, state.enemy, logs, feed, round, state.arenaId);
+  resolveSeatBattle(state.player, state.enemy, logs, feed, round, state.arenaId, state);
 
   feed.push('【层4】暗策结算');
   const pSecret = pickPlannedCard(state.player, state.player.plan.secretCardId);
@@ -832,12 +840,12 @@ function resolveRound(state: DebateBattleState): void {
 
   if (state.arenaId === 'guanxing' && pSecret) {
     state.player.resources.huYin += 1;
-    logs.push(makeLog(round, '玄机观星台触发：我方首次暗策，护印 +1'));
+    logs.push(makeLog(state, round, '玄机观星台触发：我方首次暗策，护印 +1'));
     feed.push('玄机观星台：我方暗策 护印 +1');
   }
   if (state.arenaId === 'guanxing' && eSecret) {
     state.enemy.resources.huYin += 1;
-    logs.push(makeLog(round, '玄机观星台触发：敌方首次暗策，护印 +1'));
+    logs.push(makeLog(state, round, '玄机观星台触发：敌方首次暗策，护印 +1'));
     feed.push('玄机观星台：敌方暗策 护印 +1');
   }
 
@@ -852,6 +860,7 @@ function resolveRound(state: DebateBattleState): void {
     targetSeat: state.player.plan.secretTargetSeat,
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
   resolveCardEffect({
     owner: state.enemy,
@@ -864,11 +873,12 @@ function resolveRound(state: DebateBattleState): void {
     targetSeat: state.enemy.plan.secretTargetSeat,
     arenaId: state.arenaId,
     topicId: state.activeTopicId,
+    state,
   });
 
   feed.push('【层 5】回合收束');
-  applyWriting(state.player, logs, feed, round, state.arenaId);
-  applyWriting(state.enemy, logs, feed, round, state.arenaId);
+  applyWriting(state.player, logs, feed, round, state.arenaId, state);
+  applyWriting(state.enemy, logs, feed, round, state.arenaId, state);
 
   discardPlannedCard(state.player, state.player.plan.mainCardId);
   discardPlannedCard(state.player, state.player.plan.responseCardId);
@@ -886,19 +896,19 @@ function resolveRound(state: DebateBattleState): void {
     const laneName = LANE_NAMES[laneId];
     if (control.controlledBy) {
       const controller = control.controlledBy === 'player' ? '我方' : '敌方';
-      logs.push(makeLog(round, `${controller}控制${laneName}（战力 ${control.playerPower}:${control.enemyPower}）`));
+      logs.push(makeLog(state, round, `${controller}控制${laneName}（战力 ${control.playerPower}:${control.enemyPower}）`));
       feed.push(`${laneName}: ${controller}控制 (${control.playerPower}:${control.enemyPower})`);
     } else {
-      logs.push(makeLog(round, `${laneName}未控制（战力 ${control.playerPower}:${control.enemyPower}）`));
+      logs.push(makeLog(state, round, `${laneName}未控制（战力 ${control.playerPower}:${control.enemyPower}）`));
       feed.push(`${laneName}: 未控制 (${control.playerPower}:${control.enemyPower})`);
     }
   });
   
   playerRewards.forEach(reward => {
-    logs.push(makeLog(round, `我方：${reward}`));
+    logs.push(makeLog(state, round, `我方：${reward}`));
   });
   enemyRewards.forEach(reward => {
-    logs.push(makeLog(round, `敌方：${reward}`));
+    logs.push(makeLog(state, round, `敌方：${reward}`));
   });
 
   state.logs.push(...logs);
@@ -932,20 +942,20 @@ function setPhase(state: DebateBattleState, phase: DebatePhase): void {
 function advancePhase(state: DebateBattleState): void {
   if (state.phase === 'ming_bian') {
     setPhase(state, 'an_mou');
-    state.logs.push(makeLog(state.round, '明辩结束，进入暗策'));
+    state.logs.push(makeLog(state, state.round, '明辩结束，进入暗策'));
     return;
   }
 
   if (state.phase === 'an_mou') {
     setPhase(state, 'reveal');
-    state.logs.push(makeLog(state.round, '暗策结束，进入揭示'));
+    state.logs.push(makeLog(state, state.round, '暗策结束，进入揭示'));
     return;
   }
 
   if (state.phase === 'reveal') {
     setPhase(state, 'resolve');
     resolveRound(state);
-    state.logs.push(makeLog(state.round, '进入结算层'));
+    state.logs.push(makeLog(state, state.round, '进入结算层'));
     return;
   }
 
@@ -960,7 +970,7 @@ function advancePhase(state: DebateBattleState): void {
       const result = daShiWinner === 'player' 
         ? `对局结束：我方大势达到${WIN_DASHI}，获胜！` 
         : `对局结束：敌方大势达到${WIN_DASHI}，获胜！`;
-      state.logs.push(makeLog(state.round, result));
+      state.logs.push(makeLog(state, state.round, result));
       if (daShiWinner === 'player') state.player.gold += 100;
       else state.enemy.gold += 100;
       return;
@@ -983,14 +993,14 @@ function advancePhase(state: DebateBattleState): void {
         result = '对局结束：敌方心证归零，我方胜';
         state.player.gold += 100;
       }
-      state.logs.push(makeLog(state.round, result));
+      state.logs.push(makeLog(state, state.round, result));
       return;
     }
 
     state.round += 1;
     beginNewRound(state);
     setPhase(state, 'ming_bian');
-    state.logs.push(makeLog(state.round, `第 ${state.round} 回合开始`));
+    state.logs.push(makeLog(state, state.round, `第 ${state.round} 回合开始`));
   }
 }
 
@@ -1106,7 +1116,7 @@ function aiAutoSubmit(state: DebateBattleState): void {
       zone: null,
       useToken: false,
     };
-    state.logs.push(makeLog(state.round, '敌方选择空过'));
+    state.logs.push(makeLog(state, state.round, '敌方选择空过'));
   } else {
     const card = playableCards[Math.floor(Math.random() * playableCards.length)];
     const zones: Zone[] = ['main', 'side', 'prep'];
@@ -1123,7 +1133,7 @@ function aiAutoSubmit(state: DebateBattleState): void {
       enemy.resources.chou -= 1;
     }
     
-    state.logs.push(makeLog(state.round, `敌方已提交到${zone === 'main' ? '主议' : zone === 'side' ? '旁议' : '预备区'}`));
+    state.logs.push(makeLog(state, state.round, `敌方已提交到${zone === 'main' ? '主议' : zone === 'side' ? '旁议' : '预备区'}`));
   }
   
   if (state.phase === 'ming_bian') {
@@ -1175,7 +1185,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       if (isTopicSelectionWindow(next)) {
         if (next.topicSelectionSecondsLeft === null) {
           next.topicSelectionSecondsLeft = TOPIC_SELECTION_SECONDS;
-          next.logs.push(makeLog(next.round, '本回合先确定议题后再进入明辩出牌'));
+          next.logs.push(makeLog(next, next.round, '本回合先确定议题后再进入明辩出牌'));
           return next;
         }
 
@@ -1191,7 +1201,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       next.secondsLeft -= 1;
       if (next.secondsLeft === 5 && (next.phase === 'ming_bian' || next.phase === 'an_mou')) {
         const phaseName = next.phase === 'ming_bian' ? '明辩' : '暗策';
-        next.logs.push(makeLog(next.round, `倒计时 5 秒：${phaseName}阶段即将自动结束`));
+        next.logs.push(makeLog(next, next.round, `倒计时 5 秒：${phaseName}阶段即将自动结束`));
       }
       if (next.phase === 'ming_bian' && canMoveToAnMou(next)) {
         advancePhase(next);
@@ -1244,7 +1254,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'ming_bian') return next;
       next.player.plan.lockedPublic = true;
-      next.logs.push(makeLog(next.round, '我方已提前结束明辩'));
+      next.logs.push(makeLog(next, next.round, '我方已提前结束明辩'));
       if (!next.enemy.plan.lockedPublic) {
         aiPlanForMingBian(next);
       }
@@ -1258,7 +1268,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       if (isTopicSelectionWindow(next)) return next;
       if (next.phase !== 'an_mou') return next;
       next.player.plan.lockedSecret = true;
-      next.logs.push(makeLog(next.round, '我方已提前结束暗策'));
+      next.logs.push(makeLog(next, next.round, '我方已提前结束暗策'));
       if (!next.enemy.plan.lockedSecret) {
         aiPlanForAnMou(next);
       }
@@ -1303,7 +1313,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       if (action.useToken && next.player.resources.chou > 0) {
         next.player.resources.chou -= 1;
       }
-      next.logs.push(makeLog(next.round, `我方已提交到${action.zone === 'main' ? '主议' : action.zone === 'side' ? '旁议' : '预备区'}`));
+      next.logs.push(makeLog(next, next.round, `我方已提交到${action.zone === 'main' ? '主议' : action.zone === 'side' ? '旁议' : '预备区'}`));
       return next;
     }
 
@@ -1316,7 +1326,7 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
         zone: null,
         useToken: false,
       };
-      next.logs.push(makeLog(next.round, '我方选择空过'));
+      next.logs.push(makeLog(next, next.round, '我方选择空过'));
       return next;
     }
 
