@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260328-076",
+  "goal": "Codify Codex watermark and pre-task intent log workflow so every project-wide refinement has visible attribution and archival intent notes.",
+  "constraints": [
+    "Document-only changes; no runtime/gameplay code changes.",
+    "Keep conventions explicit and enforceable by other AI collaborators.",
+    "Do not modify archived docs under docs/archive."
+  ],
+  "deliverables": [
+    "A standards doc for watermark + intent log workflow",
+    "A reusable intent log template",
+    "AI policy doc updated with mandatory references"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/AI-mainline-policy.md",
+    "docs/standards",
+    "docs/project/record",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260328-076.json"
+  ],
+  "status": "draft"
+}
