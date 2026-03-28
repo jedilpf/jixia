@@ -7,7 +7,7 @@
  * - 右路【机辩】：控制右路，获得 1 点机变（用于下一张术牌/反诘 -1 费）
  */
 
-import { SeatId, BattlePlayer, DebateBattleState } from './types';
+import { SeatId, BattlePlayer, DebateBattleState, Side, WIN_ZHENG_LI, MAX_XIN_ZHENG } from './types';
 
 // 三路定义
 export type LaneId = 'left' | 'center' | 'right';
@@ -49,8 +49,6 @@ export interface LaneControl {
   playerPower: number;        // 玩家战力
   enemyPower: number;         // 敌方战力
 }
-
-export type Side = 'player' | 'enemy';
 
 /**
  * 计算单路控制权
@@ -131,8 +129,9 @@ export function applyLaneRewards(
     playerRewards.push('中路争衡：+2 议势');
     
     // 检查胜利条件
-    if (state.player.resources.zhengLi >= 10) {
+    if (state.player.resources.zhengLi >= WIN_ZHENG_LI) {
       state.phase = 'finished';
+      state.winner = 'player';
       playerRewards.push('🏆 议势达到 10 点，获得胜利！');
     }
   }
@@ -141,8 +140,9 @@ export function applyLaneRewards(
     enemyRewards.push('中路争衡：+2 议势');
     
     // 检查胜利条件
-    if (state.enemy.resources.zhengLi >= 10) {
+    if (state.enemy.resources.zhengLi >= WIN_ZHENG_LI) {
       state.phase = 'finished';
+      state.winner = 'enemy';
       enemyRewards.push('🏆 议势达到 10 点，获得胜利！');
     }
   }
@@ -189,7 +189,7 @@ export function applyLeftLaneBonus(player: BattlePlayer): boolean {
     // 将文脉转换为心证
     const bonus = player.resources.wenMai;
     player.resources.wenMai = 0;
-    player.resources.lingShi = Math.min(player.resources.maxLingShi, player.resources.lingShi + bonus);
+    player.resources.xinZheng = Math.min(MAX_XIN_ZHENG, player.resources.xinZheng + bonus);
     return true;
   }
   return false;

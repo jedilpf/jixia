@@ -22,6 +22,7 @@ import {
   Side,
   TargetableSlot,
   WIN_DASHI,
+  MAX_XIN_ZHENG,
   Zone,
 } from './types';
 import {
@@ -73,7 +74,6 @@ export interface CreateBattleStateOptions {
 
 const ALL_SEATS: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
 const MAX_ROUNDS = 99;            // 无固定回合上限，以血量归零结束
-const HERO_MAX_XIN_ZHENG = 20;    // 主辩者初始心证
 
 let logSeq = 0;
 let unitSeq = 0;
@@ -150,7 +150,7 @@ function drawCards(player: BattlePlayer, count: number): void {
 
 function buildInitialResources(initialHuYin: number): Resources {
   return {
-    xinZheng: HERO_MAX_XIN_ZHENG,
+    xinZheng: MAX_XIN_ZHENG,
     lingShi: 3,
     maxLingShi: 3,
     huYin: initialHuYin,
@@ -649,7 +649,7 @@ function applyWriting(player: BattlePlayer, logs: BattleLog[], feed: string[], r
   }
 
   if (arenaId === 'cangshu' && hadAtLeastOneWriting) {
-    player.resources.xinZheng = Math.min(HERO_MAX_XIN_ZHENG, player.resources.xinZheng + 1);
+    player.resources.xinZheng = Math.min(MAX_XIN_ZHENG, player.resources.xinZheng + 1);
     logs.push(makeLog(round, `藏书秘阁触发：${player.name}着书回复 1 心证`));
     pushResolveFeed(feed, '藏书秘阁：着书后回复 1 心证');
   }
@@ -714,14 +714,14 @@ function beginNewRound(state: DebateBattleState): void {
   if (state.player.resources.wenMai > 0) {
     const bonus = state.player.resources.wenMai;
     state.player.resources.wenMai = 0;
-    state.player.resources.lingShi = Math.min(state.player.resources.maxLingShi, state.player.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：我方获得 ${bonus} 灵势`));
+    state.player.resources.xinZheng = Math.min(MAX_XIN_ZHENG, state.player.resources.xinZheng + bonus);
+    state.logs.push(makeLog(state.round, `左路立势：我方回复 ${bonus} 心证`));
   }
   if (state.enemy.resources.wenMai > 0) {
     const bonus = state.enemy.resources.wenMai;
     state.enemy.resources.wenMai = 0;
-    state.enemy.resources.lingShi = Math.min(state.enemy.resources.maxLingShi, state.enemy.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：敌方获得 ${bonus} 灵势`));
+    state.enemy.resources.xinZheng = Math.min(MAX_XIN_ZHENG, state.enemy.resources.xinZheng + bonus);
+    state.logs.push(makeLog(state.round, `左路立势：敌方回复 ${bonus} 心证`));
   }
   
   state.player.resources.lingShi = state.player.resources.maxLingShi;

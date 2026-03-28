@@ -67,6 +67,8 @@ export interface Resources {
 }
 
 export const WIN_DASHI = 8;
+export const WIN_ZHENG_LI = 10;
+export const MAX_XIN_ZHENG = 20;
 export const MAX_CHOU = 1;
 
 export interface TurnPlan {
