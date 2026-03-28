@@ -1,5 +1,7 @@
 # Current Baseline (2026-03-26)
 
+> Author: Trae AI
+
 ## 1. 唯一前端主线
 
 - 唯一默认入口：`src/App.tsx -> MvpFlowShell`
