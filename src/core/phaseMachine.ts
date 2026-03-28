@@ -1,4 +1,7 @@
-﻿import type { BattlePhase } from '@/core/types';
+﻿/**
+ * @deprecated 第一代阶段状态机。请使用 src/battleV2/engine.ts 中的 advancePhase。
+ */
+import type { BattlePhase } from '@/core/types';
 
 export const BATTLE_PHASE_ORDER: BattlePhase[] = [
   'round_start',

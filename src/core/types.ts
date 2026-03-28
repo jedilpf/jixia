@@ -1,3 +1,6 @@
+/**
+ * @deprecated 第一代引擎类型定义。请使用 src/battleV2/types.ts。
+ */
 export type ScreenId =
   | 'home'
   | 'match'
