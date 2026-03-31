@@ -12,6 +12,9 @@
 3. 生成可复制给任何 AI 的“任务包提示词”  
    `npm run ai:prompt -- --task ai/tasks/TASK-EXAMPLE-001.json`
 4. 把 `ai/out/*.prompt.md` 全文发给目标 AI  
+4.5 若出现方案冲突或需求理解冲突：  
+   先填写 `docs/standards/conflict-arbitration-template.md` 再动手；  
+   信息不清楚时必须先向用户提问确认。
 5. AI 产出后，运行收尾强校验  
    先 `git add` 本次任务相关文件，再执行：  
    `npm run ai:finalize -- --task ai/tasks/TASK-EXAMPLE-001.json`

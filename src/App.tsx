@@ -1,105 +1,24 @@
-﻿import { useEffect, useRef, useState } from 'react';
-import BattleFrameV2 from '@/components/BattleFrameV2';
-import { BattleSetup } from '@/components/BattleSetup';
-import { MainMenu, AppSettings, BrightnessOverlay } from '@/components/MainMenu';
-import { TransitionScreen } from '@/components/TransitionScreen';
-import { CharactersView } from '@/components/CharactersView';
-import { CardShowcase } from '@/components/CardShowcase';
-import { PreBattleFlow, PreBattleResult } from '@/components/PreBattleFlow';
-import { GameErrorBoundary } from '@/components/GameErrorBoundary';
-import { AppStoreProvider } from '@/app/store';
+import { useEffect, useRef, useState } from 'react';
+import { AppSettings, BrightnessOverlay } from '@/components/MainMenu';
+import { AppStoreProvider, useAppStore } from '@/app/store';
 import { MvpFlowShell } from '@/ui/screens/MvpFlowShell';
-import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
-type GameScreen =
-  | 'menu'
-  | 'transition'
-  | 'battle_setup'
-  | 'pre_battle'
-  | 'battle'
-  | 'collection'
-  | 'characters';
+/**
+ * App - 谋天下：问道百家 主入口
+ * 
+ * 经过 Phase 1 改造，移除了多引擎并存的路由逻辑。
+ * 统一采用 MvpFlowShell 作为主流程容器。
+ */
 
 function App() {
-  const useMvpFlow =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('newFlow') === '1';
-
-  if (useMvpFlow) {
-    return (
-      <ThemeProvider>
-        <div className="relative h-dvh w-full overflow-hidden bg-[#0f0d0a] text-[#f0ddbb]">
-          <AppStoreProvider>
-            <MvpFlowShell />
-          </AppStoreProvider>
-        </div>
-      </ThemeProvider>
-    );
-  }
-
   const isElectronRuntime =
     typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
+  
   const [hasStarted, setHasStarted] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [screen, setScreen] = useState<GameScreen>('menu');
-  const [battleFadeIn, setBattleFadeIn] = useState(false);
-  const [selectedArenaId, setSelectedArenaId] = useState<ArenaId>('jixia');
-  const [battleSessionKey, setBattleSessionKey] = useState(1);
-  const [preBattleResult, setPreBattleResult] = useState<PreBattleResult | null>(null);
-  const [screenRecoveryKey, setScreenRecoveryKey] = useState(0);
-
-  const audioHallRef = useRef<HTMLAudioElement | null>(null);
-  const audioBattleRef = useRef<HTMLAudioElement | null>(null);
-  const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
-
-  useEffect(() => {
-    if (isElectronRuntime) return;
-    audioHallRef.current = new Audio(asset('assets/bgm-hall.mp3'));
-    audioHallRef.current.loop = true;
-
-    audioBattleRef.current = new Audio(asset('assets/bgm-battle.mp3'));
-    audioBattleRef.current.loop = true;
-
-    return () => {
-      audioHallRef.current?.pause();
-      audioBattleRef.current?.pause();
-    };
-  }, [isElectronRuntime]);
-
-  useEffect(() => {
-    if (isElectronRuntime) return;
-    if (!audioHallRef.current || !audioBattleRef.current) return;
-    if (!hasStarted && !isFadingOut) return;
-
-    uiAudio.loadCustomSound('card-hover', asset('assets/卡牌声音.mp3'));
-
-    if (
-      screen === 'menu' ||
-      screen === 'characters' ||
-      screen === 'collection' ||
-      screen === 'battle_setup' ||
-      screen === 'pre_battle'
-    ) {
-      audioBattleRef.current.pause();
-      audioBattleRef.current.currentTime = 0;
-      audioHallRef.current.play().catch(console.warn);
-      return;
-    }
-
-    if (screen === 'transition') {
-      audioHallRef.current.pause();
-      return;
-    }
-
-    if (screen === 'battle') {
-      audioHallRef.current.pause();
-      audioHallRef.current.currentTime = 0;
-      audioBattleRef.current.play().catch(console.warn);
-    }
-  }, [screen, hasStarted, isFadingOut, isElectronRuntime]);
-
-  const [settings, setSettings] = useState<AppSettings>({
+  const [settings] = useState<AppSettings>({
     masterVolume: 0.8,
     bgmVolume: 0.8,
     sfxVolume: 0.5,
@@ -107,9 +26,9 @@ function App() {
     fullscreen: false,
   });
 
-  const handleSettingsChange = (next: Partial<AppSettings>) => {
-    setSettings((prev) => ({ ...prev, ...next }));
-  };
+
+
+  const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
   useEffect(() => {
     if (isElectronRuntime) return;
@@ -138,65 +57,10 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (isElectronRuntime) return;
-    const bgmVolume = settings.masterVolume * settings.bgmVolume;
-    const sfxVolume = settings.masterVolume * settings.sfxVolume;
-
-    if (audioHallRef.current) audioHallRef.current.volume = bgmVolume;
-    if (audioBattleRef.current) audioBattleRef.current.volume = bgmVolume;
-    uiAudio.setVolume(sfxVolume);
-  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume, isElectronRuntime]);
-
-  const handleStartGame = () => setScreen('transition');
-
-  const handleTransitionComplete = () => {
-    setScreen('battle_setup');
-  };
-
-  const handleStartBattle = () => {
-    setPreBattleResult(null);
-    setBattleFadeIn(false);
-    setScreen('pre_battle');
-  };
-
-  const handlePreBattleComplete = (result: PreBattleResult) => {
-    setPreBattleResult(result);
-    setBattleFadeIn(true);
-    setBattleSessionKey((k) => k + 1);
-    setScreen('battle');
-    setTimeout(() => setBattleFadeIn(false), 50);
-  };
-
-  const handleCollection = () => setScreen('collection');
-  const handleCharacters = () => setScreen('characters');
-
-  const handleBackToMenu = () => {
-    setBattleFadeIn(false);
-    setPreBattleResult(null);
-    setScreen('menu');
-  };
-
-  const handleReselectArena = () => {
-    setBattleFadeIn(false);
-    setPreBattleResult(null);
-    setScreen('battle_setup');
-  };
-
-  const retryCurrentScreen = () => {
-    setScreenRecoveryKey((k) => k + 1);
-  };
-
   const handleEnterFromSplash = () => {
     if (isFadingOut) return;
     setIsFadingOut(true);
-
-    // Keep playback tied to a user gesture so browser autoplay policies do not block it.
-    if (!isElectronRuntime && audioHallRef.current) {
-      audioHallRef.current.currentTime = 0;
-      audioHallRef.current.play().catch(console.warn);
-    }
-
+    // 开始运行 BGM
     setTimeout(() => setHasStarted(true), 1000);
   };
 
@@ -220,98 +84,87 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="relative h-dvh w-full select-none overflow-hidden bg-theme-background text-theme-text">
-        <BrightnessOverlay brightness={settings.brightness} />
-
-      {screen === 'menu' ? (
-        <MainMenu
-          settings={settings}
-          onSettingsChange={handleSettingsChange}
-          onStartGame={handleStartGame}
-          onCollection={handleCollection}
-          onCharacters={handleCharacters}
+      <AppStoreProvider>
+        <AppMainContent 
+          settings={settings} 
+          isElectronRuntime={isElectronRuntime}
         />
-      ) : null}
-
-      {screen === 'transition' ? (
-        <GameErrorBoundary
-          key={`transition-${screenRecoveryKey}`}
-          screenName="transition"
-          onBackToMenu={handleBackToMenu}
-          onRetry={retryCurrentScreen}
-        >
-          <TransitionScreen onComplete={handleTransitionComplete} />
-        </GameErrorBoundary>
-      ) : null}
-
-      {screen === 'battle_setup' ? (
-        <GameErrorBoundary
-          key={`battle-setup-${screenRecoveryKey}`}
-          screenName="battle_setup"
-          onBackToMenu={handleBackToMenu}
-          onRetry={retryCurrentScreen}
-        >
-          <BattleSetup
-            selectedArenaId={selectedArenaId}
-            onSelectArena={setSelectedArenaId}
-            onStartBattle={handleStartBattle}
-            onBackMenu={handleBackToMenu}
-          />
-        </GameErrorBoundary>
-      ) : null}
-
-      {screen === 'pre_battle' ? (
-        <GameErrorBoundary
-          key={`pre-battle-${screenRecoveryKey}`}
-          screenName="pre_battle"
-          onBackToMenu={handleBackToMenu}
-          onRetry={retryCurrentScreen}
-        >
-          <PreBattleFlow
-            arenaId={selectedArenaId}
-            onCancel={handleReselectArena}
-            onComplete={handlePreBattleComplete}
-          />
-        </GameErrorBoundary>
-      ) : null}
-
-      {screen === 'battle' ? (
-        <GameErrorBoundary
-          key={`battle-${battleSessionKey}-${screenRecoveryKey}`}
-          screenName="battle"
-          onBackToMenu={handleBackToMenu}
-          onRetry={retryCurrentScreen}
-        >
-          <div className="relative h-full w-full">
-            <BattleFrameV2
-              key={battleSessionKey}
-              arenaId={selectedArenaId}
-              forcedTopicId={preBattleResult?.topicId}
-              playerMainFaction={preBattleResult?.playerFaction}
-              enemyMainFaction={preBattleResult?.enemyFaction}
-              onMenu={handleBackToMenu}
-              onReselectArena={handleReselectArena}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                pointerEvents: 'none',
-                background: '#000',
-                opacity: battleFadeIn ? 1 : 0,
-                transition: battleFadeIn ? 'none' : 'opacity 0.8s ease-out',
-                zIndex: 100,
-              }}
-            />
-          </div>
-        </GameErrorBoundary>
-      ) : null}
-
-      {screen === 'collection' ? <CardShowcase onBack={handleBackToMenu} /> : null}
-
-      {screen === 'characters' ? <CharactersView onBack={handleBackToMenu} /> : null}
-      </div>
+      </AppStoreProvider>
     </ThemeProvider>
+  );
+}
+
+function AppMainContent({ 
+  settings, 
+  isElectronRuntime 
+}: { 
+  settings: AppSettings; 
+  isElectronRuntime: boolean;
+}) {
+  const { state } = useAppStore();
+  const audioHallRef = useRef<HTMLAudioElement | null>(null);
+  const audioBattleRef = useRef<HTMLAudioElement | null>(null);
+  const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+
+  useEffect(() => {
+    if (isElectronRuntime) return;
+    audioHallRef.current = new Audio(asset('assets/bgm-hall.mp3'));
+    audioHallRef.current.loop = true;
+    audioBattleRef.current = new Audio(asset('assets/bgm-battle.mp3'));
+    audioBattleRef.current.loop = true;
+
+    return () => {
+      audioHallRef.current?.pause();
+      audioBattleRef.current?.pause();
+    };
+  }, [isElectronRuntime]);
+
+  useEffect(() => {
+    if (isElectronRuntime) return;
+    const bgmVolume = settings.masterVolume * settings.bgmVolume;
+    const sfxVolume = settings.masterVolume * settings.sfxVolume;
+
+    if (audioHallRef.current) audioHallRef.current.volume = bgmVolume;
+    if (audioBattleRef.current) audioBattleRef.current.volume = bgmVolume;
+    uiAudio.setVolume(sfxVolume);
+  }, [settings.masterVolume, settings.bgmVolume, settings.sfxVolume, isElectronRuntime]);
+
+  useEffect(() => {
+    if (isElectronRuntime) return;
+    if (!audioHallRef.current || !audioBattleRef.current) return;
+
+    const screen = state.screen;
+
+    // 映射 BGM 到当前屏幕
+    if (
+      screen === 'home' ||
+      screen === 'match' ||
+      screen === 'topic_preview' ||
+      screen === 'faction_pick'
+    ) {
+      audioBattleRef.current.pause();
+      audioBattleRef.current.currentTime = 0;
+      audioHallRef.current.play().catch(console.warn);
+      return;
+    }
+
+    if (screen === 'loading') {
+      audioHallRef.current.pause();
+      return;
+    }
+
+    if (screen === 'battle') {
+      audioHallRef.current.pause();
+      audioHallRef.current.currentTime = 0;
+      audioBattleRef.current.play().catch(console.warn);
+    }
+  }, [state.screen, isElectronRuntime]);
+
+  return (
+    <div className="relative h-dvh w-full select-none overflow-hidden bg-[#0f0d0a] text-[#f0ddbb]">
+      <BrightnessOverlay brightness={settings.brightness} />
+      <MvpFlowShell />
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { CARDS } from '@/data/showcaseCards';
 import { CardGrid } from '@/components/showcase/CardGrid';
 import { CardDetail } from '@/components/showcase/CardDetail';

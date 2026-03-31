@@ -26,17 +26,22 @@
     "ai:scope": "node scripts/pipeline/enforce-task-scope.cjs",
     "ai:scope:staged": "node scripts/pipeline/enforce-task-scope.cjs --staged",
     "ai:finalize": "node scripts/pipeline/ai-finalize.cjs",
+    "server:start": "node server/index.cjs",
+    "server:dev": "node --watch server/index.cjs",
     "electron:dev": "node scripts/electron-dev.cjs",
     "electron:dev:legacy": "set \"ELECTRON_RUN_AS_NODE=\" && concurrently \"npm run dev -- --host 127.0.0.1 --port 5173 --strictPort\" \"wait-on tcp:127.0.0.1:5173 && electron .\"",
     "electron:build": "npm run build && electron-builder"
   },
   "dependencies": {
     "@pixi/react": "^7.1.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "framer-motion": "^12.35.1",
     "immer": "^11.1.4",
     "pixi.js": "^7.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "socket.io": "^4.8.3",
     "zustand": "^5.0.11"
   },
   "devDependencies": {

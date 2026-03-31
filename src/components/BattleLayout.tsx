@@ -1,4 +1,8 @@
-﻿import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+/**
+ * @deprecated Legacy Battle UI component.
+ * Migration target: src/components/BattleFrameV2.tsx
+ */
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { LAYOUT, expandLayouts } from '@/config/layoutSpec';
 import { GameState, PlayerId, SelectionState, DragState } from '@/types';
 import { getEnemyActions } from '@/utils/aiLogic';

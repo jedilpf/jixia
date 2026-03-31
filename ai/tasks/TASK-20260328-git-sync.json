@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260328-git-sync",
+  "goal": "修复指定文件的UTF-8 BOM编码格式，并将本地有效改动安全同步到GitHub",
+  "constraints": [
+    "仅处理已批准范围内文件",
+    "提交前必须给出改动清单与风险点",
+    "禁止 git add .，必须逐文件 add",
+    "未经确认不扩展到无关目录"
+  ],
+  "deliverables": [
+    "目标文件编码格式修复（UTF-8 无 BOM）",
+    "本地与远端分支同步",
+    "执行日志与验证结果"
+  ],
+  "allowed_write_paths": [
+    "docs/",
+    "src/",
+    "scripts/",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "git status",
+    "git log -1 --oneline",
+    "git rev-list --left-right --count origin/main...HEAD"
+  ],
+  "status": "ready"
+}

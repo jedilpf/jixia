@@ -1,11 +1,12 @@
-﻿export type ScreenId =
+export type ScreenId =
   | 'home'
   | 'match'
   | 'topic_preview'
   | 'faction_pick'
   | 'loading'
   | 'battle'
-  | 'result';
+  | 'result'
+  | 'story';
 
 export type PlayerId = 'player' | 'enemy';
 export type IssueDirectionId = 'ritual' | 'economy' | 'strategy';

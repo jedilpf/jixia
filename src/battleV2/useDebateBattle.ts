@@ -4,6 +4,7 @@ import { DebateBattleState, PlanSlot, SeatId, TargetableSlot, Zone, PublicSubmit
 
 export interface DebateBattleController {
   state: DebateBattleState;
+  selectTopic: (topicId: string) => void;
   planCard: (slot: PlanSlot, cardId: string | null) => void;
   planWriting: (cardId: string | null) => void;
   setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => void;
@@ -33,6 +34,7 @@ export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattl
 
   useEffect(() => {
     if (state.phase !== 'ming_bian' || state.enemy.plan.lockedPublic) return undefined;
+    if (state.topicSelectionPending && state.round >= state.topicSelectionRound) return undefined;
     const waitMs = 1200 + Math.floor(Math.random() * 1400);
     const timer = window.setTimeout(() => {
       dispatch({ type: 'AI_AUTO_PLAN' });
@@ -52,6 +54,7 @@ export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattl
   return useMemo(
     () => ({
       state,
+      selectTopic: (topicId: string) => dispatch({ type: 'SELECT_TOPIC', topicId }),
       planCard: (slot: PlanSlot, cardId: string | null) => dispatch({ type: 'PLAN_CARD', slot, cardId }),
       planWriting: (cardId: string | null) => dispatch({ type: 'PLAN_WRITING', cardId }),
       setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => dispatch({ type: 'SET_TARGET_SEAT', slot, seatId }),

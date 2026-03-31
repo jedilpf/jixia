@@ -167,7 +167,6 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
           ref={videoRef}
           src={videoSrc}
           autoPlay
-          muted
           playsInline
           preload="auto"
           onTimeUpdate={handleTimeUpdate}

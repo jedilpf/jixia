@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { CARDS, rarityColor, typeColor } from '@/data/showcaseCards';
 import { uiAudio } from '@/utils/audioManager';
 

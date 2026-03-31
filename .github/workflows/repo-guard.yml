@@ -1,0 +1,79 @@
+name: Repo Guard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute diff range
+        id: range
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            base_sha="${{ github.event.pull_request.base.sha }}"
+            head_sha="${{ github.event.pull_request.head.sha }}"
+          else
+            base_sha="${{ github.event.before }}"
+            head_sha="${{ github.sha }}"
+            if [[ "$base_sha" == "0000000000000000000000000000000000000000" ]]; then
+              base_sha="$(git rev-list --max-parents=0 "$head_sha" | tail -n 1)"
+            fi
+          fi
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Guard temporary and cache paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_sha="${{ steps.range.outputs.base_sha }}"
+          head_sha="${{ steps.range.outputs.head_sha }}"
+          mapfile -t blocked < <(
+            git diff --name-only --diff-filter=AMR "$base_sha" "$head_sha" \
+              | grep -E '^(\.tmp/|\.vite/|backups/|review/|src_new/|\.trae/|\.agents/|dist/|dist_electron/|node_modules/|test-results/)' \
+              || true
+          )
+          if [[ "${#blocked[@]}" -gt 0 ]]; then
+            echo "::error::Detected blocked temporary/cache paths in change set:"
+            printf '%s\n' "${blocked[@]}"
+            exit 1
+          fi
+
+      - name: Guard archive edits
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_sha="${{ steps.range.outputs.base_sha }}"
+          head_sha="${{ steps.range.outputs.head_sha }}"
+          mapfile -t archive_changes < <(
+            git diff --name-only --diff-filter=AMR "$base_sha" "$head_sha" | grep '^archive/' || true
+          )
+          if [[ "${#archive_changes[@]}" -gt 0 ]]; then
+            echo "::error::Direct edits under archive/ are blocked."
+            printf '%s\n' "${archive_changes[@]}"
+            exit 1
+          fi
+
+      - name: Guard tracked .vite cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -q '^.vite/'; then
+            echo "::error::.vite cache files must not be tracked in git."
+            git ls-files | grep '^.vite/'
+            exit 1
+          fi

@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260324-025",
+  "goal": "修复战斗图鉴与手牌卡源不一致问题，并排查修复浏览器无法打开页面的问题（保证本地 dev 可访问）。",
+  "constraints": [
+    "战斗图鉴必须以当前对局真实卡池为准，至少覆盖手牌、牌库、弃牌和已置入著书。",
+    "不改 battleV2 核心结算规则，仅修复数据接线与启动链路。",
+    "采用最小改动，不重构 UI 组件结构。",
+    "若存在不确定项，先使用保守默认值，必要时记录 open_questions.md。"
+  ],
+  "deliverables": [
+    "BattleFrameV2 图鉴卡源改为对局真实卡集合并去重",
+    "浏览器无法打开的编译链路问题定位并修复",
+    "本地 dev 服务可启动并可访问",
+    "任务包与收尾校验通过"
+  ],
+  "allowed_write_paths": [
+    "src/components",
+    "tsconfig.json",
+    "ai/tasks",
+    "ai/out",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260324-025.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260324-025.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260324-025.json"
+  ],
+  "status": "draft"
+}

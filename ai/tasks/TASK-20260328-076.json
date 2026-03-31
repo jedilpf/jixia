@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260328-076",
+  "goal": "Enhance main menu interaction: add a parallel story entry button, make top bar buttons open interactive panels, and wire a story screen route in the legacy App flow with consistent UI.",
+  "constraints": [
+    "Do not change existing battleV2 core rules.",
+    "Keep existing main menu visual language and button arrangement style.",
+    "Do not remove existing start/characters/collection buttons.",
+    "Only modify files in allowed paths."
+  ],
+  "deliverables": [
+    "Main menu includes a story-mode button parallel to existing primary entries.",
+    "Top bar buttons (profile/currency/events/quests/mail/settings) provide interactive panel content.",
+    "Legacy App flow can open StoryScreen and return to menu.",
+    "MvpFlow story back behavior remains correct."
+  ],
+  "allowed_write_paths": [
+    "src/components/MainMenu.tsx",
+    "src/App.tsx",
+    "src/ui/screens/StoryScreen.tsx",
+    "src/ui/screens/MvpFlowShell.tsx",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run typecheck"
+  ],
+  "status": "ready"
+}
