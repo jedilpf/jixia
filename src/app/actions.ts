@@ -1,4 +1,4 @@
-﻿import type { PlayerId, ScreenId } from '@/core/types';
+import type { PlayerId, ScreenId } from '@/core/types';
 
 export type AppAction =
   | { type: 'RESET_GAME' }
@@ -13,5 +13,6 @@ export type AppAction =
   | { type: 'ADVANCE_BATTLE_PHASE' }
   | { type: 'PLAY_CARD'; playerId: PlayerId; cardUid: string; zone: 'main' | 'side' }
   | { type: 'PASS_ACTION' }
-  | { type: 'RESOLVE_ROUND' };
+  | { type: 'RESOLVE_ROUND' }
+  | { type: 'FINISH_BATTLE'; winnerId: string | null };
 

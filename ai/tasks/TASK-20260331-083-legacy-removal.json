@@ -1,0 +1,35 @@
+{
+  "task_id": "TASK-20260331-083-legacy-removal",
+  "goal": "彻底移除 Legacy 路由与冗余引擎入口，将所有入口统一到 MvpFlowShell，并标记旧组件为废弃。",
+  "status": "completed",
+  "priority": "P0",
+  "constraints": [
+    "不破坏现有的 V2 引擎逻辑",
+    "保持代码通过 ESLint 和 TypeCheck",
+    "遵从 canon/taboo.yaml 对机制数量的限制"
+  ],
+  "deliverables": [
+    "重构后的 src/App.tsx，移除 ?newFlow=1 分支",
+    "被标记为 @deprecated 的 src/components/BattleLayout.tsx",
+    "被标记为 @deprecated 的 src/utils/gameLogic.ts",
+    "在 MvpFlowShell.tsx 中集成 BattleFrameV2",
+    "更新 store (actions/reducer) 以支持 V2 结果同步"
+  ],
+  "allowed_write_paths": [
+    "src/App.tsx",
+    "src/components/BattleLayout.tsx",
+    "src/utils/gameLogic.ts",
+    "src/ui/screens/MvpFlowShell.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/app/actions.ts",
+    "src/app/reducer.ts",
+    ".knowledge/decisions.md",
+    ".knowledge/project-notes.md",
+    "ai/tasks/TASK-20260331-083.json"
+  ],
+  "acceptance_commands": [
+    "npm run typecheck",
+    "npm run lint -- src/App.tsx"
+  ],
+  "context": "解决项目当中三套引擎并存的问题。目前 MvpFlowShell 已具备基础流程 and 持久化。Legacy 引擎（gameLogic.ts）和 BattleLayout.tsx 计划逐步退役。"
+}

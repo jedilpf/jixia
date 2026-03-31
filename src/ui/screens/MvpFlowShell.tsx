@@ -3,7 +3,7 @@ import { useAppStore } from '@/app/store';
 import { calculateLevelFromExp } from '@/config/levelSystem';
 import { TransitionScreen } from '@/components/TransitionScreen';
 import {
-  BattleScreen,
+
   FactionPickScreen,
   HomeScreen,
   LoadingScreen,
@@ -12,6 +12,7 @@ import {
   TopicScreen,
   StoryScreen,
 } from '@/ui/screens';
+import BattleFrameV2 from '@/components/BattleFrameV2';
 
 interface PlayerProgressState {
   level: number;
@@ -196,14 +197,16 @@ export function MvpFlowShell() {
 
   if (state.screen === 'battle') {
     return (
-      <BattleScreen
-        state={state}
-        onPlayToMain={(cardUid) => dispatch({ type: 'PLAY_CARD', playerId: 'player', cardUid, zone: 'main' })}
-        onPlayToSide={(cardUid) => dispatch({ type: 'PLAY_CARD', playerId: 'player', cardUid, zone: 'side' })}
-        onResolveRound={() => {
-          dispatch({ type: 'PASS_ACTION' });
-          dispatch({ type: 'RESOLVE_ROUND' });
-        }}
+      <BattleFrameV2
+        arenaId="jixia"
+        forcedTopicId={state.selectedIssuePreviewIds[0]}
+        playerMainFaction={state.players.player.factionId ?? undefined}
+        enemyMainFaction={state.players.enemy.factionId ?? undefined}
+        onMenu={() => dispatch({ type: 'NAVIGATE', screen: 'home' })}
+        onFinished={(winnerId) => dispatch({ type: 'FINISH_BATTLE', winnerId })}
+
+
+
       />
     );
   }

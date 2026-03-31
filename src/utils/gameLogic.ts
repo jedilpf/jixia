@@ -1,4 +1,8 @@
-﻿import { Card, CharacterCard, GearCard, FieldCard, CharacterInstance, GearInstance, FieldInstance, PlayerState, GameState, PlayerId, GameLogEntry, GamePhase, Hero, takeDamage } from '@/types';
+/**
+ * @deprecated This file belongs to the Legacy engine.
+ * Please use components in src/battleV2/engine.ts for all new features.
+ */
+import { Card, CharacterCard, GearCard, FieldCard, CharacterInstance, GearInstance, FieldInstance, PlayerState, GameState, PlayerId, GameLogEntry, GamePhase, Hero, takeDamage } from '@/types';
 import { INITIAL_DECK } from '@/data/cards';
 import { createHeroPower } from '@/data/hero';
 import { parseAndExecuteSkill, TargetContext } from './effectEngine';

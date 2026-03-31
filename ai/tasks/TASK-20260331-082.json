@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260331-082",
+  "goal": "Recover deleted local files TASK-20260331-081.json and src/game/story/data/prolog_polished.md.",
+  "constraints": [
+    "Restore file locations exactly as requested by user.",
+    "Reuse available repository artifacts when possible.",
+    "If original content is unavailable, reconstruct from closest authoritative local source."
+  ],
+  "deliverables": [
+    "Recovered ai/tasks/TASK-20260331-081.json",
+    "Recovered src/game/story/data/prolog_polished.md",
+    "Recovery summary in chat"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/game/story/data",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260331-082.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260331-082.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260331-082.json"
+  ],
+  "status": "in_progress"
+}

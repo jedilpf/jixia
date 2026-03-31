@@ -87,6 +87,7 @@ interface BattleFrameV2Props {
   enemyMainFaction?: string;
   onMenu?: () => void;
   onReselectArena?: () => void;
+  onFinished?: (winnerId: string | null) => void;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -100,6 +101,7 @@ export default function BattleFrameV2({
   enemyMainFaction,
   onMenu,
   onReselectArena,
+  onFinished,
 }: BattleFrameV2Props) {
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
@@ -111,7 +113,13 @@ export default function BattleFrameV2({
     enemyMainFaction,
   });
 
-  const { phase, player, logs } = state;
+  const { phase, player, logs, winner } = state;
+
+  useEffect(() => {
+    if (phase === 'finished' && onFinished) {
+      onFinished(winner);
+    }
+  }, [phase, winner, onFinished]);
   const isFinished = phase === 'finished';
   const isTopicSelectionWindow =
     state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';

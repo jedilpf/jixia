@@ -1,4 +1,4 @@
-﻿import type { AppAction } from '@/app/actions';
+import type { AppAction } from '@/app/actions';
 import {
   advanceBattlePhase,
   autoLockFaction,
@@ -47,6 +47,8 @@ export function appReducer(state: GameState, action: AppAction): GameState {
       return passAction(state);
     case 'RESOLVE_ROUND':
       return resolveRound(state);
+    case 'FINISH_BATTLE':
+      return { ...state, screen: 'result', winnerId: action.winnerId as any };
     default:
       return state;
   }
