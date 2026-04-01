@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
-import type { SaveSlotType } from '@/game/story/StoryEngine';
 import { SaveLoadModal } from '@/ui/components/SaveLoadModal';
 import type { SaveSlotType, SaveSlotInfo } from '@/game/story/StoryEngine';
 
@@ -320,9 +319,9 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const [lastChoiceImpact, setLastChoiceImpact] = useState<string>('');
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
-  const [, setSaveSlots] = useState(() => engine.getSaveSlots());
-  const [, setShowSaveModal] = useState(false);
-  const [, setShowLoadModal] = useState(false);
+  const [saveSlots, setSaveSlots] = useState<Record<SaveSlotType, SaveSlotInfo>>(() => engine.getSaveSlots());
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showLoadModal, setShowLoadModal] = useState(false);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
@@ -449,11 +448,6 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
     setShowSaveModal(false);
     setShowLoadModal(false);
   }, []);
-
-  // Reserved for modal wiring in the next iteration.
-  void onSave;
-  void onLoad;
-  void onModalClose;
 
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';

@@ -55,6 +55,8 @@ const DEFAULT_GUEST_COUNT = Math.max(
 export interface CreateStarterDeckOptions {
   // 兼容老逻辑：不传时仍使用 20 张固定 Starter
   useFactionFramework?: boolean;
+  // 新默认：直接使用全量活跃卡池（170）参与演算
+  useFullCardPool?: boolean;
   // 新逻辑：16 门派兼容框架
   mainFaction?: string;
   guestFactions?: string[];
@@ -90,6 +92,12 @@ function dedupePreserveOrder<T>(arr: T[]): T[] {
 function getStableFactionCards(faction: string): CardData[] {
   const cards = CARDS_BY_FACTION[faction] ?? [];
   return [...cards].sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
+}
+
+function buildEnabledShowcaseFactionSet(enabledFactions: string[]): Set<string> {
+  return new Set(
+    normalizeEnabledFactions(enabledFactions).map((faction) => resolveFactionForCards(faction))
+  );
 }
 
 function buildSignatureSlotMap(): Map<string, number> {
@@ -209,6 +217,34 @@ function createClassicStarterDeck(side: Side): DebateCard[] {
   return deck.slice(0, 20);
 }
 
+export function getActiveCardPoolSize(): number {
+  return ACTIVE_CARDS.length;
+}
+
+export function listAllDebateCardsForLibrary(): DebateCard[] {
+  return ACTIVE_CARDS
+    .map((src, idx) => ({
+      ...showcaseToDebateCardFromSource(src),
+      id: `library-${idx}-${src.id}`,
+    }))
+    .sort((a, b) => (a.cost - b.cost) || a.name.localeCompare(b.name, 'zh-Hans-CN'));
+}
+
+function createFullCardPoolDeck(side: Side, enabledFactions: string[]): DebateCard[] {
+  const enabledShowcaseFactions = buildEnabledShowcaseFactionSet(enabledFactions);
+  const isFactionEnabled = (faction: string): boolean =>
+    enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
+
+  const selected = ACTIVE_CARDS.filter((card) => isFactionEnabled(card.faction));
+  if (selected.length === 0) return [];
+
+  const shuffled = shuffleArray([...selected]);
+  return shuffled.map((src, idx) => ({
+    ...showcaseToDebateCardFromSource(src),
+    id: `${side}-p${idx}-${src.id}`,
+  }));
+}
+
 function getDeckIdsForFactionFramework(
   mainFaction: string,
   guestFactions: string[],
@@ -220,9 +256,7 @@ function getDeckIdsForFactionFramework(
   enabledFactions: string[]
 ): string[] {
   const mainShowcaseFaction = resolveFactionForCards(mainFaction);
-  const enabledShowcaseFactions = new Set(
-    normalizeEnabledFactions(enabledFactions).map((faction) => resolveFactionForCards(faction))
-  );
+  const enabledShowcaseFactions = buildEnabledShowcaseFactionSet(enabledFactions);
   const isFactionEnabled = (faction: string): boolean =>
     enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
 
@@ -285,6 +319,13 @@ export function rollGuestFactions(mainFaction: string, count = DEFAULT_GUEST_COU
 export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions): DebateCard[] {
   if (options?.forceClassicStarter) return createClassicStarterDeck(side);
 
+  const enabledFactions = normalizeEnabledFactions(options?.enabledFactions ?? DEFAULT_CARD_POOL_CONFIG.enabledFactions);
+  const useFullCardPool = options?.useFullCardPool ?? true;
+  if (useFullCardPool) {
+    const fullPoolDeck = createFullCardPoolDeck(side, enabledFactions);
+    if (fullPoolDeck.length > 0) return fullPoolDeck;
+  }
+
   const useFramework = Boolean(
     options?.useFactionFramework ||
     options?.mainFaction ||
@@ -293,7 +334,6 @@ export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions
   if (!useFramework) return createClassicStarterDeck(side);
 
   const mainFaction = toFrameworkFactionName(options?.mainFaction ?? CORE_FACTION_NAMES[0]);
-  const enabledFactions = normalizeEnabledFactions(options?.enabledFactions ?? DEFAULT_CARD_POOL_CONFIG.enabledFactions);
   const genericCardIds = options?.genericCardIds ?? DEFAULT_CARD_POOL_CONFIG.genericCardIds;
   const mainFactionCardCount = options?.mainFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount;
   const guestFactionCardCount = options?.guestFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount;

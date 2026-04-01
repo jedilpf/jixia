@@ -1,5 +1,5 @@
 import { ARENA_BY_ID } from './arena';
-import { CreateStarterDeckOptions, createStarterDeck, rollGuestFactions } from './cards';
+import { CreateStarterDeckOptions, createStarterDeck, getActiveCardPoolSize, rollGuestFactions } from './cards';
 import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, pickSceneBiasFromRoutePreference, toFrameworkFactionName } from './factions';
 import {
   ArenaId,
@@ -58,6 +58,7 @@ export interface CreateBattleStateOptions {
   arenaId?: ArenaId;
   forcedTopicId?: string;
   useFactionFramework?: boolean;
+  useFullCardPool?: boolean;
   playerMainFaction?: string;
   enemyMainFaction?: string;
   playerGuestFactions?: string[];
@@ -262,10 +263,11 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const arena = ARENA_BY_ID[arenaId];
   const initialHuYin = arenaId === 'jixia' ? 1 : 0;
   const useFactionFramework = options?.useFactionFramework ?? true;
+  const useFullCardPool = options?.useFullCardPool ?? true;
   const mainFactionCardCount = options?.mainFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount;
   const guestFactionCardCount = options?.guestFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount;
   const includeCommons = options?.includeCommons ?? DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount;
-  const deckSize = options?.deckSize ?? DEFAULT_DECK_BUILD_DEFAULTS.deckSize;
+  const deckSize = options?.deckSize ?? getActiveCardPoolSize();
   const defaultGuestFactionCount = Math.max(
     0,
     Math.floor((deckSize - mainFactionCardCount - includeCommons) / Math.max(1, guestFactionCardCount))
@@ -281,6 +283,7 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const playerDeckOptions: CreateStarterDeckOptions | undefined = useFactionFramework
     ? {
         useFactionFramework: true,
+        useFullCardPool,
         mainFaction: playerMainFaction,
         guestFactions: playerGuestFactions,
         enabledFactions: options?.enabledFactions,
@@ -294,6 +297,7 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const enemyDeckOptions: CreateStarterDeckOptions | undefined = useFactionFramework
     ? {
         useFactionFramework: true,
+        useFullCardPool,
         mainFaction: enemyMainFaction,
         guestFactions: enemyGuestFactions,
         enabledFactions: options?.enabledFactions,
@@ -1344,7 +1348,14 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
 
     case 'AI_AUTO_SUBMIT': {
       if (isTopicSelectionWindow(next)) return next;
-      if ((next.phase === 'ming_bian' || next.phase === 'an_mou') && !next.enemy.plan.lockedPublic) {
+      const enemyLocked =
+        next.phase === 'ming_bian'
+          ? next.enemy.plan.lockedPublic
+          : next.phase === 'an_mou'
+            ? next.enemy.plan.lockedSecret
+            : true;
+
+      if ((next.phase === 'ming_bian' || next.phase === 'an_mou') && !enemyLocked) {
         aiAutoSubmit(next);
         if (next.phase === 'ming_bian' && canMoveToAnMou(next)) {
           advancePhase(next);

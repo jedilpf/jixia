@@ -67,10 +67,10 @@ function App() {
 
   useEffect(() => {
     const handleWindowError = (event: ErrorEvent) => {
-      console.error('[window:error]', event.message, event.error);
+      console.error('window_error', event.message, event.error);
     };
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('[window:unhandledrejection]', event.reason);
+      console.error('window_unhandledrejection', event.reason);
     };
     window.addEventListener('error', handleWindowError);
     window.addEventListener('unhandledrejection', handleUnhandledRejection);

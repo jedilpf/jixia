@@ -26,7 +26,7 @@ function main() {
   const appSource = readUtf8('src/App.tsx');
 
   const cardCount = countCardsFromShowcase(showcaseSource);
-  const minCards = 100;
+  const minCards = 170;
   if (cardCount < minCards) {
     fail(`Card corpus too small: ${cardCount} (required >= ${minCards})`);
   }

@@ -18,10 +18,10 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
+import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
 import { getTopicById } from '@/battleV2/topics';
 import {
   ArenaId,
-  DebateCard,
   SeatId,
 } from '@/battleV2/types';
 
@@ -320,42 +320,7 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   // 图鉴数据
   // ═══════════════════════════════════════════════════════════
-  const allCards = useMemo(() => {
-    const pooled: DebateCard[] = [
-      ...state.player.hand,
-      ...state.player.deck,
-      ...state.player.discard,
-      ...state.player.writings,
-      ...state.enemy.hand,
-      ...state.enemy.deck,
-      ...state.enemy.discard,
-      ...state.enemy.writings,
-    ];
-
-    const unique = new Map<string, DebateCard>();
-    for (const card of pooled) {
-      const key = `${card.name}|${card.type}|${card.cost}|${card.description ?? ''}|${card.faction ?? ''}`;
-      if (!unique.has(key)) {
-        unique.set(key, {
-          ...card,
-          id: key,
-        });
-      }
-    }
-
-    return Array.from(unique.values()).sort((a, b) => (
-      a.cost - b.cost || a.name.localeCompare(b.name, 'zh-Hans-CN')
-    ));
-  }, [
-    state.player.hand,
-    state.player.deck,
-    state.player.discard,
-    state.player.writings,
-    state.enemy.hand,
-    state.enemy.deck,
-    state.enemy.discard,
-    state.enemy.writings,
-  ]);
+  const allCards = useMemo(() => listAllDebateCardsForLibrary(), []);
 
   // ═══════════════════════════════════════════════════════════
   // 渲染

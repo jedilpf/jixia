@@ -5,10 +5,10 @@ import { TransitionScreen } from '@/components/TransitionScreen';
 import {
   FactionPickScreen,
   HomeScreen,
-  LoadingScreen,
+  LoadingScreenV2,
   MatchScreen,
-  ResultScreen,
-  TopicScreen,
+  ResultScreenV2,
+  TopicScreenV2,
   StoryScreen,
 } from '@/ui/screens';
 import BattleFrameV2 from '@/components/BattleFrameV2';
@@ -127,7 +127,7 @@ export function MvpFlowShell() {
 
   if (state.screen === 'topic_preview') {
     return (
-      <TopicScreen
+      <TopicScreenV2
         topicIds={state.selectedIssuePreviewIds}
         onContinue={() => dispatch({ type: 'OPEN_FACTION_PICK' })}
       />
@@ -150,7 +150,7 @@ export function MvpFlowShell() {
 
   if (state.screen === 'loading') {
     return (
-      <LoadingScreen
+      <LoadingScreenV2
         playerFactionId={state.players.player.factionId}
         enemyFactionId={state.players.enemy.factionId}
         issueIds={state.selectedIssuePreviewIds}
@@ -177,7 +177,7 @@ export function MvpFlowShell() {
   }
 
   return (
-    <ResultScreen
+    <ResultScreenV2
       state={state}
       progress={playerProgress}
       settlement={latestSettlement}

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
 import { LevelDetailModal } from '@/ui/components/LevelDetailModal';
 import { PlayerLevelBadge } from '@/ui/components/PlayerLevelBadge';
-import { PlayerStatsPanel } from '@/ui/components/PlayerStatsPanel';
+import { PlayerStatsPanelV2 } from '@/ui/components/PlayerStatsPanelV2';
+import { RedDot } from '@/ui/components/RedDot';
 
 interface HomeScreenProps {
   onStart: () => void;
@@ -130,7 +131,7 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
           {onStoryMode && (
             <button
               type="button"
-              className="mt-4 w-full rounded-lg border px-6 py-3 text-sm font-semibold transition"
+              className="relative mt-4 w-full rounded-lg border px-6 py-3 text-sm font-semibold transition"
               style={{
                 borderColor: 'rgba(139,115,85,0.6)',
                 background: 'rgba(26,26,46,0.8)',
@@ -147,6 +148,7 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
               onClick={onStoryMode}
             >
               📜 争鸣史
+              <RedDot className="absolute -right-1 -top-1" pulse />
             </button>
           )}
         </div>
@@ -179,7 +181,7 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
 
       {showStats ? (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-          <PlayerStatsPanel
+          <PlayerStatsPanelV2
             playerName="游学者"
             stats={{
               level: progress.level,

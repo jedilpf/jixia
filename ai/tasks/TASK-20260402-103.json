@@ -1,0 +1,48 @@
+{
+  "task_id": "TASK-20260402-103",
+  "goal": "Publish the currently validated local improvements (170-card runtime alignment, V2 pre-battle/result/home UI chain updates, story save modal wiring cleanup, and supporting planning docs) to the active feature branch.",
+  "constraints": [
+    "Keep local branch as source of truth for this push.",
+    "Do not revert unrelated in-progress files outside this commit scope.",
+    "All committed files must pass typecheck and daily gate before push."
+  ],
+  "deliverables": [
+    "Code updates for battle runtime/card-pool baseline and UI V2 screen chain.",
+    "Story save system planning and conflict/arbitration docs captured in repository.",
+    "Task metadata file recorded for workflow traceability."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".eslintrc.cjs",
+    "scripts/pipeline/validate-ui-baseline.cjs",
+    "src/App.tsx",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/game/story/data/chapterMoru001_part2.ts",
+    "src/ui/screens/HomeScreen.tsx",
+    "src/ui/screens/MvpFlowShell.tsx",
+    "src/ui/screens/StoryScreen.tsx",
+    "src/ui/screens/index.ts",
+    "src/ui/screens/LoadingScreenV2.tsx",
+    "src/ui/screens/TopicScreenV2.tsx",
+    "src/ui/screens/ResultScreenV2.tsx",
+    "src/data/game/characters.ts",
+    "src/ui/components/PlayerStatsPanelV2.tsx",
+    "src/ui/components/RedDot.tsx",
+    "docs/project/V2_UI_System_Design.md",
+    "docs/standards/CONFLICT-20260401-003-card-corpus-baseline.md",
+    "docs/story/STORY_SAVE_SYSTEM_PLAN.md",
+    "docs/story/STORY_SAVE_SYSTEM_V2.md",
+    "ai/tasks/TASK-20260401-099.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-103.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-103.json",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-103.json"
+  ],
+  "status": "in_progress"
+}

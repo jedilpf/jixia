@@ -1,0 +1,36 @@
+{
+  "task_id": "TASK-20260401-099",
+  "goal": "Remove the temporary 48-card runtime behavior and switch battle runtime to full 170-card pool calculation, while advancing low-risk stability fixes.",
+  "constraints": [
+    "Battle runtime and in-battle library must align to the full 170-card corpus.",
+    "Do not remove unrelated in-flight files or user edits.",
+    "Keep existing game loop and screen chain stable."
+  ],
+  "deliverables": [
+    "Battle deck generation uses full active card pool by default (170 cards).",
+    "In-battle card library panel reads full corpus instead of current-match subset.",
+    "Fix AI_AUTO_SUBMIT lock check to respect phase-specific lock state.",
+    "Raise UI baseline card corpus guard from >=100 to >=170.",
+    "Reduce lint noise by ignoring archival directories not part of active runtime."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    ".knowledge",
+    "docs/standards",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/components/BattleFrameV2.tsx",
+    "scripts/pipeline/validate-ui-baseline.cjs",
+    ".eslintrc.cjs"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-099.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-099.json",
+    "npm run typecheck",
+    "npm run validate:ui-baseline",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-099.json"
+  ],
+  "status": "in_progress"
+}
