@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260401-090",
+  "goal": "Create mandatory conflict arbitration record for architecture-mainline inconsistency and establish explicit decision baseline before implementation.",
+  "constraints": [
+    "Follow docs/standards/conflict-arbitration-template.md before any mainline-changing implementation.",
+    "Record concrete conflict between current runnable local flow and docs/AI-mainline-policy.md statement.",
+    "Do not modify runtime code in this step."
+  ],
+  "deliverables": [
+    "A conflict arbitration record document with final decision and implementation requirements",
+    "Clear baseline stating which flow is primary for next optimization steps"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "docs/standards",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-090.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-090.json"
+  ],
+  "status": "in_progress"
+}

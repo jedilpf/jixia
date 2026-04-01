@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260401-093",
+  "goal": "Create mandatory conflict arbitration record for card type taxonomy mismatch between showcase data and battle type contracts.",
+  "constraints": [
+    "Document both sides of the card-type taxonomy conflict with concrete file evidence.",
+    "Decide implementation direction before changing related code.",
+    "Do not modify runtime code in this step."
+  ],
+  "deliverables": [
+    "Conflict arbitration record for card type mismatch",
+    "Approved decision basis for subsequent type alignment fix"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "docs/standards",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-093.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-093.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-093.json"
+  ],
+  "status": "in_progress"
+}

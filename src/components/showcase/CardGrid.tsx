@@ -1,25 +1,18 @@
 import { CARDS, rarityColor, typeColor } from '@/data/showcaseCards';
 import { uiAudio } from '@/utils/audioManager';
+import { getCardImageUrl, getAssetUrl } from '@/utils/assets';
 
 interface CardGridProps {
     onBack: () => void;
     onSelectCard: (index: number) => void;
 }
 
-// 使用 .png 格式的卡牌ID列表
-const PNG_CARDS = ['xingpan', 'liangyi'];
-
-// 获取卡牌图片URL，自动处理不同格式
-function getCardImageUrl(cardId: string): string {
-    const ext = PNG_CARDS.includes(cardId) ? 'png' : 'jpg';
-    return `assets/cards/${cardId}.${ext}`;
-}
 
 export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
     return (
         <div className="w-full h-full min-h-screen flex flex-col items-center relative overflow-hidden select-none pb-8">
             {/* 书架背景 */}
-            <div className="absolute inset-0 z-0" style={{ backgroundImage: `url(assets/bookshelf-bg.png)`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }} />
+            <div className="absolute inset-0 z-0" style={{ backgroundImage: `url(${getAssetUrl('assets/bookshelf-bg.png')})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }} />
             {/* 暗色蒙版确保卡牌可读 */}
             <div className="absolute inset-0 z-0 bg-black/60" />
             {/* 背景氛围光 */}
@@ -72,13 +65,13 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
                                                 {/* 背景原画 */}
                                                 <div
                                                     className="absolute inset-[4%] bg-cover bg-center opacity-90 group-hover:opacity-100 z-0"
-                                                    style={{ backgroundImage: `url(${getCardImageUrl(c.id)})` }}
+                                                    style={{ backgroundImage: `url(${getCardImageUrl(c.id, c.name)})` }}
                                                 />
 
                                                 {/* 边框贴图叠加层 */}
                                                 <div
                                                     className="absolute inset-0 bg-no-repeat z-10 pointer-events-none drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]"
-                                                    style={{ backgroundImage: `url(assets/card-frame.png)`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}
+                                                    style={{ backgroundImage: `url(${getAssetUrl('assets/card-frame.png')})`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}
                                                 />
 
                                                 {/* 顶部渐变遮罩 (放在原画之上，边框之下或者边框之上视设计而定，这里放在边框之上使文字清晰) */}
@@ -86,7 +79,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
 
                                                 {/* 费用小图标角标 */}
                                                 <div className="absolute top-3 left-3 w-7 h-7 flex items-center justify-center shadow-md rounded-full z-30">
-                                                    <img src="assets/cost.png" alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+                                                    <img src={getAssetUrl('assets/cost.png')} alt="cost" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                                                     <span className="relative z-10 text-[13px] font-bold text-[#f5e6b8] leading-none mb-0.5" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>{c.cost}</span>
                                                 </div>
 

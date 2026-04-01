@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260401-095",
+  "goal": "Persist durable workflow and architecture decisions into repository knowledge files for future multi-AI continuity.",
+  "constraints": [
+    "Only record durable conventions, decisions, and unresolved strategic questions.",
+    "Do not include transient debugging output.",
+    "Keep entries concise and directly actionable."
+  ],
+  "deliverables": [
+    "Updated .knowledge/project-notes.md",
+    "Updated .knowledge/decisions.md",
+    "Updated .knowledge/unresolved.md"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    ".knowledge/project-notes.md",
+    ".knowledge/decisions.md",
+    ".knowledge/unresolved.md",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-095.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-095.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-095.json"
+  ],
+  "status": "in_progress"
+}

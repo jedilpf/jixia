@@ -1,18 +1,8 @@
 const CARD_IMAGE_EXT_OVERRIDES: Record<string, 'png' | 'jpg'> = {
   xingpan: 'png',
   liangyi: 'png',
-  tiangong1: 'png',
-  tiangong2: 'png',
-  tiangong3: 'png',
-  tiangong4: 'png',
-  tiangong5: 'png',
-  tiangong6: 'png',
-  tiangong7: 'png',
-  tiangong8: 'png',
-  tiangong9: 'png',
-  tiangong10: 'png',
-  liangyi1: 'png',
-  liangyi2: 'png',
+  ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`tiangong${i + 1}`, 'png'])),
+  ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`liangyi${i + 1}`, 'png'])),
 };
 
 // BS01 主线卡在迁移前使用过旧图 id；这里保留兼容映射，避免迁移期卡图“看起来丢失”。
@@ -40,6 +30,22 @@ const CARD_NAME_TO_IMAGE_ID: Record<string, string> = {
   城防尺牍: 'chengfang',
   兼济匠师: 'jianshi',
   千机壁垒: 'qianji',
+  // V9 映射补全
+  墨家扣机: 'tiangong1',
+  云梯凌虚: 'tiangong2',
+  枢机错落: 'tiangong3',
+  木鸢之羽: 'tiangong4',
+  震岳石弩: 'tiangong5',
+  阴阳化宇: 'liangyi1',
+  五德流变: 'liangyi2',
+  坎离折冲: 'liangyi3',
+  两仪法象: 'liangyi4',
+  太极圆融: 'liangyi5',
+  两仪和息: 'liangyi6',
+  法象宗师: 'liangyi7',
+  五行生杀: 'liangyi8',
+  两仪守中: 'liangyi9',
+  太极万象: 'liangyi10',
 };
 
 export function getAssetUrl(assetPath: string): string {

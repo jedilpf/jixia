@@ -43,10 +43,6 @@ export const DEFAULT_PLAYER_PROGRESS: PlayerProgressState = {
   lastSettlementKey: null,
 };
 
-function isElectron(): boolean {
-  return typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
-}
-
 export function loadPlayerProgress(): PlayerProgressState {
   if (typeof window === 'undefined') return DEFAULT_PLAYER_PROGRESS;
   
@@ -67,8 +63,8 @@ export function savePlayerProgress(progress: PlayerProgressState): void {
     const raw = JSON.stringify(progress);
     window.localStorage.setItem(STORAGE_KEY, raw);
     
-    // 如果在 Electron 环境，可以通过 bridge 发送给主进程进行文件存储
-    // if (isElectron() && window.electronAPI) {
+    // 如果后续接入 Electron bridge，可在这里扩展主进程文件存储。
+    // if (window.electronAPI) {
     //   window.electronAPI.saveProgress('user_save', raw);
     // }
   } catch (err) {

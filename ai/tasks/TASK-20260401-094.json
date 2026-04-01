@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260401-094",
+  "goal": "Implement card type compatibility bridge between legacy showcase taxonomy and current battle taxonomy to restore TypeScript consistency.",
+  "constraints": [
+    "Must follow CONFLICT-20260401-002 arbitration decision.",
+    "Keep runtime behavior unchanged for existing card data entries.",
+    "Limit scope to data type compatibility and display mapping."
+  ],
+  "deliverables": [
+    "Compatibility card type union in showcase data model",
+    "Type color mapping compatibility for legacy card type labels",
+    "TypeScript check result after alignment"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/data/showcaseCards.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-094.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-094.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-094.json"
+  ],
+  "status": "in_progress"
+}

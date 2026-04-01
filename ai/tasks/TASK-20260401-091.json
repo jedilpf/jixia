@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260401-091",
+  "goal": "Align AI mainline policy document with the approved conflict arbitration baseline and define migration conditions explicitly.",
+  "constraints": [
+    "Must follow CONFLICT-20260401-001 arbitration decision.",
+    "Do not change runtime code in this step.",
+    "Keep policy language explicit for multi-AI collaboration and branch reality."
+  ],
+  "deliverables": [
+    "Updated docs/AI-mainline-policy.md with branch-truth mainline definition",
+    "Clear migration preconditions and execution guardrails"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "docs/AI-mainline-policy.md",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-091.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-091.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-091.json"
+  ],
+  "status": "in_progress"
+}

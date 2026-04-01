@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260401-089",
+  "goal": "Assess current local architecture, identify chain inconsistencies between active flows, and provide a phased optimization roadmap aligned with current local code as source of truth.",
+  "constraints": [
+    "Do not modify runtime code in this task.",
+    "Focus on architecture diagnosis, risk mapping, and execution planning.",
+    "Respect conflict arbitration rule before any implementation that changes primary flow strategy."
+  ],
+  "deliverables": [
+    "Current-state architecture assessment",
+    "Conflict points and risk list",
+    "Phased optimization roadmap with verification checkpoints"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-089.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-089.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260401-092",
+  "goal": "Unblock TypeScript validation by fixing the current persistence utility compile warning/error without changing runtime behavior.",
+  "constraints": [
+    "Only touch persistence utility and task artifacts.",
+    "Do not alter gameplay logic or screen routing behavior.",
+    "Keep behavior equivalent for browser localStorage persistence."
+  ],
+  "deliverables": [
+    "TypeScript-clean persistence utility",
+    "Validation evidence from npm run typecheck"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/utils/persistence.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-092.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-092.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-092.json"
+  ],
+  "status": "in_progress"
+}
