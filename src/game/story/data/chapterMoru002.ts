@@ -116,31 +116,27 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c001',
-        label: '前往墨家营地',
-        description: '与墨家弟子切磋，感受兼爱非攻之道',
+        text: '前往墨家营地（与墨家弟子切磋，感受兼爱非攻之道）',
         nextNode: 'ch_moru_002_n004a',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c002',
-        label: '前往法家营地',
-        description: '与法家弟子交流，领略法治严明之威',
+        text: '前往法家营地（与法家弟子交流，领略法治严明之威）',
         nextNode: 'ch_moru_002_n004b',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c003',
-        label: '独自准备',
-        description: '找一个清静之处，回顾这一个月所学',
+        text: '独自准备（找一个清静之处，回顾这一个月所学）',
         nextNode: 'ch_moru_002_n004c',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c004',
-        label: '寻找苏秦',
-        description: '鬼谷子门人或许有独到见解',
+        text: '寻找苏秦（鬼谷子门人或许有独到见解）',
         nextNode: 'ch_moru_002_n004d',
-        effects: [],
+        effects: {},
       },
     ],
   },
@@ -434,32 +430,33 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c005',
-        label: '支持变法',
-        description: '天下纷争，皆因制度陈旧。变法才能救天下。',
+        text: '支持变法（天下纷争，皆因制度陈旧。变法才能救天下。）',
         nextNode: 'ch_moru_002_n007a',
-        effects: [
-          { type: 'relationship', target: '墨家', effect: { affection: 10, trust: 5 } },
-          { type: 'relationship', target: '法家', effect: { affection: -5, trust: -5 } },
-        ],
+        effects: {
+          relationships: {
+            墨家: { affection: 10, trust: 5 },
+            法家: { affection: -5, trust: -5 },
+          },
+        },
       },
       {
         id: 'ch_moru_002_c006',
-        label: '支持守成',
-        description: '民智未开，贸然变法只会适得其反。',
+        text: '支持守成（民智未开，贸然变法只会适得其反。）',
         nextNode: 'ch_moru_002_n007b',
-        effects: [
-          { type: 'relationship', target: '法家', effect: { affection: 10, trust: 5 } },
-          { type: 'relationship', target: '墨家', effect: { affection: -5, trust: -5 } },
-        ],
+        effects: {
+          relationships: {
+            法家: { affection: 10, trust: 5 },
+            墨家: { affection: -5, trust: -5 },
+          },
+        },
       },
       {
         id: 'ch_moru_002_c007',
-        label: '综合立论',
-        description: '守成与变法，当相机而行，不可偏废。',
+        text: '综合立论（守成与变法，当相机而行，不可偏废。）',
         nextNode: 'ch_moru_002_n007c',
-        effects: [
-          { type: 'stats', effect: { wisdom: 2 } },
-        ],
+        effects: {
+          stats: { wisdom: 2 },
+        },
       },
     ],
   },
@@ -633,24 +630,21 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c008',
-        label: '以民心为标准',
-        description: '民心所向，即为变法之时；民心所离，即为守成之日。',
+        text: '以民心为标准（民心所向，即为变法之时；民心所离，即为守成之日。）',
         nextNode: 'ch_moru_002_n010a',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c009',
-        label: '以实情为标准',
-        description: '强国当变法，弱国当守成；视国情而定。',
+        text: '以实情为标准（强国当变法，弱国当守成；视国情而定。）',
         nextNode: 'ch_moru_002_n010b',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c010',
-        label: '以贤者为标准',
-        description: '有贤君则变法，无贤君则守成。',
+        text: '以贤者为标准（有贤君则变法，无贤君则守成。）',
         nextNode: 'ch_moru_002_n010c',
-        effects: [],
+        effects: {},
       },
     ],
   },
@@ -1008,26 +1002,23 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c011',
-        label: '认真观战',
-        description: '仔细观察慎到的辩论风格，寻找破绽',
+        text: '认真观战（仔细观察慎到的辩论风格，寻找破绽）',
         nextNode: 'ch_moru_002_n017a',
-        effects: [
-          { type: 'stats', effect: { insight: 1 } },
-        ],
+        effects: {
+          stats: { insight: 1 },
+        },
       },
       {
         id: 'ch_moru_002_c012',
-        label: '请教苏秦',
-        description: '鬼谷子门人或许有独到见解',
+        text: '请教苏秦（鬼谷子门人或许有独到见解）',
         nextNode: 'ch_moru_002_n017b',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c013',
-        label: '独自思考',
-        description: '回顾慎到赠予的竹简内容',
+        text: '独自思考（回顾慎到赠予的竹简内容）',
         nextNode: 'ch_moru_002_n017c',
-        effects: [],
+        effects: {},
       },
     ],
   },
@@ -1213,28 +1204,29 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c014',
-        label: '法先于德',
-        description: '以法治国，以法教民。德由法生。',
+        text: '法先于德（以法治国，以法教民。德由法生。）',
         nextNode: 'ch_moru_002_n020a',
-        effects: [
-          { type: 'relationship', target: '法家', effect: { affection: 5, trust: 5 } },
-        ],
+        effects: {
+          relationships: {
+            法家: { affection: 5, trust: 5 },
+          },
+        },
       },
       {
         id: 'ch_moru_002_c015',
-        label: '德先于法',
-        description: '以德化人，以德服众。法由德生。',
+        text: '德先于法（以德化人，以德服众。法由德生。）',
         nextNode: 'ch_moru_002_n020b',
-        effects: [
-          { type: 'relationship', target: '法家', effect: { affection: -5, trust: -5 } },
-        ],
+        effects: {
+          relationships: {
+            法家: { affection: -5, trust: -5 },
+          },
+        },
       },
       {
         id: 'ch_moru_002_c016',
-        label: '德法并重',
-        description: '德法相济，如车之两轮，缺一不可。',
+        text: '德法并重（德法相济，如车之两轮，缺一不可。）',
         nextNode: 'ch_moru_002_n020c',
-        effects: [],
+        effects: {},
       },
     ],
   },
@@ -1374,26 +1366,23 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c017',
-        label: '以法为先',
-        description: '法者，万民之绳墨，无例外则无权威。',
+        text: '以法为先（法者，万民之绳墨，无例外则无权威。）',
         nextNode: 'ch_moru_002_n022a',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c018',
-        label: '以德为先',
-        description: '德者，人心之本；法者，不得已而用之。',
+        text: '以德为先（德者，人心之本；法者，不得已而用之。）',
         nextNode: 'ch_moru_002_n022b',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c019',
-        label: '以道为本',
-        description: '道者，德法之源。合于道者，德法皆用；悖于道者，德法皆废。',
+        text: '以道为本（道者，德法之源。合于道者，德法皆用；悖于道者，德法皆废。）',
         nextNode: 'ch_moru_002_n022c',
-        effects: [
-          { type: 'stats', effect: { wisdom: 1 } },
-        ],
+        effects: {
+          stats: { wisdom: 1 },
+        },
       },
     ],
   },
@@ -1621,19 +1610,17 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c020',
-        label: '赴约',
-        description: '鬼谷子门人，或许知道父亲之事',
+        text: '赴约（鬼谷子门人，或许知道父亲之事）',
         nextNode: 'ch_moru_002_n026',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c021',
-        label: '准备决赛',
-        description: '决赛为重，不可分心',
+        text: '准备决赛（决赛为重，不可分心）',
         nextNode: 'ch_moru_002_n027',
-        effects: [
-          { type: 'stats', effect: { insight: 1 } },
-        ],
+        effects: {
+          stats: { insight: 1 },
+        },
       },
     ],
   },
@@ -1825,24 +1812,21 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c022',
-        label: '以言明道',
-        description: '辩者，以言辞阐明道理，使人明晓是非。',
+        text: '以言明道（辩者，以言辞阐明道理，使人明晓是非。）',
         nextNode: 'ch_moru_002_n031a',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c023',
-        label: '以言悟道',
-        description: '辩者，以言辞参悟真理，使人自知其愚。',
+        text: '以言悟道（辩者，以言辞参悟真理，使人自知其愚。）',
         nextNode: 'ch_moru_002_n031b',
-        effects: [],
+        effects: {},
       },
       {
         id: 'ch_moru_002_c024',
-        label: '以言忘道',
-        description: '辩者之道，在于忘言。道可道，非常道。',
+        text: '以言忘道（辩者之道，在于忘言。道可道，非常道。）',
         nextNode: 'ch_moru_002_n031c',
-        effects: [],
+        effects: {},
       },
     ],
   },
@@ -2054,30 +2038,27 @@ export const CHAPTER_MORU_002_NODES: StoryNode[] = [
     choices: [
       {
         id: 'ch_moru_002_c025',
-        label: '百家争鸣',
-        description: '学宫之本，在于百家争鸣。当开放包容，不拘一格。',
+        text: '百家争鸣（学宫之本，在于百家争鸣。当开放包容，不拘一格。）',
         nextNode: 'ch_moru_002_n035a',
-        effects: [
-          { type: 'stats', effect: { wisdom: 1, fame: 2 } },
-        ],
+        effects: {
+          stats: { wisdom: 1, fame: 2 },
+        },
       },
       {
         id: 'ch_moru_002_c026',
-        label: '以道为本',
-        description: '百家之言，皆有其理。当以道为本，融会贯通。',
+        text: '以道为本（百家之言，皆有其理。当以道为本，融会贯通。）',
         nextNode: 'ch_moru_002_n035b',
-        effects: [
-          { type: 'stats', effect: { wisdom: 2, fame: 1 } },
-        ],
+        effects: {
+          stats: { wisdom: 2, fame: 1 },
+        },
       },
       {
         id: 'ch_moru_002_c027',
-        label: '因材施教',
-        description: '学子各异，当因材施教，各适其性。',
+        text: '因材施教（学子各异，当因材施教，各适其性。）',
         nextNode: 'ch_moru_002_n035c',
-        effects: [
-          { type: 'stats', effect: { charm: 2 } },
-        ],
+        effects: {
+          stats: { charm: 2 },
+        },
       },
     ],
   },

@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260402-105",
+  "goal": "Fix TypeScript blockers in chapterMoru002 story data by aligning choice impact payloads with ChoiceImpact contract, then re-verify runtime gates.",
+  "constraints": [
+    "Do not change chapter branching structure or node IDs.",
+    "Keep battle/card runtime behavior unchanged; this task is type-contract alignment only.",
+    "If any choice effect is semantically unknown, use UNKNOWN placeholder and record it in open_questions.md before finalize."
+  ],
+  "deliverables": [
+    "chapterMoru002.ts type-compatible with ChoiceImpact.",
+    "No TS2559 errors from chapterMoru002 in npm run typecheck.",
+    "Validation evidence from typecheck, lint, gate:daily, and ai:finalize."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/game/story/types.ts",
+    "src/game/story/data/chapterMoru002.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-105.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-105.json",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-105.json"
+  ],
+  "status": "in_progress"
+}
