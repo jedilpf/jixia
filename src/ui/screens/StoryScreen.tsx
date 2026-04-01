@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
+import type { SaveSlotType } from '@/game/story/StoryEngine';
+import { SaveLoadModal } from '@/ui/components/SaveLoadModal';
+import type { SaveSlotType, SaveSlotInfo } from '@/game/story/StoryEngine';
 
 const STORY_STYLES = {
   container: {
@@ -317,7 +320,9 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const [lastChoiceImpact, setLastChoiceImpact] = useState<string>('');
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
-  const [hasSave, setHasSave] = useState(engine.hasSaveData());
+  const [, setSaveSlots] = useState(() => engine.getSaveSlots());
+  const [, setShowSaveModal] = useState(false);
+  const [, setShowLoadModal] = useState(false);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
@@ -354,7 +359,7 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           setChapter(engine.getChapter());
           setScene(engine.getScene());
           setChapterProgress(engine.getChapterProgress());
-          setHasSave(engine.hasSaveData());
+          setSaveSlots(engine.getSaveSlots());
           startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
           setDialogueState('typing');
           break;
@@ -416,30 +421,39 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   }, [onBack]);
 
   const handleSave = useCallback(() => {
-    engine.persist();
-    setHasSave(true);
-    alert('存档成功！');
+    setSaveSlots(engine.getSaveSlots());
   }, [engine]);
 
   const handleLoad = useCallback(() => {
-    if (confirm('确定要读取存档吗？当前进度将会丢失。')) {
-      const success = engine.restore();
-      if (success) {
-        const node = engine.getCurrentNode();
-        setCurrentNode(node);
-        setChapter(engine.getChapter());
-        setChapterProgress(engine.getChapterProgress());
-        setStats(engine.getPlayerStats());
-        setRelationships(engine.getRelationships());
-        startTyping(node?.content || '', Boolean(node?.choices));
-        setDialogueState('typing');
-        setHasSave(engine.hasSaveData());
-        alert('读档成功！');
-      } else {
-        alert('读取存档失败。');
-      }
+    setSaveSlots(engine.getSaveSlots());
+  }, [engine]);
+
+  const onSave = useCallback((slot: SaveSlotType) => {
+    engine.persist(slot);
+    setSaveSlots(engine.getSaveSlots());
+    setShowSaveModal(false);
+    alert('存档成功！');
+  }, [engine]);
+
+  const onLoad = useCallback((slot: SaveSlotType) => {
+    const success = engine.restore(slot);
+    if (success) {
+      setSaveSlots(engine.getSaveSlots());
+      setShowLoadModal(false);
+    } else {
+      alert('读取存档失败。');
     }
-  }, [engine, startTyping]);
+  }, [engine]);
+
+  const onModalClose = useCallback(() => {
+    setShowSaveModal(false);
+    setShowLoadModal(false);
+  }, []);
+
+  // Reserved for modal wiring in the next iteration.
+  void onSave;
+  void onLoad;
+  void onModalClose;
 
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';
@@ -521,22 +535,20 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           >
             💾 存档
           </button>
-          {hasSave && (
-            <button
-              style={STORY_STYLES.menuButton}
-              onClick={handleLoad}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#2196F3';
-                e.currentTarget.style.color = '#2196F3';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-                e.currentTarget.style.color = '#D4C5A9';
-              }}
-            >
-              📂 读档
-            </button>
-          )}
+          <button
+            style={STORY_STYLES.menuButton}
+            onClick={handleLoad}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#2196F3';
+              e.currentTarget.style.color = '#2196F3';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              e.currentTarget.style.color = '#D4C5A9';
+            }}
+          >
+            📂 读档
+          </button>
           <button
             style={STORY_STYLES.menuButton}
             onMouseEnter={(e) => {
@@ -676,7 +688,6 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
               <div
                 style={{
                   width: `${getReputation(faction)}%`,
-
                   height: '100%',
                   background: FACTION_COLORS[faction] || '#8B7355',
                   borderRadius: '2px',
@@ -687,6 +698,26 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           </div>
         ))}
       </div>
+
+      {/* Save Modal */}
+      <SaveLoadModal
+        mode="save"
+        open={showSaveModal}
+        slots={saveSlots}
+        onSave={onSave}
+        onLoad={onLoad}
+        onClose={onModalClose}
+      />
+
+      {/* Load Modal */}
+      <SaveLoadModal
+        mode="load"
+        open={showLoadModal}
+        slots={saveSlots}
+        onSave={onSave}
+        onLoad={onLoad}
+        onClose={onModalClose}
+      />
     </div>
   );
 }

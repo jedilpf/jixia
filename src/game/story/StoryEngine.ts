@@ -15,6 +15,23 @@ import { PROLOG_NODES } from './data/prolog';
 import { CHAPTER_MORU_001_NODES } from './data/chapterMoru001';
 import { CHAPTER_MORU_001_PART2_NODES } from './data/chapterMoru001_part2';
 
+export type SaveSlotType = 'autosave' | 'manual_1' | 'manual_2' | 'manual_3';
+
+export const STORAGE_KEYS: Record<SaveSlotType, string> = {
+  autosave: 'jixia.story.autosave.v2',
+  manual_1: 'jixia.story.manual.1.v2',
+  manual_2: 'jixia.story.manual.2.v2',
+  manual_3: 'jixia.story.manual.3.v2',
+};
+
+export interface SaveSlotInfo {
+  exists: boolean;
+  timestamp?: number;
+  chapter?: number;
+  currentNodeId?: string;
+  nodeCount?: number;
+}
+
 export class StoryEngine {
   private currentNodeId: string = 'prolog_0_1';
   private player: PlayerStats = {
@@ -346,9 +363,9 @@ export class StoryEngine {
     };
   }
 
-  public persist(): void {
+  public persist(slot: SaveSlotType = 'autosave'): void {
     const saveData = this.save();
-    const STORAGE_KEY = 'jixia.story.autosave.v1';
+    const STORAGE_KEY = STORAGE_KEYS[slot];
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
     } catch (err) {
@@ -356,8 +373,8 @@ export class StoryEngine {
     }
   }
 
-  public restore(): boolean {
-    const STORAGE_KEY = 'jixia.story.autosave.v1';
+  public restore(slot: SaveSlotType = 'autosave'): boolean {
+    const STORAGE_KEY = STORAGE_KEYS[slot];
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
@@ -370,14 +387,55 @@ export class StoryEngine {
     }
   }
 
-  public hasSaveData(): boolean {
-    const STORAGE_KEY = 'jixia.story.autosave.v1';
+  public hasSaveData(slot: SaveSlotType = 'autosave'): boolean {
+    const STORAGE_KEY = STORAGE_KEYS[slot];
     return localStorage.getItem(STORAGE_KEY) !== null;
   }
 
-  public deleteSaveData(): void {
-    const STORAGE_KEY = 'jixia.story.autosave.v1';
+  public deleteSaveData(slot: SaveSlotType = 'autosave'): void {
+    const STORAGE_KEY = STORAGE_KEYS[slot];
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  public getSaveSlots(): Record<SaveSlotType, SaveSlotInfo> {
+    const slots: SaveSlotType[] = ['autosave', 'manual_1', 'manual_2', 'manual_3'];
+    const result: Record<SaveSlotType, SaveSlotInfo> = {
+      autosave: { exists: false },
+      manual_1: { exists: false },
+      manual_2: { exists: false },
+      manual_3: { exists: false },
+    };
+
+    for (const slot of slots) {
+      const STORAGE_KEY = STORAGE_KEYS[slot];
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const saveData = JSON.parse(raw) as StorySaveData;
+          result[slot] = {
+            exists: true,
+            timestamp: saveData.timestamp,
+            chapter: saveData.progress.chapter,
+            currentNodeId: saveData.currentNodeId,
+            nodeCount: saveData.progress.completedNodes.length,
+          };
+        } catch {
+          result[slot] = { exists: false };
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public saveManual(slot: SaveSlotType): boolean {
+    if (!slot.startsWith('manual_')) return false;
+    this.persist(slot);
+    return true;
+  }
+
+  public loadSlot(slot: SaveSlotType): boolean {
+    return this.restore(slot);
   }
 
   public load(saveData: StorySaveData) {
