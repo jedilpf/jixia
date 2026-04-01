@@ -1,4 +1,4 @@
-import { CARDS, rarityColor, typeColor } from '@/data/showcaseCards';
+import { CARDS, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getCardImageUrl, getAssetUrl } from '@/utils/assets';
 

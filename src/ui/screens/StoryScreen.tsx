@@ -317,6 +317,7 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const [lastChoiceImpact, setLastChoiceImpact] = useState<string>('');
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
+  const [hasSave, setHasSave] = useState(engine.hasSaveData());
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
@@ -353,6 +354,7 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           setChapter(engine.getChapter());
           setScene(engine.getScene());
           setChapterProgress(engine.getChapterProgress());
+          setHasSave(engine.hasSaveData());
           startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
           setDialogueState('typing');
           break;
@@ -412,6 +414,32 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
       onBack();
     }
   }, [onBack]);
+
+  const handleSave = useCallback(() => {
+    engine.persist();
+    setHasSave(true);
+    alert('存档成功！');
+  }, [engine]);
+
+  const handleLoad = useCallback(() => {
+    if (confirm('确定要读取存档吗？当前进度将会丢失。')) {
+      const success = engine.restore();
+      if (success) {
+        const node = engine.getCurrentNode();
+        setCurrentNode(node);
+        setChapter(engine.getChapter());
+        setChapterProgress(engine.getChapterProgress());
+        setStats(engine.getPlayerStats());
+        setRelationships(engine.getRelationships());
+        startTyping(node?.content || '', Boolean(node?.choices));
+        setDialogueState('typing');
+        setHasSave(engine.hasSaveData());
+        alert('读档成功！');
+      } else {
+        alert('读取存档失败。');
+      }
+    }
+  }, [engine, startTyping]);
 
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';
@@ -479,6 +507,36 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           <span style={{ color: '#D4C5A9', fontSize: '14px' }}>
             名望: {stats.fame}
           </span>
+          <button
+            style={STORY_STYLES.menuButton}
+            onClick={handleSave}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#4CAF50';
+              e.currentTarget.style.color = '#4CAF50';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              e.currentTarget.style.color = '#D4C5A9';
+            }}
+          >
+            💾 存档
+          </button>
+          {hasSave && (
+            <button
+              style={STORY_STYLES.menuButton}
+              onClick={handleLoad}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#2196F3';
+                e.currentTarget.style.color = '#2196F3';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+                e.currentTarget.style.color = '#D4C5A9';
+              }}
+            >
+              📂 读档
+            </button>
+          )}
           <button
             style={STORY_STYLES.menuButton}
             onMouseEnter={(e) => {

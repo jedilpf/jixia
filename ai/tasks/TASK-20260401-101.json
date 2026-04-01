@@ -1,0 +1,41 @@
+{
+  "task_id": "TASK-20260401-101",
+  "goal": "Unify local runtime baseline around the 170-card source of truth by routing showcase UI through cardsSource, aligning data-contract runtime state fields with BattleV2, and strengthening baseline drift checks.",
+  "constraints": [
+    "Treat local repository as source of truth for this pass; do not overwrite local work from remote.",
+    "Keep all changes backward-compatible for existing battle/showcase entry flow.",
+    "Do not modify files outside allowed_write_paths.",
+    "Do not delete or revert unrelated in-progress local edits."
+  ],
+  "deliverables": [
+    "Card showcase entry components read card corpus via src/data/cardsSource.ts adapter instead of raw showcaseCards imports.",
+    "docs/data-contract.json runtime state definition aligns with current DebateBattleState fields used by BattleV2.",
+    "scripts/pipeline/validate-runtime-baseline.cjs includes checks that reduce false-positive drift and confirms single-source wiring.",
+    "Validation commands pass for this change scope."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".knowledge/decisions.md",
+    ".knowledge/project-notes.md",
+    "docs/data-contract.json",
+    "scripts/pipeline/gate-daily.cjs",
+    "scripts/pipeline/validate-runtime-baseline.cjs",
+    "server/README.md",
+    "server/constants.cjs",
+    "server/index.cjs",
+    "server/socket/index.cjs",
+    "server/store/match-store.cjs",
+    "src/components/CardShowcase.tsx",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-101.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-101.json",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-101.json"
+  ],
+  "status": "in_progress"
+}

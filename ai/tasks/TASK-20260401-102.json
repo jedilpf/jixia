@@ -1,0 +1,39 @@
+{
+  "task_id": "TASK-20260401-102",
+  "goal": "Produce a system-planning endorsement document from a producer/planner perspective, covering frontend/backend responsibility split, XMind-style system design structure, Axure wireframe output plan, UI requirement specification, and competitor decomposition with adaptation strategy.",
+  "constraints": [
+    "Document must be actionable for production workflow (not only conceptual).",
+    "Use this project context (card battle + collection + story) as the anchor scenario.",
+    "Include explicit sections: design purpose, function overview, system rules, red-dot rules, UI rules.",
+    "Do not delete or revert unrelated in-progress local/staged changes."
+  ],
+  "deliverables": [
+    "One planning endorsement document under docs/project with concrete templates and project-adapted examples.",
+    "Workflow-ready checklists for system planning, Axure output, UI requirement handoff, and competitor adaptation."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".knowledge/decisions.md",
+    ".knowledge/project-notes.md",
+    "docs/data-contract.json",
+    "docs/project",
+    "scripts/pipeline/gate-daily.cjs",
+    "scripts/pipeline/validate-runtime-baseline.cjs",
+    "server/README.md",
+    "server/constants.cjs",
+    "server/index.cjs",
+    "server/socket/index.cjs",
+    "server/store/match-store.cjs",
+    "src/components/CardShowcase.tsx",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-102.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-102.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-102.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,37 @@
+{
+  "task_id": "TASK-20260401-100",
+  "goal": "Continue optimization with low-risk hardening: safer backend defaults, in-memory match lifecycle cleanup, minimal socket subscription validation, and runtime baseline gate reinforcement.",
+  "constraints": [
+    "Do not break existing local PvE flow.",
+    "Prefer additive and backward-compatible server changes.",
+    "Keep changes within active runtime and pipeline files only."
+  ],
+  "deliverables": [
+    "Backend listen host and CORS defaults hardened for local development safety.",
+    "In-memory match store gets TTL-based cleanup to avoid unbounded growth.",
+    "Socket match subscription validates player identity against match participants when provided.",
+    "New runtime baseline validator added and wired into daily gate.",
+    "Server README updated with new env defaults/notes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    ".knowledge",
+    "server/index.cjs",
+    "server/constants.cjs",
+    "server/store/match-store.cjs",
+    "server/socket/index.cjs",
+    "server/README.md",
+    "scripts/pipeline/gate-daily.cjs",
+    "scripts/pipeline/validate-runtime-baseline.cjs"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-100.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-100.json",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-100.json"
+  ],
+  "status": "in_progress"
+}

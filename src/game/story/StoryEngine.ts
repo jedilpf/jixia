@@ -13,6 +13,7 @@ import type {
 
 import { PROLOG_NODES } from './data/prolog';
 import { CHAPTER_MORU_001_NODES } from './data/chapterMoru001';
+import { CHAPTER_MORU_001_PART2_NODES } from './data/chapterMoru001_part2';
 
 export class StoryEngine {
   private currentNodeId: string = 'prolog_0_1';
@@ -59,7 +60,7 @@ export class StoryEngine {
   }
 
   private loadNodes() {
-    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES];
+    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES, ...CHAPTER_MORU_001_PART2_NODES];
     for (const node of storyNodes) {
       if (this.nodeMap.has(node.id)) {
         console.warn(`StoryEngine: duplicated node id ${node.id} ignored.`);
@@ -107,6 +108,7 @@ export class StoryEngine {
     }
 
     this.emit({ type: 'node_changed', nodeId });
+    this.persist();
   }
 
   public goToNext() {
@@ -342,6 +344,40 @@ export class StoryEngine {
         choices: historyChoices,
       },
     };
+  }
+
+  public persist(): void {
+    const saveData = this.save();
+    const STORAGE_KEY = 'jixia.story.autosave.v1';
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+    } catch (err) {
+      console.error('Failed to persist story save:', err);
+    }
+  }
+
+  public restore(): boolean {
+    const STORAGE_KEY = 'jixia.story.autosave.v1';
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const saveData = JSON.parse(raw) as StorySaveData;
+      this.load(saveData);
+      return true;
+    } catch (err) {
+      console.error('Failed to restore story save:', err);
+      return false;
+    }
+  }
+
+  public hasSaveData(): boolean {
+    const STORAGE_KEY = 'jixia.story.autosave.v1';
+    return localStorage.getItem(STORAGE_KEY) !== null;
+  }
+
+  public deleteSaveData(): void {
+    const STORAGE_KEY = 'jixia.story.autosave.v1';
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   public load(saveData: StorySaveData) {

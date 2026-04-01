@@ -9,6 +9,7 @@ const CHECKS = [
   'scripts/pipeline/validate-terminology.cjs',
   'scripts/pipeline/validate-playability.cjs',
   'scripts/pipeline/validate-complexity.cjs',
+  'scripts/pipeline/validate-runtime-baseline.cjs',
 ];
 
 function validateOpenQuestions() {

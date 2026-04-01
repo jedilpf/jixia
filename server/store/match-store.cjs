@@ -1,4 +1,5 @@
 const { randomUUID } = require('crypto');
+const { DEFAULT_MATCH_TTL_MS } = require('../constants.cjs');
 
 function normalizePlayerName(input) {
   const fallback = '玩家';
@@ -18,10 +19,38 @@ function normalizeBotName(input) {
   return text.length > 0 ? text.slice(0, 24) : fallback;
 }
 
-function createInMemoryMatchStore() {
+function createInMemoryMatchStore(options = {}) {
   const matches = new Map();
+  const ttlMs = Number.isFinite(options.ttlMs) && options.ttlMs > 0
+    ? Math.floor(options.ttlMs)
+    : DEFAULT_MATCH_TTL_MS;
+
+  function isMatchExpired(match) {
+    const reference = Date.parse(match.updatedAt || match.createdAt || 0);
+    if (!Number.isFinite(reference) || reference <= 0) return false;
+    return (Date.now() - reference) > ttlMs;
+  }
+
+  function deleteIfExpired(matchId, match) {
+    if (!match) return false;
+    if (!isMatchExpired(match)) return false;
+    matches.delete(matchId);
+    return true;
+  }
+
+  function sweepExpiredMatches() {
+    let removed = 0;
+    for (const [matchId, match] of matches.entries()) {
+      if (deleteIfExpired(matchId, match)) {
+        removed += 1;
+      }
+    }
+    return removed;
+  }
 
   function createAiMatch(payload = {}) {
+    sweepExpiredMatches();
+
     const now = new Date().toISOString();
     const matchId = randomUUID();
     const humanPlayerId = `HUMAN-${randomUUID().slice(0, 8)}`;
@@ -58,12 +87,20 @@ function createInMemoryMatchStore() {
   }
 
   function getMatch(matchId) {
-    return matches.get(matchId) || null;
+    const match = matches.get(matchId) || null;
+    if (deleteIfExpired(matchId, match)) {
+      return null;
+    }
+    return match;
   }
 
   function updateMatch(matchId, updater) {
+    sweepExpiredMatches();
     const current = matches.get(matchId);
     if (!current) {
+      return null;
+    }
+    if (deleteIfExpired(matchId, current)) {
       return null;
     }
     const next = updater(current);
@@ -79,6 +116,7 @@ function createInMemoryMatchStore() {
     createAiMatch,
     getMatch,
     updateMatch,
+    sweepExpiredMatches,
   };
 }
 

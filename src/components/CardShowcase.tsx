@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CARDS } from '@/data/showcaseCards';
+import { CARDS } from '@/data/cardsSource';
 import { CardGrid } from '@/components/showcase/CardGrid';
 import { CardDetail } from '@/components/showcase/CardDetail';
 

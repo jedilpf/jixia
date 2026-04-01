@@ -1,5 +1,5 @@
 const http = require('http');
-const { DEFAULT_PORT } = require('./constants.cjs');
+const { DEFAULT_HOST, DEFAULT_PORT } = require('./constants.cjs');
 const { createInMemoryMatchStore } = require('./store/match-store.cjs');
 const { createApp } = require('./app.cjs');
 const { attachSocketServer } = require('./socket/index.cjs');
@@ -14,8 +14,8 @@ function startServer() {
     origins,
   });
 
-  httpServer.listen(port, '0.0.0.0', () => {
-    console.log(`[backend] listening on http://127.0.0.1:${port}`);
+  httpServer.listen(port, DEFAULT_HOST, () => {
+    console.log(`[backend] listening on http://${DEFAULT_HOST}:${port}`);
     console.log(`[backend] allowed origins: ${origins.join(', ')}`);
   });
 

@@ -9,3 +9,8 @@
 - For repository alignment tasks, prefer a safety snapshot (`git stash -u` or equivalent backup) before destructive sync unless the user explicitly requests direct discard.
 - User-required local run command uses `npx vite --host` for this repository workflow.
 - Current branch-level default acceptance flow is the local `src/App.tsx` menu chain; alternate flows are treated as non-default unless re-arbitrated.
+- Runtime card corpus baseline is full active pool (current 170 cards): battle deck generation and in-battle card library should use the same full-source baseline.
+- Showcase entry chain (`src/components/CardShowcase.tsx`, `src/components/showcase/CardGrid.tsx`, `src/components/showcase/CardDetail.tsx`) must import cards from `@/data/cardsSource`; direct raw imports from `@/data/showcaseCards` in this chain are treated as drift.
+- Daily gate now includes `scripts/pipeline/validate-runtime-baseline.cjs` to enforce runtime safety and card-corpus baseline consistency.
+- `docs/data-contract.json` is expected to track actual `BattleV2` runtime state shape (not legacy `playerA/playerB/currentTurn` schema), and runtime baseline validation should fail on contract drift.
+- Backend local-safe default is `BACKEND_HOST=127.0.0.1`; `0.0.0.0` should be an explicit opt-in via environment variable.

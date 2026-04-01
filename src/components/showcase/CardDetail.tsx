@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CARDS, rarityColor, typeColor } from '@/data/showcaseCards';
+import { CARDS, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getAssetUrl, getCardImageUrl } from '@/utils/assets';
 

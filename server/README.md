@@ -25,6 +25,14 @@ npm run server:start
 Default port: `8787`  
 Override with env: `BACKEND_PORT=9000`
 
+Default host bind: `127.0.0.1`  
+Override with env: `BACKEND_HOST=0.0.0.0`
+
 Optional CORS origin override:
-- `CLIENT_ORIGIN=http://127.0.0.1:5174`
+- Default allows local Vite origins: `127.0.0.1/localhost` on `5173` and `5174`
+- Custom override: `CLIENT_ORIGIN=http://127.0.0.1:5173`
 - Multiple origins: comma separated.
+
+Optional match lifecycle hardening:
+- `MATCH_TTL_MS=14400000` (default 4 hours): expire inactive in-memory matches.
+- `REQUIRE_PLAYER_ID=true`: require socket subscribers to provide `playerId` bound to match participants.

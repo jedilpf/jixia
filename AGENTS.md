@@ -2,10 +2,11 @@
 
 Before any content/design/code task:
 1. Read `AI_START_HERE.md`
-2. Use a task file in `ai/tasks/*.json`
-3. Generate packet with `npm run ai:prompt -- --task <task-file>`
-4. Follow packet constraints first, then execute task
-5. Finish with `npm run ai:finalize -- --task <task-file>`
+2. Read `docs/PROJECT_MEMORY.md` for project context and completed work
+3. Use a task file in `ai/tasks/*.json`
+4. Generate packet with `npm run ai:prompt -- --task <task-file>`
+5. Follow packet constraints first, then execute task
+6. Finish with `npm run ai:finalize -- --task <task-file>`
 
 Hard rules:
 - Do not bypass `canon/` + `scope/` constraints.

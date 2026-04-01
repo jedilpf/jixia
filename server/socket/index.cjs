@@ -1,4 +1,5 @@
 const { Server } = require('socket.io');
+const { REQUIRE_PLAYER_ID } = require('../constants.cjs');
 
 function roomForMatch(matchId) {
   return `match:${matchId}`;
@@ -39,9 +40,35 @@ function attachSocketServer(httpServer, { matchStore, origins }) {
         return;
       }
 
+      const normalizedPlayerId = typeof playerId === 'string' && playerId.trim().length > 0
+        ? playerId.trim()
+        : null;
+      const participantIds = [
+        match.players?.human?.id,
+        match.players?.ai?.id,
+      ].filter(Boolean);
+
+      if (REQUIRE_PLAYER_ID && !normalizedPlayerId) {
+        socket.emit('server:error', {
+          code: 'PLAYER_ID_REQUIRED',
+          message: 'Cannot subscribe: playerId is required for this server.',
+          matchId: match.id,
+        });
+        return;
+      }
+
+      if (normalizedPlayerId && participantIds.length > 0 && !participantIds.includes(normalizedPlayerId)) {
+        socket.emit('server:error', {
+          code: 'PLAYER_ID_INVALID',
+          message: 'Cannot subscribe: playerId does not belong to this match.',
+          matchId: match.id,
+        });
+        return;
+      }
+
       socket.join(roomForMatch(match.id));
       socket.data.matchId = match.id;
-      socket.data.playerId = playerId || null;
+      socket.data.playerId = normalizedPlayerId;
 
       socket.emit('server:match-state', {
         match,

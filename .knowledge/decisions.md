@@ -21,3 +21,18 @@
 - Decision: Use a card-type compatibility bridge during taxonomy migration (legacy showcase labels and canonical battle labels can coexist temporarily).
 - Why: Existing repository data and runtime contracts use mixed type vocabularies; forced one-shot rewrite is high risk in parallel-AI development.
 - Consequence: Align at boundaries first, keep runtime stable, and migrate card data vocabulary incrementally with explicit validation.
+
+### 2026-04-01
+- Decision: Card-runtime baseline is unified to full active corpus (170 cards), and battle-side library must not derive from current-match subsets.
+- Why: User explicitly required removing the 48-card subset behavior and keeping runtime calculation aligned with the full corpus.
+- Consequence: Default battle deck generation uses full pool mode; in-battle library reads from full card source; baseline gate threshold raised to `>=170`.
+
+### 2026-04-01
+- Decision: Backend defaults are hardened for local safety and stability, with explicit opt-in for broader exposure.
+- Why: Previous defaults bound to `0.0.0.0` and lacked in-memory match lifecycle control, increasing accidental exposure and long-running memory growth risk.
+- Consequence: Default host is now `127.0.0.1`, match store applies TTL expiration, socket subscription validates provided player identity, and daily gate enforces runtime baseline checks.
+
+### 2026-04-01
+- Decision: Contract and showcase-source chain are unified to runtime truth and enforced in baseline validation.
+- Why: The previous contract schema (`battleId/playerA/playerB/currentTurn`) diverged from BattleV2 runtime state, and showcase entry components could bypass the adapter source.
+- Consequence: `docs/data-contract.json` now matches `DebateBattleState` runtime fields (`round/maxRounds/.../player/enemy/logs/winner`), showcase entry components import from `@/data/cardsSource`, and `validate-runtime-baseline.cjs` checks both contract keys and source-chain drift.
