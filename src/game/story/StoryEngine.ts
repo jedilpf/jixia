@@ -13,6 +13,7 @@ import type {
 
 import { PROLOG_NODES } from './data/prolog';
 import { CHAPTER_MORU_001_NODES } from './data/chapterMoru001';
+import { CHAPTER_MORU_001_PART2_NODES } from './data/chapterMoru001_part2';
 
 export class StoryEngine {
   private currentNodeId: string = 'prolog_0_1';
@@ -59,7 +60,7 @@ export class StoryEngine {
   }
 
   private loadNodes() {
-    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES];
+    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES, ...CHAPTER_MORU_001_PART2_NODES];
     for (const node of storyNodes) {
       if (this.nodeMap.has(node.id)) {
         console.warn(`StoryEngine: duplicated node id ${node.id} ignored.`);
