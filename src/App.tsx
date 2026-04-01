@@ -36,6 +36,15 @@ const DEFAULT_SETTINGS: AppSettings = {
   fullscreen: false,
 };
 
+const HALL_BGM_SCREENS: ReadonlyArray<LegacyScreen> = [
+  'menu',
+  'story',
+  'characters',
+  'collection',
+  'battle_setup',
+  'pre_battle',
+];
+
 function App() {
   const isElectronRuntime =
     typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/');
@@ -128,15 +137,8 @@ function AppMainContent({
     if (isElectronRuntime) return;
     if (!audioHallRef.current || !audioBattleRef.current) return;
 
-    // 映射 BGM 到当前屏幕
-    if (
-      screen === 'menu' ||
-      screen === 'story' ||
-      screen === 'characters' ||
-      screen === 'collection' ||
-      screen === 'battle_setup' ||
-      screen === 'pre_battle'
-    ) {
+    // 主链路大厅/菜单相关屏幕统一走 Hall BGM，避免入口扩展时漏配。
+    if (HALL_BGM_SCREENS.includes(screen)) {
       audioBattleRef.current.pause();
       audioBattleRef.current.currentTime = 0;
       audioHallRef.current.play().catch(console.warn);

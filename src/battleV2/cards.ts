@@ -105,16 +105,35 @@ const SIGNATURE_SLOT_BY_ID = buildSignatureSlotMap();
 const CORE_FACTION_SET = new Set(CORE_FACTION_NAMES);
 
 function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
-  // 映射图鉴类型文本 -> DebateCard effectKind
+  // 兼容新旧两套卡牌类型词表，统一归一到 DebateCard 的五类语义。
   type EffectKind = DebateCard['effectKind'];
-  const typeMap: Record<string, EffectKind> = {
+  const canonicalTypeMap: Record<string, DebateCard['type']> = {
+    '技能': '立论',
+    '事件': '立论',
+    '场地': '玄章',
+    '装备': '策术',
+    '角色': '门客',
+    '反制': '反诘',
+    '立论': '立论',
+    '策术': '策术',
+    '玄章': '玄章',
+    '门客': '门客',
+    '反诘': '反诘',
+  };
+  const effectKindMap: Record<string, EffectKind> = {
     '技能': 'draw',
     '事件': 'damage',
     '场地': 'shield',
     '装备': 'shield',
     '角色': 'summon_front',
     '反制': 'shixu',
+    '立论': 'damage',
+    '策术': 'draw',
+    '玄章': 'shield',
+    '门客': 'summon_front',
+    '反诘': 'shixu',
   };
+  const normalizedType = canonicalTypeMap[src.type] ?? '立论';
 
   const frameworkFaction = toFrameworkFactionName(src.faction);
   const blueprint = FRAMEWORK_FACTION_BY_NAME[frameworkFaction];
@@ -122,13 +141,9 @@ function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
 
   return {
     name: src.name,
-    type: src.type === '角色' ? '门客'
-      : src.type === '反制' ? '反诘'
-        : src.type === '场地' ? '玄章'
-          : src.type === '装备' ? '策术'
-            : '立论',
+    type: normalizedType,
     cost: Math.max(1, src.cost <= 3 ? src.cost : Math.round(src.cost / 2)),
-    effectKind: typeMap[src.type] ?? 'draw',
+    effectKind: effectKindMap[src.type] ?? effectKindMap[normalizedType] ?? 'draw',
     effectValue: src.attack ?? src.shield ?? (src.hp ? Math.ceil(src.hp / 2) : 1),
     art: artPathForId(src.id, src.name),
     prologue: src.background,

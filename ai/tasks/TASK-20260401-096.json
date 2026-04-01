@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260401-096",
+  "goal": "Restore card catalog size from 48 back to the previous 100+ baseline (historical 170 cards) so project remains at hundred-plus cards.",
+  "constraints": [
+    "User requirement is hard constraint: maintain hundred-plus cards.",
+    "Restore from known-good recent branch history rather than inventing new card records.",
+    "Keep file scope minimal and do not delete unrelated in-flight assets."
+  ],
+  "deliverables": [
+    "Restored src/data/showcaseCards.ts card corpus (100+ cards)",
+    "Verification evidence of card count and typecheck"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/data/showcaseCards.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-096.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-096.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-096.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260401-097",
+  "goal": "Fix battle card mapping to support both legacy and canonical card type labels after restoring full card corpus.",
+  "constraints": [
+    "Do not reduce restored card corpus size.",
+    "Keep mapping backward-compatible for legacy labels and forward-compatible for canonical labels.",
+    "Limit changes to battle mapping logic."
+  ],
+  "deliverables": [
+    "Updated src/battleV2/cards.ts type normalization logic",
+    "Passing npm run typecheck with restored 100+ card data"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/battleV2/cards.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-097.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-097.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-097.json"
+  ],
+  "status": "in_progress"
+}

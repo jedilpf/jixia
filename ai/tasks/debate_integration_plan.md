@@ -12,35 +12,36 @@
 
 **数据文件**：`src/data/showcaseCards.ts`
 
-卡牌类型（showcaseCards.ts中定义）：
+卡牌类型（已统一）：
 
 | type值 | 说明 |
 |--------|------|
-| 技能 | 技能牌 |
-| 事件 | 事件牌 |
-| 场地 | 场地牌 |
-| 角色 | 角色牌（带hp/atk） |
+| 立论 | 攻击性论点 |
+| 策术 | 策略性论点 |
+| 玄章 | 场地增益 |
+| 门客 | 援护类论点 |
+| 反诘 | 反驳类论点 |
 
-> 注：装备类型在battleV2中使用`策术`代替。
+> 注：已统一battleV2和showcaseCards的卡牌类型，移除旧类型（技能、事件、场地、装备、角色、反制）。
 
 ### 2.2 battleV2辩论系统
 
 **核心文件**：
 - `src/battleV2/types.ts` - 类型定义
 - `src/battleV2/useDebateBattle.ts` - 辩论状态管理
-- `src/battleV2/cards.ts` - 卡牌生成逻辑
+- `src/battleV2/cards.ts` - 卡牌生成逻辑（已更新typeMap）
 - `src/battleV2/topics.ts` - 辩题配置
 - `src/battleV2/arena.ts` - 辩论场地
 
 **辩论卡牌类型**（CardTypeV2）：
 
-| CardTypeV2 | 说明 | 复用来源 |
-|------------|------|---------|
-| 立论 | 攻击性论点 | 技能 |
-| 策术 | 策略性论点 | 事件、装备 |
-| 反诘 | 反驳类论点 | 反制 |
-| 门客 | 援护类论点 | 角色 |
-| 玄章 | 场地增益 | 场地 |
+| CardTypeV2 | 说明 | effectKind |
+|------------|------|------------|
+| 立论 | 攻击性论点 | damage |
+| 策术 | 策略性论点 | draw |
+| 反诘 | 反驳类论点 | shixu |
+| 门客 | 援护类论点 | summon_front |
+| 玄章 | 场地增益 | shield |
 
 **辩论资源**：
 

@@ -1,0 +1,36 @@
+{
+  "task_id": "TASK-20260401-098",
+  "goal": "Implement the approved 1-5 stabilization plan: keep hundred-plus card corpus, normalize battle mapping compatibility, unify card-detail asset loading, harden main menu chain baseline, and add lightweight regression checks.",
+  "constraints": [
+    "Preserve the restored 100+ card corpus (current baseline 170 cards).",
+    "Do not remove in-flight unrelated files.",
+    "Keep gameplay behavior stable while improving compatibility and guardrails."
+  ],
+  "deliverables": [
+    "Card corpus guard in showcase layer",
+    "Backward/forward compatible type mapping in battle conversion",
+    "CardDetail using shared asset resolver for image consistency",
+    "Main flow baseline hardening in App",
+    "New baseline validation script and npm command"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/data/showcaseCards.ts",
+    "src/battleV2/cards.ts",
+    "src/components/showcase/CardDetail.tsx",
+    "src/App.tsx",
+    "scripts/pipeline/validate-ui-baseline.cjs",
+    "package.json",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-098.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-098.json",
+    "npm run typecheck",
+    "npm run validate:ui-baseline",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-098.json"
+  ],
+  "status": "in_progress"
+}
