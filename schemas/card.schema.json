@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jixia.local/schemas/card.schema.json",
+  "title": "Jixia Content Card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "faction",
+    "rarity",
+    "type",
+    "cost",
+    "rules_text",
+    "keyword_ids",
+    "mechanic_ids",
+    "lore_anchor_ids",
+    "provenance",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9-]{6,}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 24
+    },
+    "faction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rarity": {
+      "type": "string",
+      "enum": [
+        "common",
+        "rare",
+        "epic",
+        "legendary"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "spell",
+        "minion",
+        "field",
+        "weapon"
+      ]
+    },
+    "cost": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "rules_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "keyword_ids": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mechanic_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^MEC-[A-Z0-9-]+$"
+      }
+    },
+    "lore_anchor_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^(ANC-[A-Z0-9-]+|UNKNOWN)$"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "batch_id",
+        "models_used",
+        "canon_version",
+        "seed"
+      ],
+      "properties": {
+        "batch_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "models_used": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "canon_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "review",
+        "approved",
+        "rejected"
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+version: 0.1.0
+updated_at: 2026-03-22
+owner: project-lead
+
+hard_limits:
+  max_active_factions: 2
+  max_keywords_per_card: 2
+  max_rules_text_length: 25
+  max_rules_sentences: 2
+  max_daily_batch_size: 10
+  max_new_mechanics_per_week: 0
+  max_new_anchors_per_week: 0
+
+locked_scope:
+  active_factions:
+    - 墨家
+    - 儒家
+  frozen_tracks_before_m2:
+    - 美术制作
+    - 营销文案
+    - 本地化
+
+forbidden_actions:
+  - 未经NEW_CANON_PROPOSAL流程新增锚点ID
+  - 在同一张卡叠加超过2个关键词
+  - 使用术语表之外的机制词
+  - 机制尚未收敛时扩展学派数量
+  - 未通过门禁直接合并候选卡
+
+forbidden_mechanic_terms:
+  - 秒杀全场
+  - 无限连锁
+  - 无上限抽牌
+  - 全局硬控永久生效
+
+enforcement:
+  on_violation: block_merge
+  fallback_action: move_to_backlog

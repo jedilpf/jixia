@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260401-087",
+  "goal": "Restore the previous correct initial interface as the default app entry and simplify entry architecture while keeping an optional MVP flow switch.",
+  "constraints": [
+    "Follow AGENTS workflow: validate task, generate prompt, implement, then finalize.",
+    "Treat local current content as source of truth unless user says otherwise.",
+    "Do not delete or overwrite unrelated in-flight files from parallel AI work."
+  ],
+  "deliverables": [
+    "Conflict arbitration record for the app-entry architecture decision",
+    "Refactored src/App.tsx with clear default entry to the previous initial interface",
+    "Verification results from typecheck and local run"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/App.tsx",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-087.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-087.json",
+    "npm run typecheck",
+    "npx vite --host",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-087.json"
+  ],
+  "status": "in_progress"
+}

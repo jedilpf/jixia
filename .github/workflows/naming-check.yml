@@ -1,0 +1,68 @@
+name: Naming Convention Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-naming:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint (non-blocking)
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: Collect changed files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            base_sha="${{ github.event.pull_request.base.sha }}"
+            head_sha="${{ github.event.pull_request.head.sha }}"
+          else
+            base_sha="${{ github.event.before }}"
+            head_sha="${{ github.sha }}"
+            if [[ "$base_sha" == "0000000000000000000000000000000000000000" ]]; then
+              base_sha="$(git rev-list --max-parents=0 "$head_sha" | tail -n 1)"
+            fi
+          fi
+
+          echo "Base: $base_sha"
+          echo "Head: $head_sha"
+
+          git diff --name-only --diff-filter=AMR "$base_sha" "$head_sha" > .changed-files.txt
+          echo "Changed files:"
+          cat .changed-files.txt || true
+
+      - name: Validate naming conventions (changed files only)
+        run: node scripts/validate-naming.cjs --files-file .changed-files.txt
+
+      - name: Generate report
+        if: always()
+        run: |
+          {
+            echo "## 命名规范检查结果"
+            echo ""
+            echo "检查时间: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo ""
+            echo "本次采用增量模式：只检查当前 PR/Push 的变更文件。"
+          } >> "$GITHUB_STEP_SUMMARY"
+

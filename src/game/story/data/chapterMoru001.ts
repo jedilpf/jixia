@@ -1,0 +1,362 @@
+import type { StoryNode } from '../types';
+
+export const CHAPTER_MORU_001_NODES: StoryNode[] = [
+  {
+    id: 'ch_moru_001_n001',
+    type: 'narration',
+    content: `【第一章上半·初试论场】
+
+晨钟三响，问道堂外已人声鼎沸。
+
+汝甫完成入门礼，便被告知须参与一场"墨儒联合试辩"。
+
+此非胜负之局，乃学宫观察新弟子之第一道门槛。`,
+    background: 'wendao_hall',
+    music: 'bgm_story_intro_01',
+    nextNode: 'ch_moru_001_n002',
+  },
+  {
+    id: 'ch_moru_001_n002',
+    type: 'dialogue',
+    speaker: '执教长史',
+    emotion: 'thinking',
+    content: `「今日辩题：『救急之举，应先立规还是先施援？』」
+
+「汝不必赢，但须使人见汝之判断。」
+
+「谨记，稷下所重者非口舌之快，乃证据、秩序与担当。」`,
+    background: 'wendao_hall',
+    nextNode: 'ch_moru_001_n003',
+  },
+  {
+    id: 'ch_moru_001_n003',
+    type: 'choice',
+    speaker: '汝',
+    emotion: 'normal',
+    content: '辩题将启，汝决意先从哪条路切入？',
+    background: 'wendao_hall',
+    choices: [
+      {
+        id: 'ch_moru_001_n003_c01',
+        text: '公开取证：先于堂前收集证词与实情',
+        effects: {
+          stats: { insight: 1 },
+          flags: { public_evidence_route: true },
+          relationships: { mozi: { trust: 1 } },
+          path: 'public_evidence',
+        },
+        nextNode: 'ch_moru_001_n004',
+      },
+      {
+        id: 'ch_moru_001_n003_c02',
+        text: '私下斡旋：先寻儒、墨两方关键人沟通',
+        effects: {
+          stats: { charm: 1 },
+          flags: { silent_bargain_route: true },
+          relationships: { confucian: { trust: 1 } },
+          path: 'silent_bargain',
+        },
+        nextNode: 'ch_moru_001_n006',
+      },
+      {
+        id: 'ch_moru_001_n003_c03',
+        text: '谨慎观望：先旁听，待双方露出破绽再入场',
+        effects: {
+          stats: { wisdom: 1 },
+          flags: { cautious_route: true },
+          path: 'cautious_observe',
+        },
+        nextNode: 'ch_moru_001_n008',
+      },
+    ],
+  },
+  {
+    id: 'ch_moru_001_n004',
+    type: 'dialogue',
+    speaker: '墨家弟子',
+    emotion: 'determined',
+    content: `「灾民等不起空谈。」
+
+「若制度今日不能救人，那便先救人，再补制度。」
+
+汝于旁记录了三份现场证词，发现争议核心并非善恶，乃是执行顺序。`,
+    background: 'academy_court',
+    nextNode: 'ch_moru_001_n005',
+  },
+  {
+    id: 'ch_moru_001_n005',
+    type: 'choice',
+    speaker: '汝',
+    emotion: 'thinking',
+    content: '汝将如何处置手中之公开证据？',
+    background: 'academy_court',
+    choices: [
+      {
+        id: 'ch_moru_001_n005_c01',
+        text: '整理成可核验清单，先交学宫执律记录',
+        effects: {
+          stats: { insight: 1 },
+          flags: { evidence_locked: true, mentor_trust: 1 },
+          relationships: { mozi: { trust: 1 }, confucian: { affection: 1 } },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+      {
+        id: 'ch_moru_001_n005_c02',
+        text: '直接于堂前质询法条漏洞，逼对方立刻回应',
+        effects: {
+          stats: { courage: 1 },
+          flags: { offended_legalist: true },
+          relationships: { mozi: { affection: 1 } },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+    ],
+  },
+  {
+    id: 'ch_moru_001_n006',
+    type: 'dialogue',
+    speaker: '儒家讲席',
+    emotion: 'normal',
+    content: `「援急可贵，但若无秩序，明日仍会重演。」
+
+「汝若能给出『先救后规』之可执行次序，礼院可为其背书。」`,
+    background: 'rites_hall',
+    nextNode: 'ch_moru_001_n007',
+  },
+  {
+    id: 'ch_moru_001_n007',
+    type: 'choice',
+    speaker: '汝',
+    emotion: 'thinking',
+    content: '斡旋方案如何落地？',
+    background: 'rites_hall',
+    choices: [
+      {
+        id: 'ch_moru_001_n007_c01',
+        text: '提出"先援三日、后立细则"之折中议程',
+        effects: {
+          stats: { wisdom: 1 },
+          flags: { etiquette_support: true, mentor_trust: 1 },
+          relationships: { confucian: { trust: 2 }, mozi: { trust: 1 } },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+      {
+        id: 'ch_moru_001_n007_c02',
+        text: '私下交换承诺，先保场面稳定',
+        effects: {
+          stats: { charm: 1, fame: -1 },
+          flags: { private_deal: true },
+          relationships: { confucian: { affection: 1 } },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+    ],
+  },
+  {
+    id: 'ch_moru_001_n008',
+    type: 'narration',
+    content: `汝于廊下完整旁听了两轮交锋。
+
+墨方抓"救急时效"，儒方抓"规则可复制"。
+
+汝遂意识及：此争论真正缺者，乃"可被双方接受之执行顺序"。`,
+    background: 'academy_corridor',
+    nextNode: 'ch_moru_001_n009',
+  },
+  {
+    id: 'ch_moru_001_n009',
+    type: 'choice',
+    speaker: '汝',
+    emotion: 'thinking',
+    content: '汝决意如何入场？',
+    background: 'academy_corridor',
+    choices: [
+      {
+        id: 'ch_moru_001_n009_c01',
+        text: '先递交旁听笔记，请双方按"争点-证据"复述',
+        effects: {
+          stats: { insight: 1 },
+          flags: { record_ready: true },
+          relationships: { confucian: { trust: 1 }, mozi: { trust: 1 } },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+      {
+        id: 'ch_moru_001_n009_c02',
+        text: '保持中立，不站队，只给流程建议',
+        effects: {
+          stats: { fame: -1, wisdom: 1 },
+          flags: { neutral_observer: true },
+        },
+        nextNode: 'ch_moru_001_n010',
+      },
+    ],
+  },
+  {
+    id: 'ch_moru_001_n010',
+    type: 'choice',
+    speaker: '学宫评议席',
+    emotion: 'normal',
+    content: `钟声再响，众目皆聚。
+
+「新弟子，今由汝给出最终主张。」`,
+    background: 'debate_hall',
+    choices: [
+      {
+        id: 'ch_moru_001_n010_c01',
+        text: '举证直陈：先公开证据，再按三日试行立规',
+        conditions: [
+          { type: 'flag', target: 'public_evidence_route', operator: 'eq', value: true },
+        ],
+        effects: {
+          stats: { fame: 1 },
+          flags: { ch_moru_001_completed: true, chapter_outcome: 'positive' },
+          relationships: { mozi: { trust: 1 }, confucian: { trust: 1 } },
+          path: 'chapter1_positive',
+        },
+        nextNode: 'ending_ch_moru_001_positive',
+      },
+      {
+        id: 'ch_moru_001_n010_c02',
+        text: '折中调停：先援后规，限定时效并留复盘口',
+        effects: {
+          stats: { wisdom: 1 },
+          flags: { ch_moru_001_completed: true, chapter_outcome: 'neutral' },
+          relationships: { confucian: { affection: 1 }, mozi: { affection: 1 } },
+          path: 'chapter1_neutral',
+        },
+        nextNode: 'ending_ch_moru_001_neutral',
+      },
+      {
+        id: 'ch_moru_001_n010_c03',
+        text: '暂不表态：建议延后裁决，先由长老接管',
+        effects: {
+          stats: { fame: -1 },
+          flags: { ch_moru_001_completed: true, chapter_outcome: 'degraded' },
+          path: 'chapter1_degraded',
+        },
+        nextNode: 'ending_ch_moru_001_degraded',
+      },
+    ],
+  },
+  {
+    id: 'ending_ch_moru_001_positive',
+    type: 'ending',
+    speaker: '学宫评议席',
+    emotion: 'normal',
+    content: `【第一章上半结果：正向收束】
+
+汝之证据链与执行顺序皆站得住脚。
+
+墨、儒两席虽仍有分歧，却第一次于同一份议程上签字。
+
+【已记录】公议取证路线`,
+    background: 'debate_hall',
+    nextNode: 'transition_ch_moru_001_part2',
+  },
+  {
+    id: 'ending_ch_moru_001_neutral',
+    type: 'ending',
+    speaker: '学宫评议席',
+    emotion: 'thinking',
+    content: `【第一章上半结果：稳态收束】
+
+汝未赢得满堂喝彩，然成功避免了争执升级。
+
+双方同意进入"三日试行"，汝获继续观察之权限。
+
+【已记录】折中调停路线`,
+    background: 'debate_hall',
+    nextNode: 'transition_ch_moru_001_part2',
+  },
+  {
+    id: 'ending_ch_moru_001_degraded',
+    type: 'ending',
+    speaker: '学宫评议席',
+    emotion: 'normal',
+    content: `【第一章上半结果：降级收束】
+
+汝选择了保守方案，冲突被压下，然核心分歧尚未解决。
+
+长老席接管后续裁决，汝被要求补交完整论证。
+
+【已记录】观望降级路线`,
+    background: 'debate_hall',
+    nextNode: 'transition_ch_moru_001_part2',
+  },
+  {
+    id: 'transition_ch_moru_001_part2',
+    type: 'narration',
+    speaker: '旁白',
+    emotion: 'normal',
+    content: `【第一章·上半 完】
+
+论辩落幕，余音袅袅。
+
+明德殿外，夕阳西沉，将天际染成一片血红。
+
+汝立于殿前石阶之上，望着众人渐渐散去，心中思绪如潮。
+
+墨家救急之说，儒家规矩之论……
+
+两派争执，各执一词，汝夹于其中，当如何自处？
+
+汝低头沉思，不觉间握紧了怀中那封泛黄的信函——
+
+父亲……
+
+彼临终所言，汝至今仍不甚明白。
+
+「若有难，可凭此信入稷下……」
+
+何难之有？父亲究竟知晓什么？
+
+忽而，汝脑海中闪过一道身影——
+
+那梦中老者，腰悬酒葫芦，目光如电……
+
+「汝父当年于此地，亦曾见吾……」
+
+「彼时彼刻，恰如此时此刻！」
+
+那老者究竟是何方神圣？与父亲又有何渊源？
+
+正当汝沉思之际，一阵晚风拂过，带来丝丝凉意。
+
+汝抬首四望——
+
+学宫之内，暮色渐浓。
+
+远处藏书阁的轮廓隐于暮霭之中，若隐若现；
+近处诸生三三两两，交头接耳；
+空气中似有一股暗流涌动……
+
+墨法之争，方兴未艾；
+秦国阴影，隐隐浮现；
+父亲之谜，待解未解；
+
+一切的一切，都指向同一个地方——
+
+稷下学宫。
+
+汝深吸一口气，目光渐渐坚定。
+
+既入此门，便无退路。
+
+无论前路如何迷雾重重，无论真相如何深藏不露——
+
+汝，都要——
+
+求一个明白。
+
+*夜色渐深，明月东升。*
+
+*稷下学宫之篇章，方才启幕……*
+
+【待续】`,
+    background: 'mingde_hall_sunset',
+    nextNode: 'ch_moru_001_n011',
+  },
+];

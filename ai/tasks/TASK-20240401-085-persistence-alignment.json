@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20240401-085-persistence-alignment",
+  "goal": "解耦持久化逻辑，支持多场景数据对齐并为 Electron 原生存储预留接口。",
+  "status": "in-progress",
+  "priority": "P1",
+  "constraints": [
+    "保持 localStorage 兼容性作为保底",
+    "不破坏现有的 MvpFlowShell 结算流程",
+    "遵从 canon/taboo.yaml 对机制数量的限制"
+  ],
+  "deliverables": [
+    "src/utils/persistence.ts - 独立的持久化工具",
+    "重构后的 src/ui/screens/MvpFlowShell.tsx (引用外部持久化)",
+    "src/config/arenas.ts - 场景/竞技场数据基准"
+  ],
+  "allowed_write_paths": [
+    "src/utils/persistence.ts",
+    "src/ui/screens/MvpFlowShell.tsx",
+    "src/config/arenas.ts"
+  ],
+  "acceptance_commands": [
+    "npm run typecheck"
+  ],
+  "context": "Phase 2 of renovation: 优化数据链路。将 MvpFlowShell 中的本地存储逻辑抽取出来，并支持多竞技场场景配置。"
+}

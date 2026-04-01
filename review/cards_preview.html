@@ -1,0 +1,191 @@
+﻿<!doctype html>
+<html lang='zh-CN'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <title>BS01 卡牌预览（可视化）</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --accent:#0f766e; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width:980px; margin:24px auto; padding:0 16px 28px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    .sub { color:var(--muted); margin-bottom:20px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,.04); }
+    .head { display:flex; gap:10px; align-items:baseline; margin-bottom:10px; }
+    .id { color:var(--accent); font-weight:700; }
+    .name { font-size:20px; font-weight:700; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:8px 0 10px; }
+    .grid > div { background:#fafafa; border:1px solid var(--line); border-radius:10px; padding:8px; }
+    .line { margin:6px 0; }
+    .note { margin-top:10px; padding:10px; border-radius:10px; background:#ecfeff; border:1px solid #cffafe; }
+    @media (max-width:700px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  </style>
+</head>
+<body>
+  <div class='wrap'>
+    <h1>BS01 卡牌预览（你可以直接看，不用看 JSON）</h1>
+    <div class='sub'>共 10 张，按“儒家 5 张 + 墨家 5 张”顺序展示。生成时间：2026-03-22 23:19:23</div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-RU-002</span>
+      <span class='name'>Wenyan-Lilun</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>confucian</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>spell</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Draw1;if allied,+1draw</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DRAW / MEC-CORE-ORDER</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-002 / ANC-RULE-002</div>
+    <div class='note'><b>大白话解释：</b>基础过牌法术；有友方单位时额外抽1。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-RU-003</span>
+      <span class='name'>Zhudu-Chaolu</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>confucian</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>spell</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Fetch1spell;discard1</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DRAW / MEC-CORE-TEMPO</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-002 / ANC-RULE-002</div>
+    <div class='note'><b>大白话解释：</b>检索一张法术，同时弃1张牌。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-RU-004</span>
+      <span class='name'>Jiangxi-Qinggui</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>confucian</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>field</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>First spell +1draw;gain2</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-ORDER / MEC-CORE-DEFENSE</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-002 / ANC-CONTENT-002</div>
+    <div class='note'><b>大白话解释：</b>场地效果：每回合第一张法术有额外收益并回复。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-RU-005</span>
+      <span class='name'>Sishi-Zhibi</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>confucian</div>
+      <div><b>稀有度</b><br/>rare</div>
+      <div><b>类型</b><br/>minion</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Onplay draw2;enemy Doubt1</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DRAW / MEC-CORE-ORDER</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-002 / ANC-CONTENT-002</div>
+    <div class='note'><b>大白话解释：</b>随从进场抽2，同时给敌方施加轻度干扰。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-RU-006</span>
+      <span class='name'>Libian-Tonggui</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>confucian</div>
+      <div><b>稀有度</b><br/>epic</div>
+      <div><b>类型</b><br/>spell</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Both draw1;you gain2</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DRAW / MEC-CORE-DEFENSE</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-002 / ANC-CONTENT-002</div>
+    <div class='note'><b>大白话解释：</b>双方都抽1，但你额外获得回复。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-MO-002</span>
+      <span class='name'>Liannu-Xia</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>mohist</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>weapon</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Equip +1atk;first hit +1</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-TEMPO / MEC-CORE-COUNTER</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-001 / ANC-RULE-002</div>
+    <div class='note'><b>大白话解释：</b>装备后提升攻击，第一次命中再补一点伤害。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-MO-003</span>
+      <span class='name'>Muyuan-Scout</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>mohist</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>weapon</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Peek1hand;damage to it +1</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-TEMPO / MEC-CORE-COUNTER</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-001 / ANC-RULE-002</div>
+    <div class='note'><b>大白话解释：</b>先看对手手牌，再对目标牌增加伤害效率。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-MO-004</span>
+      <span class='name'>Chengfang-Chidu</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>mohist</div>
+      <div><b>稀有度</b><br/>common</div>
+      <div><b>类型</b><br/>spell</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Gain4;with field gain6</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DEFENSE / MEC-CORE-TEMPO</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-001 / ANC-CONTENT-002</div>
+    <div class='note'><b>大白话解释：</b>防御回复法术；有场地时回复更高。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-MO-005</span>
+      <span class='name'>Jianji-Jiangshi</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>mohist</div>
+      <div><b>稀有度</b><br/>rare</div>
+      <div><b>类型</b><br/>minion</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Onplay fetch1gear;next-1</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DRAW / MEC-CORE-TEMPO</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-001 / ANC-RULE-003</div>
+    <div class='note'><b>大白话解释：</b>随从进场拿装备，并给下一张牌减费。</div>
+  </div>
+  <div class='card'>
+    <div class='head'>
+      <span class='id'>BS01-MO-006</span>
+      <span class='name'>Qianji-Bilei</span>
+    </div>
+    <div class='grid'>
+      <div><b>学派</b><br/>mohist</div>
+      <div><b>稀有度</b><br/>epic</div>
+      <div><b>类型</b><br/>field</div>
+      <div><b>费用</b><br/>2</div>
+    </div>
+    <div class='line'><b>规则文本：</b>Gear in +2;enemy first-2</div>
+    <div class='line'><b>机制ID：</b>MEC-CORE-DEFENSE / MEC-CORE-ORDER</div>
+    <div class='line'><b>锚点ID：</b>ANC-FACTION-001 / ANC-CONTENT-002</div>
+    <div class='note'><b>大白话解释：</b>场地控制：强化我方装备入场，压制敌方首个动作。</div>
+  </div>
+  </div>
+</body>
+</html>

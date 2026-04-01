@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260323-019",
+  "goal": "恢复旧版首页大厅体验（初始界面、音乐触发、卡牌图鉴、人物志与顶部功能区），同时保留当前战斗机制与战斗内逻辑不变。",
+  "constraints": [
+    "仅调整首页/大厅与图鉴相关UI流程，不修改核心战斗规则与结算逻辑。",
+    "保留现有可运行构建链路（build-safe），不得破坏 npm run build。",
+    "优先复用旧版已有UI资源与结构，避免无关扩写。",
+    "仅在允许路径内修改。"
+  ],
+  "deliverables": [
+    "首页初始界面与音乐触发交互恢复",
+    "卡牌图鉴与人物志入口及展示体验恢复",
+    "顶部系统功能区与导航体验恢复",
+    "验证 npm run typecheck 与 npm run build 通过"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-019.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-019.json"
+  ],
+  "status": "draft"
+}

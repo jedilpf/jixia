@@ -1,0 +1,2729 @@
+================================================================================
+                    稷下对决卡牌对战系统 V1.0
+                        源代码（后60页）
+================================================================================
+
+软件名称：稷下对决卡牌对战系统
+软件版本：V1.0
+软件简称：稷下对决
+
+--------------------------------------------------------------------------------
+                              第1页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx
+// 功能：手牌卡牌组件
+
+import { useState } from 'react';
+import type { Card } from '@/types/game';
+
+interface HandCardProps {
+  card: Card;
+  index: number;
+  x: number;
+  y: number;
+  rotation: number;
+  zIndex: number;
+  isPlayable: boolean;
+  isEnemy?: boolean;
+  isSelected?: boolean;
+  isDragging?: boolean;
+  scale: number;
+  onPointerDown?: (e: React.PointerEvent, index: number) => void;
+}
+
+const RARITY_GRADIENT: Record<string, string> = {
+  common: 'linear-gradient(160deg, #252015 0%, #1a1508 100%)',
+  rare: 'linear-gradient(160deg, #101830 0%, #0a1020 100%)',
+  epic: 'linear-gradient(160deg, #1e0830 0%, #120520 100%)',
+  legendary: 'linear-gradient(160deg, #2a1800 0%, #1a0e00 100%)',
+};
+
+const RARITY_BORDER: Record<string, string> = {
+  common: 'rgba(139,115,85,0.7)',
+  rare: 'rgba(30,120,230,0.85)',
+  epic: 'rgba(160,60,220,0.85)',
+  legendary: 'rgba(255,170,0,0.95)',
+};
+
+const TYPE_ICON: Record<string, string> = {
+  minion: '⚔',
+  weapon: '🗡',
+  spell: '✦',
+};
+
+--------------------------------------------------------------------------------
+                              第2页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 主函数
+
+export function HandCard({
+  card,
+  index,
+  x,
+  y,
+  rotation,
+  zIndex,
+  isPlayable,
+  isEnemy = false,
+  isSelected = false,
+  isDragging = false,
+  scale,
+  onPointerDown,
+}: HandCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const rarity = card.rarity ?? 'common';
+  const W = 238 * scale;
+  const H = 333 * scale;
+
+  const borderColor = isSelected
+    ? '#fff'
+    : isPlayable
+      ? '#E85D04'
+      : RARITY_BORDER[rarity];
+
+  const glowShadow = isSelected
+    ? `0 0 0 3px #fff, 0 0 20px rgba(255,255,255,0.5)`
+    : isHovered
+      ? `0 0 0 2px ${RARITY_BORDER[rarity]}, 0 0 24px rgba(232,93,4,0.5), 
+        0 8px 30px rgba(0,0,0,0.7)`
+      : isPlayable
+        ? `0 0 0 2px rgba(232,93,4,0.9), 0 0 18px rgba(232,93,4,0.6)`
+        : `0 4px 16px rgba(0,0,0,0.6)`;
+
+  const hoverActive = isHovered && !isDragging && !isEnemy;
+  const computedTransform = isDragging
+    ? 'rotate(0deg)'
+    : hoverActive
+      ? `rotate(0deg) scale(1.5) translateY(-${100 * scale}px)`
+      : `rotate(${rotation}deg)`;
+  const computedZ = isDragging ? 9999 : hoverActive ? 5000 : zIndex;
+
+--------------------------------------------------------------------------------
+                              第3页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 敌方手牌渲染
+
+  if (isEnemy) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          left: `${x * scale - W / 2}px`,
+          top: `${y * scale - H / 2}px`,
+          width: `${W}px`,
+          height: `${H}px`,
+          zIndex,
+          transform: `rotate(${rotation}deg)`,
+          transformOrigin: 'center bottom',
+          borderRadius: `${6 * scale}px`,
+          background: 'linear-gradient(135deg, #1a1208 0%, #0f0c05 100%)',
+          border: `${1.5 * scale}px solid rgba(139,115,85,0.4)`,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          overflow: 'hidden',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        <div style={{ fontSize: `${28 * scale}px`, opacity: 0.3 }}>☯</div>
+        <div style={{
+          position: 'absolute', inset: `${4 * scale}px`,
+          border: `${1 * scale}px solid rgba(139,115,85,0.2)`,
+          borderRadius: `${4 * scale}px`,
+        }} />
+      </div>
+    );
+  }
+
+--------------------------------------------------------------------------------
+                              第4页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 己方手牌渲染
+
+  const fx = scale;
+
+  return (
+    <div
+      onPointerDown={e => onPointerDown?.(e, index)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        position: 'absolute',
+        left: `${x * scale - W / 2}px`,
+        top: `${y * scale - H}px`,
+        width: `${W}px`,
+        height: `${H}px`,
+        zIndex: computedZ,
+        transform: computedTransform,
+        transformOrigin: 'center bottom',
+        borderRadius: `${6 * fx}px`,
+        background: `url(/assets/cards/${card.id}.jpg) center/cover no-repeat, 
+          ${RARITY_GRADIENT[rarity]}`,
+        border: `${2 * fx}px solid ${borderColor}`,
+        boxShadow: glowShadow,
+        cursor: isPlayable ? 'grab' : 'default',
+        transition: isDragging ? 'none' : 
+          'box-shadow 0.2s, border-color 0.2s, transform 0.2s ease-out, z-index 0s',
+        overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+        userSelect: 'none',
+      }}
+    >
+      {/* 顶部高光 */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '35%',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)',
+        pointerEvents: 'none',
+        zIndex: 10,
+      }} />
+
+--------------------------------------------------------------------------------
+                              第5页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 费用水晶和类型图标
+
+      {/* 稀有度顶色条 */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: `${3 * fx}px`,
+        background: `linear-gradient(90deg, transparent, ${RARITY_BORDER[rarity]}, transparent)`,
+      }} />
+
+      {/* 费用水晶 */}
+      <div style={{
+        position: 'absolute', top: `${5 * fx}px`, left: `${5 * fx}px`,
+        width: `${22 * fx}px`, height: `${22 * fx}px`,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle at 35% 30%, #60a5fa 0%, #1d4ed8 60%, #0f2060 100%)',
+        boxShadow: '0 0 8px rgba(96,165,250,0.6)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        border: `${1 * fx}px solid rgba(147,197,253,0.5)`,
+        zIndex: 2,
+      }}>
+        <span style={{ color: '#fff', fontWeight: 900, fontSize: `${12 * fx}px` }}>
+          {card.cost}
+        </span>
+      </div>
+
+      {/* 类型图标 */}
+      <div style={{
+        position: 'absolute', top: `${5 * fx}px`, right: `${5 * fx}px`,
+        fontSize: `${11 * fx}px`, opacity: 0.6, zIndex: 2,
+      }}>
+        {TYPE_ICON[card.type]}
+      </div>
+
+--------------------------------------------------------------------------------
+                              第6页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 名称和属性显示
+
+      {/* 名称横幅 */}
+      <div style={{
+        margin: `${3 * fx}px ${4 * fx}px 0`,
+        padding: `${2 * fx}px ${4 * fx}px`,
+        background: 'rgba(0,0,0,0.6)',
+        borderRadius: `${3 * fx}px`,
+        textAlign: 'center',
+      }}>
+        <div style={{
+          color: '#d4c5a9',
+          fontWeight: 700,
+          fontFamily: 'serif',
+          fontSize: `${10 * fx}px`,
+          letterSpacing: '0.5px',
+          lineHeight: 1.2,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}>
+          {card.name}
+        </div>
+      </div>
+
+      {/* 攻击力/血量或耐久 */}
+      {card.type !== 'spell' && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          padding: `${2 * fx}px ${6 * fx}px`,
+          marginTop: 'auto',
+        }}>
+          <div style={{
+            background: 'rgba(220,60,0,0.35)', borderRadius: `${3 * fx}px`,
+            padding: `${1 * fx}px ${5 * fx}px`,
+          }}>
+            <span style={{ color: '#fb923c', fontWeight: 900, fontSize: `${13 * fx}px` }}>
+              {card.atk ?? '—'}
+            </span>
+          </div>
+          <div style={{
+            background: card.type === 'weapon' ? 'rgba(200,160,0,0.3)' : 'rgba(16,80,50,0.35)',
+            borderRadius: `${3 * fx}px`,
+            padding: `${1 * fx}px ${5 * fx}px`,
+          }}>
+            <span style={{
+              color: card.type === 'weapon' ? '#fbbf24' : '#4ade80',
+              fontWeight: 900,
+              fontSize: `${13 * fx}px`,
+            }}>
+              {card.type === 'weapon' ? card.durability : card.hp}
+            </span>
+          </div>
+        </div>
+      )}
+
+--------------------------------------------------------------------------------
+                              第7页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HandCard.tsx（续）
+// 功能：手牌卡牌组件 - 可出牌动画
+
+      {/* 可出牌发光动画 */}
+      {isPlayable && (
+        <div style={{
+          position: 'absolute', inset: `-${2 * fx}px`,
+          borderRadius: `${8 * fx}px`,
+          border: `${2 * fx}px solid rgba(232,93,4,0.4)`,
+          animation: 'hand-card-playable 1.5s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+      )}
+
+      <style>{`
+        @keyframes hand-card-playable {
+          0%,100% { opacity:0.4; }
+          50% { opacity:1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第8页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx
+// 功能：随从卡牌组件
+
+import type { MinionInstance } from '@/types/game';
+
+interface MinionCardProps {
+  minion: MinionInstance;
+  isEnemy?: boolean;
+  canAttack?: boolean;
+  isSelected?: boolean;
+  isAttacking?: boolean;
+  onClick?: () => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
+  style?: React.CSSProperties;
+}
+
+const RARITY_COLORS: Record<string, string> = {
+  common: 'rgba(180,180,180,0.8)',
+  rare: 'rgba(30,120,230,0.9)',
+  epic: 'rgba(160,60,220,0.9)',
+  legendary: 'rgba(255,170,0,0.95)',
+};
+
+--------------------------------------------------------------------------------
+                              第9页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 主函数
+
+export function MinionCard({
+  minion,
+  isEnemy = false,
+  canAttack = false,
+  isSelected = false,
+  isAttacking = false,
+  onClick,
+  onPointerDown,
+  style,
+}: MinionCardProps) {
+  const rarity = minion.rarity ?? 'common';
+  const rarityColor = RARITY_COLORS[rarity];
+  const isLow = minion.hp <= minion.maxHp * 0.35;
+
+  const borderColor = isSelected
+    ? '#fff'
+    : canAttack
+      ? '#E85D04'
+      : minion.isExhausted
+        ? '#444'
+        : rarityColor;
+
+  const boxShadow = isSelected
+    ? '0 0 0 3px #fff, 0 0 20px rgba(255,255,255,0.6)'
+    : canAttack
+      ? '0 0 0 2px #E85D04, 0 0 16px rgba(232,93,4,0.7)'
+      : '0 4px 12px rgba(0,0,0,0.5)';
+
+  const hpColor = isLow ? '#ef4444' : '#6ee7b7';
+
+--------------------------------------------------------------------------------
+                              第10页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 容器渲染
+
+  return (
+    <div
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        cursor: canAttack && !isEnemy ? 'grab' : 'default',
+        userSelect: 'none',
+        borderRadius: '8px',
+        border: `2px solid ${borderColor}`,
+        background: 'linear-gradient(160deg, #2a1f0e 0%, #1a1408 60%, #0f0c05 100%)',
+        boxShadow,
+        transition: 'box-shadow 0.2s, border-color 0.2s, transform 0.15s',
+        transform: isAttacking ? 'scale(1.08)' : 'scale(1)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...style,
+      }}
+    >
+      {/* 金属光泽顶部高光 */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '30%',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* 稀有度色条（顶部） */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+        background: `linear-gradient(90deg, transparent, ${rarityColor}, transparent)`,
+      }} />
+
+--------------------------------------------------------------------------------
+                              第11页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 嘲讽和疲劳标记
+
+      {/* 嘲讽标记 */}
+      {minion.hasTaunt && (
+        <div style={{
+          position: 'absolute', top: 4, right: 4,
+          background: 'rgba(180,130,0,0.9)', borderRadius: '3px',
+          fontSize: '8px', color: '#fff', padding: '1px 4px', fontWeight: 700,
+          letterSpacing: '0.5px',
+        }}>
+          嘲讽
+        </div>
+      )}
+
+      {/* 疲劳蒙层 */}
+      {minion.isExhausted && !isEnemy && (
+        <div style={{
+          position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)',
+          zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '20px',
+        }}>
+          ⏳
+        </div>
+      )}
+
+      {/* 可攻击脉冲环 */}
+      {canAttack && !isEnemy && !minion.isExhausted && (
+        <div style={{
+          position: 'absolute', inset: '-3px', borderRadius: '10px',
+          border: '2px solid rgba(232,93,4,0.5)',
+          animation: 'minion-glow 1.4s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+      )}
+
+--------------------------------------------------------------------------------
+                              第12页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 名称和血条
+
+      {/* 名称 */}
+      <div style={{
+        color: '#d4c5a9',
+        fontSize: 'clamp(9px, 1.8vh, 13px)',
+        fontWeight: 700,
+        fontFamily: 'serif',
+        textAlign: 'center',
+        letterSpacing: '0.5px',
+        padding: '0 4px',
+        lineHeight: 1.2,
+        textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+        zIndex: 2,
+      }}>
+        {minion.name}
+      </div>
+
+      {/* HP 条 */}
+      <div style={{
+        width: '85%', height: '6px',
+        background: 'rgba(0,0,0,0.5)',
+        borderRadius: '3px', margin: '8px 0 4px',
+        overflow: 'hidden', zIndex: 2,
+      }}>
+        <div style={{
+          width: `${Math.max(0, (minion.hp / minion.maxHp) * 100)}%`,
+          height: '100%',
+          background: isLow
+            ? 'linear-gradient(90deg, #ef4444, #f97316)'
+            : 'linear-gradient(90deg, #10b981, #6ee7b7)',
+          transition: 'width 0.3s',
+          borderRadius: '2px',
+        }} />
+      </div>
+
+--------------------------------------------------------------------------------
+                              第13页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 攻击力和血量显示
+
+      {/* 攻击力 / 血量数字 */}
+      <div style={{
+        display: 'flex', gap: '12px',
+        alignItems: 'center', zIndex: 2, marginTop: '4px',
+      }}>
+        {/* 攻击力 */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '4px',
+          background: 'rgba(255,80,0,0.25)', borderRadius: '6px', padding: '2px 8px',
+        }}>
+          <span style={{ color: '#f97316', fontSize: '12px' }}>⚔</span>
+          <span style={{
+            color: '#ffd700', fontWeight: 900,
+            fontSize: 'clamp(14px, 2.8vh, 22px)',
+            textShadow: '0 0 10px rgba(255,100,0,0.8)',
+          }}>
+            {minion.atk}
+          </span>
+        </div>
+        {/* 血量 */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '4px',
+          background: 'rgba(16,80,50,0.3)', borderRadius: '6px', padding: '2px 8px',
+        }}>
+          <span style={{ color: '#6ee7b7', fontSize: '12px' }}>❤</span>
+          <span style={{
+            color: hpColor,
+            fontWeight: 900,
+            fontSize: 'clamp(14px, 2.8vh, 22px)',
+            textShadow: isLow ? '0 0 10px rgba(239,68,68,0.8)' : 
+              '0 0 10px rgba(110,231,183,0.6)',
+          }}>
+            {minion.hp}
+          </span>
+        </div>
+      </div>
+
+--------------------------------------------------------------------------------
+                              第14页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/MinionCard.tsx（续）
+// 功能：随从卡牌组件 - 底部装饰和动画
+
+      {/* 底部铜纹装饰 */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+        background: `linear-gradient(90deg, transparent, ${rarityColor}55, transparent)`,
+      }} />
+
+      <style>{`
+        @keyframes minion-glow {
+          0%,100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.02); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第15页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx
+// 功能：英雄卡牌组件
+
+import type { Hero, WeaponInstance } from '@/types/game';
+
+interface HeroCardProps {
+  hero: Hero;
+  isEnemy?: boolean;
+  isSelected?: boolean;
+  canBeAttacked?: boolean;
+  onClick?: () => void;
+  style?: React.CSSProperties;
+}
+
+export function HeroCard({
+  hero,
+  isEnemy = false,
+  isSelected = false,
+  canBeAttacked = false,
+  onClick,
+  style,
+}: HeroCardProps) {
+  const isLow = hero.hp <= 10;
+  const isCritical = hero.hp <= 5;
+
+  const borderColor = isSelected
+    ? '#fff'
+    : canBeAttacked
+      ? '#ef4444'
+      : isEnemy
+        ? 'rgba(180,60,60,0.6)'
+        : 'rgba(139,115,85,0.7)';
+
+  const boxShadow = isSelected
+    ? '0 0 0 3px #fff, 0 0 20px rgba(255,255,255,0.5)'
+    : canBeAttacked
+      ? '0 0 0 2px #ef4444, 0 0 14px rgba(239,68,68,0.6)'
+      : isCritical
+        ? '0 0 16px rgba(239,68,68,0.4)'
+        : '0 4px 16px rgba(0,0,0,0.5)';
+
+--------------------------------------------------------------------------------
+                              第16页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx（续）
+// 功能：英雄卡牌组件 - 容器渲染
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        cursor: canBeAttacked ? 'crosshair' : onClick ? 'pointer' : 'default',
+        borderRadius: '10px',
+        border: `2px solid ${borderColor}`,
+        background: isEnemy
+          ? 'linear-gradient(160deg, #1e0808 0%, #120505 100%)'
+          : 'linear-gradient(160deg, #1a1408 0%, #0f0c05 100%)',
+        boxShadow,
+        transition: 'box-shadow 0.2s, border-color 0.2s',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '3px',
+        ...style,
+      }}
+    >
+      {/* 顶部高光 */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '30%',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }} />
+
+--------------------------------------------------------------------------------
+                              第17页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx（续）
+// 功能：英雄卡牌组件 - 头像和HP显示
+
+      {/* 英雄头像 */}
+      <div style={{
+        fontSize: 'clamp(28px, 5vh, 48px)',
+        lineHeight: 1,
+        filter: isCritical ? 'drop-shadow(0 0 8px rgba(239,68,68,0.8))' : 'none',
+        animation: isCritical ? 'hero-critical 0.8s ease-in-out infinite' : 'none',
+      }}>
+        {isEnemy ? '👿' : '🎓'}
+      </div>
+
+      {/* HP 显示 */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '6px',
+        background: 'rgba(0,0,0,0.5)',
+        borderRadius: '8px', padding: '4px 12px',
+        marginTop: '4px',
+      }}>
+        <span style={{ color: '#6ee7b7', fontSize: '14px' }}>❤</span>
+        <span style={{
+          color: isCritical ? '#ef4444' : isLow ? '#f97316' : '#6ee7b7',
+          fontWeight: 900,
+          fontSize: 'clamp(20px, 3.5vh, 28px)',
+          textShadow: isCritical ? '0 0 12px rgba(239,68,68,0.9)' : 
+            '0 0 10px rgba(110,231,183,0.5)',
+          animation: isCritical ? 'hero-critical 0.8s ease-in-out infinite' : 'none',
+        }}>
+          {hero.hp}
+        </span>
+        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>/{hero.maxHp}</span>
+      </div>
+
+--------------------------------------------------------------------------------
+                              第18页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx（续）
+// 功能：英雄卡牌组件 - 护甲和武器显示
+
+      {/* 护甲 */}
+      {hero.armor > 0 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '3px',
+          background: 'rgba(100,140,200,0.2)',
+          borderRadius: '4px', padding: '1px 6px',
+        }}>
+          <span style={{ color: '#93c5fd', fontSize: '9px' }}>🛡</span>
+          <span style={{ color: '#93c5fd', fontWeight: 700, 
+            fontSize: 'clamp(11px, 2vh, 15px)' }}>
+            {hero.armor}
+          </span>
+        </div>
+      )}
+
+      {/* 武器显示 */}
+      {hero.weapon && (
+        <WeaponBadge weapon={hero.weapon} />
+      )}
+
+      {/* HP 条 */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
+        background: 'rgba(0,0,0,0.5)',
+      }}>
+        <div style={{
+          width: `${Math.max(0, (hero.hp / hero.maxHp) * 100)}%`,
+          height: '100%',
+          background: isCritical
+            ? 'linear-gradient(90deg, #dc2626, #ef4444)'
+            : isLow
+              ? 'linear-gradient(90deg, #ea580c, #f97316)'
+              : 'linear-gradient(90deg, #059669, #10b981)',
+          transition: 'width 0.4s, background 0.3s',
+        }} />
+      </div>
+
+--------------------------------------------------------------------------------
+                              第19页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx（续）
+// 功能：英雄卡牌组件 - 目标环和动画
+
+      {/* 可被攻击Target环 */}
+      {canBeAttacked && (
+        <div style={{
+          position: 'absolute', inset: '-3px',
+          borderRadius: '12px',
+          border: '2px solid rgba(239,68,68,0.5)',
+          animation: 'target-pulse 1s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+      )}
+
+      <style>{`
+        @keyframes hero-critical {
+          0%,100% { opacity:1; }
+          50% { opacity:0.6; }
+        }
+        @keyframes target-pulse {
+          0%,100% { opacity:0.5; transform: scale(1); }
+          50% { opacity:1; transform: scale(1.03); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第20页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/HeroCard.tsx（续）
+// 功能：武器徽章组件
+
+function WeaponBadge({ weapon }: { weapon: WeaponInstance }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '3px',
+      background: 'rgba(180, 100, 0, 0.3)',
+      borderRadius: '4px', padding: '1px 6px',
+      border: '1px solid rgba(220,120,0,0.4)',
+    }}>
+      <span style={{ fontSize: '9px' }}>⚔</span>
+      <span style={{ color: '#fbbf24', fontWeight: 700, 
+        fontSize: 'clamp(10px,1.8vh,13px)' }}>
+        {weapon.atk}
+      </span>
+      <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px' }}>|</span>
+      <span style={{ color: '#fb923c', fontWeight: 700, 
+        fontSize: 'clamp(10px,1.8vh,13px)' }}>
+        {weapon.durability}
+      </span>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第21页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/ManaBar.tsx
+// 功能：法力水晶条组件
+
+import type { PlayerState } from '@/types/game';
+
+interface ManaBarProps {
+  player: PlayerState;
+  isEnemy?: boolean;
+  scale: number;
+}
+
+export function ManaBar({ player, isEnemy = false, scale }: ManaBarProps) {
+  const { mana, maxMana } = player;
+  const crystals = Array.from({ length: 10 }, (_, i) => ({
+    index: i,
+    filled: i < mana,
+    available: i < maxMana,
+  }));
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: `${4 * scale}px`,
+        padding: `${4 * scale}px ${8 * scale}px`,
+        background: 'rgba(0,0,0,0.6)',
+        borderRadius: `${8 * scale}px`,
+        border: `${1 * scale}px solid rgba(139,115,85,0.3)',
+      }}
+    >
+      {crystals.map((crystal) => (
+        <div
+          key={crystal.index}
+          style={{
+            width: `${20 * scale}px`,
+            height: `${20 * scale}px`,
+            borderRadius: '50%',
+            background: crystal.filled
+              ? 'radial-gradient(circle at 35% 30%, #60a5fa 0%, #1d4ed8 60%, #0f2060 100%)'
+              : crystal.available
+                ? 'radial-gradient(circle at 35% 30%, #1e3a5f 0%, #0f1f3a 60%, #050a15 100%)'
+                : 'rgba(30,30,30,0.5)',
+            boxShadow: crystal.filled
+              ? '0 0 8px rgba(96,165,250,0.6)'
+              : 'none',
+            border: `${1 * scale}px solid ${crystal.filled 
+              ? 'rgba(147,197,253,0.5)' : 'rgba(50,50,50,0.5)'}`,
+            transition: 'all 0.3s ease',
+          }}
+        />
+      ))}
+      <div style={{
+        color: '#60a5fa',
+        fontWeight: 700,
+        fontSize: `${14 * scale}px`,
+        marginLeft: `${4 * scale}px`,
+        textShadow: '0 0 8px rgba(96,165,250,0.5)',
+      }}>
+        {mana}/{maxMana}
+      </div>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第22页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/DeckPile.tsx
+// 功能：牌库组件
+
+interface DeckPileProps {
+  count: number;
+  isEnemy?: boolean;
+  scale: number;
+}
+
+export function DeckPile({ count, isEnemy = false, scale }: DeckPileProps) {
+  return (
+    <div
+      style={{
+        width: `${80 * scale}px`,
+        height: `${110 * scale}px`,
+        position: 'relative',
+        cursor: 'default',
+      }}
+    >
+      {/* 卡牌堆叠效果 */}
+      {Array.from({ length: Math.min(5, count) }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            top: `${i * 2}px`,
+            left: `${i * 1}px`,
+            width: '100%',
+            height: '100%',
+            borderRadius: `${6 * scale}px`,
+            background: 'linear-gradient(135deg, #1a1208 0%, #0f0c05 100%)',
+            border: `${1.5 * scale}px solid rgba(139,115,85,0.4)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+          }}
+        />
+      ))}
+
+      {/* 剩余牌数 */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#d4c5a9',
+        fontWeight: 700,
+        fontSize: `${18 * scale}px`,
+        textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+        zIndex: 10,
+      }}>
+        {count}
+      </div>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第23页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/EndTurnButton.tsx
+// 功能：结束回合按钮组件
+
+interface EndTurnButtonProps {
+  isPlayerTurn: boolean;
+  onClick: () => void;
+  scale: number;
+}
+
+export function EndTurnButton({ isPlayerTurn, onClick, scale }: EndTurnButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={!isPlayerTurn}
+      style={{
+        width: `${100 * scale}px`,
+        height: `${50 * scale}px`,
+        borderRadius: `${8 * scale}px`,
+        border: `${2 * scale}px solid ${isPlayerTurn ? '#E85D04' : 'rgba(100,100,100,0.5)'}`,
+        background: isPlayerTurn
+          ? 'linear-gradient(180deg, #E85D04 0%, #c44d00 100%)'
+          : 'linear-gradient(180deg, #333 0%, #222 100%)',
+        color: isPlayerTurn ? '#fff' : '#666',
+        fontWeight: 700,
+        fontSize: `${14 * scale}px`,
+        cursor: isPlayerTurn ? 'pointer' : 'not-allowed',
+        boxShadow: isPlayerTurn
+          ? '0 0 20px rgba(232,93,4,0.5), 0 4px 12px rgba(0,0,0,0.4)'
+          : '0 2px 8px rgba(0,0,0,0.3)',
+        transition: 'all 0.2s ease',
+        textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+      }}
+    >
+      {isPlayerTurn ? '结束回合' : '敌方回合'}
+    </button>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第24页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/EmptySlot.tsx
+// 功能：空槽位组件
+
+interface EmptySlotProps {
+  isHighlighted?: boolean;
+  onClick?: () => void;
+  scale: number;
+}
+
+export function EmptySlot({ isHighlighted = false, onClick, scale }: EmptySlotProps) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        width: '100%',
+        height: '100%',
+        borderRadius: `${8 * scale}px`,
+        border: `${2 * scale}px dashed ${isHighlighted ? '#E85D04' : 'rgba(139,115,85,0.2)'}`,
+        background: isHighlighted
+          ? 'rgba(232,93,4,0.1)'
+          : 'rgba(0,0,0,0.2)',
+        cursor: isHighlighted ? 'pointer' : 'default',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {isHighlighted && (
+        <div style={{
+          color: '#E85D04',
+          fontSize: `${24 * scale}px`,
+          opacity: 0.6,
+        }}>
+          +
+        </div>
+      )}
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第25页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/TurnBanner.tsx
+// 功能：回合提示横幅组件
+
+interface TurnBannerProps {
+  isPlayerTurn: boolean;
+  turnNumber: number;
+  scale: number;
+}
+
+export function TurnBanner({ isPlayerTurn, turnNumber, scale }: TurnBannerProps) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        padding: `${12 * scale}px ${32 * scale}px`,
+        background: 'rgba(0,0,0,0.9)',
+        borderRadius: `${8 * scale}px`,
+        border: `${2 * scale}px solid ${isPlayerTurn ? '#E85D04' : '#ef4444'}`,
+        boxShadow: `0 0 30px ${isPlayerTurn ? 'rgba(232,93,4,0.5)' : 'rgba(239,68,68,0.5)'}`,
+        zIndex: 1000,
+        animation: 'turn-banner-in 0.5s ease-out',
+      }}
+    >
+      <div style={{
+        color: isPlayerTurn ? '#E85D04' : '#ef4444',
+        fontWeight: 900,
+        fontSize: `${24 * scale}px`,
+        textAlign: 'center',
+        textShadow: `0 0 20px ${isPlayerTurn ? 'rgba(232,93,4,0.8)' : 'rgba(239,68,68,0.8)'}`,
+      }}>
+        {isPlayerTurn ? '你的回合' : '敌方回合'}
+      </div>
+      <div style={{
+        color: '#d4c5a9',
+        fontSize: `${14 * scale}px`,
+        textAlign: 'center',
+        marginTop: `${4 * scale}px`,
+      }}>
+        第 {turnNumber} 回合
+      </div>
+
+      <style>{`
+        @keyframes turn-banner-in {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+          100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第26页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/GameResultOverlay.tsx
+// 功能：游戏结果覆盖层组件
+
+interface GameResultOverlayProps {
+  isVictory: boolean;
+  onRestart: () => void;
+  onMainMenu: () => void;
+  scale: number;
+}
+
+export function GameResultOverlay({ 
+  isVictory, 
+  onRestart, 
+  onMainMenu, 
+  scale 
+}: GameResultOverlayProps) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'rgba(0,0,0,0.85)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 2000,
+        animation: 'result-fade-in 0.5s ease-out',
+      }}
+    >
+      {/* 结果标题 */}
+      <div style={{
+        color: isVictory ? '#ffd700' : '#ef4444',
+        fontWeight: 900,
+        fontSize: `${48 * scale}px`,
+        textShadow: `0 0 40px ${isVictory ? 'rgba(255,215,0,0.8)' : 'rgba(239,68,68,0.8)'}`,
+        marginBottom: `${32 * scale}px`,
+        animation: isVictory ? 'victory-glow 1s ease-in-out infinite' : 'none',
+      }}>
+        {isVictory ? '胜利!' : '失败'}
+      </div>
+
+--------------------------------------------------------------------------------
+                              第27页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/GameResultOverlay.tsx（续）
+// 功能：游戏结果覆盖层组件 - 按钮
+
+      {/* 操作按钮 */}
+      <div style={{
+        display: 'flex',
+        gap: `${16 * scale}px`,
+      }}>
+        <button
+          onClick={onRestart}
+          style={{
+            padding: `${12 * scale}px ${32 * scale}px`,
+            borderRadius: `${8 * scale}px`,
+            border: `${2 * scale}px solid #E85D04`,
+            background: 'linear-gradient(180deg, #E85D04 0%, #c44d00 100%)',
+            color: '#fff',
+            fontWeight: 700,
+            fontSize: `${16 * scale}px`,
+            cursor: 'pointer',
+            boxShadow: '0 0 20px rgba(232,93,4,0.5)',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          再来一局
+        </button>
+        <button
+          onClick={onMainMenu}
+          style={{
+            padding: `${12 * scale}px ${32 * scale}px`,
+            borderRadius: `${8 * scale}px`,
+            border: `${2 * scale}px solid rgba(139,115,85,0.5)',
+            background: 'linear-gradient(180deg, #333 0%, #222 100%)',
+            color: '#d4c5a9',
+            fontWeight: 700,
+            fontSize: `${16 * scale}px`,
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          返回菜单
+        </button>
+      </div>
+
+--------------------------------------------------------------------------------
+                              第28页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/GameResultOverlay.tsx（续）
+// 功能：游戏结果覆盖层组件 - 动画样式
+
+      <style>{`
+        @keyframes result-fade-in {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        @keyframes victory-glow {
+          0%,100% { text-shadow: 0 0 40px rgba(255,215,0,0.8); }
+          50% { text-shadow: 0 0 60px rgba(255,215,0,1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第29页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/battle/index.ts
+// 功能：战斗组件导出索引
+
+export { HandCard } from './HandCard';
+export { MinionCard } from './MinionCard';
+export { HeroCard } from './HeroCard';
+export { ManaBar } from './ManaBar';
+export { DeckPile } from './DeckPile';
+export { EndTurnButton } from './EndTurnButton';
+export { EmptySlot } from './EmptySlot';
+export { TurnBanner } from './TurnBanner';
+export { GameResultOverlay } from './GameResultOverlay';
+
+--------------------------------------------------------------------------------
+                              第30页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/layoutUtils.ts
+// 功能：布局计算工具函数
+
+import { LAYOUT } from '@/config/layoutSpec';
+import type { BBox } from '@/types/layout';
+
+export function getLayoutBBox(id: string): BBox | undefined {
+  const item = LAYOUT.layouts.find(l => l.id === id);
+  if (!item) return undefined;
+  
+  let x = typeof item.x === 'string' ? parseInt(item.x, 10) : item.x;
+  let y = typeof item.y === 'string' ? parseInt(item.y, 10) : item.y;
+  
+  return {
+    x,
+    y,
+    w: item.w,
+    h: item.h,
+  };
+}
+
+export function getMinionSlotPosition(
+  index: number,
+  isEnemy: boolean
+): { x: number; y: number; w: number; h: number } {
+  const prefix = isEnemy ? 'enemy-minion' : 'player-minion';
+  const bbox = getLayoutBBox(`${prefix}-${index}`);
+  
+  if (!bbox) {
+    return { x: 0, y: 0, w: 120, h: 140 };
+  }
+  
+  return { x: bbox.x, y: bbox.y, w: bbox.w, h: bbox.h };
+}
+
+--------------------------------------------------------------------------------
+                              第31页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/layoutUtils.ts（续）
+// 功能：布局计算工具函数 - 手牌位置计算
+
+export function getHandCardPositions(
+  cardCount: number,
+  isEnemy: boolean
+): Array<{ x: number; y: number; rotation: number; zIndex: number }> {
+  const positions: Array<{ x: number; y: number; rotation: number; zIndex: number }> = [];
+  
+  const centerX = 960;
+  const baseY = isEnemy ? 50 : 950;
+  const cardSpacing = 95;
+  const maxSpread = 800;
+  const fanAngle = 15;
+  
+  const totalWidth = Math.min(cardCount * cardSpacing, maxSpread);
+  const startX = centerX - totalWidth / 2;
+  
+  for (let i = 0; i < cardCount; i++) {
+    const progress = cardCount > 1 ? i / (cardCount - 1) : 0.5;
+    const offsetFromCenter = progress - 0.5;
+    
+    const x = startX + i * cardSpacing;
+    const rotation = offsetFromCenter * fanAngle * (isEnemy ? -1 : 1);
+    const y = baseY + Math.abs(offsetFromCenter) * 30;
+    
+    positions.push({
+      x,
+      y,
+      rotation,
+      zIndex: i,
+    });
+  }
+  
+  return positions;
+}
+
+--------------------------------------------------------------------------------
+                              第32页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/layoutUtils.ts（续）
+// 功能：布局计算工具函数 - 坐标转换
+
+export function screenToCanvas(
+  clientX: number,
+  clientY: number,
+  scale: number,
+  offsetX: number,
+  offsetY: number
+): { x: number; y: number } {
+  return {
+    x: (clientX - offsetX) / scale,
+    y: (clientY - offsetY) / scale,
+  };
+}
+
+export function canvasToScreen(
+  x: number,
+  y: number,
+  scale: number,
+  offsetX: number,
+  offsetY: number
+): { x: number; y: number } {
+  return {
+    x: x * scale + offsetX,
+    y: y * scale + offsetY,
+  };
+}
+
+export function isPointInRect(
+  px: number,
+  py: number,
+  rect: { x: number; y: number; w: number; h: number }
+): boolean {
+  return px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
+}
+
+--------------------------------------------------------------------------------
+                              第33页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/layoutUtils.ts（续）
+// 功能：布局计算工具函数 - 目标检测
+
+export function getTargetAtPosition(
+  x: number,
+  y: number,
+  game: { player: { board: unknown[]; hero: unknown }; 
+    enemy: { board: unknown[]; hero: unknown } }
+): { type: 'minion' | 'hero'; player: 'player' | 'enemy'; index?: number } | null {
+  // 检查敌方随从
+  for (let i = 0; i < 7; i++) {
+    const slot = getMinionSlotPosition(i, true);
+    if (isPointInRect(x, y, slot) && game.enemy.board[i]) {
+      return { type: 'minion', player: 'enemy', index: i };
+    }
+  }
+  
+  // 检查敌方英雄
+  const enemyHeroBBox = getLayoutBBox('enemy-hero');
+  if (enemyHeroBBox && isPointInRect(x, y, enemyHeroBBox)) {
+    return { type: 'hero', player: 'enemy' };
+  }
+  
+  // 检查己方随从
+  for (let i = 0; i < 7; i++) {
+    const slot = getMinionSlotPosition(i, false);
+    if (isPointInRect(x, y, slot) && game.player.board[i]) {
+      return { type: 'minion', player: 'player', index: i };
+    }
+  }
+  
+  // 检查己方英雄
+  const playerHeroBBox = getLayoutBBox('player-hero');
+  if (playerHeroBBox && isPointInRect(x, y, playerHeroBBox)) {
+    return { type: 'hero', player: 'player' };
+  }
+  
+  return null;
+}
+
+--------------------------------------------------------------------------------
+                              第34页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/layoutMath.ts
+// 功能：布局数学计算工具
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+export function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
+
+export function easeOutQuad(t: number): number {
+  return t * (2 - t);
+}
+
+export function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+export function distance(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+export function angle(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.atan2(y2 - y1, x2 - x1);
+}
+
+--------------------------------------------------------------------------------
+                              第35页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/hero.ts
+// 功能：英雄数据定义
+
+import { HeroPower } from '@/types/game';
+
+export function createHeroPower(): HeroPower {
+  return {
+    name: '召唤报告兵',
+    cost: 2,
+    type: 'summon',
+    value: 1,
+    description: '召唤一个1/1的报告兵',
+    usedThisTurn: false,
+  };
+}
+
+export const HERO_DATA = {
+  player: {
+    name: '稷下学者',
+    title: '诸子百家之徒',
+    description: '来自稷下学宫的年轻学者，精通各家学说',
+  },
+  enemy: {
+    name: '机关守卫',
+    title: '青铜城的守护者',
+    description: '守护青铜机关城的古老守卫',
+  },
+};
+
+--------------------------------------------------------------------------------
+                              第36页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/BattleBackground.tsx
+// 功能：战斗背景组件
+
+interface BattleBackgroundProps {
+  scale: number;
+}
+
+export function BattleBackground({ scale }: BattleBackgroundProps) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: `
+          radial-gradient(ellipse at 50% 0%, rgba(139,115,85,0.15) 0%, transparent 50%),
+          radial-gradient(ellipse at 50% 100%, rgba(74,124,111,0.1) 0%, transparent 50%),
+          linear-gradient(180deg, #0a0805 0%, #0f0c08 50%, #0a0805 100%)
+        `,
+        overflow: 'hidden',
+      }}
+    >
+      {/* 装饰性齿轮图案 */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        width: `${200 * scale}px`,
+        height: `${200 * scale}px`,
+        borderRadius: '50%',
+        border: `${2 * scale}px solid rgba(139,115,85,0.1)`,
+        opacity: 0.3,
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        right: '8%',
+        width: `${150 * scale}px`,
+        height: `${150 * scale}px`,
+        borderRadius: '50%',
+        border: `${2 * scale}px solid rgba(74,124,111,0.1)`,
+        opacity: 0.3,
+      }} />
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第37页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/TransitionScreen.tsx
+// 功能：过渡动画界面组件
+
+import { useEffect, useState } from 'react';
+
+interface TransitionScreenProps {
+  onComplete: () => void;
+}
+
+export function TransitionScreen({ onComplete }: TransitionScreenProps) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const duration = 2000;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min(1, elapsed / duration);
+      setProgress(newProgress);
+
+      if (newProgress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setTimeout(onComplete, 200);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [onComplete]);
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'linear-gradient(135deg, #0a0805 0%, #1a1408 50%, #0a0805 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 3000,
+      }}
+    >
+      <div style={{
+        color: '#d4a520',
+        fontSize: '32px',
+        fontWeight: 700,
+        marginBottom: '32px',
+        textShadow: '0 0 20px rgba(212,165,32,0.5)',
+      }}>
+        对战即将开始
+      </div>
+
+      <div style={{
+        width: '300px',
+        height: '4px',
+        background: 'rgba(139,115,85,0.3)',
+        borderRadius: '2px',
+        overflow: 'hidden',
+      }}>
+        <div style={{
+          width: `${progress * 100}%`,
+          height: '100%',
+          background: 'linear-gradient(90deg, #d4a520, #E85D04)',
+          transition: 'width 0.1s linear',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第38页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/BattleAnimations.tsx
+// 功能：战斗动画系统组件
+
+import { useEffect, useRef, useState } from 'react';
+
+interface DamageNumber {
+  id: string;
+  value: number;
+  x: number;
+  y: number;
+  isHeal?: boolean;
+}
+
+interface BattleAnimationsProps {
+  damageNumbers: DamageNumber[];
+  scale: number;
+}
+
+export function BattleAnimations({ damageNumbers, scale }: BattleAnimationsProps) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+        zIndex: 1500,
+      }}
+    >
+      {damageNumbers.map((dn) => (
+        <DamageNumber key={dn.id} {...dn} scale={scale} />
+      ))}
+    </div>
+  );
+}
+
+function DamageNumber({ value, x, y, isHeal, scale }: DamageNumber & { scale: number }) {
+  const [offset, setOffset] = useState(0);
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    const duration = 1000;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = elapsed / duration;
+
+      setOffset(progress * 50);
+      setOpacity(1 - progress);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: x * scale,
+        top: (y - offset) * scale,
+        color: isHeal ? '#4ade80' : '#ef4444',
+        fontWeight: 900,
+        fontSize: `${28 * scale}px`,
+        textShadow: `0 0 10px ${isHeal ? 'rgba(74,222,128,0.8)' : 'rgba(239,68,68,0.8)'}`,
+        opacity,
+        transform: 'translate(-50%, -50%)',
+      }}
+    >
+      {isHeal ? '+' : '-'}{value}
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第39页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/BattleAnimations.tsx（续）
+// 功能：战斗动画系统 - 攻击轨迹组件
+
+interface AttackTrailProps {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  scale: number;
+}
+
+export function AttackTrail({ startX, startY, endX, endY, scale }: AttackTrailProps) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const duration = 200;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min(1, elapsed / duration);
+      setProgress(newProgress);
+
+      if (newProgress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, []);
+
+  const currentX = startX + (endX - startX) * progress;
+  const currentY = startY + (endY - startY) * progress;
+
+  return (
+    <svg
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 1400,
+      }}
+    >
+      <line
+        x1={startX * scale}
+        y1={startY * scale}
+        x2={currentX * scale}
+        y2={currentY * scale}
+        stroke="#E85D04"
+        strokeWidth={3 * scale}
+        strokeLinecap="round"
+        opacity={0.8}
+      />
+      <circle
+        cx={currentX * scale}
+        cy={currentY * scale}
+        r={8 * scale}
+        fill="#E85D04"
+        opacity={0.9}
+      />
+    </svg>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第40页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/HeroConsole.tsx
+// 功能：英雄控制台组件
+
+import type { Hero, PlayerState } from '@/types/game';
+
+interface HeroConsoleProps {
+  player: PlayerState;
+  isPlayerTurn: boolean;
+  onHeroPowerClick: () => void;
+  onHeroClick: () => void;
+  scale: number;
+}
+
+export function HeroConsole({
+  player,
+  isPlayerTurn,
+  onHeroPowerClick,
+  onHeroClick,
+  scale,
+}: HeroConsoleProps) {
+  const { hero, mana, maxMana } = player;
+  const canUsePower = isPlayerTurn && 
+    mana >= hero.heroPower.cost && 
+    !hero.heroPower.usedThisTurn;
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: `${8 * scale}px`,
+      }}
+    >
+      {/* 英雄卡 */}
+      <div
+        onClick={onHeroClick}
+        style={{
+          width: `${140 * scale}px`,
+          height: `${180 * scale}px`,
+          cursor: 'pointer',
+        }}
+      >
+        {/* HeroCard 组件渲染位置 */}
+      </div>
+
+      {/* 英雄技能按钮 */}
+      <button
+        onClick={onHeroPowerClick}
+        disabled={!canUsePower}
+        style={{
+          width: `${60 * scale}px`,
+          height: `${60 * scale}px`,
+          borderRadius: '50%',
+          border: `${2 * scale}px solid ${canUsePower ? '#E85D04' : '#333'}`,
+          background: canUsePower
+            ? 'radial-gradient(circle at 35% 30%, #E85D04 0%, #c44d00 100%)'
+            : '#222',
+          cursor: canUsePower ? 'pointer' : 'not-allowed',
+          boxShadow: canUsePower
+            ? '0 0 15px rgba(232,93,4,0.5)'
+            : 'none',
+        }}
+      >
+        <span style={{
+          color: canUsePower ? '#fff' : '#666',
+          fontSize: `${12 * scale}px`,
+          fontWeight: 700,
+        }}>
+          {hero.heroPower.cost}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第41页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/MainMenu.tsx
+// 功能：主菜单界面组件
+
+interface MainMenuProps {
+  onStartGame: () => void;
+  onCollection: () => void;
+  onCharacters: () => void;
+}
+
+export function MainMenu({ onStartGame, onCollection, onCharacters }: MainMenuProps) {
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0a0805 0%, #1a1408 50%, #0a0805 100%)',
+      }}
+    >
+      {/* 背景装饰 */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(ellipse at 50% 30%, rgba(212,165,32,0.1) 0%, transparent 50%)',
+      }} />
+
+      {/* 标题 */}
+      <div style={{
+        color: '#d4a520',
+        fontSize: '64px',
+        fontWeight: 900,
+        fontFamily: 'serif',
+        letterSpacing: '0.2em',
+        textShadow: '0 0 40px rgba(212,165,32,0.5)',
+        marginBottom: '64px',
+      }}>
+        稷下对决
+      </div>
+
+--------------------------------------------------------------------------------
+                              第42页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/MainMenu.tsx（续）
+// 功能：主菜单界面组件 - 菜单按钮
+
+      {/* 菜单按钮 */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}>
+        <MenuButton onClick={onStartGame} primary>
+          开始对决
+        </MenuButton>
+        <MenuButton onClick={onCharacters}>
+          角色选择
+        </MenuButton>
+        <MenuButton onClick={onCollection}>
+          卡牌收藏
+        </MenuButton>
+      </div>
+
+      {/* 底部装饰 */}
+      <div style={{
+        position: 'absolute',
+        bottom: '32px',
+        color: 'rgba(212,165,32,0.5)',
+        fontSize: '14px',
+      }}>
+        稷下青铜机关城 · V1.0
+      </div>
+    </div>
+  );
+}
+
+interface MenuButtonProps {
+  onClick: () => void;
+  primary?: boolean;
+  children: React.ReactNode;
+}
+
+function MenuButton({ onClick, primary, children }: MenuButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '200px',
+        padding: '16px 32px',
+        borderRadius: '8px',
+        border: `2px solid ${primary ? '#d4a520' : 'rgba(139,115,85,0.5)'}`,
+        background: primary
+          ? 'linear-gradient(180deg, rgba(212,165,32,0.2) 0%, rgba(212,165,32,0.1) 100%)'
+          : 'rgba(0,0,0,0.3)',
+        color: primary ? '#d4a520' : '#8b7355',
+        fontWeight: 700,
+        fontSize: '18px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第43页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/CardShowcase.tsx
+// 功能：卡牌展示组件
+
+import { INITIAL_DECK } from '@/data/cards';
+
+interface CardShowcaseProps {
+  onBack: () => void;
+}
+
+export function CardShowcase({ onBack }: CardShowcaseProps) {
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(135deg, #0a0805 0%, #1a1408 50%, #0a0805 100%)',
+        padding: '32px',
+        overflow: 'auto',
+      }}
+    >
+      {/* 返回按钮 */}
+      <button
+        onClick={onBack}
+        style={{
+          position: 'absolute',
+          top: '16px',
+          left: '16px',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          border: '1px solid rgba(139,115,85,0.5)',
+          background: 'rgba(0,0,0,0.5)',
+          color: '#8b7355',
+          cursor: 'pointer',
+        }}
+      >
+        返回
+      </button>
+
+      {/* 标题 */}
+      <div style={{
+        color: '#d4a520',
+        fontSize: '32px',
+        fontWeight: 700,
+        textAlign: 'center',
+        marginBottom: '32px',
+      }}>
+        卡牌收藏
+      </div>
+
+--------------------------------------------------------------------------------
+                              第44页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/CardShowcase.tsx（续）
+// 功能：卡牌展示组件 - 卡牌网格
+
+      {/* 卡牌网格 */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+        gap: '16px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+      }}>
+        {INITIAL_DECK.map((card, index) => (
+          <div
+            key={`${card.id}-${index}`}
+            style={{
+              width: '180px',
+              height: '250px',
+              borderRadius: '8px',
+              border: `2px solid ${getRarityBorderColor(card.rarity)}`,
+              background: getRarityGradient(card.rarity),
+              padding: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* 卡牌内容 */}
+            <div style={{
+              color: '#d4c5a9',
+              fontSize: '14px',
+              fontWeight: 700,
+              textAlign: 'center',
+              marginBottom: '8px',
+            }}>
+              {card.name}
+            </div>
+            <div style={{
+              color: '#60a5fa',
+              fontSize: '12px',
+            }}>
+              费用: {card.cost}
+            </div>
+            {card.type === 'minion' && (
+              <div style={{
+                color: '#fb923c',
+                fontSize: '12px',
+              }}>
+                {card.atk}/{card.hp}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getRarityBorderColor(rarity?: string): string {
+  const colors: Record<string, string> = {
+    common: 'rgba(139,115,85,0.7)',
+    rare: 'rgba(30,120,230,0.85)',
+    epic: 'rgba(160,60,220,0.85)',
+    legendary: 'rgba(255,170,0,0.95)',
+  };
+  return colors[rarity ?? 'common'];
+}
+
+function getRarityGradient(rarity?: string): string {
+  const gradients: Record<string, string> = {
+    common: 'linear-gradient(160deg, #252015 0%, #1a1508 100%)',
+    rare: 'linear-gradient(160deg, #101830 0%, #0a1020 100%)',
+    epic: 'linear-gradient(160deg, #1e0830 0%, #120520 100%)',
+    legendary: 'linear-gradient(160deg, #2a1800 0%, #1a0e00 100%)',
+  };
+  return gradients[rarity ?? 'common'];
+}
+
+--------------------------------------------------------------------------------
+                              第45页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/CharactersView.tsx
+// 功能：角色选择界面组件
+
+interface CharactersViewProps {
+  onBack: () => void;
+}
+
+export function CharactersView({ onBack }: CharactersViewProps) {
+  const characters = [
+    {
+      id: 'scholar',
+      name: '稷下学者',
+      title: '诸子百家之徒',
+      description: '来自稷下学宫的年轻学者，精通各家学说',
+      color: '#d4a520',
+    },
+    {
+      id: 'guardian',
+      name: '机关守卫',
+      title: '青铜城的守护者',
+      description: '守护青铜机关城的古老守卫',
+      color: '#4a7c6f',
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(135deg, #0a0805 0%, #1a1408 50%, #0a0805 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* 返回按钮 */}
+      <button
+        onClick={onBack}
+        style={{
+          position: 'absolute',
+          top: '16px',
+          left: '16px',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          border: '1px solid rgba(139,115,85,0.5)',
+          background: 'rgba(0,0,0,0.5)',
+          color: '#8b7355',
+          cursor: 'pointer',
+        }}
+      >
+        返回
+      </button>
+
+--------------------------------------------------------------------------------
+                              第46页
+--------------------------------------------------------------------------------
+
+// 文件：src/components/CharactersView.tsx（续）
+// 功能：角色选择界面组件 - 角色卡片
+
+      {/* 标题 */}
+      <div style={{
+        color: '#d4a520',
+        fontSize: '32px',
+        fontWeight: 700,
+        marginBottom: '48px',
+      }}>
+        选择角色
+      </div>
+
+      {/* 角色卡片 */}
+      <div style={{
+        display: 'flex',
+        gap: '32px',
+      }}>
+        {characters.map((char) => (
+          <div
+            key={char.id}
+            style={{
+              width: '280px',
+              padding: '24px',
+              borderRadius: '12px',
+              border: `2px solid ${char.color}`,
+              background: 'rgba(0,0,0,0.5)',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease',
+            }}
+          >
+            <div style={{
+              fontSize: '48px',
+              textAlign: 'center',
+              marginBottom: '16px',
+            }}>
+              {char.id === 'scholar' ? '🎓' : '🤖'}
+            </div>
+            <div style={{
+              color: char.color,
+              fontSize: '20px',
+              fontWeight: 700,
+              textAlign: 'center',
+              marginBottom: '8px',
+            }}>
+              {char.name}
+            </div>
+            <div style={{
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: '12px',
+              textAlign: 'center',
+              marginBottom: '12px',
+            }}>
+              {char.title}
+            </div>
+            <div style={{
+              color: 'rgba(255,255,255,0.8)',
+              fontSize: '14px',
+              textAlign: 'center',
+            }}>
+              {char.description}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+--------------------------------------------------------------------------------
+                              第47页
+--------------------------------------------------------------------------------
+
+// 文件：src/index.css
+// 功能：全局样式文件
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #0a0805;
+  color: #d4c5a9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 115, 85, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 115, 85, 0.7);
+}
+
+--------------------------------------------------------------------------------
+                              第48页
+--------------------------------------------------------------------------------
+
+// 文件：src/index.css（续）
+// 功能：全局样式文件 - 动画和过渡
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 淡出动画 */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 缩放动画 */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* 发光动画 */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px currentColor;
+  }
+ 50% {
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+--------------------------------------------------------------------------------
+                              第49页
+--------------------------------------------------------------------------------
+
+// 文件：src/index.css（续）
+// 功能：全局样式文件 - 卡牌样式
+
+/* 卡牌基础样式 */
+.card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-common {
+  border-color: rgba(139, 115, 85, 0.7);
+  background: linear-gradient(160deg, #252015 0%, #1a1508 100%);
+}
+
+.card-rare {
+  border-color: rgba(30, 120, 230, 0.85);
+  background: linear-gradient(160deg, #101830 0%, #0a1020 100%);
+}
+
+.card-epic {
+  border-color: rgba(160, 60, 220, 0.85);
+  background: linear-gradient(160deg, #1e0830 0%, #120520 100%);
+}
+
+.card-legendary {
+  border-color: rgba(255, 170, 0, 0.95);
+  background: linear-gradient(160deg, #2a1800 0%, #1a0e00 100%);
+}
+
+/* 稀有度发光效果 */
+.card-rare:hover {
+  box-shadow: 0 0 20px rgba(30, 120, 230, 0.5);
+}
+
+.card-epic:hover {
+  box-shadow: 0 0 20px rgba(160, 60, 220, 0.5);
+}
+
+.card-legendary:hover {
+  box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+}
+
+--------------------------------------------------------------------------------
+                              第50页
+--------------------------------------------------------------------------------
+
+// 文件：src/index.css（续）
+// 功能：全局样式文件 - 按钮样式
+
+/* 按钮基础样式 */
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #E85D04 0%, #c44d00 100%);
+  border-color: #E85D04;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 20px rgba(232, 93, 4, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(139, 115, 85, 0.5);
+  color: #8b7355;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(139, 115, 85, 0.8);
+  color: #d4c5a9;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+--------------------------------------------------------------------------------
+                              第51页
+--------------------------------------------------------------------------------
+
+// 文件：src/index.css（续）
+// 功能：全局样式文件 - 工具类
+
+/* 文字阴影 */
+.text-shadow-glow {
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* 青铜色文字 */
+.text-bronze {
+  color: #8b7355;
+}
+
+/* 金色文字 */
+.text-gold {
+  color: #d4a520;
+}
+
+/* 炉火橙色 */
+.text-fire {
+  color: #E85D04;
+}
+
+/* 铜绿色 */
+.text-patina {
+  color: #4a7c6f;
+}
+
+/* 背景渐变 */
+.bg-bronze-gradient {
+  background: linear-gradient(180deg, #1a1408 0%, #0f0c05 100%);
+}
+
+/* 边框样式 */
+.border-bronze {
+  border-color: rgba(139, 115, 85, 0.5);
+}
+
+.border-gold {
+  border-color: #d4a520;
+}
+
+--------------------------------------------------------------------------------
+                              第52页
+--------------------------------------------------------------------------------
+
+// 文件：vite.config.ts
+// 功能：Vite构建配置
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    port: 5173,
+    host: true,
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
+})
+
+--------------------------------------------------------------------------------
+                              第53页
+--------------------------------------------------------------------------------
+
+// 文件：tailwind.config.js
+// 功能：Tailwind CSS配置
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        bronze: {
+          50: '#f5f0e8',
+          100: '#e6d9c3',
+          200: '#d4c19e',
+          300: '#c2a879',
+          400: '#b08f54',
+          500: '#8b7355',
+          600: '#6e5c44',
+          700: '#514533',
+          800: '#342e22',
+          900: '#171711',
+        },
+        gold: {
+          500: '#d4a520',
+          600: '#b88c1a',
+        },
+        fire: {
+          500: '#E85D04',
+          600: '#c44d00',
+        },
+        patina: {
+          500: '#4a7c6f',
+          600: '#3d655a',
+        },
+      },
+      fontFamily: {
+        serif: ['Noto Serif SC', 'serif'],
+      },
+    },
+  },
+  plugins: [],
+}
+
+--------------------------------------------------------------------------------
+                              第54页
+--------------------------------------------------------------------------------
+
+// 文件：tsconfig.json
+// 功能：TypeScript配置
+
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path alias */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+
+--------------------------------------------------------------------------------
+                              第55页
+--------------------------------------------------------------------------------
+
+// 文件：index.html
+// 功能：HTML入口文件
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="稷下对决 - 青铜机关城卡牌对战游戏" />
+    <meta name="keywords" content="卡牌游戏,对战,稷下,青铜机关城" />
+    <title>稷下对决 - 青铜机关城卡牌对战</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+--------------------------------------------------------------------------------
+                              第56页
+--------------------------------------------------------------------------------
+
+// 文件：package.json
+// 功能：项目配置文件
+
+{
+  "name": "jixia-card-battle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}
+
+--------------------------------------------------------------------------------
+                              第57页
+--------------------------------------------------------------------------------
+
+// 文件：src/vite-env.d.ts
+// 功能：Vite环境类型声明
+
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_APP_TITLE: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
+--------------------------------------------------------------------------------
+                              第58页
+--------------------------------------------------------------------------------
+
+// 文件：src/types/index.ts
+// 功能：类型导出索引
+
+export type {
+  Card,
+  MinionCard,
+  WeaponCard,
+  SpellCard,
+  MinionInstance,
+  WeaponInstance,
+  HeroPower,
+  Hero,
+  PlayerState,
+  GameState,
+  GamePhase,
+  PlayerId,
+  GameLogEntry,
+  SelectionType,
+  SelectionState,
+  DragState,
+  AttackState,
+} from './game';
+
+export type {
+  BBox,
+  LayoutItem,
+  LayoutSpec,
+} from './layout';
+
+--------------------------------------------------------------------------------
+                              第59页
+--------------------------------------------------------------------------------
+
+// 文件：src/utils/index.ts
+// 功能：工具函数导出索引
+
+export {
+  createInitialPlayerState,
+  createInitialGameState,
+  drawCard,
+  startTurn,
+  canPlayCard,
+  playCard,
+  equipWeapon,
+  canHeroAttack,
+  heroAttack,
+  canUseHeroPower,
+  activateHeroPower,
+  canAttack,
+  performAttack,
+  checkWinner,
+  endTurn,
+  getEmptySlotCenterOut,
+} from './gameLogic';
+
+export {
+  getEnemyActions,
+  getEnemyAction,
+} from './aiLogic';
+
+export {
+  getLayoutBBox,
+  getMinionSlotPosition,
+  getHandCardPositions,
+  screenToCanvas,
+  canvasToScreen,
+  isPointInRect,
+  getTargetAtPosition,
+} from './layoutUtils';
+
+export {
+  clamp,
+  lerp,
+  easeOutQuad,
+  easeInOutCubic,
+  distance,
+  angle,
+} from './layoutMath';
+
+--------------------------------------------------------------------------------
+                              第60页
+--------------------------------------------------------------------------------
+
+// 文件：src/data/index.ts
+// 功能：数据导出索引
+
+export {
+  createMinionCard,
+  createWeaponCard,
+  INITIAL_DECK,
+} from './cards';
+
+export {
+  createHeroPower,
+  HERO_DATA,
+} from './hero';
+
+================================================================================
+                        源代码（后60页）结束
+================================================================================

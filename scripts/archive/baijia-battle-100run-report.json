@@ -1,0 +1,113 @@
+{
+  "docPath": "C:/Users/21389/Desktop/百家争鸣_v1.2_全量卡牌数据.md",
+  "rulesApplied": {
+    "targetMomentum": 8,
+    "openingHand": 5,
+    "secondPlayerBonusDraw": 1,
+    "maxCardsPerTurn": 2,
+    "maxChip": 1,
+    "cardExtraMomentumCapPerRound": 1,
+    "roundTieDamage": 1,
+    "mainWinMomentum": 1,
+    "sideWinChip": 1,
+    "runsPerMatchup": 100
+  },
+  "assumptions": [
+    "每回合双方各抽1张",
+    "用度曲线为 3 起步，每2回合+1，最高6",
+    "以卡牌文本关键词驱动效果，不可机读的复杂时序按近似规则处理"
+  ],
+  "matchups": [
+    {
+      "matchup": "礼心殿 vs 游策阁",
+      "runs": 100,
+      "wins": {
+        "礼心殿": 70,
+        "游策阁": 30,
+        "draw": 0
+      },
+      "avgRounds": 14.86,
+      "avgMomentum": {
+        "礼心殿": 6.5,
+        "游策阁": 4.67
+      }
+    },
+    {
+      "matchup": "礼心殿 vs 名相府",
+      "runs": 100,
+      "wins": {
+        "礼心殿": 25,
+        "名相府": 75,
+        "draw": 0
+      },
+      "avgRounds": 13.17,
+      "avgMomentum": {
+        "礼心殿": 3.13,
+        "名相府": 6.84
+      }
+    },
+    {
+      "matchup": "礼心殿 vs 万农坊",
+      "runs": 100,
+      "wins": {
+        "礼心殿": 36,
+        "万农坊": 64,
+        "draw": 0
+      },
+      "avgRounds": 12.96,
+      "avgMomentum": {
+        "礼心殿": 3.98,
+        "万农坊": 6.02
+      }
+    },
+    {
+      "matchup": "游策阁 vs 名相府",
+      "runs": 100,
+      "wins": {
+        "游策阁": 15,
+        "名相府": 85,
+        "draw": 0
+      },
+      "avgRounds": 12.82,
+      "avgMomentum": {
+        "游策阁": 2.88,
+        "名相府": 7.28
+      }
+    },
+    {
+      "matchup": "游策阁 vs 万农坊",
+      "runs": 100,
+      "wins": {
+        "游策阁": 27,
+        "万农坊": 73,
+        "draw": 0
+      },
+      "avgRounds": 12.93,
+      "avgMomentum": {
+        "游策阁": 3.59,
+        "万农坊": 6.61
+      }
+    },
+    {
+      "matchup": "名相府 vs 万农坊",
+      "runs": 100,
+      "wins": {
+        "名相府": 67,
+        "万农坊": 33,
+        "draw": 0
+      },
+      "avgRounds": 12.83,
+      "avgMomentum": {
+        "名相府": 6.37,
+        "万农坊": 3.88
+      }
+    }
+  ],
+  "issues": [
+    "[礼心殿 vs 游策阁] 单边胜率偏高：礼心殿 胜率 70.0%",
+    "[礼心殿 vs 名相府] 单边胜率偏高：名相府 胜率 75.0%",
+    "[游策阁 vs 名相府] 单边胜率偏高：名相府 胜率 85.0%",
+    "[游策阁 vs 万农坊] 单边胜率偏高：万农坊 胜率 73.0%",
+    "[名相府 vs 万农坊] 单边胜率偏高：名相府 胜率 67.0%"
+  ]
+}

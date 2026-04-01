@@ -1,0 +1,88 @@
+{
+  "name": "card-battle-ui",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && node scripts/build-safe.cjs",
+    "build:direct": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "typecheck": "tsc --noEmit",
+    "validate:structure": "node scripts/pipeline/validate-structure.cjs",
+    "validate:refs": "node scripts/pipeline/validate-references.cjs",
+    "validate:terms": "node scripts/pipeline/validate-terminology.cjs",
+    "validate:playability": "node scripts/pipeline/validate-playability.cjs",
+    "validate:complexity": "node scripts/pipeline/validate-complexity.cjs",
+    "preview:cards": "node scripts/pipeline/generate-cards-preview.cjs",
+    "gate:daily": "node scripts/pipeline/gate-daily.cjs",
+    "gate:weekly": "node scripts/pipeline/gate-weekly.cjs",
+    "gate:milestone": "node scripts/pipeline/gate-milestone.cjs",
+    "ai:task:validate": "node scripts/pipeline/validate-ai-task.cjs",
+    "ai:prompt": "node scripts/pipeline/build-ai-prompt.cjs",
+    "ai:scope": "node scripts/pipeline/enforce-task-scope.cjs",
+    "ai:scope:staged": "node scripts/pipeline/enforce-task-scope.cjs --staged",
+    "ai:finalize": "node scripts/pipeline/ai-finalize.cjs",
+    "server:start": "node server/index.cjs",
+    "server:dev": "node --watch server/index.cjs",
+    "electron:dev": "node scripts/electron-dev.cjs",
+    "electron:dev:legacy": "set \"ELECTRON_RUN_AS_NODE=\" && concurrently \"npm run dev -- --host 127.0.0.1 --port 5173 --strictPort\" \"wait-on tcp:127.0.0.1:5173 && electron .\"",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@pixi/react": "^7.1.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "framer-motion": "^12.35.1",
+    "immer": "^11.1.4",
+    "pixi.js": "^7.4.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "socket.io": "^4.8.3",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "playwright": "^1.58.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.mutianxia.game",
+    "productName": "谋天下：问道百家",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

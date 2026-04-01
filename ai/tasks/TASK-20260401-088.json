@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260401-088",
+  "goal": "Unify local app navigation chain so MainMenu routes consistently to battle, story, characters, and collection with reliable back navigation.",
+  "constraints": [
+    "Follow AGENTS workflow: validate task, generate prompt, implement, then finalize if possible.",
+    "Use local current content as source of truth.",
+    "Do not delete unrelated in-flight files."
+  ],
+  "deliverables": [
+    "Unified single entry navigation in src/App.tsx",
+    "Story route wired from MainMenu and integrated into back-navigation loop",
+    "Verification notes for local run behavior"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "ai/work-log",
+    "src/App.tsx",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260401-088.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260401-088.json",
+    "npm run typecheck",
+    "npx vite --host",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260401-088.json"
+  ],
+  "status": "in_progress"
+}

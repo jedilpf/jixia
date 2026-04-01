@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260323-014",
+  "goal": "修复GitHub命名检查工作流失败：将命名校验改为仅校验本次改动文件，避免被历史遗留文件阻断。",
+  "constraints": [
+    "仅修改命名检查相关脚本与workflow，不改业务逻辑。",
+    "保留原有全量扫描能力，新增按改动文件扫描模式。",
+    "PR与push事件都需要可用，且在无相关改动时应直接通过。",
+    "仅在允许路径内写文件。"
+  ],
+  "deliverables": [
+    ".github/workflows/naming-check.yml",
+    "scripts/validate-naming.cjs"
+  ],
+  "allowed_write_paths": [
+    ".github/workflows",
+    "scripts",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-014.json",
+    "node scripts/validate-naming.cjs --files docs/dev/dev-guide-开发者指南.md,src/App.tsx",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-014.json"
+  ],
+  "status": "draft"
+}

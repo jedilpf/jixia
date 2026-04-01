@@ -1,0 +1,264 @@
+﻿import type { CardDefinition, IssueDirectionId } from '@/core/types';
+
+type LegacyIssueTag = 'ritual_law' | 'diplomacy' | 'people' | 'war_peace' | 'prosperity' | 'neutral';
+
+type LegacyCard = Omit<CardDefinition, 'type' | 'publicPower' | 'issueTags' | 'comboTags' | 'issueTag'> & {
+  issueTag: LegacyIssueTag;
+};
+
+const LEGACY_TO_DIRECTION: Record<Exclude<LegacyIssueTag, 'neutral'>, IssueDirectionId> = {
+  ritual_law: 'ritual',
+  diplomacy: 'strategy',
+  people: 'economy',
+  war_peace: 'strategy',
+  prosperity: 'economy',
+};
+
+function mapCategoryToType(category: LegacyCard['category']): CardDefinition['type'] {
+  if (category === 'strategy') {
+    return 'scheme';
+  }
+  return category;
+}
+
+function mapIssueTags(issueTag: LegacyIssueTag): IssueDirectionId[] {
+  if (issueTag === 'neutral') {
+    return [];
+  }
+  return [LEGACY_TO_DIRECTION[issueTag]];
+}
+
+const RAW_CARDS: LegacyCard[] = [
+  {
+    id: 'confucian_argument_1',
+    name: '礼序明辨',
+    factionId: 'confucian',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 3,
+    issueTag: 'ritual_law',
+    category: 'argument',
+    description: '以礼立序，强调规范先行。',
+  },
+  {
+    id: 'confucian_support_1',
+    name: '春秋裁断',
+    factionId: 'confucian',
+    cost: 3,
+    baseAttack: 3,
+    baseHealth: 3,
+    issueTag: 'ritual_law',
+    category: 'support',
+    description: '重申法度，稳固主议。',
+  },
+  {
+    id: 'legalist_argument_1',
+    name: '法绳天下',
+    factionId: 'legalist',
+    cost: 2,
+    baseAttack: 3,
+    baseHealth: 2,
+    issueTag: 'ritual_law',
+    category: 'argument',
+    description: '以法治国，赏罚分明。',
+  },
+  {
+    id: 'legalist_counter_1',
+    name: '术势反压',
+    factionId: 'legalist',
+    cost: 3,
+    baseAttack: 4,
+    baseHealth: 2,
+    issueTag: 'diplomacy',
+    category: 'counter',
+    description: '借势翻盘，压制对手节奏。',
+  },
+  {
+    id: 'daoist_strategy_1',
+    name: '虚实相生',
+    factionId: 'daoist',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 4,
+    issueTag: 'people',
+    category: 'strategy',
+    description: '以柔克刚，争取回合空间。',
+  },
+  {
+    id: 'daoist_argument_1',
+    name: '无为调息',
+    factionId: 'daoist',
+    cost: 1,
+    baseAttack: 1,
+    baseHealth: 3,
+    issueTag: 'people',
+    category: 'support',
+    description: '恢复秩序，积蓄后势。',
+  },
+  {
+    id: 'mohist_argument_1',
+    name: '兼爱并守',
+    factionId: 'mohist',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 4,
+    issueTag: 'war_peace',
+    category: 'argument',
+    description: '强调兼爱与守御的价值。',
+  },
+  {
+    id: 'mohist_support_1',
+    name: '非攻陈义',
+    factionId: 'mohist',
+    cost: 3,
+    baseAttack: 2,
+    baseHealth: 5,
+    issueTag: 'war_peace',
+    category: 'support',
+    description: '反对滥战，巩固防线。',
+  },
+  {
+    id: 'strategist_argument_1',
+    name: '兵势夺先',
+    factionId: 'strategist',
+    cost: 2,
+    baseAttack: 4,
+    baseHealth: 2,
+    issueTag: 'war_peace',
+    category: 'argument',
+    description: '抢占先机，压制主议。',
+  },
+  {
+    id: 'strategist_strategy_1',
+    name: '奇正互转',
+    factionId: 'strategist',
+    cost: 3,
+    baseAttack: 3,
+    baseHealth: 3,
+    issueTag: 'diplomacy',
+    category: 'strategy',
+    description: '主旁联动，打乱对位。',
+  },
+  {
+    id: 'diplomat_argument_1',
+    name: '连横合纵',
+    factionId: 'diplomat',
+    cost: 2,
+    baseAttack: 3,
+    baseHealth: 3,
+    issueTag: 'diplomacy',
+    category: 'argument',
+    description: '借联盟与分化争夺主动。',
+  },
+  {
+    id: 'diplomat_counter_1',
+    name: '借势游说',
+    factionId: 'diplomat',
+    cost: 3,
+    baseAttack: 3,
+    baseHealth: 2,
+    issueTag: 'prosperity',
+    category: 'counter',
+    description: '以说服与交换扭转局势。',
+  },
+  {
+    id: 'logician_counter_1',
+    name: '名实诘难',
+    factionId: 'logician',
+    cost: 2,
+    baseAttack: 3,
+    baseHealth: 2,
+    issueTag: 'diplomacy',
+    category: 'counter',
+    description: '抓住漏洞，迫使对手让步。',
+  },
+  {
+    id: 'logician_support_1',
+    name: '白马辩形',
+    factionId: 'logician',
+    cost: 1,
+    baseAttack: 1,
+    baseHealth: 2,
+    issueTag: 'ritual_law',
+    category: 'support',
+    description: '细化概念，压缩对手空间。',
+  },
+  {
+    id: 'eclectic_argument_1',
+    name: '兼收并蓄',
+    factionId: 'eclectic',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 3,
+    issueTag: 'neutral',
+    category: 'support',
+    description: '融合百家，强化适配能力。',
+  },
+  {
+    id: 'merchant_strategy_1',
+    name: '通货折冲',
+    factionId: 'merchant',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 2,
+    issueTag: 'prosperity',
+    category: 'strategy',
+    description: '通过交易快速建立优势。',
+  },
+  {
+    id: 'agronomist_support_1',
+    name: '务本厚生',
+    factionId: 'agronomist',
+    cost: 1,
+    baseAttack: 1,
+    baseHealth: 3,
+    issueTag: 'prosperity',
+    category: 'support',
+    description: '稳扎稳打，逐回合积累资源。',
+  },
+  {
+    id: 'yin_yang_strategy_1',
+    name: '阴阳推演',
+    factionId: 'yin_yang',
+    cost: 3,
+    baseAttack: 3,
+    baseHealth: 3,
+    issueTag: 'people',
+    category: 'strategy',
+    description: '观察节律，提前布局。',
+  },
+  {
+    id: 'universal_argument_1',
+    name: '众议归衡',
+    factionId: 'neutral',
+    cost: 2,
+    baseAttack: 2,
+    baseHealth: 2,
+    issueTag: 'neutral',
+    category: 'argument',
+    description: '中立论证卡，可加入任意牌组。',
+  },
+  {
+    id: 'universal_support_1',
+    name: '众志同谋',
+    factionId: 'neutral',
+    cost: 1,
+    baseAttack: 1,
+    baseHealth: 2,
+    issueTag: 'neutral',
+    category: 'support',
+    description: '中立支援卡，补足曲线。',
+  },
+];
+
+export const CARDS: CardDefinition[] = RAW_CARDS.map((card) => {
+  const issueTags = mapIssueTags(card.issueTag);
+  return {
+    ...card,
+    type: mapCategoryToType(card.category),
+    publicPower: Math.max(1, card.baseAttack),
+    issueTags,
+    comboTags: [card.factionId, card.category, ...(issueTags.length ? issueTags : ['neutral'])],
+    issueTag: issueTags[0] ?? 'neutral',
+  };
+});

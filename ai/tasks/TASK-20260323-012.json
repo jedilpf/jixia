@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260323-012",
+  "goal": "保留旧版战斗流不改动，将新版MVP流程设为默认入口，并补充一份给其他AI可直接执行的主线说明文档。",
+  "constraints": [
+    "旧版 BattleFrameV2 与 battleV2 代码只做保留，不修改其逻辑。",
+    "默认入口必须指向新版 MvpFlowShell；旧版仅作为显式开关可访问。",
+    "文档需明确：哪些目录是主线、哪些目录是legacy、修改边界是什么。",
+    "只允许在允许路径内修改文件。"
+  ],
+  "deliverables": [
+    "src/App.tsx（入口切换）",
+    "docs/AI-mainline-policy.md（给多AI协作的执行备注）"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "docs",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-012.json",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-012.json"
+  ],
+  "status": "draft"
+}

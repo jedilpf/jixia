@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260323-015",
+  "goal": "修复a950748提交带来的文档规范不匹配问题：将3个standards文档重命名为kebab-case并同步更新全仓引用与索引，确保命名检查通过。",
+  "constraints": [
+    "只处理文档命名与引用，不改游戏逻辑与代码行为。",
+    "仅修改本任务涉及的文档及索引引用，避免扩散改动。",
+    "所有改动必须保持UTF-8中文可读，不引入乱码。",
+    "严格遵守AGENTS流程与任务范围。"
+  ],
+  "deliverables": [
+    "docs/standards下3个重命名后的文档",
+    "所有受影响引用路径的同步更新",
+    "docs/index.md中新增/修正条目"
+  ],
+  "allowed_write_paths": [
+    "docs",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-015.json",
+    "node scripts/validate-naming.cjs --files docs/standards/standards-guide-ai-task-assignment.md,docs/standards/standards-guide-quick-reference.md,docs/standards/standards-review-style-consistency.md",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-015.json"
+  ],
+  "status": "draft"
+}

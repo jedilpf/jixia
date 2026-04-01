@@ -1,0 +1,29 @@
+{
+  "id": "BS01-RU-001",
+  "name": "礼序问辩",
+  "faction": "儒家",
+  "rarity": "common",
+  "type": "spell",
+  "cost": 2,
+  "rules_text": "令敌方获得【怀疑1】；抽1。",
+  "keyword_ids": [
+    "怀疑"
+  ],
+  "mechanic_ids": [
+    "MEC-CORE-ORDER",
+    "MEC-CORE-DRAW"
+  ],
+  "lore_anchor_ids": [
+    "ANC-FACTION-002",
+    "ANC-CONTENT-002"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260322-01",
+    "models_used": [
+      "ChatGPT"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "42"
+  },
+  "status": "draft"
+}

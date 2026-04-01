@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "侠客论剑战斗系统数据契约 - 前端、后端、AI决策都按这个定义",
+  "lastUpdated": "2026-03-28",
+  "system": "BattleV2 (DebateBattle)",
+  
+  "DebateCard": {
+    "type": "object",
+    "description": "游戏中的单张卡牌定义",
+    "required": ["id", "name", "type", "cost", "effectKind"],
+    "properties": {
+      "id": { "type": "string", "example": "MOJ-001" },
+      "name": { "type": "string", "example": "墨翟" },
+      "description": { "type": "string", "example": "非攻论者" },
+      "type": { "type": "string", "enum": ["立论", "策术", "反诘", "门客", "玄章"], "example": "立论" },
+      "faction": { "type": "string", "enum": ["MOJ", "RU", "DAO", "FA", "YIN", "QING", "ZO", "ZHU"], "example": "MOJ" },
+      "cost": { "type": "integer", "description": "出牌费用（灵识消耗）", "example": 2 },
+      "power": { "type": "integer", "description": "辩锋（攻击力）", "example": 3 },
+      "hp": { "type": "integer", "description": "根基（生命值）", "example": 2 },
+      "effectKind": {
+        "type": "string",
+        "description": "卡牌效果类型",
+        "enum": ["damage", "shield", "draw", "zhengli", "shixu", "summon_front", "summon_back"],
+        "example": "damage"
+      },
+      "effectValue": { "type": "integer", "description": "效果数值（根据effectKind而定）", "example": 2 },
+      "lanePreference": { "type": "string", "enum": ["left", "center", "right", "any"], "example": "center", "description": "卡牌倾向的三路（左/中/右）" },
+      "loreAnchorIds": { "type": "array", "items": { "type": "string" }, "example": ["ANC-FACTION-001"] },
+      "prologue": { "type": "string", "description": "卡牌背景故事" },
+      "tags": { "type": "array", "items": { "type": "string" }, "example": ["core", "offensive"] }
+    }
+  },
+  
+  "Resources": {
+    "type": "object",
+    "description": "资源池 (10种资源，其中daShi是胜利条件)",
+    "properties": {
+      "xinZheng": { "type": "integer", "description": "心证（主要战斗资源）" },
+      "lingShi": { "type": "integer", "description": "灵识（当前可用值）" },
+      "maxLingShi": { "type": "integer", "description": "灵识上限（每回合 +1，上限通常 10）" },
+      "huYin": { "type": "integer", "description": "慧音" },
+      "zhengLi": { "type": "integer", "description": "正理" },
+      "shiXu": { "type": "integer", "description": "实虚" },
+      "wenMai": { "type": "integer", "description": "文脉" },
+      "jiBian": { "type": "integer", "description": "机变（右路议势奖励）" },
+      "daShi": { "type": "integer", "description": "大势（胜利计分指标，先到8获胜）", "minimum": 0, "maximum": 8 },
+      "chou": { "type": "integer", "description": "筹（旁议/门客获得，可抵消卡牌费用，上限1）", "minimum": 0, "maximum": 1 }
+    }
+  },
+
+  "BattlePlayer": {
+    "type": "object",
+    "description": "战斗中一方的完整状态",
+    "required": ["side", "resources", "hand", "deck"],
+    "properties": {
+      "side": { "type": "string", "enum": ["player", "enemy"], "description": "玩家方或敌方" },
+      "faction": { "type": "string", "example": "MOJ" },
+      "resources": { "$ref": "#/definitions/Resources" },
+      "seats": {
+        "type": "object",
+        "description": "三席位卡牌状态 (先声/主辩/余论)",
+        "properties": {
+          "xian_sheng": { "$ref": "#/definitions/SeatState" },
+          "zhu_bian": { "$ref": "#/definitions/SeatState" },
+          "yu_lun": { "$ref": "#/definitions/SeatState" }
+        }
+      },
+      "hand": { "type": "array", "items": { "$ref": "#/DebateCard" }, "description": "手牌" },
+      "deck": { "type": "array", "items": { "$ref": "#/DebateCard" }, "description": "牌库" },
+      "discard": { "type": "array", "items": { "$ref": "#/DebateCard" }, "description": "弃牌堆" },
+      "writings": { "type": "array", "items": { "type": "string" }, "description": "玄章效果列表" }
+    }
+  },
+
+  "SeatState": {
+    "type": "object",
+    "description": "席位（三席之一）的卡牌及其状态",
+    "properties": {
+      "front": { "$ref": "#/definitions/SeatUnit" },
+      "back": { "$ref": "#/definitions/SeatUnit" }
+    }
+  },
+
+  "SeatUnit": {
+    "type": "object",
+    "description": "席位上的单个卡牌单位状态",
+    "properties": {
+      "id": { "type": "string" },
+      "name": { "type": "string" },
+      "power": { "type": "integer", "description": "辩锋" },
+      "hp": { "type": "integer", "description": "当前根基" },
+      "maxHp": { "type": "integer", "description": "最大根基" },
+      "buffs": { "type": "array", "items": { "type": "string" } },
+      "debuffs": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+
+  "DebateBattleState": {
+    "type": "object",
+    "description": "整个战斗的完整状态",
+    "required": ["battleId", "playerA", "playerB", "currentTurn", "phase"],
+    "properties": {
+      "battleId": { "type": "string", "format": "uuid" },
+      "playerA": { "$ref": "#/BattlePlayer" },
+      "playerB": { "$ref": "#/BattlePlayer" },
+      "currentTurn": {
+        "type": "object",
+        "properties": {
+          "number": { "type": "integer", "description": "回合数", "example": 3 },
+          "phase": { "type": "string", "enum": ["ming_bian", "an_mou", "reveal", "resolve", "finished"], "example": "ming_bian" },
+          "activePlayer": { "type": "string", "enum": ["playerA", "playerB"], "example": "playerA" }
+        }
+      },
+      "laneControls": {
+        "type": "object",
+        "description": "三路控制权状态 (left/center/right，影响daShi增长)",
+        "properties": {
+          "left": { "type": "string", "enum": ["playerA", "playerB", "neutral"], "example": "playerA" },
+          "center": { "type": "string", "enum": ["playerA", "playerB", "neutral"], "example": "neutral" },
+          "right": { "type": "string", "enum": ["playerA", "playerB", "neutral"], "example": "playerB" }
+        }
+      },
+      "logsAndFeed": { "type": "array", "items": { "$ref": "#/definitions/BattleLogEntry" } },
+      "status": { "type": "string", "enum": ["playing", "finished"], "description": "游戏状态" }
+    }
+  },
+
+  "BattleLogEntry": {
+    "type": "object",
+    "description": "战斗日志中的一条事件记录",
+    "properties": {
+      "timestamp": { "type": "integer", "description": "毫秒时间戳" },
+      "turn": { "type": "integer", "description": "第几回合" },
+      "phase": { "type": "string", "description": "事件发生时的阶段" },
+      "actor": { "type": "string", "enum": ["playerA", "playerB", "system"] },
+      "action": { "type": "string", "example": "played_card" },
+      "cardId": { "type": "string" },
+      "details": { "type": "object", "description": "额外上下文" },
+      "result": { "type": "string", "description": "人类可读的结果" }
+    }
+  },
+
+  "definitions": {
+    "Resources": {
+      "type": "object",
+      "properties": {
+        "xinZheng": { "type": "integer" },
+        "lingShi": { "type": "integer" },
+        "maxLingShi": { "type": "integer" },
+        "huYin": { "type": "integer" },
+        "zhengLi": { "type": "integer" },
+        "shiXu": { "type": "integer" },
+        "wenMai": { "type": "integer" },
+        "jiBian": { "type": "integer" },
+        "daShi": { "type": "integer" },
+        "chou": { "type": "integer" }
+      }
+    },
+    "SeatState": {
+      "type": "object",
+      "properties": {
+        "front": { "type": ["object", "null"] },
+        "back": { "type": ["object", "null"] }
+      }
+    },
+    "SeatUnit": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "power": { "type": "integer" },
+        "hp": { "type": "integer" },
+        "maxHp": { "type": "integer" },
+        "buffs": { "type": "array" },
+        "debuffs": { "type": "array" }
+      }
+    },
+    "BattleLogEntry": {
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "integer" },
+        "turn": { "type": "integer" },
+        "phase": { "type": "string" },
+        "actor": { "type": "string" },
+        "action": { "type": "string" },
+        "cardId": { "type": "string" },
+        "details": { "type": "object" },
+        "result": { "type": "string" }
+      }
+    }
+  }
+}

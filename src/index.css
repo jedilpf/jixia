@@ -1,0 +1,278 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background, #0f0f1a);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer components {
+  .theme-surface {
+    @apply bg-theme-surface border border-theme-border rounded-lg;
+  }
+
+  .theme-card {
+    @apply bg-theme-card rounded-lg border border-theme-border shadow-theme-card;
+  }
+
+  .theme-button {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply bg-theme-surface border border-theme-border;
+    @apply hover:border-theme-border-light hover:shadow-theme-primary;
+    @apply active:scale-95;
+  }
+
+  .theme-button-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply bg-theme-primary text-theme-background;
+    @apply hover:shadow-theme-glow active:scale-95;
+  }
+
+  .theme-input {
+    @apply w-full px-3 py-2 rounded-lg;
+    @apply bg-theme-background border border-theme-border;
+    @apply text-theme-text placeholder:text-theme-text-muted;
+    @apply focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary;
+    @apply transition-all duration-200;
+  }
+
+  .theme-modal {
+    @apply fixed inset-0 z-[9999] flex items-center justify-center p-8;
+    @apply bg-black/70 backdrop-blur-md;
+    animation: modal-fade-in 0.2s ease-out;
+  }
+
+  .theme-modal-content {
+    @apply bg-theme-surface border-2 border-theme-border rounded-xl;
+    @apply shadow-theme-elevated flex flex-col overflow-hidden;
+    animation: modal-scale-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .theme-modal-header {
+    @apply h-14 bg-gradient-to-r from-theme-surface-dark via-theme-surface-light to-theme-surface-dark;
+    @apply border-b border-theme-border flex items-center justify-between px-6;
+  }
+
+  .theme-glow-text {
+    text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+  }
+
+  .theme-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  .border-glow {
+    box-shadow: 0 0 10px var(--color-primary), inset 0 0 10px rgba(var(--color-primary), 0.1);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300;
+    @apply hover:scale-105 hover:shadow-theme-glow;
+  }
+
+  .btn-hover {
+    @apply transition-all duration-200;
+    @apply hover:brightness-110 hover:shadow-theme-primary active:scale-95;
+  }
+}
+
+@keyframes debateFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-scale-up {
+  from { 
+    transform: scale(0.95) translateY(-10px); 
+    opacity: 0; 
+  }
+  to { 
+    transform: scale(1) translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 15px var(--color-primary), 0 0 25px var(--color-primary);
+    opacity: 0.9;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.debate-fade-up {
+  animation: debateFadeUp 380ms ease-out both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+::selection {
+  background: var(--color-primary, #d4a520);
+  color: var(--color-background, #0f0f1a);
+}
+
+/* ─── 结算动画关键帧 ───────────────────────────────────────────────────────── */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+@keyframes flash {
+  0%, 100% { 
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% { 
+    opacity: 0.7;
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes damage-float {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-25px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-35px) scale(0.9);
+  }
+}
+
+@keyframes card-attack {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-15px) scale(1.05);
+  }
+  60% {
+    transform: translateY(5px) scale(1.1);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes penetrate-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.animate-flash {
+  animation: flash 0.3s ease-in-out 2;
+}
+
+.animate-damage-float {
+  animation: damage-float 1.2s ease-out forwards;
+}
+
+.animate-card-attack {
+  animation: card-attack 0.4s ease-out;
+}
+
+.animate-penetrate-flash {
+  animation: penetrate-flash 0.5s ease-out;
+}

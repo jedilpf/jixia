@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260328-075",
+  "goal": "Implement Phase-A (50%) story expansion: add chapter 1 half-flow data, emit chapter bridge events, and wire StoryScreen for chapter progress/choice impact preview without changing core battle rules.",
+  "constraints": [
+    "Only implement the agreed 50% scope; no new game features outside story flow and bridge wiring.",
+    "Do not modify battleV2 core win/loss rules.",
+    "Keep changes limited to story engine/data/UI entry points.",
+    "Preserve existing menu buttons and current navigation behavior."
+  ],
+  "deliverables": [
+    "New chapter 1 half-flow story data file with 12-16 nodes and 3 key decisions.",
+    "Story engine chapter completion and bridge-state event support.",
+    "StoryScreen updates for chapter progress and choice impact preview."
+  ],
+  "allowed_write_paths": [
+    "src/game/story",
+    "src/ui/screens/StoryScreen.tsx",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run typecheck"
+  ],
+  "status": "ready"
+}

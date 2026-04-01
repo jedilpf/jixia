@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260323-024",
+  "goal": "将对局准备流程收敛为“1匹配->2门派”，移除战前议题步骤与独立加载步骤，门派锁定后直接进入战斗。",
+  "constraints": [
+    "议题选择必须保留在战斗过程中，不得回退到战前。",
+    "只做最小改动，不改动 battleV2 核心战斗逻辑。",
+    "仅修改对局准备流程相关文件。",
+    "若信息不完整，采用保守默认值并记录 open_questions.md。"
+  ],
+  "deliverables": [
+    "PreBattleFlow 去除 topic_vote/topic_result/loading 步骤",
+    "流程步骤展示改为两步：匹配、门派",
+    "门派确认后直接触发 onComplete 进入战斗"
+  ],
+  "allowed_write_paths": [
+    "src/components",
+    "ai/tasks",
+    "ai/out",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-024.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260323-024.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-024.json"
+  ],
+  "status": "draft"
+}

@@ -1,0 +1,124 @@
+.sync-battle-page {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.sync-battle-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-battle-loading p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.sync-battle-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+  text-align: center;
+}
+
+.sync-battle-result h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+.sync-battle-result p {
+  font-size: 20px;
+  color: #94a3b8;
+  margin-bottom: 40px;
+}
+
+.restart-btn {
+  padding: 15px 40px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
+
+.battle-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 80px 20px 180px;
+}
+
+.enemy-area {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.player-area {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.phase-debug {
+  position: fixed;
+  bottom: 180px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  display: flex;
+  gap: 15px;
+  z-index: 999;
+}
+
+.phase-debug button {
+  padding: 4px 12px;
+  background: #475569;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.phase-debug button:hover {
+  background: #64748b;
+}

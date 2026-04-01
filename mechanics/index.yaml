@@ -1,0 +1,19 @@
+version: 0.1.0
+updated_at: 2026-03-22
+
+mechanics:
+  - id: MEC-CORE-DEFENSE
+    name: 防守转化
+    summary: 通过护持与减伤换取后续回合节奏。
+  - id: MEC-CORE-ORDER
+    name: 礼序压制
+    summary: 通过秩序与规则限制对方上限。
+  - id: MEC-CORE-COUNTER
+    name: 反制窗口
+    summary: 在关键结算点打断或改写对方效果。
+  - id: MEC-CORE-DRAW
+    name: 稳定抽取
+    summary: 以低波动方式维持手牌循环。
+  - id: MEC-CORE-TEMPO
+    name: 回合节奏
+    summary: 通过费用与行动次数压缩对方选择。

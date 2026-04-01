@@ -1,0 +1,23 @@
+{
+  "task_id": "TASK-EXAMPLE-001",
+  "goal": "Migrate first 10 cards from legacy pool into content/cards and make them pass gate:daily.",
+  "constraints": [
+    "Must follow canon anchors and taboo limits.",
+    "No new anchor IDs without NEW_CANON_PROPOSAL.",
+    "Every card must include lore_anchor_ids and mechanic_ids.",
+    "Unknown mapping must use UNKNOWN and be logged in open_questions.md."
+  ],
+  "deliverables": [
+    "10 card JSON files under content/cards/",
+    "Updated open_questions.md for unknowns"
+  ],
+  "allowed_write_paths": [
+    "content/cards",
+    "open_questions.md",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run gate:daily"
+  ],
+  "status": "draft"
+}

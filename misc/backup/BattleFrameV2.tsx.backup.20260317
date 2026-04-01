@@ -1,0 +1,2036 @@
+﻿/**
+ * BattleFrameV2 鈥?鍙岃瑙掑垏鎹㈡垬鏂楃晫闈? *
+ * 甯冨眬闃舵 (ming_bian / an_mou)锛氭墜鐗屼富瑙嗚锛屾墖褰㈠ぇ鎵嬬墝锛屾垬鍦虹缉鐣ラ瑙? * 缁撶畻闃舵 (reveal / resolve)锛氭垬鍦轰富瑙嗚锛屽弻鏂瑰崱鐗屽畬鏁村睍绀猴紝鎸夎矾楂樹寒缁撶畻
+ */
+
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { getPlanAssignError } from '@/battleV2/engine';
+import { useDebateBattle } from '@/battleV2/useDebateBattle';
+import {
+  ArenaId,
+  BattlePlayer,
+  CardTypeV2,
+  DebatePhase,
+  DebateCard,
+  PlanSlot,
+  SeatId,
+  SeatState,
+  SeatUnit,
+} from '@/battleV2/types';
+
+// 鈹€鈹€鈹€ Props 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+interface BattleFrameV2Props {
+  arenaId: ArenaId;
+  forcedTopicId?: string;
+  playerMainFaction?: string;
+  enemyMainFaction?: string;
+  onMenu?: () => void;
+  onReselectArena?: () => void;
+}
+
+// 鈹€鈹€鈹€ Local types 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+type ActionChoice = 'main' | 'response' | 'secret' | 'writing';
+type ToastLevel = 'info' | 'success' | 'warning' | 'error';
+
+interface LaneCards {
+  playerMain: DebateCard | null;
+  playerSecret: DebateCard | null;
+  enemyMain: DebateCard | null;
+  enemySecret: DebateCard | null;
+}
+
+// 鈹€鈹€鈹€ Constants 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+const SEATS: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
+
+const SEAT_ALIAS: Record<SeatId, string> = {
+  xian_sheng: '\u5de6\u8def',
+  zhu_bian: '\u4e2d\u8def',
+  yu_lun: '\u53f3\u8def',
+};
+
+const ACTION_LABEL: Record<ActionChoice, string> = {
+  main: '\u660e\u8bba',
+  response: '\u53cd\u5236',
+  secret: '\u6697\u7b56',
+  writing: '\u7740\u4e66\u84c4\u52bf',
+};
+
+const ACTION_NEEDS_TARGET: Record<ActionChoice, boolean> = {
+  main: true,
+  response: false,
+  secret: true,
+  writing: false,
+};
+
+const ACTION_ORDER: ActionChoice[] = ['main', 'response', 'secret', 'writing'];
+
+const PHASE_STEP_ORDER = ['ming_bian', 'an_mou', 'reveal', 'resolve'] as const;
+const PHASE_STEP_LABEL: Record<(typeof PHASE_STEP_ORDER)[number] | 'finished', string> = {
+  ming_bian: '\u660e\u8fa9',
+  an_mou: '\u6697\u7b56',
+  reveal: '\u63ed\u793a',
+  resolve: '\u7ed3\u7b97',
+  finished: '\u7ed3\u675f',
+};
+
+function resolveAsset(path: string): string {
+  if (/^(https?:|data:|blob:)/i.test(path)) return path;
+  const normalized = path.replace(/^\/+/, '');
+  return `${import.meta.env.BASE_URL}${normalized}`;
+}
+
+const DEFAULT_ART = {
+  '\u7acb\u8bba': 'assets/cards/libian.jpg',
+  '\u7b56\u672f': 'assets/cards/qianji.jpg',
+  '\u53cd\u8bd8': 'assets/cards/guibian.jpg',
+  '\u95e8\u5ba2': 'assets/cards/mingshi.jpg',
+  '\u7384\u7ae0': 'assets/cards/wenyan.jpg',
+} as Record<CardTypeV2, string>;
+
+// 鈹€鈹€鈹€ Helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function findCard(player: BattlePlayer, cardId: string | null): DebateCard | undefined {
+  if (!cardId) return undefined;
+  return (
+    player.hand.find((c) => c.id === cardId) ??
+    player.discard.find((c) => c.id === cardId) ??
+    player.writings.find((c) => c.id === cardId) ??
+    player.deck.find((c) => c.id === cardId)
+  );
+}
+
+function artSrc(card: DebateCard): string {
+  return resolveAsset(card.art ?? DEFAULT_ART[card.type]);
+}
+
+function effectShort(card: DebateCard): string {
+  switch (card.effectKind) {
+    case 'damage': return `鍘嬪姏 ${card.effectValue}`;
+    case 'shield': return `鎶ゅ嵃 +${card.effectValue}`;
+    case 'draw': return `鎶?${card.effectValue}`;
+    case 'zhengli': return `璇佺珛 +${card.effectValue}`;
+    case 'shixu': return `澶卞簭 +${card.effectValue}`;
+    case 'summon_front': return `鍓嶅腑 鈿?{card.effectValue}`;
+    case 'summon_back': return `鍚庡腑 鈿?{card.effectValue}`;
+    default: return card.effectKind;
+  }
+}
+
+// 鈹€鈹€鈹€ 瀵规垬鍗＄墝绫诲瀷鈫掕竟妗嗛厤缃紙浠庡乏鍒板彸瀵瑰簲5绉嶇被鍨嬶級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/**
+ * 浜旂绫诲瀷杈规鏂囦欢鍚嶏紙鏀惧湪 public/assets/frames/ 涓嬪嵆鐢熸晥锛夛細
+ * frame-lilun.png / frame-ceshu.png / frame-fanje.png / frame-menke.png / frame-xuanzhang.png
+ */
+const CARD_FRAME_LIST = [
+  { img: 'assets/frames/frame-lilun.png', color: '#9EAD8A', shadow: 'rgba(158,173,138,0.5)' },
+  { img: 'assets/frames/frame-ceshu.png', color: '#C06F6F', shadow: 'rgba(192,111,111,0.5)' },
+  { img: 'assets/frames/frame-fanje.png', color: '#C9A063', shadow: 'rgba(201,160,99,0.5)' },
+  { img: 'assets/frames/frame-menke.png', color: '#9C88A8', shadow: 'rgba(156,136,168,0.5)' },
+  { img: 'assets/frames/frame-xuanzhang.png', color: '#909BA6', shadow: 'rgba(144,155,166,0.5)' },
+] as const;
+
+function getCardFrame(type: CardTypeV2) {
+  const typeOrder = Object.keys(DEFAULT_ART) as CardTypeV2[];
+  const index = typeOrder.indexOf(type);
+  const frame = CARD_FRAME_LIST[index] ?? CARD_FRAME_LIST[0];
+  return { ...frame, img: resolveAsset(frame.img) };
+}
+
+const HAND_CARD_WIDTH = 116;
+const HAND_CARD_HEIGHT = 174;
+const HAND_CARD_FRAME_OUTSET = 15;
+const FIELD_CARD_WIDTH = 92;
+const FIELD_CARD_HEIGHT = 138;
+const FIELD_CARD_FRAME_OUTSET = 9;
+const ACTION_SLOT_WIDTH = 68;
+const ACTION_SLOT_HEIGHT = 102;
+const ATTACK_WINDUP_MS = 220;
+const DAMAGE_HOLD_MS = 260;
+const PENETRATE_HOLD_MS = 220;
+const LANE_FOCUS_HOLD_MS = 560;
+const LANE_SETTLEMENT_GAP_MS = 760;
+
+// 鈹€鈹€鈹€ HandCard (2:3 姣斾緥锛屾墖褰㈡墜鐗岀敤) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function HandCard({ card, isSelected }: { card: DebateCard; isSelected: boolean }) {
+  const frame = getCardFrame(card.type);
+  return (
+    <div
+      className="relative select-none transition-all duration-150"
+      style={{
+        width: HAND_CARD_WIDTH,
+        height: HAND_CARD_HEIGHT,
+        zIndex: isSelected ? 50 : 1,
+      }}
+    >
+      {/* 搴曢儴鍗＄墝鍘熺敾锛堝甫鍦嗚鎴柇锛?*/}
+      <div 
+        className="absolute inset-0 overflow-hidden rounded-xl"
+        style={{
+          boxShadow: isSelected
+            ? `0 0 0 3px ${frame.color}, 0 0 20px ${frame.shadow}, 0 16px 40px rgba(0,0,0,0.4)`
+            : `0 0 0 2px ${frame.color}80, 0 6px 16px rgba(0,0,0,0.2)`,
+        }}
+      >
+        <img src={artSrc(card)} alt={card.name} className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#12100a]/85 via-[#12100a]/15 to-transparent" />
+      </div>
+
+      {/* 鈹€鈹€ 绫诲瀷杈规鍥剧墖鍙犲姞灞傦紙鍏佽鍚戝鎵╁嚭锛?鈹€鈹€ */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: `-${HAND_CARD_FRAME_OUTSET}px`,
+          bottom: `-${HAND_CARD_FRAME_OUTSET}px`,
+          left: `-${HAND_CARD_FRAME_OUTSET}px`,
+          right: `-${HAND_CARD_FRAME_OUTSET}px`,
+          backgroundImage: `url(${frame.img})`,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 10,
+        }}
+      />
+
+      {/* 璐圭敤鍦嗗湀 */}
+      <div
+        className="absolute left-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full text-[16px] font-bold text-[#f0c97a]"
+        style={{ 
+          background: 'rgba(18,16,10,0.85)', 
+          zIndex: 30, 
+          border: `2px solid ${frame.color}`,
+          boxShadow: `0 0 8px ${frame.shadow}, 0 2px 4px rgba(0,0,0,0.3)`,
+        }}
+      >
+        {card.cost}
+      </div>
+
+      {/* 绫诲瀷鑹叉爣宸茶绉婚櫎锛屾寜鐢ㄦ埛瑕佹眰涓嶅姞鐐?*/}
+
+      {/* 鍗″悕 + 绫诲瀷 */}
+      <div
+        className="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-6"
+        style={{
+          zIndex: 30,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(8,7,5,0.72) 42%, rgba(8,7,5,0.92) 100%)',
+          borderBottomLeftRadius: 12,
+          borderBottomRightRadius: 12,
+        }}
+      >
+        <div 
+          className="truncate font-semibold text-white drop-shadow-lg"
+          style={{ 
+            fontSize: '15px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.5)',
+          }}
+        >
+          {card.name}
+        </div>
+        <div 
+          className="truncate font-black tracking-widest uppercase"
+          style={{ 
+            fontSize: '12px',
+            color: frame.color,
+            textShadow: `0 0 2px #000, 1px 1px 0px #000, -1px -1px 0px rgba(255,255,255,0.2), 0 4px 8px rgba(0,0,0,0.8)`,
+            transform: 'skewX(-10deg)'
+          }}
+        >
+          {card.type}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// 鈹€鈹€鈹€ FanHand 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function FanHand({
+  cards,
+  selectedCardId,
+  onSelect,
+  onDragStart,
+}: {
+  cards: DebateCard[];
+  selectedCardId: string | null;
+  onSelect: (id: string) => void;
+  onDragStart?: (cardId: string) => void;
+}) {
+  const n = cards.length;
+  const maxSpreadDeg = 18;
+  const overlapPx = 46;
+
+  return (
+    <div
+      className="flex items-end justify-center"
+      style={{ paddingTop: 28, paddingBottom: 18, paddingLeft: 28, paddingRight: 20 }}
+    >
+      {cards.map((card, i) => {
+        const t = n <= 1 ? 0 : (i / (n - 1)) * 2 - 1;
+        const angle = t * maxSpreadDeg;
+        const liftY = (1 - t * t) * 12;
+        const isSelected = selectedCardId === card.id;
+        return (
+          <button
+            type="button"
+            key={card.id}
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', card.id);
+              if (onDragStart) onDragStart(card.id);
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              onSelect(card.id);
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={{
+              marginLeft: i === 0 ? 0 : -overlapPx,
+              transform: `rotate(${angle}deg) translateY(${isSelected ? -36 : liftY}px) scale(${isSelected ? 1.08 : 1})`,
+              transformOrigin: 'bottom center',
+              zIndex: isSelected ? 100 : 10 + i,
+              position: 'relative',
+              cursor: 'grab',
+              transition: 'transform 0.2s ease, z-index 0.15s ease',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+            }}
+          >
+            <HandCard card={card} isSelected={isSelected} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ MiniUnitPip (甯冨眬闃舵鎴樺満棰勮涓殑鍗曚綅鐐? 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function MiniUnitPip({ 
+  unit, 
+  isEnemy, 
+  label = '',
+  isShaking = false,
+  isFlashing = false,
+}: { 
+  unit: SeatUnit | null; 
+  isEnemy: boolean; 
+  label?: string;
+  isShaking?: boolean;
+  isFlashing?: boolean;
+}) {
+  if (!unit) {
+    return (
+      <div className={`flex h-12 w-8 items-center justify-center rounded-sm border border-dashed border-[#ccb590]/40 bg-[#f7edde]/30 ${isShaking ? 'animate-shake' : ''}`}>
+        <span className="text-[10px] text-[#bfa884]/80">{label}</span>
+      </div>
+    );
+  }
+  const hpPct = Math.max(0, Math.min(100, (unit.hp / unit.maxHp) * 100));
+  const barColor = isEnemy ? '#c68c72' : '#9f7f55';
+  return (
+    <div
+      title={`${unit.name} ATK ${unit.power} ${unit.hp}/${unit.maxHp}`}
+      className={`relative flex h-12 w-8 flex-col items-center justify-center overflow-hidden rounded-sm border ${
+        isEnemy
+          ? 'border-[#c69a7d]/70 bg-[#4a2e22]'
+          : 'border-[#bfa884]/70 bg-[#2b3542]'
+      } ${isShaking ? 'animate-shake' : ''} ${isFlashing ? 'animate-flash' : ''}`}
+      style={{
+        outline: `1px solid ${isEnemy ? '#e8c8b4' : '#d6c2a0'}`,
+        outlineOffset: '1px',
+        boxShadow: isFlashing ? '0 0 10px 2px rgba(255, 107, 107, 0.6)' : undefined,
+      }}
+    >
+      <div 
+        className="absolute bottom-0 left-0 right-0 opacity-40 transition-all duration-300" 
+        style={{ height: `${hpPct}%`, backgroundColor: barColor }} 
+      />
+      <span className="relative z-10 mb-[2px] text-[11px] font-bold text-white" style={{ textShadow: '0 0 2px #000' }}>
+        ATK {unit.power}
+      </span>
+      <span className="relative z-10 w-full truncate px-[2px] text-center text-[9px] leading-tight text-white/90">
+        {unit.name}
+      </span>
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ MiniLanePreview (甯冨眬闃舵涓夎矾缂╃暐) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function MiniLanePreview({
+  seat,
+  enemyLane,
+  playerLane,
+  phase,
+  isSelectable,
+  isTarget,
+  plannedPlayerCard,
+  playerMainPlanned,
+  enemyMainPlanned,
+  playerSecretPlanned,
+  onSelect,
+  onDropCard,
+}: {
+  seat: SeatId;
+  enemyLane: SeatState;
+  playerLane: SeatState;
+  phase: DebatePhase;
+  isSelectable: boolean;
+  isTarget: boolean;
+  plannedPlayerCard?: DebateCard | null;
+  playerMainPlanned?: boolean;
+  enemyMainPlanned?: boolean;
+  playerSecretPlanned?: boolean;
+  onSelect: (s: SeatId) => void;
+  onDropCard?: (seat: SeatId, cardId: string) => void;
+}) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelect(seat)}
+      onDragOver={(e) => {
+        if (onDropCard) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+        }
+      }}
+      onDrop={(e) => {
+        if (onDropCard) {
+          e.preventDefault();
+          const cardId = e.dataTransfer.getData('text/plain');
+          if (cardId) {
+            onDropCard(seat, cardId);
+          }
+        }
+      }}
+      className={`relative flex flex-1 flex-col items-center rounded-xl border px-1 py-2 transition-all duration-200 ${
+        isTarget
+          ? 'border-[#b4823f] bg-[#f2dfbf] shadow-[0_0_0_2px_rgba(180,130,63,0.35)]'
+          : isSelectable
+          ? 'border-[#bda97e] bg-[#f7edde]/80 hover:border-[#b4823f]'
+          : 'border-[#d0b98a]/50 bg-[#f7edde]/50'
+      } ${isSelectable || onDropCard ? 'cursor-pointer' : 'cursor-default'}`}
+    >
+      <span className="mb-2 text-xs font-bold text-[#5c4631]">
+        {SEAT_ALIAS[seat]}
+        {isTarget && <span className="ml-1 text-[#b4823f]">✓</span>}
+      </span>
+      <div className="mb-1.5 flex min-h-[18px] flex-wrap items-center justify-center gap-1">
+        {phase === 'ming_bian' && playerMainPlanned ? (
+          <span className="rounded border border-[#9f7f55]/50 bg-[#9f7f55]/15 px-1.5 py-0.5 text-[9px] text-[#7f6441]">
+            鎴戞柟鏄庤
+          </span>
+        ) : null}
+        {phase === 'ming_bian' && enemyMainPlanned ? (
+          <span className="rounded border border-[#b57878]/50 bg-[#b57878]/12 px-1.5 py-0.5 text-[9px] text-[#8a4f4f]">
+            鏁屾柟鏄庤
+          </span>
+        ) : null}
+        {phase === 'an_mou' && playerSecretPlanned ? (
+          <span className="rounded border border-[#c9952a]/50 bg-[#c9952a]/15 px-1.5 py-0.5 text-[9px] text-[#8c6626]">
+            鎴戞柟鏆楃瓥
+          </span>
+        ) : null}
+        {phase === 'an_mou' ? (
+          <span className="rounded border border-[#bfa884]/35 bg-[#f7edde]/40 px-1.5 py-0.5 text-[9px] text-[#9a886a]">
+            鏁屾柟鏆楃瓥鏈煡
+          </span>
+        ) : null}
+      </div>
+      {/* Enemy units */}
+      <div className="flex flex-col gap-1 items-center">
+        <MiniUnitPip unit={enemyLane.back} isEnemy label="鏁屽悗" />
+        <MiniUnitPip unit={enemyLane.front} isEnemy label="鏁屽墠" />
+      </div>
+      <div className="my-2 flex w-full items-center justify-center border-t border-[#cfb896]/50">
+        <span className="bg-[#f7edde] px-1 text-[9px] font-bold text-[#b4823f] -mt-2">VS</span>
+      </div>
+      {/* Player Area with possible Planned Card overlap */}
+      <div className="relative flex w-full flex-col items-center min-h-[104px] gap-1">
+        {plannedPlayerCard && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div className="h-[76px] w-[50px] overflow-hidden rounded border border-[#c9952a] bg-[#12100a] shadow-lg">
+              <img src={artSrc(plannedPlayerCard)} alt={plannedPlayerCard.name} className="h-full w-full object-cover opacity-90" />
+              <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent px-0.5 pb-0.5 pt-3 text-center text-[9px] text-white">
+                {plannedPlayerCard.name}
+              </div>
+            </div>
+          </div>
+        )}
+        <div className={`flex flex-col items-center gap-1 transition-opacity ${plannedPlayerCard ? 'opacity-25' : 'opacity-100'}`}>
+          <MiniUnitPip unit={playerLane.front} isEnemy={false} label="鎴戝墠" />
+          <MiniUnitPip unit={playerLane.back} isEnemy={false} label="鎴戝悗" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ FieldCard (缁撶畻闃舵瀹屾暣鍗＄墝锛?:3) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function FieldCard({
+  card,
+  slot,
+  side,
+  isRevealed,
+  isNew,
+  isActiveLane,
+  isAttacking,
+  isShaking,
+}: {
+  card: DebateCard | null;
+  slot: 'main' | 'secret' | 'response';
+  side: 'player' | 'enemy';
+  isRevealed?: boolean;
+  isNew?: boolean;
+  isActiveLane?: boolean;
+  isAttacking?: boolean;
+  isShaking?: boolean | null;
+}) {
+  const frame = card ? getCardFrame(card.type) : CARD_FRAME_LIST[0];
+  const showBack = slot === 'secret' && !isRevealed;
+
+  if (!card) {
+    return (
+      <div
+        className="flex items-center justify-center rounded-xl border border-dashed border-[#c5ad88]/30 bg-transparent"
+        style={{ width: FIELD_CARD_WIDTH, height: FIELD_CARD_HEIGHT }}
+      />
+    );
+  }
+
+  if (showBack) {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center overflow-hidden rounded-xl border shadow-md ${
+          side === 'enemy' ? 'border-[#c68c72]/60 bg-[#2d1a14]' : 'border-[#9f7f55]/60 bg-[#1a2014]'
+        }`}
+        style={{ width: FIELD_CARD_WIDTH, height: FIELD_CARD_HEIGHT }}
+      >
+        <div className="text-[18px] opacity-40">暗</div>
+        <div className="mt-1 text-[9px] text-white/40">鏆楃瓥</div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`relative overflow-visible transition-all duration-300 ${
+        isNew ? 'animate-[fadeSlideIn_0.4s_ease]' : ''
+      } ${
+        isActiveLane
+          ? 'shadow-[0_0_0_3px_#c9952a,0_0_25px_rgba(201,149,42,0.9)] scale-[1.05] z-30'
+          : 'shadow-lg'
+      } ${
+        isAttacking ? 'animate-card-attack scale-110 z-40 shadow-[0_0_0_4px_#ffeb3b,0_0_30px_rgba(255,235,59,0.9)]' : ''
+      } ${
+        isShaking ? 'animate-shake' : ''
+      }`}
+      style={{ 
+        width: FIELD_CARD_WIDTH, 
+        height: FIELD_CARD_HEIGHT,
+        zIndex: isAttacking ? 40 : isActiveLane ? 30 : 20,
+      }}
+    >
+      <div className="absolute inset-0 overflow-hidden rounded-xl">
+        <img src={artSrc(card)} alt={card.name} className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#12100a]/80 via-transparent to-transparent" />
+        <div 
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 truncate font-black tracking-widest uppercase"
+          style={{ 
+            fontSize: '10px',
+            color: frame.color,
+            textShadow: `1px 1px 0px #000, 0 2px 4px rgba(0,0,0,0.9)`,
+            transform: 'skewX(-5deg)'
+          }}
+        >
+          {card.type}
+        </div>
+      </div>
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          top: `-${FIELD_CARD_FRAME_OUTSET}px`,
+          bottom: `-${FIELD_CARD_FRAME_OUTSET}px`,
+          left: `-${FIELD_CARD_FRAME_OUTSET}px`,
+          right: `-${FIELD_CARD_FRAME_OUTSET}px`,
+          backgroundImage: `url(${frame.img})`,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 10,
+          filter: side === 'enemy' ? 'saturate(0.92) brightness(0.95)' : 'none',
+        }}
+      />
+      {/* Cost */}
+      <div
+        className="absolute left-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-[#12100a]/75 text-[11px] font-bold text-[#f0c97a]"
+        style={{ 
+          zIndex: 30,
+          border: `2px solid ${frame.color}`,
+          boxShadow: `0 0 6px ${frame.shadow}, 0 1px 3px rgba(0,0,0,0.4)`,
+        }}
+      >
+        {card.cost}
+      </div>
+      {slot === 'secret' && (
+        <div className="absolute right-1.5 top-1.5 rounded bg-[#7a5c2e]/90 px-1.5 text-[9px] font-bold text-[#f0c97a]" style={{ zIndex: 30, border: '1px solid rgba(255,255,255,0.2)' }}>
+          暗策
+        </div>
+      )}
+      {/* Name */}
+      <div className="absolute bottom-0 left-0 right-0 px-2 pb-2" style={{ zIndex: 30 }}>
+        <div 
+          className="truncate font-semibold text-white/95"
+          style={{ 
+            fontSize: '12px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 1px rgba(0,0,0,0.5)',
+          }}
+        >
+          {card.name}
+        </div>
+        <div 
+          className="truncate font-medium"
+          style={{ 
+            fontSize: '11px',
+            color: 'rgba(255,255,255,0.75)',
+            textShadow: '0 1px 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.5)',
+          }}
+        >
+          {effectShort(card)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ SettlementLane (缁撶畻闃舵瀹屾暣璺? 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+interface DamageNumber {
+  id: string;
+  value: number;
+  type: 'huyin' | 'xinzheng' | 'dingli';
+  position: { x: number; y: number };
+}
+
+interface SettlementAnimation {
+  laneIdx: number;
+  attackerCardId: string | null;
+  targetSlot: 'front' | 'back' | 'hero' | null;
+  isAttacking: boolean;
+  damageNumbers: DamageNumber[];
+  showPenetrate: boolean;
+  penetrateTarget: 'back' | 'hero' | null;
+}
+
+function SettlementLane({
+  seat,
+  enemyLane,
+  playerLane,
+  laneCards,
+  isActive,
+  isDimmed,
+  isRevealed,
+  animation,
+  side,
+}: {
+  seat: SeatId;
+  enemyLane: SeatState;
+  playerLane: SeatState;
+  laneCards: LaneCards;
+  isActive: boolean;
+  isDimmed: boolean;
+  isRevealed: boolean;
+  animation?: SettlementAnimation;
+  side?: 'player' | 'enemy' | null;
+}) {
+  const hasEnemyPlay = laneCards.enemyMain || laneCards.enemySecret;
+  const hasPlayerPlay = laneCards.playerMain || laneCards.playerSecret;
+  const isAttacking = animation?.isAttacking && isActive;
+  
+  // 判定本轮进攻方
+  const isPlayerAttacker = side === 'player';
+  const playerCardId = laneCards.playerMain?.id || laneCards.playerSecret?.id;
+  const enemyCardId = laneCards.enemyMain?.id || laneCards.enemySecret?.id;
+  const isPlayerCardAttacking = isAttacking && isPlayerAttacker && animation?.attackerCardId === playerCardId;
+  const isEnemyCardAttacking = isAttacking && !isPlayerAttacker && animation?.attackerCardId === enemyCardId;
+
+  return (
+    <div
+      className={`flex flex-1 flex-col overflow-hidden rounded-2xl border transition-all duration-500 ${
+        isActive
+          ? 'z-10 scale-[1.03] border-[#d4a520] bg-[#f5e6c8] shadow-[0_0_0_3px_rgba(212,165,32,0.42),0_12px_30px_rgba(0,0,0,0.22)]'
+          : isDimmed
+          ? 'scale-[0.96] border-[#c5ad88]/35 bg-[#f7edde]/45 opacity-45'
+          : 'border-[#c5ad88]/80 bg-[#f7edde]'
+      }`}
+    >
+      {/* Lane header */}
+      <div
+        className={`flex items-center justify-center gap-2 border-b py-2 ${
+          isActive ? 'border-[#d4a520]/50 bg-[#f2dfbf]/80' : 'border-[#d0b98a]/40'
+        }`}
+      >
+        <span className={`text-sm font-semibold ${isActive ? 'text-[#8b4513] scale-110' : 'text-[#5c4631]'}`}>
+          {SEAT_ALIAS[seat]}
+        </span>
+        {isActive && (
+          <span className="animate-pulse rounded-full bg-[#d4a520] px-3 py-1 text-[11px] font-bold text-white shadow-lg">
+            结算中
+          </span>
+        )}
+      </div>
+
+      <div className="relative flex flex-1 flex-col gap-2 p-2">
+        {/* 浼ゅ鏁板瓧娴姩灞?*/}
+        {animation?.damageNumbers.map((dmg) => (
+          <DamageFloat
+            key={dmg.id}
+            value={dmg.value}
+            type={dmg.type}
+            position={dmg.position}
+          />
+        ))}
+        
+        {/* 绌块€忔彁绀?*/}
+        {isActive && animation?.showPenetrate && (
+          <div className="absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2">
+            <div className="animate-bounce rounded-lg border-2 border-[#ff6b6b] bg-[#ff6b6b]/20 px-4 py-2 text-lg font-bold text-[#ff6b6b] shadow-lg">
+              鈿旓笍 绌块€忥紒
+            </div>
+          </div>
+        )}
+
+        {/* Enemy cards + units */}
+        <div className="flex flex-col items-center gap-1.5">
+          {/* Enemy played cards */}
+          {hasEnemyPlay ? (
+            <div className="flex gap-1.5 justify-center">
+              {laneCards.enemyMain && (
+                <FieldCard 
+                  card={laneCards.enemyMain} 
+                  slot="main" 
+                  side="enemy" 
+                  isRevealed 
+                  isNew={isRevealed}
+                  isActiveLane={isActive}
+                  isAttacking={isEnemyCardAttacking && laneCards.enemyMain.id === animation?.attackerCardId}
+                  isShaking={isActive && animation?.targetSlot && !isPlayerAttacker}
+                />
+              )}
+              {laneCards.enemySecret && (
+                <FieldCard 
+                  card={laneCards.enemySecret} 
+                  slot="secret" 
+                  side="enemy" 
+                  isRevealed={isRevealed} 
+                  isNew={isRevealed}
+                  isActiveLane={isActive}
+                  isAttacking={isEnemyCardAttacking && laneCards.enemySecret.id === animation?.attackerCardId}
+                  isShaking={isActive && animation?.targetSlot && !isPlayerAttacker}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="flex h-[120px] items-center justify-center text-[10px] text-[#b3a080]">无出牌</div>
+          )}
+          {/* Enemy units row */}
+          <div className="flex gap-1 justify-center">
+            <MiniUnitPip 
+              unit={enemyLane.back} 
+              isEnemy 
+              label="鏁屽悗"
+              isShaking={isActive && animation?.targetSlot === 'back' && !isPlayerAttacker}
+              isFlashing={isActive && animation?.targetSlot === 'back' && !isPlayerAttacker}
+            />
+            <MiniUnitPip 
+              unit={enemyLane.front} 
+              isEnemy 
+              label="鏁屽墠"
+              isShaking={isActive && animation?.targetSlot === 'front' && !isPlayerAttacker}
+              isFlashing={isActive && animation?.targetSlot === 'front' && !isPlayerAttacker}
+            />
+          </div>
+        </div>
+
+        {/* Center divider */}
+        <div className={`h-px ${isActive ? 'bg-[#d4a520]/60' : 'bg-[#cfb896]'}`} />
+
+        {/* Player units + cards */}
+        <div className="flex flex-col items-center gap-1.5">
+          {/* Player units row */}
+          <div className="flex gap-1 justify-center">
+            <MiniUnitPip 
+              unit={playerLane.front} 
+              isEnemy={false} 
+              label="鎴戝墠"
+              isShaking={isActive && animation?.targetSlot === 'front' && isPlayerAttacker}
+              isFlashing={isActive && animation?.targetSlot === 'front' && isPlayerAttacker}
+            />
+            <MiniUnitPip 
+              unit={playerLane.back} 
+              isEnemy={false} 
+              label="鎴戝悗"
+              isShaking={isActive && animation?.targetSlot === 'back' && isPlayerAttacker}
+              isFlashing={isActive && animation?.targetSlot === 'back' && isPlayerAttacker}
+            />
+          </div>
+          {/* Player played cards */}
+          {hasPlayerPlay ? (
+            <div className="flex gap-1.5 justify-center">
+              {laneCards.playerMain && (
+                <FieldCard 
+                  card={laneCards.playerMain} 
+                  slot="main" 
+                  side="player" 
+                  isRevealed 
+                  isNew={isRevealed}
+                  isActiveLane={isActive}
+                  isAttacking={isPlayerCardAttacking && laneCards.playerMain.id === animation?.attackerCardId}
+                  isShaking={isActive && animation?.targetSlot && isPlayerAttacker}
+                />
+              )}
+              {laneCards.playerSecret && (
+                <FieldCard 
+                  card={laneCards.playerSecret} 
+                  slot="secret" 
+                  side="player" 
+                  isRevealed={isRevealed} 
+                  isNew={isRevealed}
+                  isActiveLane={isActive}
+                  isAttacking={isPlayerCardAttacking && laneCards.playerSecret.id === animation?.attackerCardId}
+                  isShaking={isActive && animation?.targetSlot && isPlayerAttacker}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="flex h-[120px] items-center justify-center text-[10px] text-[#b3a080]">无出牌</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ DamageFloat (浼ゅ鏁板瓧娴姩) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function DamageFloat({
+  value,
+  type,
+  position,
+}: {
+  value: number;
+  type: 'huyin' | 'xinzheng' | 'dingli';
+  position: { x: number; y: number };
+}) {
+  const typeConfig = {
+    huyin: { label: '鎶ゅ嵃', color: '#4a90d9', bg: 'rgba(74,144,217,0.2)' },
+    xinzheng: { label: '蹇冭瘉', color: '#ff6b6b', bg: 'rgba(255,107,107,0.2)' },
+    dingli: { label: '瀹氬姏', color: '#9b59b6', bg: 'rgba(155,89,182,0.2)' },
+  };
+  const config = typeConfig[type];
+
+  return (
+    <div
+      className="pointer-events-none absolute z-40 animate-damage-float"
+      style={{
+        left: position.x,
+        top: position.y,
+      }}
+    >
+      <div
+        className="flex flex-col items-center rounded-lg border px-3 py-1.5 shadow-lg"
+        style={{
+          background: config.bg,
+          borderColor: config.color,
+          color: config.color,
+        }}
+      >
+        <span className="text-[10px] font-medium">{config.label}</span>
+        <span className="text-lg font-bold">-{value}</span>
+      </div>
+    </div>
+  );
+}
+
+
+// 鈹€鈹€鈹€ ActionChip 鈹€鈹€ 鐘舵€佷欢锛氭棦鏄姸鎬佸睍绀猴紝涔熸槸鍑虹墝鍔ㄤ綔鍏ュ彛 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+/**
+ * 瑙嗚鐘舵€侊細
+// 鈹€鈹€鈹€ ActionDropZone (鍘?ActionChip 鐨勫崱妲藉寲) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+/**
+ * 鐘舵€侀€昏緫涓?ActionChip 鐩稿悓锛屼絾娓叉煋涓哄疄闄呯殑鍗＄墝妲?(姣斾緥 2:3锛屾瘮濡?64x96)
+ * 鏀寔 Drag & Drop
+ */
+function ActionDropZone({
+  action,
+  filledCard,
+  locked,
+  canAct,
+  isActive,
+  onAct,
+  onClear,
+  onDrop,
+}: {
+  action: ActionChoice;
+  filledCard: DebateCard | null;
+  locked: boolean;
+  canAct: boolean;
+  isActive: boolean;
+  onAct: () => void;
+  onClear?: () => void;
+  onDrop: (cardId: string) => void;
+}) {
+  const filledFrame = filledCard ? getCardFrame(filledCard.type) : null;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (canAct) onAct();
+    else if (filledCard && !locked && onClear) onClear();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (canAct && !locked) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const cardId = e.dataTransfer.getData('text/plain');
+    if (cardId && canAct && !locked) {
+      onDrop(cardId);
+    }
+  };
+
+  // 鏍峰紡璁惧畾
+  let borderCls = '';
+  let bgCls = '';
+  
+  if (isActive) {
+    borderCls = 'border-2 border-[#c9952a] shadow-[0_0_12px_rgba(201,149,42,0.4)]';
+    bgCls = 'bg-[#f5e890]/20';
+  } else if (locked && filledCard) {
+    borderCls = 'border border-[#9f7d52]/50 cursor-default';
+    bgCls = 'bg-[#d4b97a]/15';
+  } else if (locked && !filledCard) {
+    borderCls = 'border border-dashed border-[#c5ad88]/20 cursor-default';
+    bgCls = 'bg-transparent';
+  } else if (canAct && !filledCard) {
+    borderCls = 'border border-dashed border-[#c9952a]/70 hover:border-solid hover:bg-[#f5e890]/10 cursor-pointer';
+    bgCls = 'bg-[#f5e890]/5';
+  } else if (canAct && filledCard) {
+    borderCls = 'border-2 border-[#9f7d52] hover:border-[#c9952a] cursor-pointer';
+    bgCls = 'bg-transparent';
+  } else if (filledCard) {
+    borderCls = 'border border-[#9f7d52]/80 cursor-default';
+    bgCls = 'bg-transparent';
+  } else {
+    borderCls = 'border border-dashed border-[#c5ad88]/40 cursor-default';
+    bgCls = 'bg-transparent';
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="text-[10px] text-[#7a6450] font-medium">{ACTION_LABEL[action]}</div>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleClick}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={`relative overflow-hidden flex flex-col items-center justify-center rounded-lg transition-all duration-200 ${borderCls} ${bgCls}`}
+        style={{ width: ACTION_SLOT_WIDTH, height: ACTION_SLOT_HEIGHT }}
+      >
+        {filledCard ? (
+          <>
+            <img src={artSrc(filledCard)} alt={filledCard.name} className="absolute inset-0 w-full h-full object-cover opacity-90" />
+            {filledFrame ? (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  backgroundImage: `url(${filledFrame.img})`,
+                  backgroundSize: '100% 100%',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  zIndex: 10,
+                  opacity: 0.92,
+                }}
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#12100a]/90 via-[#12100a]/20 to-transparent" />
+            <div className="absolute bottom-1 w-full px-1 text-center" style={{ zIndex: 20 }}>
+              <div className="truncate text-[10px] font-bold text-white/95">{filledCard.name}</div>
+            </div>
+            {(!locked && onClear) && (
+              <div className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/50 text-[10px] text-white/80 hover:bg-red-500/80" style={{ zIndex: 20 }}>
+                脳
+              </div>
+            )}
+            {locked && (
+              <div className="absolute top-1 right-1 text-[10px] opacity-70" style={{ zIndex: 20 }}>馃敀</div>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center opacity-40">
+            <span className="text-xl text-[#c5ad88]">+</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// 鈹€鈹€鈹€ Main component 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+export function BattleFrameV2({
+  arenaId,
+  forcedTopicId,
+  playerMainFaction,
+  enemyMainFaction,
+  onMenu,
+  onReselectArena,
+}: BattleFrameV2Props) {
+  const { state, planCard, planWriting, setTargetSeat, lockPublic, lockSecret } = useDebateBattle({
+    arenaId,
+    forcedTopicId,
+    playerMainFaction,
+    enemyMainFaction,
+  });
+
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] = useState<ActionChoice | null>(null);
+  const [, setHotSeats] = useState<SeatId[]>([]);
+  const [activeLaneIdx, setActiveLaneIdx] = useState<number | null>(null);
+  const [isConfirmPending, setIsConfirmPending] = useState(false);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; level: ToastLevel } | null>(null);
+  
+  // 结算动画状态
+  const [settlementAnimation, setSettlementAnimation] = useState<SettlementAnimation | null>(null);
+  const [settlementAnimationSide, setSettlementAnimationSide] = useState<'player' | 'enemy' | null>(null);
+
+  const hotSeatTimerRef = useRef<number | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+  const confirmCooldownRef = useRef<number | null>(null);
+  const prevSeatSnapshotRef = useRef<Record<SeatId, string> | null>(null);
+  const settlementSequenceTokenRef = useRef(0);
+  const latestLaneCardsMapRef = useRef<Record<SeatId, LaneCards> | null>(null);
+  const resolveAnimationRoundRef = useRef<number | null>(null);
+
+  const { phase, round } = state;
+
+  const showToast = useCallback((message: string, level: ToastLevel = 'info') => {
+    if (toastTimerRef.current) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    setToast({ message, level });
+    toastTimerRef.current = window.setTimeout(() => setToast(null), 1900);
+  }, []);
+
+  const CARD_TYPE_ORDER: Record<string, number> = {
+    '绔嬭': 1,
+    '绛栨湳': 2,
+    '鍙嶈瘶': 3,
+    '鐜勭珷': 4,
+    '闂ㄥ': 5,
+  };
+  const handCardMap = useMemo(() => {
+    const map = new Map<string, DebateCard>();
+    for (const card of state.player.hand) {
+      map.set(card.id, card);
+    }
+    return map;
+  }, [state.player.hand]);
+
+  const sortedHand = useMemo(() => {
+    return [...state.player.hand].sort((a, b) => {
+      const typeDiff = (CARD_TYPE_ORDER[a.type] ?? 99) - (CARD_TYPE_ORDER[b.type] ?? 99);
+      if (typeDiff !== 0) return typeDiff;
+      return a.cost - b.cost;
+    });
+  }, [state.player.hand]);
+  const selectedCard = selectedCardId ? handCardMap.get(selectedCardId) ?? null : null;
+  const plannedMainCard = state.player.plan.mainCardId ? handCardMap.get(state.player.plan.mainCardId) ?? null : null;
+  const plannedResponseCard = state.player.plan.responseCardId ? handCardMap.get(state.player.plan.responseCardId) ?? null : null;
+  const plannedSecretCard = state.player.plan.secretCardId ? handCardMap.get(state.player.plan.secretCardId) ?? null : null;
+  const plannedWritingCard = state.player.plan.writingCardId ? handCardMap.get(state.player.plan.writingCardId) ?? null : null;
+
+  const isAnMou = phase === 'an_mou';
+  const isLayoutPhase = phase === 'ming_bian' || phase === 'an_mou';
+  const isSettlementPhase = phase === 'reveal' || phase === 'resolve';
+  const isFinished = phase === 'finished';
+  const isRevealed = phase === 'resolve' || phase === 'finished';
+
+  const canPlanPublic = phase === 'ming_bian' && !state.player.plan.lockedPublic;
+  const canPlanSecret = phase === 'an_mou' && !state.player.plan.lockedSecret;
+
+  const timeWarningActive =
+    !isFinished && (phase === 'ming_bian' || phase === 'an_mou') && state.secondsLeft <= 5;
+  const timerText = isFinished ? '--' : `${state.secondsLeft}s`;
+
+  const phaseLabel = PHASE_STEP_LABEL[phase];
+  const xinMaxForBars = Math.max(
+    30,
+    state.player.resources.xinZheng,
+    state.enemy.resources.xinZheng,
+    1,
+  );
+  const enemyXinPct = Math.max(0, Math.min(100, Math.round((state.enemy.resources.xinZheng / xinMaxForBars) * 100)));
+
+
+  // 鈹€鈹€ Hot seat animation 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const seatSnapshot = useMemo(() => {
+    const snap = {} as Record<SeatId, string>;
+    for (const seat of SEATS) {
+      const p = state.player.seats[seat];
+      const e = state.enemy.seats[seat];
+      snap[seat] = [p.front?.hp, p.back?.hp, e.front?.hp, e.back?.hp].join('|');
+    }
+    return snap;
+  }, [state.player.seats, state.enemy.seats]);
+
+  useEffect(() => {
+    const prev = prevSeatSnapshotRef.current;
+    if (!prev) { prevSeatSnapshotRef.current = seatSnapshot; return; }
+    const changed = SEATS.filter((s) => prev[s] !== seatSnapshot[s]);
+    prevSeatSnapshotRef.current = seatSnapshot;
+    if (!changed.length) return;
+    setHotSeats(changed);
+    if (hotSeatTimerRef.current) window.clearTimeout(hotSeatTimerRef.current);
+    hotSeatTimerRef.current = window.setTimeout(() => { setHotSeats([]); }, 900);
+  }, [seatSnapshot]);
+
+  useEffect(() => () => {
+    if (hotSeatTimerRef.current) window.clearTimeout(hotSeatTimerRef.current);
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    if (confirmCooldownRef.current) window.clearTimeout(confirmCooldownRef.current);
+  }, []);
+
+  // 鈹€鈹€ Deselect card when it leaves hand 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  useEffect(() => {
+    if (selectedCardId && !state.player.hand.some((c) => c.id === selectedCardId)) {
+      setSelectedCardId(null); setSelectedAction(null);
+    }
+  }, [selectedCardId, state.player.hand]);
+
+  // 鈹€鈹€ Reset selection on phase/round change 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  useEffect(() => { setSelectedAction(null); setSelectedCardId(null); }, [phase, round]);
+
+  // 鈹€鈹€ Slot validation 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const getSlotError = (slot: PlanSlot): string | null => {
+    if (!selectedCardId) return '璇峰厛閫夋嫨鎵嬬墝';
+    if (slot === 'secret' && !canPlanSecret) return '褰撳墠涓嶆槸鏆楃瓥闃舵';
+    if (slot !== 'secret' && !canPlanPublic) return '褰撳墠涓嶆槸鍏紑闃舵';
+    return getPlanAssignError(state.player, slot, selectedCardId);
+  };
+
+  const getWritingError = (): string | null => {
+    if (!selectedCardId) return '璇峰厛閫夋嫨鎵嬬墝';
+    if (!canPlanPublic) return '褰撳墠涓嶆槸鍏紑闃舵';
+    const used = [state.player.plan.mainCardId, state.player.plan.responseCardId, state.player.plan.secretCardId].filter(Boolean);
+    if (used.includes(selectedCardId)) return '该卡已放入其他位置';
+    return null;
+  };
+
+  const canMain = !getSlotError('main');
+  const canResponse = !getSlotError('response');
+  const canSecret = !getSlotError('secret');
+  const canWriting = !getWritingError();
+
+  const actionOptions = useMemo<ActionChoice[]>(() => {
+    if (!selectedCardId) return [];
+    return ACTION_ORDER.filter((a) => {
+      if (a === 'main') return canMain;
+      if (a === 'response') return canResponse;
+      if (a === 'secret') return canSecret;
+      return canWriting;
+    });
+  }, [selectedCardId, canMain, canResponse, canSecret, canWriting]);
+
+  // 鈹€鈹€ Handlers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const handleCardSelect = useCallback((id: string) => {
+    setSelectedCardId((prev) => (prev === id ? null : id));
+    setSelectedAction(null);
+  }, []);
+
+  const reportRuntimeError = useCallback((context: string, error: unknown) => {
+    const detail = error instanceof Error ? error.message : '鏈煡寮傚父';
+    setRuntimeError(`${context}: ${detail}`);
+    showToast(`${context}澶辫触`, 'error');
+  }, [showToast]);
+
+  const runSafeAction = useCallback((context: string, action: () => void, successMessage?: string) => {
+    try {
+      action();
+      setRuntimeError(null);
+      if (successMessage) {
+        showToast(successMessage, 'success');
+      }
+    } catch (error) {
+      reportRuntimeError(context, error);
+    }
+  }, [reportRuntimeError, showToast]);
+
+  const planCardSafe = useCallback((slot: PlanSlot, cardId: string | null, successMessage?: string) => {
+    runSafeAction('甯冪疆鍗＄墝', () => planCard(slot, cardId), successMessage);
+  }, [planCard, runSafeAction]);
+
+  const planWritingSafe = useCallback((cardId: string | null, successMessage?: string) => {
+    runSafeAction('着书蓄势', () => planWriting(cardId), successMessage);
+  }, [planWriting, runSafeAction]);
+
+  const setTargetSeatSafe = useCallback((slot: 'main' | 'secret', seat: SeatId) => {
+    runSafeAction('璁剧疆鐩爣璺綅', () => setTargetSeat(slot, seat));
+  }, [runSafeAction, setTargetSeat]);
+
+  const applyCardToAction = useCallback((action: ActionChoice, cardId: string) => {
+    if (!handCardMap.has(cardId)) {
+      showToast('璇ュ崱鐗岀姸鎬佸凡鍙樺寲锛岃閲嶆柊閫夋嫨', 'warning');
+      return;
+    }
+
+    if (ACTION_NEEDS_TARGET[action]) {
+      setSelectedCardId(cardId);
+      setSelectedAction(action);
+      showToast(action === 'main' ? '请选择主动位目标路位' : '请选择暗策目标路位', 'info');
+      return;
+    }
+
+    if (action === 'response') {
+      planCardSafe('response', cardId, '已分配至反制槽');
+    } else {
+      planWritingSafe(cardId, '已放入着书蓄势');
+    }
+    setSelectedCardId(null);
+    setSelectedAction(null);
+  }, [handCardMap, planCardSafe, planWritingSafe, showToast]);
+
+  const handleActionPick = useCallback((action: ActionChoice) => {
+    if (!selectedCardId || !selectedCard) {
+      showToast('璇峰厛閫夋嫨鎵嬬墝', 'warning');
+      return;
+    }
+    if (ACTION_NEEDS_TARGET[action]) {
+      setSelectedAction(action);
+      showToast(action === 'main' ? '请选择主动位目标路位' : '请选择暗策目标路位', 'info');
+    } else if (action === 'response') {
+      planCardSafe('response', selectedCardId, '已分配至反制槽');
+      setSelectedCardId(null);
+      setSelectedAction(null);
+    } else {
+      planWritingSafe(selectedCardId, '已放入着书蓄势');
+      setSelectedCardId(null);
+      setSelectedAction(null);
+    }
+  }, [planCardSafe, planWritingSafe, selectedCard, selectedCardId, showToast]);
+
+  const handleSeatSelect = useCallback((seat: SeatId) => {
+    const seatAction = selectedAction === 'main' || selectedAction === 'secret' ? selectedAction : null;
+    if (!seatAction || !selectedCardId || !selectedCard) {
+      showToast('请先选择需要落位的卡牌与动作', 'warning');
+      return;
+    }
+    setTargetSeatSafe(seatAction, seat);
+    planCardSafe(
+      seatAction,
+      selectedCardId,
+      seatAction === 'main' ? `主动位已布置到${SEAT_ALIAS[seat]}` : `暗策已布置到${SEAT_ALIAS[seat]}`,
+    );
+    setSelectedCardId(null);
+    setSelectedAction(null);
+  }, [planCardSafe, selectedAction, selectedCard, selectedCardId, setTargetSeatSafe, showToast]);
+
+  // 鈹€鈹€ Confirm button 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const runConfirm = useCallback((kind: 'public' | 'secret') => {
+    if (isConfirmPending) return;
+    try {
+      setIsConfirmPending(true);
+      if (kind === 'public') {
+        lockPublic();
+        showToast('明辩布局已确认', 'success');
+      } else {
+        lockSecret();
+        showToast('暗策布局已确认', 'success');
+      }
+      setRuntimeError(null);
+    } catch (error) {
+      reportRuntimeError('纭闃舵', error);
+    } finally {
+      if (confirmCooldownRef.current) {
+        window.clearTimeout(confirmCooldownRef.current);
+      }
+      confirmCooldownRef.current = window.setTimeout(() => setIsConfirmPending(false), 350);
+    }
+  }, [isConfirmPending, lockPublic, lockSecret, reportRuntimeError, showToast]);
+
+  const confirmBtn = useMemo(() => {
+    if (phase === 'ming_bian') {
+      return {
+        label: state.player.plan.lockedPublic ? '已确认' : isConfirmPending ? '确认中...' : '确认',
+        onClick: () => runConfirm('public'),
+        disabled: !canPlanPublic || isConfirmPending,
+      };
+    }
+    if (phase === 'an_mou') {
+      return {
+        label: state.player.plan.lockedSecret ? '已确认' : isConfirmPending ? '确认中...' : '确认暗策',
+        onClick: () => runConfirm('secret'),
+        disabled: !canPlanSecret || isConfirmPending,
+      };
+    }
+    return { label: '绛夊緟', onClick: () => undefined, disabled: true };
+  }, [canPlanPublic, canPlanSecret, isConfirmPending, phase, runConfirm, state.player.plan.lockedPublic, state.player.plan.lockedSecret]);
+
+  // 鈹€鈹€ Seat picking 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const seatPickingAction = selectedAction === 'main' || selectedAction === 'secret' ? selectedAction : null;
+  const activeTargetSeat =
+    seatPickingAction === 'main' ? state.player.plan.mainTargetSeat :
+    seatPickingAction === 'secret' ? state.player.plan.secretTargetSeat : null;
+
+  // 鈹€鈹€ Lane cards for settlement 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  const laneCardsMap = useMemo((): Record<SeatId, LaneCards> => {
+    const result = {} as Record<SeatId, LaneCards>;
+    for (const seat of SEATS) {
+      result[seat] = { playerMain: null, playerSecret: null, enemyMain: null, enemySecret: null };
+    }
+    const { plan: pp } = state.player;
+    const { plan: ep } = state.enemy;
+
+    if (pp.mainCardId) result[pp.mainTargetSeat].playerMain = findCard(state.player, pp.mainCardId) ?? null;
+    if (pp.secretCardId) result[pp.secretTargetSeat].playerSecret = findCard(state.player, pp.secretCardId) ?? null;
+    if (ep.mainCardId) result[ep.mainTargetSeat].enemyMain = findCard(state.enemy, ep.mainCardId) ?? null;
+    if (ep.secretCardId) result[ep.secretTargetSeat].enemySecret = findCard(state.enemy, ep.secretCardId) ?? null;
+
+    return result;
+  }, [state.player, state.enemy]);
+
+  useEffect(() => {
+    latestLaneCardsMapRef.current = laneCardsMap;
+  }, [laneCardsMap]);
+
+  // 播放攻击动画
+  const playAttackAnimation = async (
+    laneIdx: number,
+    attackerCardId: string,
+    side: 'player' | 'enemy',
+    seat: SeatId,
+    sequenceToken: number,
+  ) => {
+    if (settlementSequenceTokenRef.current !== sequenceToken) return;
+    const enemyLane = state.enemy.seats[seat];
+    const playerLane = state.player.seats[seat];
+
+    // 目标优先级：前排 > 后排 > 主辩
+    let targetSlot: 'front' | 'back' | 'hero' = 'hero';
+    if (side === 'player') {
+      if (enemyLane.front) targetSlot = 'front';
+      else if (enemyLane.back) targetSlot = 'back';
+    } else {
+      if (playerLane.front) targetSlot = 'front';
+      else if (playerLane.back) targetSlot = 'back';
+    }
+
+    setSettlementAnimationSide(side);
+    setSettlementAnimation({
+      laneIdx,
+      attackerCardId,
+      targetSlot,
+      isAttacking: true,
+      damageNumbers: [],
+      showPenetrate: false,
+      penetrateTarget: null,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, ATTACK_WINDUP_MS));
+    if (settlementSequenceTokenRef.current !== sequenceToken) return;
+
+    const damageNumbers: DamageNumber[] = [];
+    if (targetSlot === 'front' || targetSlot === 'back') {
+      damageNumbers.push({
+        id: `huyin-${laneIdx}-${Date.now()}`,
+        value: Math.floor(Math.random() * 3) + 2,
+        type: 'huyin',
+        position: { x: 50 + Math.random() * 40, y: side === 'player' ? 30 : 70 },
+      });
+    } else {
+      damageNumbers.push({
+        id: `xinzheng-${laneIdx}-${Date.now()}`,
+        value: Math.floor(Math.random() * 2) + 1,
+        type: 'xinzheng',
+        position: { x: 50, y: 50 },
+      });
+    }
+
+    setSettlementAnimation((prev) => (prev ? { ...prev, isAttacking: false, damageNumbers } : null));
+    await new Promise((resolve) => setTimeout(resolve, DAMAGE_HOLD_MS));
+    if (settlementSequenceTokenRef.current !== sequenceToken) return;
+
+    const shouldPenetrate = targetSlot === 'front' && Math.random() > 0.5;
+    if (shouldPenetrate) {
+      setSettlementAnimation((prev) =>
+        prev
+          ? {
+              ...prev,
+              showPenetrate: true,
+              penetrateTarget: 'back',
+            }
+          : null,
+      );
+      await new Promise((resolve) => setTimeout(resolve, PENETRATE_HOLD_MS));
+      if (settlementSequenceTokenRef.current !== sequenceToken) return;
+
+      setSettlementAnimation((prev) =>
+        prev
+          ? {
+              ...prev,
+              targetSlot: 'back',
+              showPenetrate: false,
+              damageNumbers: [
+                {
+                  id: `dingli-${laneIdx}-${Date.now()}`,
+                  value: Math.floor(Math.random() * 2) + 1,
+                  type: 'dingli',
+                  position: { x: 60, y: side === 'player' ? 40 : 60 },
+                },
+              ],
+            }
+          : null,
+      );
+      await new Promise((resolve) => setTimeout(resolve, DAMAGE_HOLD_MS));
+      if (settlementSequenceTokenRef.current !== sequenceToken) return;
+    }
+
+    if (settlementSequenceTokenRef.current === sequenceToken) {
+      setSettlementAnimation(null);
+    }
+  };
+
+  // 鈹€鈹€ Active lane during resolve 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  useEffect(() => {
+    // 澧炲姞涓€涓澶栫殑 check锛屽鏋滄槸鍥犱负鐘舵€佹洿鏂帮紙姣斿鎵ｈ锛夎Е鍙戠殑 re-run锛?    // 浣?token 娌″彉锛屾垜浠氨涓嶈閲嶇疆銆傝繖閲岀殑 logic 闇€瑕佺簿纭帶鍒躲€?    // 浣嗘槸 React 鐨?useEffect 浼氬湪姣忔渚濊禆鍙樺寲鏃舵墽琛屻€?    // 涓轰簡闃叉鈥滀粠璺綅 0 閲嶅ご寮€濮嬧€濓紝鎴戜滑闇€瑕佸湪 runSettlementSequence 鍐呴儴
+    // 涔熻兘鎰熺煡鍒版槸鍚﹁繖鏄竴涓€滄柊鈥濈殑 resolve 闃舵銆?    
+    if (phase !== 'resolve') {
+      resolveAnimationRoundRef.current = null;
+      setActiveLaneIdx(null);
+      setSettlementAnimation(null);
+      settlementSequenceTokenRef.current += 1; // 浠呭湪閫€鍑烘垨杞崲闃舵鏃舵洿鏂?token
+      return;
+    }
+
+    if (resolveAnimationRoundRef.current === round) {
+      return;
+    }
+    resolveAnimationRoundRef.current = round;
+    settlementSequenceTokenRef.current += 1;
+    const currentToken = settlementSequenceTokenRef.current;
+    const laneCardsSnapshot = latestLaneCardsMapRef.current;
+    if (!laneCardsSnapshot) return;
+
+    const runSettlementSequence = async () => {
+      try {
+        for (let laneIdx = 0; laneIdx < 3; laneIdx++) {
+          if (settlementSequenceTokenRef.current !== currentToken) return;
+          setActiveLaneIdx(laneIdx);
+          const seat = SEATS[laneIdx];
+          const laneCard = laneCardsSnapshot[seat];
+
+          const hasPlayerAttack = Boolean(laneCard.playerMain || laneCard.playerSecret);
+          const hasEnemyAttack = Boolean(laneCard.enemyMain || laneCard.enemySecret);
+          const hasAnyAttack = hasPlayerAttack || hasEnemyAttack;
+
+          if (!hasAnyAttack) {
+            setSettlementAnimation({
+              laneIdx,
+              attackerCardId: null,
+              targetSlot: null,
+              isAttacking: false,
+              damageNumbers: [],
+              showPenetrate: false,
+              penetrateTarget: null,
+            });
+            await new Promise((resolve) => setTimeout(resolve, LANE_FOCUS_HOLD_MS));
+            if (settlementSequenceTokenRef.current !== currentToken) return;
+            setSettlementAnimation(null);
+          }
+
+          if (hasPlayerAttack) {
+            const attackerCard = laneCard.playerMain || laneCard.playerSecret;
+            if (attackerCard) {
+              await playAttackAnimation(laneIdx, attackerCard.id, 'player', seat, currentToken);
+            }
+          }
+
+          if (hasEnemyAttack) {
+            const attackerCard = laneCard.enemyMain || laneCard.enemySecret;
+            if (attackerCard) {
+              await playAttackAnimation(laneIdx, attackerCard.id, 'enemy', seat, currentToken);
+            }
+          }
+
+          if (settlementSequenceTokenRef.current !== currentToken) return;
+          await new Promise((resolve) => setTimeout(resolve, LANE_SETTLEMENT_GAP_MS));
+        }
+        if (settlementSequenceTokenRef.current === currentToken) {
+          setActiveLaneIdx(null);
+          setSettlementAnimation(null);
+        }
+      } catch (error) {
+        reportRuntimeError('缁撶畻鍔ㄧ敾', error);
+      }
+    };
+
+    void runSettlementSequence();
+
+    return () => {
+      settlementSequenceTokenRef.current += 1;
+      setSettlementAnimation(null);
+    };
+  }, [phase, round, reportRuntimeError]);
+
+  const finalPlayerXin = state.player.resources.xinZheng;
+  const finalEnemyXin = state.enemy.resources.xinZheng;
+  const finalWinner: 'player' | 'enemy' | 'draw' =
+    finalPlayerXin === finalEnemyXin ? 'draw' : finalPlayerXin > finalEnemyXin ? 'player' : 'enemy';
+  const finalTitle =
+    finalWinner === 'player' ? '本局胜利' : finalWinner === 'enemy' ? '本局失利' : '势均力敌';
+  const finalSubtitle =
+    finalWinner === 'player' ? '你在本局中占据上风' : finalWinner === 'enemy' ? '再调整策略继续挑战' : '双方心证持平，难分高下';
+  const finalTitleClass =
+    finalWinner === 'player'
+      ? 'text-[#ffe3af]'
+      : finalWinner === 'enemy'
+      ? 'text-[#ffc0c0]'
+      : 'text-[#f3dcb1]';
+  const finalProgressMax = Math.max(30, finalPlayerXin, finalEnemyXin, 1);
+  const finalPlayerPct = Math.max(0, Math.min(100, Math.round((finalPlayerXin / finalProgressMax) * 100)));
+  const finalEnemyPct = Math.max(0, Math.min(100, Math.round((finalEnemyXin / finalProgressMax) * 100)));
+  const toastStyleMap: Record<ToastLevel, { bg: string; border: string; text: string; icon: string }> = {
+    info: { bg: 'rgba(74,46,34,0.9)', border: '#b89560', text: '#f0d3a2', icon: 'i' },
+    success: { bg: 'rgba(26,71,54,0.92)', border: '#3fa36b', text: '#c8f2dc', icon: '+' },
+    warning: { bg: 'rgba(92,64,24,0.92)', border: '#d4a520', text: '#ffe8a9', icon: '!' },
+    error: { bg: 'rgba(90,32,32,0.92)', border: '#dc6b6b', text: '#ffd1d1', icon: 'x' },
+  };
+
+  // 鈹€鈹€ Render 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+  return (
+    <div className="relative h-screen w-full overflow-hidden bg-[#ede1cc]">
+      {/* 鈹€鈹€ 鑳屾櫙姘涘洿灞?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_20%,rgba(184,135,67,0.1),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(74,122,132,0.08),transparent_45%)]" />
+
+      {/* 鈹€鈹€ Toast 閫氱煡灞?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {toast?.message && (
+        <div 
+          className="absolute left-1/2 top-10 z-[100] -translate-x-1/2 rounded border px-6 py-2 text-sm font-bold shadow-2xl flex items-center gap-3 transition-all animate-in fade-in slide-in-from-top-4"
+          style={{ 
+            backgroundColor: toastStyleMap[toast.level].bg,
+            borderColor: toastStyleMap[toast.level].border,
+            color: toastStyleMap[toast.level].text
+          }}
+        >
+          <span className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">
+            {toastStyleMap[toast.level].icon}
+          </span>
+          {toast.message}
+        </div>
+      )}
+
+      {/* 鈹€鈹€ 椤堕儴淇℃伅鎸傜敾锛氬洖鍚?& 闃舵 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {!isFinished && (
+        <div className="absolute left-[clamp(14rem,34vw,44rem)] top-4 z-50 flex max-w-[460px] flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <div className="rounded-sm border border-[#c9b189]/50 bg-[#f7edde]/90 px-3 py-1 font-serif text-base font-bold text-[#5b4530] shadow-sm backdrop-blur-sm">
+              绗?{round} 鍥炲悎
+            </div>
+            <div className={`rounded-sm border px-3 py-1 shadow-sm backdrop-blur-sm font-serif text-base font-bold ${timeWarningActive ? 'border-[#b94f3c]/50 bg-[#b94f3c]/10 text-[#b94f3c]' : 'border-[#c9b189]/50 bg-[#f7edde]/90 text-[#6b553d]'}`}>
+              {phaseLabel} 路 {timerText}
+            </div>
+          </div>
+          {state.activeTopic && (
+            <div className="rounded-sm border border-[#c9b189]/45 bg-[#f7edde]/90 px-3 py-1.5 text-[13px] leading-relaxed text-[#5f4a35] shadow-sm backdrop-blur-sm font-serif">
+              <span className="mr-2 text-[11px] uppercase tracking-[0.2em] text-[#7a6450]/80">璁</span>
+              <span className="font-semibold">{state.activeTopic}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 鈹€鈹€ 鏁屾柟鐘舵€佺悆 (Top Right) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {!isFinished && (
+        <div className="absolute right-8 top-8 z-50 flex flex-col items-center">
+          <div className="relative h-32 w-32 rounded-full border-4 border-[#8f5454]/60 bg-[#1e1912]/95 shadow-[0_18px_42px_rgba(0,0,0,0.7)] flex flex-col items-center justify-center backdrop-blur-xl group overflow-hidden">
+            {/* 瑁呴グ鎬у厜鏅?*/}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
+            
+            <div className="relative z-10 -mt-2 rounded-full bg-[#8f5454] px-4 py-1 text-[11px] font-black text-white tracking-[0.3em] uppercase shadow-lg">
+              瀵规墜
+            </div>
+            <div className="relative z-10 mt-1 text-4xl font-black text-[#ffc0c0] drop-shadow-[0_0_15px_rgba(255,192,192,0.6)] font-serif">
+              {state.enemy.resources.xinZheng}
+            </div>
+            <div className="relative z-10 text-[12px] text-[#8f5454] font-black tracking-[0.4em] uppercase opacity-60">蹇冭瘉</div>
+            
+            {/* 鏁屾柟杈呭姪閲忔潯 */}
+            <div className="absolute bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 overflow-hidden rounded-full bg-black/40">
+               <div className="h-full bg-[#b57878] shadow-[0_0_8px_rgba(181,120,120,0.8)]" style={{ width: `${enemyXinPct}%` }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 鈹€鈹€ 鎴戞柟鐘舵€佺悆 (Bottom Right Focal Point) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {!isFinished && (
+        <div className="absolute bottom-8 right-8 z-50">
+          <div className="relative h-40 w-40 rounded-full border-[5px] border-[#cfa666]/70 bg-[#120f0a]/98 shadow-[0_0_60px_rgba(0,0,0,0.8),0_0_30px_rgba(207,166,102,0.2)] flex flex-col items-center justify-center backdrop-blur-2xl">
+             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,178,82,0.08)_0%,transparent_60%)]" />
+             
+            <div className="relative z-10 -mt-2 rounded-full bg-[#cfa666] px-4 py-1 text-xs font-black text-[#1e1912] tracking-[0.35em] uppercase shadow-2xl">
+               鎴戞柟
+             </div>
+             
+             {/* 鏍稿績蹇冭瘉 */}
+            <div className="relative z-10 mt-1 text-5xl font-black text-[#ffe3af] drop-shadow-[0_0_20px_rgba(207,166,102,0.8)] font-serif">
+               {state.player.resources.xinZheng}
+             </div>
+            <div className="relative z-10 text-[12px] text-[#cfa666] font-black tracking-[0.38em] uppercase opacity-80">蹇冭瘉涔嬪嵃</div>
+
+             {/* 鐏靛娍涓庢姢鍗?- 鐜粫鍒嗗竷 */}
+            <div className="absolute -left-6 bottom-8 flex flex-col items-end gap-2 pr-2">
+               <div className="flex items-center gap-2 rounded-2xl border border-[#3d7a84]/50 bg-black/60 px-3 py-1.5 backdrop-blur-xl shadow-xl transition-transform hover:scale-110">
+                  <span className="text-xs text-[#3d7a84] font-black tracking-widest uppercase">鐏靛娍</span>
+                 <span className="text-base font-black text-white">{state.player.resources.lingShi}/{state.player.resources.maxLingShi}</span>
+               </div>
+               <div className="flex items-center gap-2 rounded-2xl border border-[#b88743]/50 bg-black/60 px-3 py-1.5 backdrop-blur-xl shadow-xl transition-transform hover:scale-110">
+                  <span className="text-xs text-[#b88743] font-black tracking-widest uppercase">鎶ゅ嵃</span>
+                 <span className="text-base font-black text-white">{state.player.resources.huYin}</span>
+               </div>
+             </div>
+             
+             {/* 瑁呴グ鎬у鐜?*/}
+             <div className="absolute inset-[-15px] rounded-full border border-[#cfa666]/10 animate-[spin_20s_linear_infinite]" />
+             <div className="absolute inset-[-15px] rounded-full border-t-2 border-[#cfa666]/30 animate-[spin_12s_linear_infinite]" />
+          </div>
+        </div>
+      )}
+
+      {/* 鈹€鈹€ 杩愯鏃堕敊璇€氱煡 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {runtimeError && !isFinished && (
+        <div className="absolute left-1/2 bottom-32 z-50 -translate-x-1/2 flex items-center justify-between rounded-lg border border-[#d87373]/50 bg-[#fce8e8]/90 p-3 text-xs text-[#8e2f2f] shadow-lg backdrop-blur-sm">
+          <span className="truncate">{runtimeError}</span>
+          <button type="button" className="ml-4 text-xs underline" onClick={() => setRuntimeError(null)}>关闭</button>
+        </div>
+      )}
+
+
+      {/* 鈹€鈹€ 鏍稿績鍐呭鍖?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      <main className="relative z-10 h-full w-full">
+        {/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲
+            甯冨眬闃舵 (甯冪疆鍗＄墝)
+            鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲 */}
+        {isLayoutPhase && (
+          <div className="absolute inset-0 flex flex-col overflow-visible">
+            
+            {/* 涓棿/鍙充晶锛氭垬鍦?(鏄庣墝鍖? */}
+            <div className="absolute left-[clamp(24rem,29vw,30rem)] right-[clamp(13.5rem,18vw,19.5rem)] top-[18%] bottom-[27%]">
+              <div className="mb-5 pr-2">
+                <div className="font-serif text-2xl font-black tracking-[0.8em] text-[#5b4530]/40 uppercase select-none">
+                  鏄庣墝甯冨眬 路 杈╃粡婕旀
+                </div>
+                {isAnMou && (
+                  <div className="mt-3 inline-flex rounded-full border border-[#f0c97a]/40 bg-[#1e1810]/90 px-5 py-2 text-[13px] text-[#f0c97a] backdrop-blur-md">
+                    鏆楃瓥闃舵锛氭槑鐗屽尯宸查攣瀹氾紝浠呭彲甯冪疆鏆楃瓥
+                  </div>
+                )}
+              </div>
+              
+              <div className="relative flex h-full gap-5">
+                {seatPickingAction && (
+                  <div className="absolute inset-x-0 -top-16 z-20 text-center animate-bounce">
+                    <span className="rounded-full bg-[#8b4513] px-6 py-2 text-base font-bold text-[#fef3c7] shadow-xl font-serif">
+                      请在此处选择路位落子
+                    </span>
+                  </div>
+                )}
+                {SEATS.map((seat) => (
+                  <MiniLanePreview
+                    key={seat}
+                    seat={seat}
+                    enemyLane={state.enemy.seats[seat]}
+                    playerLane={state.player.seats[seat]}
+                    phase={phase}
+                    isSelectable={Boolean(seatPickingAction)}
+                    isTarget={activeTargetSeat === seat}
+                    plannedPlayerCard={seatPickingAction === 'main' && state.player.plan.mainTargetSeat === seat ? plannedMainCard : seatPickingAction === 'secret' && state.player.plan.secretTargetSeat === seat ? plannedSecretCard : null}
+                    playerMainPlanned={Boolean(state.player.plan.mainCardId && state.player.plan.mainTargetSeat === seat)}
+                    enemyMainPlanned={Boolean(state.enemy.plan.mainCardId && state.enemy.plan.mainTargetSeat === seat)}
+                    playerSecretPlanned={Boolean(state.player.plan.secretCardId && state.player.plan.secretTargetSeat === seat)}
+                    onSelect={handleSeatSelect}
+                    onDropCard={(droppedSeat, cardId) => {
+                      if (!handCardMap.has(cardId)) {
+                        showToast('鎷栨嫿鏃犳晥锛氬崱鐗屽凡涓嶅湪鍏朵綅', 'warning');
+                        return;
+                      }
+                      if (phase === 'ming_bian' && !state.player.plan.lockedPublic) {
+                        setTargetSeatSafe('main', droppedSeat);
+                        planCardSafe('main', cardId, `涓昏鎷熷畾浜?{SEAT_ALIAS[droppedSeat]}`);
+                        return;
+                      }
+                      if (phase === 'an_mou' && !state.player.plan.lockedSecret) {
+                        setTargetSeatSafe('secret', droppedSeat);
+                        planCardSafe('secret', cardId, `鏆楃瓥浼忓叺浜?{SEAT_ALIAS[droppedSeat]}`);
+                        return;
+                      }
+                      showToast('步骤限制：当前阶段不可变动路位', 'warning');
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+
+          {/* 鈹€鈹€ 鍔ㄤ綔鐘舵€佹潯 (Action Slots) 鈹€鈹€ */}
+          <div className="absolute right-5 bottom-3 z-[65] flex flex-row-reverse items-end gap-3 group scale-[0.88] origin-bottom-right">
+             <div className="flex items-center gap-2.5 rounded-3xl border border-white/10 bg-black/30 p-3 backdrop-blur-xl shadow-[0_14px_36px_rgba(0,0,0,0.5)]">
+                <ActionDropZone
+                  action="main"
+                  filledCard={plannedMainCard}
+                  locked={!canPlanPublic}
+                  canAct={actionOptions.includes('main')}
+                  isActive={selectedAction === 'main'}
+                  onAct={() => handleActionPick('main')}
+                  onClear={canPlanPublic ? () => planCardSafe('main', null) : undefined}
+                  onDrop={(cardId) => applyCardToAction('main', cardId)}
+                />
+                <ActionDropZone
+                  action="response"
+                  filledCard={plannedResponseCard}
+                  locked={!canPlanPublic}
+                  canAct={actionOptions.includes('response')}
+                  isActive={selectedAction === 'response'}
+                  onAct={() => handleActionPick('response')}
+                  onClear={canPlanPublic ? () => planCardSafe('response', null) : undefined}
+                  onDrop={(cardId) => applyCardToAction('response', cardId)}
+                />
+                <ActionDropZone
+                  action="secret"
+                  filledCard={plannedSecretCard}
+                  locked={!canPlanSecret}
+                  canAct={actionOptions.includes('secret')}
+                  isActive={selectedAction === 'secret'}
+                  onAct={() => handleActionPick('secret')}
+                  onClear={canPlanSecret ? () => planCardSafe('secret', null) : undefined}
+                  onDrop={(cardId) => applyCardToAction('secret', cardId)}
+                />
+                <ActionDropZone
+                  action="writing"
+                  filledCard={plannedWritingCard}
+                  locked={!canPlanPublic}
+                  canAct={actionOptions.includes('writing')}
+                  isActive={false}
+                  onAct={() => handleActionPick('writing')}
+                  onClear={canPlanPublic ? () => planWritingSafe(null) : undefined}
+                  onDrop={(cardId) => applyCardToAction('writing', cardId)}
+                />
+             </div>
+             
+             {/* 鏍稿績纭鎸夐挳 */}
+             <button
+                type="button"
+                disabled={confirmBtn.disabled}
+                onClick={confirmBtn.onClick}
+                className="relative overflow-hidden rounded-3xl px-7 py-4 text-base font-serif font-black tracking-[0.28em] transition-all duration-700 active:scale-95 group/btn"
+                style={{
+                  background: confirmBtn.disabled
+                    ? 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)'
+                    : 'linear-gradient(135deg, #5a2d0a 0%, #8b4513 50%, #5a2d0a 100%)',
+                  border: `3px solid ${confirmBtn.disabled ? 'rgba(255,255,255,0.05)' : '#d4a520'}`,
+                  color: confirmBtn.disabled ? 'rgba(255,255,255,0.2)' : '#fef3c7',
+                  boxShadow: confirmBtn.disabled ? 'none' : '0 15px 45px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.2)',
+                }}
+              >
+                {!confirmBtn.disabled && (
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,0.15)_0%,transparent_100%)] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                )}
+                <span className="relative z-10">{confirmBtn.label}</span>
+             </button>
+          </div>
+
+            {/* 宸︿晶锛氬崱鐗屼粙缁嶉潰鏉?(The Jade Slip / Scroll) */}
+            <div className="absolute left-6 top-[12%] bottom-[clamp(16rem,26vh,20rem)] z-30 w-[320px] max-w-[29vw]">
+              {selectedCard ? (
+                <div 
+                  className="relative flex h-full flex-col overflow-hidden rounded-2xl border-x-4 border-[#c5ad88] bg-[#fdfaf5] p-5 shadow-[0_25px_60px_rgba(0,0,0,0.35)] backdrop-blur-md animate-in fade-in slide-in-from-left-8 duration-500"
+                  style={{ 
+                    backgroundImage: 'linear-gradient(90deg, #e8dbc5 0%, #fdfaf5 15%, #fdfaf5 85%, #e8dbc5 100%)',
+                    transform: 'perspective(1000px) rotateY(2deg)'
+                  }}
+                >
+                  {/* 涔﹀嵎鍗疯酱鏁堟灉 */}
+                  <div className="absolute -left-1 top-0 bottom-0 w-2 bg-gradient-to-r from-[#9a7b4f] to-transparent opacity-40" />
+                  <div className="absolute -right-1 top-0 bottom-0 w-2 bg-gradient-to-l from-[#9a7b4f] to-transparent opacity-40" />
+
+                  <div className="relative mb-5 h-44 flex-shrink-0 overflow-hidden rounded-xl border-2 border-[#c5ad88]/40 shadow-2xl">
+                    <img src={artSrc(selectedCard)} alt={selectedCard.name} className="h-full w-full object-cover transform hover:scale-105 transition-transform duration-1000" />
+                    <div className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#f0c97a] bg-[#1e1912]/90 text-sm font-black text-[#f0c97a] shadow-lg">
+                      {selectedCard.cost}
+                    </div>
+                  </div>
+                  
+                  <div className="mb-2 text-2xl font-black tracking-[0.2em] text-[#3d2b1f] font-serif border-b-2 border-[#3d2b1f]/10 pb-2">{selectedCard.name}</div>
+                  
+                  <div className="mb-3 inline-flex self-start rounded bg-[#8b4513]/10 px-3 py-1 text-[11px] font-bold text-[#8b4513] tracking-wider uppercase">
+                    {selectedCard.type}
+                  </div>
+
+                  <div className="mb-6 flex-1 text-[14px] leading-[1.8] text-[#5b4530] font-medium italic opacity-95">
+                    銆?{selectedCard.description ?? effectShort(selectedCard)} 銆?                  </div>
+
+                  {actionOptions.length > 0 ? (
+                    <div className="flex flex-col gap-3">
+                       <div className="text-[10px] text-[#8b775f] font-bold tracking-[0.3em] uppercase opacity-60">閫夋嫨钀戒綅绛栫暐</div>
+                       <div className="grid grid-cols-2 gap-3">
+                          {actionOptions.map((action) => {
+                            const isSelected = selectedAction === action;
+                            return (
+                              <button
+                                key={action}
+                                onClick={() => handleActionPick(action)}
+                                className={`group relative overflow-hidden rounded-xl py-3 text-center text-sm font-black transition-all duration-300 ${
+                                  isSelected 
+                                    ? 'bg-[#3d2b1f] text-[#fef3c7] shadow-xl scale-[1.05] z-10' 
+                                    : 'bg-[#ede1cc] text-[#5b4530] hover:bg-[#dcd0b8] hover:shadow-md'
+                                }`}
+                                style={{ border: isSelected ? '2px solid #d4a520' : '1px solid #c9b189' }}
+                              >
+                                {isSelected && (
+                                  <div className="absolute inset-x-0 bottom-0 h-1 bg-[#d4a520] animate-pulse" />
+                                )}
+                                {ACTION_LABEL[action]}
+                              </button>
+                            );
+                          })}
+                       </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border-2 border-dashed border-[#c5ad88]/30 bg-[#f7edde]/50 py-4 text-center text-sm text-[#9a886a] font-serif">
+                      当前局势暂无可落子的位置
+                    </div>
+                  )}
+                </div>
+              ) : (
+                 <div className="group flex h-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#c5ad88]/20 bg-[#f7edde]/20 p-10 text-center backdrop-blur-[4px] transition-all duration-500 hover:bg-[#f7edde]/30 hover:border-[#c5ad88]/40">
+                   <div className="mb-4 text-4xl opacity-20 group-hover:opacity-40 transition-opacity">馃幋</div>
+                   <div className="text-base text-[#9a886a] font-serif tracking-[0.2em] italic">
+                     请选择一张手牌
+                     <br />
+                     以决定布局
+                   </div>
+                 </div>
+              )}
+            </div>
+
+            {/* 宸︿笅瑙掞細鎵囧舰鎵嬬墝 (Fan Hand) - 瀹冩槸鐜╁浜掑姩鐨勬牳蹇冿紝浣嶇疆闇€鏋佸害鑸掗€?*/}
+            <div className="absolute left-6 right-[clamp(14rem,20vw,19.5rem)] bottom-0 z-40 pointer-events-none">
+               <div className="pointer-events-auto h-[340px] max-w-full overflow-x-auto overflow-y-visible">
+                  <div className="flex h-full items-end pl-2 pr-2 pb-3 pt-8">
+                    <FanHand
+                      cards={sortedHand}
+                      selectedCardId={selectedCardId}
+                      onSelect={handleCardSelect}
+                    />
+                  </div>
+               </div>
+            </div>
+          </div>
+        )}
+
+      {/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲
+          缁撶畻闃舵瑙嗗浘
+          鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲 */}
+      {isSettlementPhase && (
+        <div className="flex flex-1 flex-col overflow-hidden" style={{ background: '#1e1912' }}>
+
+          {/* 涓夎矾瀹屾暣鎴樺満 鈥?缁濆涓昏 */}
+          <div className="flex flex-1 gap-3 overflow-hidden px-3 py-3">
+            {SEATS.map((seat, idx) => (
+              <SettlementLane
+                key={seat}
+                seat={seat}
+                enemyLane={state.enemy.seats[seat]}
+                playerLane={state.player.seats[seat]}
+                laneCards={laneCardsMap[seat]}
+                isActive={activeLaneIdx === idx && phase === 'resolve'}
+                isDimmed={activeLaneIdx !== null && activeLaneIdx !== idx && phase === 'resolve'}
+                isRevealed={isRevealed}
+                animation={settlementAnimation?.laneIdx === idx ? settlementAnimation : undefined}
+                side={settlementAnimation?.laneIdx === idx ? settlementAnimationSide : undefined}
+              />
+            ))}
+          </div>
+
+          {/* 缁撶畻鎾姤鏍?*/}
+          <div className="flex flex-shrink-0 items-center gap-3 border-t border-white/10 px-4 py-2.5">
+            <span className="flex-shrink-0 rounded bg-[#b4823f]/30 px-2 py-0.5 text-xs text-[#f0c97a]">
+              {phase === 'reveal' ? '鎻ず' : '缁撶畻'}
+            </span>
+            {phase === 'resolve' && activeLaneIdx !== null && (
+              <div className="flex gap-1.5">
+                {SEATS.map((s, i) => (
+                  <span
+                    key={s}
+                    className={`rounded px-2 py-0.5 text-xs transition-all duration-300 ${
+                      i === activeLaneIdx ? 'bg-[#b4823f] text-white' : 'text-[#f0c97a]/30'
+                    }`}
+                  >
+                    {SEAT_ALIAS[s]}
+                  </span>
+                ))}
+              </div>
+            )}
+            <span className="flex-1 truncate text-sm text-[#e8d5b0]">
+              {phase === 'resolve' && activeLaneIdx !== null
+                ? `${SEAT_ALIAS[SEATS[activeLaneIdx]]} 结算中...`
+                : state.resolveFeed[0] ?? (phase === 'reveal' ? '双方出牌正在揭示...' : '等待结算...')}
+            </span>
+          </div>
+
+          {/* 鎵嬬墝鏈€灏忓寲鏉?*/}
+          <div className="flex flex-shrink-0 items-center gap-2 border-t border-white/10 px-4 py-2">
+            <span className="text-xs text-white/40">手牌 {state.player.hand.length} 张</span>
+            <div className="flex gap-1">
+              {state.player.hand.map((c) => (
+                <div
+                  key={c.id}
+                  className="rounded"
+                  style={{ width: 18, height: 27, background: 'rgba(197,173,136,0.25)', border: '1px solid rgba(197,173,136,0.3)' }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* finished 鐘舵€侊細鑳屾櫙鍗犱綅锛堢粨鏉熷脊绐楃敱涓嬫柟 isFinished overlay 瑕嗙洊锛?*/}
+      {isFinished && (
+        <div className="flex flex-1 items-center justify-center" style={{ background: '#1e1912' }} />
+      )}
+
+      {/* CardActionPopup removed: actions are now in the inline left panel */}
+
+      {/* 鈹€鈹€ 瀵瑰眬缁撴潫 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */}
+      {isFinished && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(18,16,10,0.76)' }}>
+          <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-[#8f7752] shadow-[0_22px_70px_rgba(0,0,0,0.55)]" style={{ background: 'linear-gradient(180deg,#1b2430,#151b24)' }}>
+            <div className="border-b border-[#8f7752]/45 px-6 py-5">
+              <div className="text-center text-xs tracking-[0.2em] text-[#b9cad8]/80">绗?{state.round} / {state.maxRounds} 鍥炲悎缁撴潫</div>
+              <div className={`mt-2 text-center text-2xl font-semibold ${finalTitleClass}`}>{finalTitle}</div>
+              <div className="mt-1 text-center text-sm text-[#b9cad8]">{finalSubtitle}</div>
+            </div>
+
+            <div className="px-6 py-5">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-[#7f8b97]/35 bg-[#111821]/65 p-3">
+                  <div className="text-xs text-[#9fb2c6]">鎴戞柟</div>
+                  <div className="mt-2 flex items-end justify-between">
+                    <span className="text-sm text-[#dce8f4]">蹇冭瘉</span>
+                    <span className="text-xl font-semibold text-[#ffe3af]">{finalPlayerXin}</span>
+                  </div>
+                  <div className="mt-2 h-2 rounded-full bg-[#2f3947]">
+                    <div className="h-2 rounded-full bg-[#d4b97a]" style={{ width: `${finalPlayerPct}%` }} />
+                  </div>
+                  <div className="mt-2 flex justify-between text-[11px] text-[#a8bbc9]">
+                    <span>鎶ゅ嵃 {state.player.resources.huYin}</span>
+                    <span>鏂囪剦 {state.player.resources.wenMai}</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-[#7f8b97]/35 bg-[#111821]/65 p-3">
+                  <div className="text-xs text-[#9fb2c6]">瀵规墜</div>
+                  <div className="mt-2 flex items-end justify-between">
+                    <span className="text-sm text-[#dce8f4]">蹇冭瘉</span>
+                    <span className="text-xl font-semibold text-[#ffd3d3]">{finalEnemyXin}</span>
+                  </div>
+                  <div className="mt-2 h-2 rounded-full bg-[#2f3947]">
+                    <div className="h-2 rounded-full bg-[#b57878]" style={{ width: `${finalEnemyPct}%` }} />
+                  </div>
+                  <div className="mt-2 flex justify-between text-[11px] text-[#a8bbc9]">
+                    <span>鎶ゅ嵃 {state.enemy.resources.huYin}</span>
+                    <span>鏂囪剦 {state.enemy.resources.wenMai}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-lg border border-[#8f7752]/35 bg-[#111821]/55 px-3 py-2 text-xs text-[#a8bbc9]">
+                瀵瑰眬缁撹锛氭垜鏂?{finalPlayerXin} vs 瀵规墜 {finalEnemyXin}
+              </div>
+            </div>
+
+            <div className="flex gap-3 border-t border-[#8f7752]/45 px-4 py-4">
+              {onReselectArena && (
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200"
+                  style={{
+                    background: 'linear-gradient(135deg, #5a2d0a 0%, #8b4513 25%, #a0522d 50%, #8b4513 75%, #5a2d0a 100%)',
+                    border: '2px solid rgba(212, 165, 32, 0.8)',
+                    color: '#fef3c7',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                    backgroundImage: 'radial-gradient(ellipse 8px 4px at 10% 50%, rgba(212, 165, 32, 0.15) 0%, transparent 100%), radial-gradient(ellipse 8px 4px at 90% 50%, rgba(212, 165, 32, 0.15) 0%, transparent 100%)',
+                  }}
+                  onClick={onReselectArena}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #6b380c 0%, #a0522d 25%, #b8652e 50%, #a0522d 75%, #6b380c 100%)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 165, 32, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #5a2d0a 0%, #8b4513 25%, #a0522d 50%, #8b4513 75%, #5a2d0a 100%)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  }}
+                >
+                  鍐嶆潵涓€灞€
+                </button>
+              )}
+              {onMenu && (
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200"
+                  style={{
+                    background: 'linear-gradient(135deg, #4a1a1a 0%, #6b2a2a 25%, #7a3535 50%, #6b2a2a 75%, #4a1a1a 100%)',
+                    border: '2px solid rgba(180, 80, 80, 0.7)',
+                    color: '#f5c5c5',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    backgroundImage: 'radial-gradient(ellipse 8px 4px at 10% 50%, rgba(180, 80, 80, 0.12) 0%, transparent 100%), radial-gradient(ellipse 8px 4px at 90% 50%, rgba(180, 80, 80, 0.12) 0%, transparent 100%)',
+                  }}
+                  onClick={onMenu}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #5a2a2a 0%, #7b3a3a 25%, #8a4545 50%, #7b3a3a 75%, #5a2a2a 100%)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(180, 80, 80, 0.3), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #4a1a1a 0%, #6b2a2a 25%, #7a3535 50%, #6b2a2a 75%, #4a1a1a 100%)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)';
+                  }}
+                >
+                  杩斿洖鑿滃崟
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      </main>
+    </div>
+  );
+}

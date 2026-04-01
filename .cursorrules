@@ -1,0 +1,8 @@
+Always follow repository AI workflow:
+1) Read AI_START_HERE.md
+2) Work only from ai/tasks/*.json packets
+3) Generate prompt via npm run ai:prompt -- --task <task-file>
+4) Respect allowed_write_paths
+5) Finalize with npm run ai:finalize -- --task <task-file>
+
+No direct edits outside task scope.

@@ -1,0 +1,51 @@
+version: 0.1.0
+updated_at: 2026-03-22
+milestone: BS01-MVP
+
+goal:
+  summary: 先做可试玩MVP，再扩到BS01全量卡池。
+  completion_signal:
+    - 双学派可对战
+    - 3-5核心机制稳定
+    - 快测胜率在45%-55%
+    - 可导出打印或TTS包
+
+in_scope_now:
+  factions:
+    - 墨家
+    - 儒家
+  mechanics:
+    - MEC-CORE-DEFENSE
+    - MEC-CORE-ORDER
+    - MEC-CORE-COUNTER
+  card_target:
+    min: 30
+    max: 40
+  rarity_allowed:
+    - common
+    - rare
+
+out_of_scope_now:
+  factions:
+    - 道家
+    - 法家
+    - 兵家
+    - 名家
+    - 阴阳家
+    - 纵横家
+    - 农家
+    - 杂家
+  tracks:
+    - 完整美术制作
+    - 正式营销物料
+    - 多语言本地化
+
+weekly_budget:
+  new_mechanics: 0
+  new_anchors: 0
+  new_cards: 10
+  deep_test_sessions: 1
+
+review_rules:
+  cadence: weekly
+  overflow_policy: move_to_backlog

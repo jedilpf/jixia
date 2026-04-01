@@ -1,0 +1,27 @@
+{
+  "id": "BS01-RU-006",
+  "name": "礼辩同归",
+  "faction": "儒家",
+  "rarity": "rare",
+  "type": "spell",
+  "cost": 4,
+  "rules_text": "造成2点伤害；抽1。",
+  "keyword_ids": [],
+  "mechanic_ids": [
+    "MEC-CORE-ORDER",
+    "MEC-CORE-COUNTER"
+  ],
+  "lore_anchor_ids": [
+    "ANC-FACTION-002",
+    "ANC-CONTENT-002"
+  ],
+  "provenance": {
+    "batch_id": "BATCH-20260322-10R1",
+    "models_used": [
+      "Codex"
+    ],
+    "canon_version": "0.1.0",
+    "seed": "20260322-10"
+  },
+  "status": "draft"
+}

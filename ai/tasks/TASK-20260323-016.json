@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260323-016",
+  "goal": "统一standards文档命名：下线旧大写文件名，统一切换到kebab-case主文件，并修复相关引用与门禁兼容。",
+  "constraints": [
+    "仅处理文档命名统一与引用修复，不改业务逻辑。",
+    "删除旧重复文档，保留唯一主文件来源。",
+    "所有引用更新必须可读、可追踪，不引入乱码。",
+    "改动后必须通过命名检查与AI finalize流程。"
+  ],
+  "deliverables": [
+    "删除旧文件：AI_TASK_ASSIGNMENT_GUIDE.md, QUICK_REFERENCE_GUIDE.md, STYLE_CONSISTENCY_REVIEW.md",
+    "统一引用到standards-guide-ai-task-assignment.md, standards-guide-quick-reference.md, standards-review-style-consistency.md",
+    "更新命名检查脚本兼容历史文档维护场景"
+  ],
+  "allowed_write_paths": [
+    "docs",
+    "scripts",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260323-016.json",
+    "node scripts/validate-naming.cjs --files docs/index.md,docs/standards/DOCUMENT_ORGANIZATION_STANDARD.md,docs/standards/IMPLEMENTATION_PLAN.md,docs/standards/NAMING_GUIDE_FOR_NON_TECHNICAL.md,docs/standards/SELF_REVIEW_REPORT.md,docs/standards/standards-guide-ai-task-assignment.md,docs/standards/standards-guide-quick-reference.md,docs/standards/standards-review-style-consistency.md,scripts/validate-naming.cjs",
+    "npm run ai:scope:staged -- --task ai/tasks/TASK-20260323-016.json"
+  ],
+  "status": "draft"
+}

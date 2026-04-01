@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260322-010",
+  "goal": "从旧卡池迁移首批10张卡到 content/cards/，并确保通过 gate:daily。",
+  "constraints": [
+    "必须遵守 canon/anchors.yaml、canon/taboo.yaml、canon/terminology.yaml、scope/bs01.yaml。",
+    "不允许新增锚点ID；如无法映射，使用 UNKNOWN 并登记 open_questions.md。",
+    "每张卡必须包含 lore_anchor_ids 和 mechanic_ids。",
+    "rules_text 必须满足复杂度阈值：字数<=25，句数<=2，关键词<=2。",
+    "只允许在允许路径内写文件，禁止改动其他目录。"
+  ],
+  "deliverables": [
+    "content/cards/ 下新增10个卡牌JSON文件",
+    "open_questions.md 中新增本批 UNKNOWN 项（如有）",
+    "简短迁移报告：列出10张卡ID与映射依据"
+  ],
+  "allowed_write_paths": [
+    "content/cards",
+    "open_questions.md",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run gate:daily"
+  ],
+  "status": "draft"
+}
