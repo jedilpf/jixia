@@ -214,8 +214,8 @@ export const CHAPTER_MORU_004_NODES: StoryNode[] = [
   {
     id: 'ch_moru_004_n007',
     type: 'dialogue',
-    speaker: '祭酒',
-    emotion: 'sad',
+    speaker: '汝',
+    emotion: 'angry',
     content: `「汝反对？」
 
 汝的声音微微颤抖。
@@ -232,7 +232,7 @@ export const CHAPTER_MORU_004_NODES: StoryNode[] = [
 
 「若此学为某一国所得，必将打破天下格局。」
 
-汝沉默片刻。
+汝沉默了片刻。
 
 「所以汝选择了隐瞒？」
 
@@ -353,14 +353,14 @@ export const CHAPTER_MORU_004_NODES: StoryNode[] = [
 
 「凶手，不是我！」`,
     background: 'mingde_hall',
-    nextNode: 'ch_moru_004_n011',
+    nextNode: 'ch_moru_004_n010',
   },
 
   {
     id: 'ch_moru_004_n010',
     type: 'dialogue',
-    speaker: '祭酒',
-    emotion: 'sad',
+    speaker: '汝',
+    emotion: 'normal',
     content: `汝强迫自己冷静下来。
 
 「祭酒大人……」
