@@ -29,6 +29,8 @@ export const STORAGE_KEYS: Record<SaveSlotType, string> = {
   manual_3: 'jixia.story.manual.3.v2',
 };
 
+const STORY_SAVE_VERSION = '1.1.0';
+
 export interface SaveSlotInfo {
   exists: boolean;
   timestamp?: number;
@@ -342,13 +344,16 @@ export class StoryEngine {
   }
 
   public save(): StorySaveData {
-    const historyNodeIds = this.history.map(h => h.nodeId);
-    const historyChoices = this.history
-      .filter(h => h.choiceId)
-      .map(h => ({ nodeId: h.nodeId, choiceId: h.choiceId as string }));
+    const historyEntries = this.history
+      .filter((entry) => this.nodeMap.has(entry.nodeId))
+      .map((entry) => (entry.choiceId ? { nodeId: entry.nodeId, choiceId: entry.choiceId } : { nodeId: entry.nodeId }));
+    const historyNodeIds = historyEntries.map((entry) => entry.nodeId);
+    const historyChoices = historyEntries
+      .filter((entry): entry is { nodeId: string; choiceId: string } => typeof entry.choiceId === 'string')
+      .map((entry) => ({ nodeId: entry.nodeId, choiceId: entry.choiceId }));
 
     return {
-      version: '1.0.0',
+      version: STORY_SAVE_VERSION,
       timestamp: Date.now(),
       currentNodeId: this.currentNodeId,
       player: {
@@ -360,11 +365,19 @@ export class StoryEngine {
         chapter: this.chapter,
         scene: this.scene,
         completedNodes: Array.from(this.completedNodes),
+        visitedNodes: Array.from(this.visitedNodes),
       },
       history: {
         nodeIds: historyNodeIds,
         choices: historyChoices,
+        entries: historyEntries,
       },
+      runtime: {
+        currentPath: this.currentPath,
+        currentChapterId: this.currentChapterId,
+        completedChapters: Array.from(this.completedChapters),
+      },
+      bridgeState: this.getBridgeState(),
     };
   }
 
@@ -383,7 +396,8 @@ export class StoryEngine {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
-      const saveData = JSON.parse(raw) as StorySaveData;
+      const saveData = this.parseSavePayload(raw);
+      if (!saveData) return false;
       this.load(saveData);
       return true;
     } catch (err) {
@@ -415,18 +429,21 @@ export class StoryEngine {
       const STORAGE_KEY = STORAGE_KEYS[slot];
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        try {
-          const saveData = JSON.parse(raw) as StorySaveData;
-          result[slot] = {
-            exists: true,
-            timestamp: saveData.timestamp,
-            chapter: saveData.progress.chapter,
-            currentNodeId: saveData.currentNodeId,
-            nodeCount: saveData.progress.completedNodes.length,
-          };
-        } catch {
+        const saveData = this.parseSavePayload(raw);
+        if (!saveData) {
           result[slot] = { exists: false };
+          continue;
         }
+        const progress = saveData.progress ?? { chapter: this.extractChapterFromNodeId(saveData.currentNodeId), scene: 0, completedNodes: [] };
+        const completedNodes = Array.isArray(progress.completedNodes) ? progress.completedNodes : [];
+        const visitedNodes = Array.isArray(progress.visitedNodes) ? progress.visitedNodes : [];
+        result[slot] = {
+          exists: true,
+          timestamp: saveData.timestamp,
+          chapter: typeof progress.chapter === 'number' ? progress.chapter : this.extractChapterFromNodeId(saveData.currentNodeId),
+          currentNodeId: saveData.currentNodeId,
+          nodeCount: visitedNodes.length > 0 ? visitedNodes.length : completedNodes.length,
+        };
       }
     }
 
@@ -434,7 +451,7 @@ export class StoryEngine {
   }
 
   public saveManual(slot: SaveSlotType): boolean {
-    if (!slot.startsWith('manual_')) return false;
+    if (!slot.startsWith('manual_') || slot === 'autosave') return false;
     this.persist(slot);
     return true;
   }
@@ -444,19 +461,123 @@ export class StoryEngine {
   }
 
   public load(saveData: StorySaveData) {
-    this.currentNodeId = saveData.currentNodeId;
-    this.player = { ...saveData.player.stats };
-    this.relationships = JSON.parse(JSON.stringify(saveData.player.relationships));
-    this.flags = { ...saveData.player.flags };
-    this.chapter = saveData.progress.chapter;
-    this.scene = saveData.progress.scene;
-    this.completedNodes = new Set(saveData.progress.completedNodes);
-    this.visitedNodes = new Set(saveData.progress.completedNodes);
+    const safeNodeId = this.nodeMap.has(saveData.currentNodeId) ? saveData.currentNodeId : 'prolog_0_1';
+    this.currentNodeId = safeNodeId;
+
+    const savedStats = saveData.player?.stats;
+    this.player = {
+      fame: typeof savedStats?.fame === 'number' ? savedStats.fame : 0,
+      wisdom: typeof savedStats?.wisdom === 'number' ? savedStats.wisdom : 5,
+      charm: typeof savedStats?.charm === 'number' ? savedStats.charm : 5,
+      courage: typeof savedStats?.courage === 'number' ? savedStats.courage : 5,
+      insight: typeof savedStats?.insight === 'number' ? savedStats.insight : 5,
+    };
+
+    this.relationships = JSON.parse(JSON.stringify(saveData.player?.relationships ?? {}));
+    this.flags = { ...(saveData.player?.flags ?? {}) };
+
+    const savedProgress = saveData.progress ?? { chapter: 0, scene: 0, completedNodes: [] };
+    this.chapter = typeof savedProgress.chapter === 'number' ? savedProgress.chapter : 0;
+    this.scene = typeof savedProgress.scene === 'number' ? savedProgress.scene : 0;
+
+    const completedNodes = Array.isArray(savedProgress.completedNodes)
+      ? savedProgress.completedNodes.filter((nodeId) => typeof nodeId === 'string' && this.nodeMap.has(nodeId))
+      : [];
+    const visitedNodesRaw = Array.isArray(savedProgress.visitedNodes) && savedProgress.visitedNodes.length > 0
+      ? savedProgress.visitedNodes
+      : completedNodes;
+    const visitedNodes = visitedNodesRaw
+      .filter((nodeId) => typeof nodeId === 'string' && this.nodeMap.has(nodeId));
+
+    this.completedNodes = new Set(completedNodes);
+    this.visitedNodes = new Set(visitedNodes);
     this.markNodeVisited(this.currentNodeId);
-    this.history = saveData.history.choices.map(c => ({ nodeId: c.nodeId, choiceId: c.choiceId }));
+
+    this.history = this.restoreHistoryFromSave(saveData);
+    this.currentPath = saveData.runtime?.currentPath ?? 'none';
+
+    const completedChapters = Array.isArray(saveData.runtime?.completedChapters)
+      ? saveData.runtime?.completedChapters.filter((chapterId) => typeof chapterId === 'string')
+      : [];
+    this.completedChapters = new Set(completedChapters);
+
+    const bridgeState = saveData.bridgeState;
+    this.bridgeState = {
+      unlockedFactions: Array.isArray(bridgeState?.unlockedFactions)
+        ? [...new Set(bridgeState.unlockedFactions.filter((item) => typeof item === 'string'))]
+        : [],
+      unlockedCards: Array.isArray(bridgeState?.unlockedCards)
+        ? [...new Set(bridgeState.unlockedCards.filter((item) => typeof item === 'string'))]
+        : [],
+      chapterFlags: Array.isArray(bridgeState?.chapterFlags)
+        ? [...new Set(bridgeState.chapterFlags.filter((item) => typeof item === 'string'))]
+        : [],
+      lastStoryEndingId: typeof bridgeState?.lastStoryEndingId === 'string'
+        ? bridgeState.lastStoryEndingId
+        : undefined,
+    };
+
     this.syncChapterByNodeId(this.currentNodeId);
 
     this.emit({ type: 'node_changed', nodeId: this.currentNodeId });
+    this.emit({ type: 'bridge_state_changed', state: this.getBridgeState() });
+  }
+
+  private parseSavePayload(raw: string): StorySaveData | null {
+    try {
+      const parsed = JSON.parse(raw) as Partial<StorySaveData>;
+      if (!parsed || typeof parsed !== 'object') return null;
+      if (typeof parsed.currentNodeId !== 'string') return null;
+      return parsed as StorySaveData;
+    } catch {
+      return null;
+    }
+  }
+
+  private restoreHistoryFromSave(saveData: StorySaveData): Array<{ nodeId: string; choiceId?: string }> {
+    const result: Array<{ nodeId: string; choiceId?: string }> = [];
+
+    if (Array.isArray(saveData.history?.entries) && saveData.history.entries.length > 0) {
+      for (const entry of saveData.history.entries) {
+        if (!entry || typeof entry.nodeId !== 'string' || !this.nodeMap.has(entry.nodeId)) continue;
+        if (typeof entry.choiceId === 'string') {
+          result.push({ nodeId: entry.nodeId, choiceId: entry.choiceId });
+        } else {
+          result.push({ nodeId: entry.nodeId });
+        }
+      }
+      return result;
+    }
+
+    const choiceByNode = new Map<string, string>();
+    if (Array.isArray(saveData.history?.choices)) {
+      for (const item of saveData.history.choices) {
+        if (!item || typeof item.nodeId !== 'string' || typeof item.choiceId !== 'string') continue;
+        if (!choiceByNode.has(item.nodeId)) {
+          choiceByNode.set(item.nodeId, item.choiceId);
+        }
+      }
+    }
+
+    const nodeIds = Array.isArray(saveData.history?.nodeIds) ? saveData.history.nodeIds : [];
+    for (const nodeId of nodeIds) {
+      if (typeof nodeId !== 'string' || !this.nodeMap.has(nodeId)) continue;
+      const choiceId = choiceByNode.get(nodeId);
+      if (choiceId) {
+        result.push({ nodeId, choiceId });
+      } else {
+        result.push({ nodeId });
+      }
+    }
+
+    return result;
+  }
+
+  private extractChapterFromNodeId(nodeId: string): number {
+    const chapterMatch = /^(?:ch_[a-z]+_(\d{3}))_/i.exec(nodeId);
+    if (chapterMatch) return Number(chapterMatch[1]);
+    if (nodeId.startsWith('prolog_0')) return 0;
+    return 0;
   }
 
   public updateSettings(settings: Partial<StorySettings>) {

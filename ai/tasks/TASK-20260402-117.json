@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260402-117",
+  "goal": "Harden and expand backend for project-wide core flows: persistent story saves, persistent player progress, and safer API contract for runtime integration.",
+  "constraints": [
+    "Keep existing match API behavior backward compatible.",
+    "Avoid adding heavyweight external dependencies in this task.",
+    "Implement deterministic file-based persistence under server-managed data directory."
+  ],
+  "deliverables": [
+    "Persistent story save store and REST routes under /api/v1/story.",
+    "Persistent player progress store and REST routes under /api/v1/progress.",
+    "Validation and explicit error responses for malformed payloads and slot misuse.",
+    "Updated backend README documenting new endpoints and run expectations."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "server",
+    "docs/story"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-117.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-117.json",
+    "node -e \"const { createInMemoryMatchStore } = require('./server/store/match-store.cjs'); const { createApp } = require('./server/app.cjs'); const s = createInMemoryMatchStore(); const { app } = createApp({ matchStore: s }); console.log(!!app ? 'backend-app-ok' : 'backend-app-fail');\"",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-117.json"
+  ],
+  "status": "completed"
+}

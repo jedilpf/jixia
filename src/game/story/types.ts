@@ -1,6 +1,6 @@
 export type StoryNodeType = 'narration' | 'dialogue' | 'choice' | 'scene' | 'transition' | 'ending' | 'qte';
 
-export type CharacterEmotion = 'normal' | 'happy' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'determined' | 'scared' | 'serious';
+export type CharacterEmotion = 'normal' | 'happy' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'determined' | 'scared' | 'serious' | 'worried' | 'interested';
 
 export type ChoiceImpact = {
   stats?: Partial<Record<'fame' | 'wisdom' | 'charm' | 'courage' | 'insight', number>>;
@@ -79,11 +79,19 @@ export interface StorySaveData {
     chapter: number;
     scene: number;
     completedNodes: string[];
+    visitedNodes?: string[];
   };
   history: {
     nodeIds: string[];
     choices: Array<{ nodeId: string; choiceId: string }>;
+    entries?: Array<{ nodeId: string; choiceId?: string }>;
   };
+  runtime?: {
+    currentPath?: string;
+    currentChapterId?: string;
+    completedChapters?: string[];
+  };
+  bridgeState?: StoryBattleBridgeState;
 }
 
 export interface StorySettings {

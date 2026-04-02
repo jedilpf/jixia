@@ -1,0 +1,23 @@
+{
+  "task_id": "TASK-20260402-118",
+  "goal": "Transform the legacy LogDrawer.tsx into a premium V9 'History of Contention' (争鸣史) experience with concertina folding layout and mineral-style icons.",
+  "constraints": [
+    "Keep existing BattleLog type compatibility.",
+    "Use only V9 palette: Ivory, Ink, Vermilion, Stone Green.",
+    "No external heavy animation libraries."
+  ],
+  "deliverables": [
+    "Refactored LogDrawer.tsx with V9 Yahua visual system.",
+    "Integrated 6 custom mineral-style icons into the project assets.",
+    "Responsive and animated scroll-like log display."
+  ],
+  "allowed_write_paths": [
+    "src/components/battle/panels/LogDrawer.tsx",
+    "public/assets/v9/battle_log_icons.png"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-118.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-118.json"
+  ],
+  "status": "completed"
+}

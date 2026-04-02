@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { uiAudio } from '@/utils/audioManager';
 import type { SaveSlotInfo, SaveSlotType } from '@/game/story/StoryEngine';
 
@@ -17,34 +17,55 @@ interface SaveLoadModalProps {
   onClose: () => void;
 }
 
-function formatTimestamp(ts: number | undefined): string {
+function formatTimestamp(ts?: number): string {
   if (!ts) return '';
   const d = new Date(ts);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
-function getChapterLabel(chapter: number | undefined): string {
-  if (!chapter) return '';
-  if (chapter === 1) return '第一章·百家争鸣';
-  if (chapter === 2) return '第二章·问道';
-  return `第${chapter}章`;
+function formatChapter(chapter?: number): string {
+  if (chapter === undefined) return '';
+  if (chapter === 0) return '序章';
+  return `第 ${chapter} 章`;
+}
+
+function getSlotDisplays(mode: 'save' | 'load', slots: Record<SaveSlotType, SaveSlotInfo>): SaveSlotDisplay[] {
+  const manual: SaveSlotDisplay[] = [
+    { slot: 'manual_1', label: '手动存档 1', info: slots.manual_1 },
+    { slot: 'manual_2', label: '手动存档 2', info: slots.manual_2 },
+    { slot: 'manual_3', label: '手动存档 3', info: slots.manual_3 },
+  ];
+  if (mode === 'save') return manual;
+  return [{ slot: 'autosave', label: '自动存档', info: slots.autosave }, ...manual];
 }
 
 export function SaveLoadModal({ mode, open, slots, onSave, onLoad, onClose }: SaveLoadModalProps) {
   const [selectedSlot, setSelectedSlot] = useState<SaveSlotType | null>(null);
   const [confirmSlot, setConfirmSlot] = useState<SaveSlotType | null>(null);
+  const [confirmAction, setConfirmAction] = useState<'overwrite' | 'load' | null>(null);
+
+  const slotDisplays = useMemo(() => getSlotDisplays(mode, slots), [mode, slots]);
 
   useEffect(() => {
     if (!open) {
       setSelectedSlot(null);
       setConfirmSlot(null);
+      setConfirmAction(null);
     }
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const handle = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { uiAudio.playClick(); onClose(); }
+      if (e.key === 'Escape') {
+        uiAudio.playClick();
+        onClose();
+      }
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
@@ -52,12 +73,15 @@ export function SaveLoadModal({ mode, open, slots, onSave, onLoad, onClose }: Sa
 
   if (!open) return null;
 
-  const slotDisplays: SaveSlotDisplay[] = [
-    { slot: 'autosave', label: '自动存档', info: slots.autosave },
-    { slot: 'manual_1', label: '手动存档 1', info: slots.manual_1 },
-    { slot: 'manual_2', label: '手动存档 2', info: slots.manual_2 },
-    { slot: 'manual_3', label: '手动存档 3', info: slots.manual_3 },
-  ];
+  const runSave = (slot: SaveSlotType) => {
+    onSave(slot);
+    setSelectedSlot(null);
+  };
+
+  const runLoad = (slot: SaveSlotType) => {
+    onLoad(slot);
+    setSelectedSlot(null);
+  };
 
   const handleSlotClick = (slot: SaveSlotType, info: SaveSlotInfo) => {
     uiAudio.playClick();
@@ -66,209 +90,186 @@ export function SaveLoadModal({ mode, open, slots, onSave, onLoad, onClose }: Sa
     if (mode === 'save') {
       if (info.exists) {
         setConfirmSlot(slot);
+        setConfirmAction('overwrite');
       } else {
-        onSave(slot);
-        setSelectedSlot(null);
+        runSave(slot);
       }
-    } else {
-      if (info.exists) {
-        onLoad(slot);
-        setSelectedSlot(null);
-      }
+      return;
     }
+
+    if (!info.exists) return;
+    setConfirmSlot(slot);
+    setConfirmAction('load');
+  };
+
+  const closeConfirm = () => {
+    setConfirmSlot(null);
+    setConfirmAction(null);
   };
 
   const handleConfirm = () => {
-    if (confirmSlot) {
-      onSave(confirmSlot);
-      setConfirmSlot(null);
-      setSelectedSlot(null);
+    if (!confirmSlot || !confirmAction) return;
+    if (confirmAction === 'overwrite') {
+      runSave(confirmSlot);
+    } else {
+      runLoad(confirmSlot);
     }
+    closeConfirm();
   };
 
-  const handleCancelConfirm = () => {
-    setConfirmSlot(null);
-  };
-
-  const title = mode === 'save' ? '💾 存档' : '📂 读档';
+  const title = mode === 'save' ? '存档' : '读档';
 
   return (
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 99999,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         background: 'rgba(0,0,0,0.65)',
         backdropFilter: 'blur(4px)',
-        animation: 'modal-fade-in 0.15s ease-out',
       }}
-      onClick={() => { uiAudio.playClick(); onClose(); }}
+      onClick={() => {
+        uiAudio.playClick();
+        onClose();
+      }}
     >
-      <style>{`
-        @keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scroll-drop-in {
-          0% { opacity: 0; transform: scaleY(0.2) scaleX(0.9) translateY(-30px); }
-          60% { transform: scaleY(1.03) scaleX(0.98); }
-          100% { opacity: 1; transform: scaleY(1) scaleX(1) translateY(0); }
-        }
-      `}</style>
-
       <div
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         style={{
           position: 'relative',
-          width: '420px',
-          background: 'linear-gradient(160deg, #f0e8d5 0%, #e8dcc4 50%, #d6c9a8 100%)',
-          boxShadow: '0 12px 48px rgba(0,0,0,0.85), inset 0 0 40px rgba(139,115,85,0.12)',
-          borderRadius: '4px',
+          width: 440,
+          maxWidth: '92vw',
+          borderRadius: 8,
+          border: '1px solid rgba(139,115,85,0.55)',
+          background: 'linear-gradient(160deg, #f0e8d5 0%, #e8dcc4 55%, #d6c9a8 100%)',
+          boxShadow: '0 18px 52px rgba(0,0,0,0.55)',
           overflow: 'hidden',
-          animation: 'scroll-drop-in 0.4s cubic-bezier(0.2,0.8,0.2,1) forwards',
         }}
       >
-        <div style={{ height: '10px', background: 'linear-gradient(90deg, #3d2616, #6e4a28, #8b6040, #6e4a28, #3d2616)', boxShadow: '0 3px 8px rgba(0,0,0,0.5)' }} />
-
-        <div style={{ position: 'absolute', inset: '10px', background: 'repeating-linear-gradient(90deg, transparent, transparent 36px, rgba(139,115,85,0.1) 37px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: '10px 12px 10px 12px', border: '1px solid rgba(139,115,85,0.35)', pointerEvents: 'none' }} />
-
-        <div style={{ position: 'relative', padding: '28px 32px 24px', zIndex: 2 }}>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <p style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '24px', letterSpacing: '4px', color: '#2a1e0e', margin: 0 }}>
-              {title}
-            </p>
-            <p style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '12px', letterSpacing: '2px', color: '#7a6347', marginTop: '6px' }}>
-              {mode === 'save' ? '— 记录当前进度 —' : '— 选择存档 —'}
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-            {slotDisplays.map(({ slot, label, info }) => (
-              <button
-                key={slot}
-                onClick={() => handleSlotClick(slot, info)}
-                onMouseEnter={() => uiAudio.playHover()}
-                disabled={mode === 'load' && !info.exists}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: '12px 16px',
-                  background: selectedSlot === slot
-                    ? 'rgba(139,115,85,0.2)'
-                    : 'rgba(255,255,255,0.3)',
-                  border: `2px solid ${selectedSlot === slot ? 'rgba(139,115,85,0.6)' : 'rgba(139,115,85,0.25)'}`,
-                  borderRadius: '4px',
-                  cursor: mode === 'load' && !info.exists ? 'not-allowed' : 'pointer',
-                  opacity: mode === 'load' && !info.exists ? 0.5 : 1,
-                  transition: 'all 0.15s',
-                  textAlign: 'left',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <span style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '16px', letterSpacing: '2px', color: '#2a1e0e' }}>
-                    {label}
-                  </span>
-                  {info.exists && (
-                    <span style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '12px', color: '#7a6347' }}>
-                      {getChapterLabel(info.chapter)}
-                    </span>
-                  )}
-                </div>
-                {info.exists ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '4px' }}>
-                    <span style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '12px', color: '#7a6347' }}>
-                      {formatTimestamp(info.timestamp)}
-                    </span>
-                    <span style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '12px', color: '#7a6347' }}>
-                      已访{info.nodeCount}节点
-                    </span>
-                  </div>
-                ) : (
-                  <span style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '12px', color: '#9a8a7a', marginTop: '4px' }}>
-                    （空）
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <button
-              onClick={() => { uiAudio.playClick(); onClose(); }}
-              onMouseEnter={() => uiAudio.playHover()}
-              style={{
-                padding: '10px 32px',
-                background: 'linear-gradient(135deg, #3d4a3a 0%, #2a3527 100%)',
-                border: '2px solid rgba(80,110,70,0.6)',
-                borderRadius: '3px',
-                color: '#a7c5ba',
-                fontFamily: '"STKaiti", serif',
-                fontSize: '14px', letterSpacing: '3px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
-              }}
-            >
-              取消
-            </button>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(139,115,85,0.35)' }}>
+          <div style={{ fontSize: 22, letterSpacing: 2, color: '#2a1e0e', fontWeight: 700 }}>{title}</div>
+          <div style={{ fontSize: 12, color: '#6f5a3f', marginTop: 4 }}>
+            {mode === 'save' ? '选择一个手动槽位保存当前进度' : '选择一个存档槽位继续'}
           </div>
         </div>
 
-        <div style={{ height: '10px', background: 'linear-gradient(90deg, #3d2616, #6e4a28, #8b6040, #6e4a28, #3d2616)', boxShadow: '0 -3px 8px rgba(0,0,0,0.5)' }} />
+        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {slotDisplays.map(({ slot, label, info }) => (
+            <button
+              key={slot}
+              onClick={() => handleSlotClick(slot, info)}
+              onMouseEnter={() => uiAudio.playHover()}
+              disabled={mode === 'load' && !info.exists}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                gap: 6,
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: 6,
+                border: selectedSlot === slot ? '2px solid rgba(139,115,85,0.65)' : '1px solid rgba(139,115,85,0.35)',
+                background: selectedSlot === slot ? 'rgba(139,115,85,0.16)' : 'rgba(255,255,255,0.35)',
+                color: '#2a1e0e',
+                textAlign: 'left',
+                cursor: mode === 'load' && !info.exists ? 'not-allowed' : 'pointer',
+                opacity: mode === 'load' && !info.exists ? 0.45 : 1,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{label}</span>
+                {info.exists && <span style={{ fontSize: 12, color: '#6f5a3f' }}>{formatChapter(info.chapter)}</span>}
+              </div>
+              {info.exists ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12, color: '#6f5a3f' }}>
+                  <span>{formatTimestamp(info.timestamp)}</span>
+                  <span>已访问 {info.nodeCount ?? 0} 节点</span>
+                </div>
+              ) : (
+                <div style={{ fontSize: 12, color: '#8f826d' }}>（空）</div>
+              )}
+            </button>
+          ))}
+        </div>
 
-        {confirmSlot && (
+        <div style={{ padding: '12px 16px 16px', display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => {
+              uiAudio.playClick();
+              onClose();
+            }}
+            onMouseEnter={() => uiAudio.playHover()}
+            style={{
+              padding: '8px 18px',
+              borderRadius: 6,
+              border: '1px solid rgba(139,115,85,0.45)',
+              background: '#f8f3e8',
+              color: '#3b2c17',
+              cursor: 'pointer',
+              fontSize: 13,
+            }}
+          >
+            关闭
+          </button>
+        </div>
+
+        {confirmSlot && confirmAction && (
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'rgba(0,0,0,0.3)',
+              background: 'rgba(0,0,0,0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 10,
             }}
           >
             <div
               style={{
-                background: 'linear-gradient(160deg, #f0e8d5 0%, #e8dcc4 100%)',
-                padding: '24px 32px',
-                borderRadius: '4px',
-                textAlign: 'center',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                width: 320,
+                maxWidth: '86vw',
+                background: '#f6eddc',
+                borderRadius: 8,
+                border: '1px solid rgba(139,115,85,0.45)',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.35)',
+                padding: 18,
               }}
             >
-              <p style={{ fontFamily: '"STKaiti", "楷体", serif', fontSize: '16px', color: '#2a1e0e', marginBottom: '20px' }}>
-                存档位已有数据，确认覆盖？
-              </p>
-              <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <div style={{ fontSize: 15, color: '#2a1e0e', lineHeight: 1.6 }}>
+                {confirmAction === 'overwrite'
+                  ? '该槽位已有数据，确认覆盖吗？'
+                  : '读取后会覆盖当前进度，确认继续吗？'}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
                 <button
-                  onClick={handleConfirm}
+                  onClick={closeConfirm}
                   onMouseEnter={() => uiAudio.playHover()}
                   style={{
-                    padding: '8px 24px',
-                    background: 'linear-gradient(135deg, #8b2a2a 0%, #6b1f1f 100%)',
-                    border: '2px solid rgba(180,80,80,0.6)',
-                    borderRadius: '3px',
-                    color: '#f5e6b8',
-                    fontFamily: '"STKaiti", serif',
-                    fontSize: '14px', letterSpacing: '2px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  确定
-                </button>
-                <button
-                  onClick={handleCancelConfirm}
-                  onMouseEnter={() => uiAudio.playHover()}
-                  style={{
-                    padding: '8px 24px',
-                    background: 'linear-gradient(135deg, #4a4a4a 0%, #333 100%)',
-                    border: '2px solid rgba(100,100,100,0.6)',
-                    borderRadius: '3px',
-                    color: '#ccc',
-                    fontFamily: '"STKaiti", serif',
-                    fontSize: '14px', letterSpacing: '2px',
+                    padding: '7px 14px',
+                    borderRadius: 6,
+                    border: '1px solid rgba(120,120,120,0.45)',
+                    background: '#f3f3f3',
                     cursor: 'pointer',
                   }}
                 >
                   取消
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  onMouseEnter={() => uiAudio.playHover()}
+                  style={{
+                    padding: '7px 14px',
+                    borderRadius: 6,
+                    border: '1px solid rgba(139,115,85,0.55)',
+                    background: '#5e4a2f',
+                    color: '#fff',
+                    cursor: 'pointer',
+                  }}
+                >
+                  确认
                 </button>
               </div>
             </div>

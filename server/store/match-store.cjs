@@ -112,10 +112,27 @@ function createInMemoryMatchStore(options = {}) {
     return next;
   }
 
+  function listMatches(options = {}) {
+    sweepExpiredMatches();
+    const limit = Number.isFinite(options.limit) && options.limit > 0
+      ? Math.floor(options.limit)
+      : 50;
+
+    return Array.from(matches.values())
+      .sort((a, b) => Date.parse(b.updatedAt || b.createdAt || 0) - Date.parse(a.updatedAt || a.createdAt || 0))
+      .slice(0, limit);
+  }
+
+  function removeMatch(matchId) {
+    return matches.delete(matchId);
+  }
+
   return {
     createAiMatch,
     getMatch,
     updateMatch,
+    listMatches,
+    removeMatch,
     sweepExpiredMatches,
   };
 }

@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260402-116",
+  "goal": "Finalize Story Mode save system (auto/manual/load slot UX + robustness) and align branch docs by removing stale src_new mention from mainline README context.",
+  "constraints": [
+    "Do not regress existing story chapter progression logic.",
+    "Keep save data backward-compatible with existing localStorage entries where possible.",
+    "Avoid changing unrelated battle/runtime systems."
+  ],
+  "deliverables": [
+    "Story save/load slot flow fully functional and robust in StoryEngine + StoryScreen.",
+    "Autosave and manual save metadata consistency improved.",
+    "README directory section contains only active source tree guidance."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/game/story",
+    "src/ui/components/SaveLoadModal.tsx",
+    "src/ui/screens/StoryScreen.tsx",
+    "src/utils/persistence.ts",
+    "README.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-116.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-116.json",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-116.json"
+  ],
+  "status": "completed"
+}

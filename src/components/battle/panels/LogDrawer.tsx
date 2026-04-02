@@ -1,6 +1,6 @@
 /**
- * 战斗日志抽屉
- * 显示出牌记录、结算记录、议题推进记录
+ * 《争鸣史》实录 
+ * 稷下受业全案记录 (V9 雅化版)
  */
 
 import React from 'react';
@@ -12,13 +12,37 @@ interface LogDrawerProps {
   logs: BattleLog[];
 }
 
-const LOG_TYPE_CONFIG: Record<string, { color: string; icon: string; label: string }> = {
-  action: { color: '#3A5F41', icon: '行', label: '名士行动' },
-  effect: { color: '#1A1A1A', icon: '效', label: '言辞效果' },
-  result: { color: '#D4AF65', icon: '结', label: '定论结果' },
-  damage: { color: '#8D2F2F', icon: '伤', label: '辩锋挫损' },
-  heal: { color: '#3A5F41', icon: '愈', label: '根基固守' },
-  system: { color: '#5C4033', icon: '系', label: '司议笔录' },
+const LOG_TYPE_CONFIG: Record<string, { color: string; bg: string; label: string; offset: string }> = {
+  action: { color: '#1A1A1A', bg: 'rgba(26,26,26,0.05)', label: '名士出奇', offset: '0% 0%' },
+  effect: { color: '#3A5F41', bg: 'rgba(58,95,65,0.05)', label: '言辞法效', offset: '50% 0%' },
+  result: { color: '#8D2F2F', bg: 'rgba(141,47,47,0.05)', label: '终局定论', offset: '0% 50%' },
+  damage: { color: '#1A1A1A', bg: 'rgba(26,26,26,0.05)', label: '锋芒挫损', offset: '50% 50%' },
+  heal: { color: '#3A5F41', bg: 'rgba(58,95,65,0.05)', label: '物华固本', offset: '0% 100%' },
+  system: { color: '#5C4033', bg: 'rgba(92,64,51,0.05)', label: '司议笔录', offset: '50% 100%' },
+};
+
+const LogIcon: React.FC<{ type: string; color: string }> = ({ type, color }) => {
+  const iconPath = '/assets/v9/battle_log_icons.png';
+  return (
+    <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
+      <div 
+        className="absolute inset-0 rounded-2xl border-2 rotate-6 transition-transform group-hover:rotate-0 shadow-lg"
+        style={{ borderColor: `${color}20`, backgroundColor: '#fff' }}
+      />
+      <div 
+        className="relative w-12 h-12 rounded-xl overflow-hidden grayscale group-hover:grayscale-0 transition-all"
+        style={{ 
+          backgroundImage: `url('${iconPath}')`,
+          backgroundSize: '200% 300%',
+          backgroundPosition: LOG_TYPE_CONFIG[type]?.offset || '0% 0%',
+          border: `1px solid ${color}10`
+        }}
+      />
+      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-[#1A1A1A] shadow-md flex items-center justify-center">
+         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+      </div>
+    </div>
+  );
 };
 
 const LogDrawer: React.FC<LogDrawerProps> = ({ isOpen, onClose, logs }) => {
@@ -35,127 +59,130 @@ const LogDrawer: React.FC<LogDrawerProps> = ({ isOpen, onClose, logs }) => {
     .sort((a, b) => b - a);
 
   return (
-    <div className="fixed inset-0 z-[100] flex animate-in fade-in duration-500">
-      <div className="flex-1 bg-[#1A1A1A]/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex animate-in fade-in duration-700">
+      <div className="flex-1 bg-[#1A1A1A]/60 backdrop-blur-md" onClick={onClose} />
 
-      <div className="w-[450px] h-full bg-[#FDFBF7] border-l-4 border-white shadow-[-50px_0_100px_rgba(0,0,0,0.2)] flex flex-col pt-safe animate-in slide-in-from-right duration-500">
-        <div className="h-24 px-8 flex items-center justify-between border-b border-[#1A1A1A]/5 bg-white">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center text-[#1A1A1A]">
-               <span className="text-sm font-black">录</span>
+      <div className="w-[500px] h-full bg-[#FDFBF7] shadow-[-80px_0_120px_rgba(0,0,0,0.4)] flex flex-col pt-safe relative overflow-hidden animate-in slide-in-from-right duration-700 cubic-bezier(0.23, 1, 0.32, 1)">
+        {/* 背景纹理：宣纸经折感 */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0">
+           <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+           <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/20 to-transparent" />
+        </div>
+
+        <header className="relative z-10 h-32 px-10 flex items-center justify-between border-b-4 border-[#1A1A1A] bg-white">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-full border-4 border-[#1A1A1A] flex items-center justify-center shadow-2xl bg-[#FDFBF7]">
+               <span className="text-2xl font-black italic serif">史</span>
             </div>
             <div>
-              <h2 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tight">论战笔录</h2>
-              <p className="text-[10px] font-black text-[#5C4033]/40 uppercase tracking-widest">{logs.length} RECORDS FILED</p>
+              <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase leading-none">争鸣实录</h2>
+              <div className="flex items-center gap-3 mt-2">
+                 <span className="text-[10px] font-black bg-[#8D2F2F] text-white px-3 py-1 rounded-full tracking-widest uppercase">Chronicle</span>
+                 <span className="text-[10px] font-black text-[#5C4033]/30 tracking-[0.3em] uppercase italic">{logs.length} SCROLLS</span>
+              </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all active:scale-90"
+            className="group w-12 h-12 rounded-2xl border-2 border-[#1A1A1A]/10 flex items-center justify-center text-[#1A1A1A] hover:border-[#8D2F2F] hover:text-[#8D2F2F] transition-all active:scale-90 bg-white"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <span className="text-xl font-bold group-hover:rotate-90 transition-transform">✕</span>
           </button>
-        </div>
+        </header>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide p-8 space-y-10 relative">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.02] z-0">
-             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
-          </div>
-          
-          <div className="relative z-10 space-y-10">
-            {rounds.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center opacity-20 py-20 text-center">
-                <div className="text-6xl font-black italic mb-4">无</div>
-                <p className="text-sm font-black tracking-widest uppercase">司议尚未开笔，论争犹待后续</p>
+        <main className="relative z-10 flex-1 overflow-y-auto scrollbar-hide px-10 py-12 space-y-12">
+          {rounds.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center py-40 text-center space-y-6">
+              <div className="w-40 h-40 rounded-full border-8 border-[#1A1A1A]/5 flex items-center justify-center grayscale opacity-20">
+                 <span className="text-8xl font-black italic serif">虚</span>
               </div>
-            ) : (
-              rounds.map((round) => (
-                <RoundGroup key={round} round={round} logs={groupedLogs[round]} />
-              ))
-            )}
-          </div>
-        </div>
+              <div>
+                <h3 className="text-xl font-black text-[#1A1A1A] uppercase tracking-widest">笔下无痕</h3>
+                <p className="text-[10px] font-black text-[#5C4033]/30 tracking-[0.4em] uppercase mt-2">The contention has not yet begun</p>
+              </div>
+            </div>
+          ) : (
+            rounds.map((round) => (
+              <RoundBlock key={round} round={round} logs={groupedLogs[round]} />
+            ))
+          )}
+        </main>
 
-        <div className="h-16 px-8 flex items-center justify-between border-t border-[#1A1A1A]/5 bg-white/40 text-[10px] font-black text-[#5C4033]/30 uppercase tracking-[0.2em]">
-          <span>Sorted by Timeline</span>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/10" />
-            <span>Esc to Close</span>
+        <footer className="relative z-10 h-20 px-10 flex items-center justify-between border-t border-[#1A1A1A]/10 bg-white/80 backdrop-blur-sm text-[10px] font-black text-[#5C4033]/40 uppercase tracking-[0.3em]">
+          <div className="flex items-center gap-4">
+             <div className="w-2 h-2 rounded-full bg-[#3A5F41] animate-pulse" />
+             <span>Archived by Jixia Scholars</span>
           </div>
-        </div>
+          <span>Page {rounds.length || 0}</span>
+        </footer>
       </div>
     </div>
   );
 };
 
-const RoundGroup: React.FC<{
+const RoundBlock: React.FC<{
   round: number;
   logs: BattleLog[];
 }> = ({ round, logs }) => (
-  <div className="space-y-6">
-    <div className="flex items-center gap-4 sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-md py-2 z-20">
-      <div className="px-5 py-2.5 rounded-full bg-[#1A1A1A] text-white shadow-lg flex items-center gap-2">
-        <span className="text-xs font-black uppercase tracking-widest">ROUND</span>
-        <span className="text-lg font-black italic tabular-nums">{round}</span>
+  <section className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
+    <div className="flex items-center gap-6 sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-sm py-4 z-20">
+      <div className="relative group">
+        <div className="absolute -inset-2 bg-[#8D2F2F]/10 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="relative w-14 h-14 bg-[#8D2F2F] text-white shadow-xl flex flex-col items-center justify-center rounded-lg rotate-3 group-hover:rotate-0 transition-transform">
+           <span className="text-[8px] font-black tracking-widest">第</span>
+           <span className="text-xl font-black italic serif leading-none">{round}</span>
+           <span className="text-[8px] font-black tracking-widest">轮</span>
+        </div>
       </div>
-      <div className="flex-1 h-px bg-[#1A1A1A]/5" />
-      <span className="text-[10px] font-black text-[#5C4033]/30 uppercase tracking-widest">{logs.length} OPS</span>
+      <div className="flex-1">
+         <div className="text-[10px] font-black text-[#1A1A1A]/30 uppercase tracking-[0.5em] mb-1">Encounter History</div>
+         <div className="h-0.5 w-full bg-[#1A1A1A]/5 rounded-full overflow-hidden">
+            <div className="h-full bg-[#1A1A1A] w-24" />
+         </div>
+      </div>
     </div>
-    <div className="space-y-3 pl-2">
+
+    <div className="space-y-4 pl-4 border-l-2 border-[#1A1A1A]/5">
       {logs.map((log, index) => (
-        <LogItem key={log.id || index} log={log} />
+        <ContentEntry key={log.id || index} log={log} />
       ))}
     </div>
-  </div>
+  </section>
 );
 
-const LogItem: React.FC<{
+const ContentEntry: React.FC<{
   log: BattleLog;
 }> = ({ log }) => {
-  const getLogType = (text: string): keyof typeof LOG_TYPE_CONFIG => {
+  const detectType = (text: string): keyof typeof LOG_TYPE_CONFIG => {
     const t = text.toLowerCase();
-    if (t.includes('结算') || t.includes('获胜') || t.includes('失败') || t.includes('定论')) return 'result';
-    if (t.includes('伤害') || t.includes('扣除') || t.includes('损失') || t.includes('挫损')) return 'damage';
-    if (t.includes('恢复') || t.includes('获得') || t.includes('增加') || t.includes('固守')) return 'heal';
-    if (t.includes('触发') || t.includes('效果') || t.includes('能力') || t.includes('共鸣')) return 'effect';
-    if (t.includes('已') || t.includes('选择') || t.includes('出牌') || t.includes('行动')) return 'action';
-    return 'system';
+    if (t.includes('结算') || t.includes('定论') || t.includes('回合') || t.includes('获胜')) return 'result';
+    if (t.includes('伤害') || t.includes('扣除') || t.includes('损失')) return 'damage';
+    if (t.includes('回复') || t.includes('获得') || t.includes('增加')) return 'heal';
+    if (t.includes('由于') || t.includes('效果') || t.includes('触发') || t.includes('连锁')) return 'effect';
+    return 'action';
   };
 
-  const type = getLogType(log.text);
+  const type = detectType(log.text);
   const config = LOG_TYPE_CONFIG[type];
 
   return (
-    <div
-      className="flex items-start gap-5 p-5 rounded-[1.25rem] border-2 transition-all hover:bg-white hover:shadow-xl group"
-      style={{
-        borderColor: 'rgba(26,26,26,0.03)',
-        backgroundColor: 'rgba(255,255,255,0.4)',
-      }}
-    >
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-black shadow-sm shrink-0 mt-0.5"
-        style={{ backgroundColor: config.color, color: 'white' }}
-      >
-        {config.icon}
-      </div>
+    <div className="group flex items-start gap-6 p-6 rounded-[2rem] bg-white border-2 border-[#1A1A1A]/5 hover:border-[#1A1A1A] hover:shadow-2xl transition-all duration-500">
+      <LogIcon type={type} color={config.color} />
+      
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-bold text-[#1A1A1A] leading-relaxed serif underline decoration-[#1A1A1A]/5 decoration-2 underline-offset-4">{log.text}</p>
-        <div className="flex items-center gap-4 mt-3">
-          <span
-            className="text-[9px] font-black uppercase tracking-[0.2em]"
-            style={{ color: config.color }}
-          >
-            {config.label}
-          </span>
-          {log.timestamp && (
-            <span className="text-[9px] font-black text-[#5C4033]/20 tabular-nums">
-              {new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-          )}
+        <div className="flex items-center justify-between mb-2">
+           <span className="text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full border border-current" style={{ color: config.color, backgroundColor: config.bg }}>
+             {config.label}
+           </span>
+           {log.timestamp && (
+             <span className="text-[9px] font-black text-[#5C4033]/20 tabular-nums">
+               {new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+             </span>
+           )}
         </div>
+        <p className="text-base font-bold text-[#1A1A1A] leading-relaxed serif tracking-tight">
+          {log.text}
+        </p>
       </div>
     </div>
   );

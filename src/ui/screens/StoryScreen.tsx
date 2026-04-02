@@ -357,6 +357,8 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           setAvailableChoices(engine.getAvailableChoices());
           setChapter(engine.getChapter());
           setScene(engine.getScene());
+          setStats(engine.getPlayerStats());
+          setRelationships(engine.getRelationships());
           setChapterProgress(engine.getChapterProgress());
           setSaveSlots(engine.getSaveSlots());
           startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
@@ -377,6 +379,8 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
 
     const initialNode = engine.getCurrentNode();
     setAvailableChoices(engine.getAvailableChoices());
+    setStats(engine.getPlayerStats());
+    setRelationships(engine.getRelationships());
     setChapterProgress(engine.getChapterProgress());
     startTyping(initialNode?.content || '', Boolean(initialNode?.choices));
 
@@ -421,24 +425,33 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
 
   const handleSave = useCallback(() => {
     setSaveSlots(engine.getSaveSlots());
+    setShowLoadModal(false);
+    setShowSaveModal(true);
   }, [engine]);
 
   const handleLoad = useCallback(() => {
     setSaveSlots(engine.getSaveSlots());
+    setShowSaveModal(false);
+    setShowLoadModal(true);
   }, [engine]);
 
   const onSave = useCallback((slot: SaveSlotType) => {
-    engine.persist(slot);
+    const success = engine.saveManual(slot);
+    if (!success) {
+      alert('该槽位不支持手动存档。');
+      return;
+    }
     setSaveSlots(engine.getSaveSlots());
     setShowSaveModal(false);
-    alert('存档成功！');
+    alert('存档成功。');
   }, [engine]);
 
   const onLoad = useCallback((slot: SaveSlotType) => {
-    const success = engine.restore(slot);
+    const success = engine.loadSlot(slot);
     if (success) {
       setSaveSlots(engine.getSaveSlots());
       setShowLoadModal(false);
+      setLastChoiceImpact('');
     } else {
       alert('读取存档失败。');
     }

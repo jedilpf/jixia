@@ -20,6 +20,7 @@ const DEFAULT_CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
   || 'http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:5174,http://localhost:5174';
 const DEFAULT_MATCH_TTL_MS = parsePositiveInt(process.env.MATCH_TTL_MS, 4 * 60 * 60 * 1000);
 const REQUIRE_PLAYER_ID = parseBoolean(process.env.REQUIRE_PLAYER_ID, false);
+const DEFAULT_DATA_DIR = process.env.BACKEND_DATA_DIR || 'data/backend';
 
 function parseOrigins(value) {
   const raw = typeof value === 'string' && value.trim().length > 0
@@ -36,5 +37,6 @@ module.exports = {
   DEFAULT_HOST,
   DEFAULT_MATCH_TTL_MS,
   REQUIRE_PLAYER_ID,
+  DEFAULT_DATA_DIR,
   parseOrigins,
 };
