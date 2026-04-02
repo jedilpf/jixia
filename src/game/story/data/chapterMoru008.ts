@@ -1671,7 +1671,7 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'sunrise',
-    nextNode: 'ch_moru_008_ending_perfect',
+    nextNode: 'ch_moru_008_ending',
   },
 
   {
@@ -1743,7 +1743,7 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'sunset',
-    nextNode: 'ch_moru_008_ending_normal',
+    nextNode: 'ch_moru_008_ending',
   },
 
   {
@@ -1835,7 +1835,7 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'blood_moon',
-    nextNode: 'ch_moru_008_ending_tragedy',
+    nextNode: 'ch_moru_008_ending',
   },
 
   {
@@ -2028,7 +2028,7 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'qin_palace_throne',
-    nextNode: 'ch_moru_008_ending_hidden_emperor',
+    nextNode: 'ch_moru_008_ending',
   },
 
   {
@@ -2118,7 +2118,7 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'miluo_river_peaceful',
-    nextNode: 'ch_moru_008_ending_hidden_hermit',
+    nextNode: 'ch_moru_008_ending',
   },
 
   {
@@ -2204,5 +2204,6 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'hangu_pass_sunset',
+    nextNode: null,
   },
 ];

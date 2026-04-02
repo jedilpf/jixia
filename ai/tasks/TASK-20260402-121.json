@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260402-121",
+  "goal": "Produce a detailed metaverse-direction execution plan with role-based ownership (Antigravity for art, Trae for copywriting, Codex for framework and hard tasks) while preserving most current systems.",
+  "constraints": [
+    "Preserve current core gameplay and content baseline as default strategy.",
+    "Focus on phased expansion through additive architecture, not full rewrites.",
+    "Provide concrete milestone criteria, risk control, and team handoff rules."
+  ],
+  "deliverables": [
+    "A comprehensive strategy document under docs/project for metaverse evolution roadmap.",
+    "Detailed role split and responsibility matrix for Antigravity, Trae, and Codex.",
+    "Execution sequence with quarter-level milestones, KPIs, and go/no-go gates."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/project",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-121.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-121.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-121.json"
+  ],
+  "status": "in_progress"
+}

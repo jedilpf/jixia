@@ -3,276 +3,162 @@ import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
 import { SaveLoadModal } from '@/ui/components/SaveLoadModal';
 import type { SaveSlotType, SaveSlotInfo } from '@/game/story/StoryEngine';
 
+const V9_COLORS = {
+  paper: '#FDFBF7',
+  ink: '#1A1A1A',
+  gold: '#D4AF65',
+  jade: '#3A5F41',
+  crimson: '#8D2F2F',
+  wood: '#2A1A1A',
+  silk: '#F2E8D5',
+};
+
 const STORY_STYLES = {
   container: {
     width: '100%',
     height: '100dvh',
-    background: '#0f0f1a',
+    background: V9_COLORS.paper,
     display: 'flex',
     flexDirection: 'column' as const,
     overflow: 'hidden',
     position: 'relative' as const,
+    color: V9_COLORS.ink,
+    fontFamily: 'serif',
+  },
+  paperOverlay: {
+    position: 'absolute' as const,
+    inset: 0,
+    opacity: 0.08,
+    pointerEvents: 'none' as const,
+    backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")',
+    zIndex: 1,
   },
   topBar: {
-    minHeight: '72px',
-    padding: '10px 24px',
+    minHeight: '88px',
+    padding: '0 40px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottom: '1px solid rgba(139,115,85,0.3)',
-    background: 'rgba(15,15,26,0.95)',
+    borderBottom: `2px solid ${V9_COLORS.wood}`,
+    background: 'white',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
     zIndex: 10,
-    gap: '14px',
-  },
-  topLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    minWidth: 0,
+    gap: '20px',
   },
   chapterBadge: {
-    padding: '6px 16px',
-    background: 'rgba(26,26,46,0.9)',
-    borderRadius: '20px',
-    border: '1px solid rgba(139,115,85,0.5)',
-    color: '#D4A017',
-    fontSize: '14px',
-    fontWeight: 600,
+    padding: '8px 24px',
+    background: V9_COLORS.wood,
+    borderRadius: '4px',
+    color: V9_COLORS.silk,
+    fontSize: '15px',
+    fontWeight: 800,
     whiteSpace: 'nowrap' as const,
-  },
-  chapterProgressWrap: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '6px',
-    minWidth: '180px',
-  },
-  chapterProgressTrack: {
-    height: '6px',
-    background: 'rgba(139,115,85,0.3)',
-    borderRadius: '4px',
-    overflow: 'hidden',
-  },
-  chapterProgressFill: {
-    height: '100%',
-    background: 'linear-gradient(90deg, #8B7355 0%, #D4A017 100%)',
-    borderRadius: '4px',
-    transition: 'width 0.25s ease',
-  },
-  chapterProgressText: {
-    color: '#D4C5A9',
-    fontSize: '12px',
-    opacity: 0.9,
-  },
-  topRightPanel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  saveStatusPanel: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '2px',
-    minWidth: '240px',
-    textAlign: 'right' as const,
-  },
-  saveStatusLine: {
-    color: '#D4C5A9',
-    fontSize: '12px',
-    lineHeight: 1.25,
-  },
-  saveStatusMuted: {
-    opacity: 0.8,
+    letterSpacing: '0.2em',
+    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',
   },
   centerArea: {
     flex: 1,
-    padding: '32px 48px',
+    padding: '48px 64px',
     overflowY: 'auto' as const,
     display: 'flex',
     flexDirection: 'column' as const,
+    gap: '32px',
+    zIndex: 2,
+    background: 'radial-gradient(circle at center, transparent, rgba(58,95,65,0.02))',
   },
   sceneDescription: {
-    fontSize: '16px',
-    lineHeight: 1.8,
-    color: '#D4C5A9',
-    marginBottom: '24px',
-    padding: '16px 24px',
-    background: 'rgba(26,26,46,0.6)',
-    borderRadius: '8px',
-    borderLeft: '3px solid #8B7355',
+    fontSize: '20px',
+    lineHeight: 1.9,
+    color: V9_COLORS.ink,
+    marginBottom: '32px',
+    padding: '40px 50px',
+    background: 'white',
+    borderRadius: '2px',
+    border: `1px solid ${V9_COLORS.ink}10`,
+    boxShadow: '0 20px 60px rgba(0,0,0,0.03)',
     whiteSpace: 'pre-wrap' as const,
+    position: 'relative' as const,
+    overflow: 'hidden',
+    borderLeft: `6px solid ${V9_COLORS.jade}`,
   },
   dialogueArea: {
     display: 'flex',
-    gap: '24px',
-    marginBottom: '24px',
+    gap: '40px',
+    marginBottom: '32px',
+    alignItems: 'flex-start',
   },
   portrait: {
-    width: '160px',
-    height: '240px',
-    borderRadius: '8px',
-    border: '2px solid #8B7355',
+    width: '240px',
+    height: '360px',
+    borderRadius: '4px',
+    border: `4px solid ${V9_COLORS.wood}`,
+    boxShadow: '20px 20px 0 rgba(0,0,0,0.05)',
     objectFit: 'cover' as const,
-    background: 'rgba(26,26,46,0.8)',
+    background: V9_COLORS.silk,
     flexShrink: 0,
+    position: 'relative' as const,
   },
   dialogueBox: {
     flex: 1,
-    background: 'rgba(26,26,46,0.85)',
-    borderRadius: '12px',
-    border: '1px solid rgba(139,115,85,0.5)',
-    padding: '20px 24px',
+    background: 'white',
+    border: `1px solid ${V9_COLORS.ink}15`,
+    borderRadius: '4px',
+    padding: '32px 40px',
+    position: 'relative' as const,
+    boxShadow: '10px 10px 40px rgba(0,0,0,0.02)',
   },
   speakerName: {
-    fontSize: '15px',
-    fontWeight: 700,
-    color: '#D4A017',
-    marginBottom: '8px',
+    fontSize: '18px',
+    fontWeight: 900,
+    color: V9_COLORS.crimson,
+    marginBottom: '16px',
+    letterSpacing: '0.1em',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
   },
   dialogueText: {
-    fontSize: '17px',
-    lineHeight: 1.7,
-    color: '#f0ddbb',
+    fontSize: '22px',
+    lineHeight: 1.8,
+    color: V9_COLORS.ink,
+    opacity: 0.9,
     whiteSpace: 'pre-wrap' as const,
   },
-  continueIndicator: {
-    textAlign: 'right' as const,
-    marginTop: '12px',
-    color: '#8B7355',
-    fontSize: '14px',
-    animation: 'pulse 1.5s ease-in-out infinite',
-  },
   choicesArea: {
-    padding: '24px 48px',
-    background: 'rgba(15,15,26,0.95)',
-    borderTop: '1px solid rgba(139,115,85,0.3)',
-  },
-  choiceImpactHint: {
-    marginTop: '6px',
-    fontSize: '12px',
-    color: '#9db7d6',
-    opacity: 0.9,
-  },
-  latestImpactPanel: {
-    padding: '12px 14px',
-    marginBottom: '14px',
-    borderRadius: '8px',
-    border: '1px solid rgba(90, 140, 180, 0.5)',
-    background: 'rgba(22, 36, 52, 0.6)',
-    color: '#bfd7f3',
-    fontSize: '13px',
-    lineHeight: 1.5,
+    padding: '40px 64px',
+    background: 'white',
+    borderTop: `2px solid ${V9_COLORS.wood}`,
+    boxShadow: '0 -20px 50px rgba(0,0,0,0.05)',
+    zIndex: 5,
   },
   choiceButton: {
     width: '100%',
-    padding: '16px 24px',
-    marginBottom: '12px',
-    background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-    border: '1px solid rgba(139,115,85,0.6)',
-    borderRadius: '8px',
-    color: '#f0ddbb',
-    fontSize: '16px',
+    padding: '24px 32px',
+    marginBottom: '16px',
+    background: 'white',
+    border: `1px solid ${V9_COLORS.ink}10`,
+    borderRadius: '4px',
+    color: V9_COLORS.ink,
+    fontSize: '18px',
+    fontWeight: 700,
     textAlign: 'left' as const,
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '20px',
+    position: 'relative' as const,
   },
-  choiceButtonHover: {
-    background: 'linear-gradient(135deg, #2a2a3e 0%, #1a1a2a 100%)',
-    borderColor: '#E85D04',
-    transform: 'translateX(8px)',
-  },
-  relationshipBar: {
-    height: '56px',
-    padding: '0 24px',
-    background: 'rgba(15,15,26,0.98)',
-    borderTop: '1px solid rgba(139,115,85,0.3)',
+  reputationStrip: {
+    height: '64px',
+    padding: '0 40px',
+    background: V9_COLORS.paper,
+    borderTop: `1px solid ${V9_COLORS.ink}05`,
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    overflowX: 'auto' as const,
+    gap: '20px',
+    zIndex: 50,
   },
-  factionBadge: {
-    minWidth: '72px',
-    padding: '6px 10px',
-    background: 'rgba(26,26,46,0.8)',
-    borderRadius: '6px',
-    border: '1px solid rgba(139,115,85,0.4)',
-    textAlign: 'center' as const,
-    flexShrink: 0,
-  },
-  factionName: {
-    fontSize: '11px',
-    color: '#D4C5A9',
-    marginBottom: '4px',
-  },
-  reputationBar: {
-    height: '3px',
-    background: 'rgba(139,115,85,0.3)',
-    borderRadius: '2px',
-    overflow: 'hidden',
-  },
-  backButton: {
-    padding: '8px 16px',
-    background: 'transparent',
-    border: '1px solid rgba(139,115,85,0.5)',
-    borderRadius: '6px',
-    color: '#D4C5A9',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
-  },
-  menuButton: {
-    padding: '8px 16px',
-    background: 'transparent',
-    border: '1px solid rgba(139,115,85,0.5)',
-    borderRadius: '6px',
-    color: '#D4C5A9',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
-    whiteSpace: 'nowrap' as const,
-  },
-  toastWrap: {
-    position: 'fixed' as const,
-    left: '50%',
-    bottom: '88px',
-    transform: 'translateX(-50%)',
-    zIndex: 100000,
-    pointerEvents: 'none' as const,
-  },
-  toast: {
-    minWidth: '260px',
-    maxWidth: '80vw',
-    borderRadius: '10px',
-    border: '1px solid rgba(139,115,85,0.6)',
-    padding: '10px 14px',
-    boxShadow: '0 10px 28px rgba(0,0,0,0.4)',
-    color: '#f0ddbb',
-    background: 'rgba(24,24,42,0.92)',
-    fontSize: '13px',
-    lineHeight: 1.4,
-  },
-};
-
-const FACTION_COLORS: Record<string, string> = {
-  confucian: '#B58A52',
-  legalist: '#8D4E3E',
-  daoist: '#5E8F7E',
-  mozi: '#4E6A88',
-  strategist: '#A85C45',
-  diplomat: '#7C5FA3',
-  logician: '#5C6D9E',
-  eclectic: '#80755A',
-  agronomist: '#6B8D4F',
-  yin_yang: '#6C6A89',
-  novelist: '#8E6B6B',
-  healer: '#5F8D8B',
-  musician: '#92713D',
-  calendar: '#536A76',
-  ritualist: '#8B6A4E',
-  merchant: '#9A7E3B',
 };
 
 const FACTION_NAMES: Record<string, string> = {
@@ -284,22 +170,7 @@ const FACTION_NAMES: Record<string, string> = {
   diplomat: '纵横家',
   logician: '名家',
   eclectic: '杂家',
-  agronomist: '农家',
-  yin_yang: '阴阳家',
-  novelist: '小说家',
-  healer: '医家',
-  musician: '乐家',
-  calendar: '历数家',
-  ritualist: '礼家',
-  merchant: '商家',
 };
-
-type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
-type SaveToastTone = 'success' | 'error' | 'info';
-
-interface StoryScreenProps {
-  onBack?: () => void;
-}
 
 const STAT_LABELS: Record<string, string> = {
   fame: '名望',
@@ -313,90 +184,11 @@ function formatDelta(delta: number): string {
   return delta >= 0 ? `+${delta}` : `${delta}`;
 }
 
-function summarizeEffects(effects: StoryChoice['effects']): string {
-  const parts: string[] = [];
-  if (effects.stats) {
-    for (const [stat, delta] of Object.entries(effects.stats)) {
-      if (typeof delta !== 'number' || delta === 0) continue;
-      const label = STAT_LABELS[stat] ?? stat;
-      parts.push(`${label}${formatDelta(delta)}`);
-    }
-  }
+type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
+type SaveToastTone = 'success' | 'error' | 'info';
 
-  if (effects.relationships) {
-    for (const [target, value] of Object.entries(effects.relationships)) {
-      if (!value) continue;
-      const trust = value.trust ?? 0;
-      const affection = value.affection ?? 0;
-      const total = trust + affection;
-      if (total !== 0) {
-        parts.push(`${FACTION_NAMES[target] ?? target}关系${formatDelta(total)}`);
-      }
-    }
-  }
-
-  if (effects.path) {
-    parts.push(`路线 -> ${effects.path}`);
-  }
-
-  if (effects.flags) {
-    const keyFlags = Object.entries(effects.flags)
-      .filter(([, value]) => value === true)
-      .slice(0, 2)
-      .map(([flag]) => `标记:${flag}`);
-    parts.push(...keyFlags);
-  }
-
-  return parts.slice(0, 4).join(' · ');
-}
-
-function summarizeChoiceEffects(choice: StoryChoice): string {
-  return summarizeEffects(choice.effects);
-}
-
-function formatSaveTime(ts?: number): string {
-  if (!ts) return '暂无';
-  const date = new Date(ts);
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  const hh = String(date.getHours()).padStart(2, '0');
-  const min = String(date.getMinutes()).padStart(2, '0');
-  return `${mm}-${dd} ${hh}:${min}`;
-}
-
-function getSlotLabel(slot: SaveSlotType): string {
-  if (slot === 'autosave') return '自动存档';
-  if (slot === 'manual_1') return '手动存档 1';
-  if (slot === 'manual_2') return '手动存档 2';
-  return '手动存档 3';
-}
-
-function getChapterLabel(chapter: number): string {
-  if (chapter === 0) return '序章 · 入学';
-  if (chapter === 1) return '第一章 · 百家入门';
-  if (chapter === 2) return '第二章 · 论辩风云';
-  if (chapter === 3) return '第三章 · 暗流涌动';
-  if (chapter === 99) return '终章 · 问道';
-  return `第 ${chapter} 章`;
-}
-
-function getToastToneStyle(tone: SaveToastTone): { border: string; background: string } {
-  if (tone === 'success') {
-    return {
-      border: '1px solid rgba(90,180,120,0.55)',
-      background: 'rgba(20, 54, 36, 0.92)',
-    };
-  }
-  if (tone === 'error') {
-    return {
-      border: '1px solid rgba(205,90,90,0.55)',
-      background: 'rgba(63, 30, 30, 0.92)',
-    };
-  }
-  return {
-    border: '1px solid rgba(90,140,190,0.55)',
-    background: 'rgba(20, 36, 60, 0.92)',
-  };
+interface StoryScreenProps {
+  onBack?: () => void;
 }
 
 export function StoryScreen({ onBack }: StoryScreenProps = {}) {
@@ -408,438 +200,275 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const [displayedText, setDisplayedText] = useState('');
   const [isHoveredChoice, setIsHoveredChoice] = useState<number | null>(null);
   const [chapter, setChapter] = useState(0);
-  const [, setScene] = useState(0);
   const [chapterProgress, setChapterProgress] = useState(engine.getChapterProgress());
   const [lastChoiceImpact, setLastChoiceImpact] = useState<string>('');
-  const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
   const [saveSlots, setSaveSlots] = useState<Record<SaveSlotType, SaveSlotInfo>>(() => engine.getSaveSlots());
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [saveToast, setSaveToast] = useState<{ tone: SaveToastTone; text: string } | null>(null);
 
-  const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
 
   const showToast = useCallback((tone: SaveToastTone, text: string) => {
-    if (toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current);
-    }
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setSaveToast({ tone, text });
-    toastTimerRef.current = window.setTimeout(() => {
-      setSaveToast(null);
-      toastTimerRef.current = null;
-    }, 2400);
+    toastTimerRef.current = window.setTimeout(() => setSaveToast(null), 3000);
   }, []);
 
   const startTyping = useCallback((text: string, hasChoices: boolean) => {
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-    }
-
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     setDisplayedText('');
     let index = 0;
-    const speed = 30;
-
     typingIntervalRef.current = window.setInterval(() => {
       if (index < text.length) {
         setDisplayedText(text.slice(0, index + 1));
         index += 1;
       } else {
-        if (typingIntervalRef.current) {
-          clearInterval(typingIntervalRef.current);
-        }
+        clearInterval(typingIntervalRef.current!);
         setDialogueState(hasChoices ? 'choice' : 'complete');
       }
-    }, speed);
+    }, 25);
+  }, []);
+
+  const summarizeEffects = useCallback((effects: StoryChoice['effects']) => {
+    const parts: string[] = [];
+    if (effects.stats) {
+      Object.entries(effects.stats).forEach(([k, v]) => {
+        if (v) parts.push(`${STAT_LABELS[k] ?? k}${formatDelta(v as number)}`);
+      });
+    }
+    return parts.join(' · ');
   }, []);
 
   useEffect(() => {
     const unsubscribe = engine.subscribe((event) => {
-      switch (event.type) {
-        case 'node_changed': {
-          const nextNode = engine.getCurrentNode();
-          setCurrentNode(nextNode);
-          setAvailableChoices(engine.getAvailableChoices());
-          setChapter(engine.getChapter());
-          setScene(engine.getScene());
-          setStats(engine.getPlayerStats());
-          setRelationships(engine.getRelationships());
-          setChapterProgress(engine.getChapterProgress());
-          setSaveSlots(engine.getSaveSlots());
-          startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
-          setDialogueState('typing');
-          break;
-        }
-        case 'choice_made':
-          setLastChoiceImpact(summarizeEffects(event.effects));
-          break;
-        case 'relationship_changed':
-          setRelationships(engine.getRelationships());
-          break;
-        case 'stats_changed':
-          setStats(engine.getPlayerStats());
-          break;
+      if (event.type === 'node_changed') {
+        const nextNode = engine.getCurrentNode();
+        setCurrentNode(nextNode);
+        setAvailableChoices(engine.getAvailableChoices());
+        setChapter(engine.getChapter());
+        setStats(engine.getPlayerStats());
+        setChapterProgress(engine.getChapterProgress());
+        setSaveSlots(engine.getSaveSlots());
+        setDialogueState('typing');
+        startTyping(nextNode?.content || '', Boolean(nextNode?.choices));
+      } else if (event.type === 'choice_made') {
+        setLastChoiceImpact(summarizeEffects(event.effects));
       }
     });
 
-    const initialNode = engine.getCurrentNode();
-    setAvailableChoices(engine.getAvailableChoices());
-    setStats(engine.getPlayerStats());
-    setRelationships(engine.getRelationships());
-    setChapterProgress(engine.getChapterProgress());
-    setSaveSlots(engine.getSaveSlots());
-    startTyping(initialNode?.content || '', Boolean(initialNode?.choices));
-
+    const initial = engine.getCurrentNode();
+    startTyping(initial?.content || '', Boolean(initial?.choices));
     return () => {
       unsubscribe();
-      if (typingIntervalRef.current) {
-        clearInterval(typingIntervalRef.current);
-      }
-      if (toastTimerRef.current) {
-        clearTimeout(toastTimerRef.current);
-      }
+      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     };
-  }, [engine, startTyping]);
+  }, [engine, startTyping, summarizeEffects]);
 
-  const skipTyping = useCallback(() => {
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-    }
-    setDisplayedText(currentNode?.content || '');
-    setDialogueState(currentNode?.choices ? 'choice' : 'complete');
-  }, [currentNode]);
-
-  const handleContinue = useCallback(() => {
+  const handleContinue = () => {
     if (dialogueState === 'typing') {
-      skipTyping();
-      return;
+      clearInterval(typingIntervalRef.current!);
+      setDisplayedText(currentNode?.content || '');
+      setDialogueState((currentNode as any)?.choices ? 'choice' : 'complete');
+    } else if (dialogueState === 'complete' && (currentNode as any)?.nextNode) {
+      engine.goToNext();
     }
-    if (dialogueState === 'complete' && currentNode?.nextNode) {
-      setDialogueState('transition');
-      setTimeout(() => {
-        engine.goToNext();
-      }, 300);
-    }
-  }, [dialogueState, currentNode, engine, skipTyping]);
-
-  const handleChoice = useCallback(
-    (choice: StoryChoice) => {
-      engine.makeChoice(choice.id);
-    },
-    [engine]
-  );
-
-  const handleBack = useCallback(() => {
-    if (onBack) {
-      onBack();
-    }
-  }, [onBack]);
-
-  const handleSave = useCallback(() => {
-    setSaveSlots(engine.getSaveSlots());
-    setShowLoadModal(false);
-    setShowSaveModal(true);
-    setLastChoiceImpact('');
-    showToast('info', '请选择一个手动存档槽位。');
-  }, [engine, showToast]);
-
-  const handleLoad = useCallback(() => {
-    setSaveSlots(engine.getSaveSlots());
-    setShowSaveModal(false);
-    setShowLoadModal(true);
-    showToast('info', '请选择要读取的存档槽位。');
-  }, [engine, showToast]);
-
-  const onSave = useCallback(
-    (slot: SaveSlotType) => {
-      const success = engine.saveManual(slot);
-      if (!success) {
-        showToast('error', '该槽位不支持手动存档，请选择手动槽位。');
-        return;
-      }
-      setSaveSlots(engine.getSaveSlots());
-      setShowSaveModal(false);
-      showToast('success', `${getSlotLabel(slot)} 保存成功。`);
-    },
-    [engine, showToast]
-  );
-
-  const onLoad = useCallback(
-    (slot: SaveSlotType) => {
-      const success = engine.loadSlot(slot);
-      if (!success) {
-        showToast('error', '读取失败：槽位为空或数据损坏。');
-        return;
-      }
-      setSaveSlots(engine.getSaveSlots());
-      setShowLoadModal(false);
-      setLastChoiceImpact('');
-      showToast('success', `${getSlotLabel(slot)} 读取成功，已恢复进度。`);
-    },
-    [engine, showToast]
-  );
-
-  const onModalClose = useCallback(() => {
-    setShowSaveModal(false);
-    setShowLoadModal(false);
-  }, []);
-
-  const getReputation = (faction: string) => {
-    const rel = relationships[faction];
-    if (!rel) return 0;
-    return Math.max(0, Math.min(100, rel.affection + rel.trust + 50));
   };
-
-  const visibleFactions = useMemo(() => Object.keys(FACTION_NAMES).slice(0, 8), []);
-
-  const saveStatus = useMemo(() => {
-    const autosaveText = saveSlots.autosave.exists ? formatSaveTime(saveSlots.autosave.timestamp) : '暂无';
-    const manualOrder: SaveSlotType[] = ['manual_1', 'manual_2', 'manual_3'];
-    const latestManual = manualOrder
-      .map((slot) => ({ slot, info: saveSlots[slot] }))
-      .filter((item) => item.info.exists)
-      .sort((a, b) => (b.info.timestamp ?? 0) - (a.info.timestamp ?? 0))[0];
-
-    const manualText = latestManual
-      ? `${getSlotLabel(latestManual.slot)} ${formatSaveTime(latestManual.info.timestamp)}`
-      : '暂无';
-
-    return {
-      autosaveText,
-      manualText,
-    };
-  }, [saveSlots]);
 
   return (
     <div style={STORY_STYLES.container}>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
+      <div style={STORY_STYLES.paperOverlay} />
+      
+      {/* 顶部：史官案头 */}
       <div style={STORY_STYLES.topBar}>
-        <div style={STORY_STYLES.topLeft}>
-          <button
-            style={STORY_STYLES.backButton}
-            onClick={handleBack}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.borderColor = '#E85D04';
-              event.currentTarget.style.color = '#E85D04';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              event.currentTarget.style.color = '#D4C5A9';
-            }}
+        <div className="flex items-center gap-10">
+          <button 
+            onClick={onBack}
+            className="text-sm font-black uppercase tracking-widest text-[#1A1A1A]/40 hover:text-[#8D2F2F] transition-colors flex items-center gap-2"
           >
-            ← 返回
+            ← 归隐
           </button>
-          <span style={STORY_STYLES.chapterBadge}>{getChapterLabel(chapter)}</span>
-          <div style={STORY_STYLES.chapterProgressWrap}>
-            <div style={STORY_STYLES.chapterProgressTrack}>
-              <div
-                style={{
-                  ...STORY_STYLES.chapterProgressFill,
-                  width: `${Math.round(chapterProgress.ratio * 100)}%`,
-                }}
-              />
+          <div style={STORY_STYLES.chapterBadge}>
+            {chapter === 0 ? '序 · 入学' : `第 ${chapter} 章`}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <div className="h-1.5 w-48 bg-[#1A1A1A]/5 rounded-full overflow-hidden">
+               <div 
+                 className="h-full bg-[#D4AF65] transition-all duration-1000" 
+                 style={{ width: `${chapterProgress.ratio * 100}%` }} 
+               />
             </div>
-            <span style={STORY_STYLES.chapterProgressText}>
-              章节进度 {chapterProgress.visited}/{chapterProgress.total}
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/30">
+              Chronicle Progress: {chapterProgress.visited}/{chapterProgress.total}
             </span>
           </div>
         </div>
 
-        <div style={STORY_STYLES.topRightPanel}>
-          <div style={STORY_STYLES.saveStatusPanel}>
-            <span style={STORY_STYLES.saveStatusLine}>名望：{stats.fame}</span>
-            <span style={STORY_STYLES.saveStatusLine}>自动存档：{saveStatus.autosaveText}</span>
-            <span style={{ ...STORY_STYLES.saveStatusLine, ...STORY_STYLES.saveStatusMuted }}>
-              手动最近：{saveStatus.manualText}
-            </span>
+        <div className="flex items-center gap-8">
+          <div className="text-right">
+             <div className="text-xs font-black text-[#1A1A1A] tracking-widest">学子 · {stats.fame}名望</div>
+             <div className="text-[9px] font-black text-[#5C4033]/30 uppercase tracking-[0.3em] mt-1">Registry of Deeds</div>
           </div>
-
-          <button
-            style={STORY_STYLES.menuButton}
-            onClick={handleSave}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.borderColor = '#4CAF50';
-              event.currentTarget.style.color = '#4CAF50';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              event.currentTarget.style.color = '#D4C5A9';
-            }}
-          >
-            保存
-          </button>
-          <button
-            style={STORY_STYLES.menuButton}
-            onClick={handleLoad}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.borderColor = '#2196F3';
-              event.currentTarget.style.color = '#2196F3';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              event.currentTarget.style.color = '#D4C5A9';
-            }}
-          >
-            读取
-          </button>
-          <button
-            style={STORY_STYLES.menuButton}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.borderColor = '#E85D04';
-              event.currentTarget.style.color = '#E85D04';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              event.currentTarget.style.color = '#D4C5A9';
-            }}
-          >
-            设置
-          </button>
+          <div className="flex gap-3">
+            {['存', '取'].map((btn) => (
+              <button
+                key={btn}
+                onClick={btn === '存' ? () => setShowSaveModal(true) : () => setShowLoadModal(true)}
+                className="w-12 h-12 rounded-lg border-2 border-[#1A1A1A]/10 flex items-center justify-center font-black text-sm hover:border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all shadow-sm"
+              >
+                {btn}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div style={STORY_STYLES.centerArea} ref={textContainerRef} onClick={handleContinue}>
-        {(currentNode?.type === 'narration' || currentNode?.type === 'ending' || currentNode?.type === 'transition') && (
-          <div style={STORY_STYLES.sceneDescription}>
+      <div style={STORY_STYLES.centerArea} onClick={handleContinue}>
+        {/* 背景大插图插槽 */}
+        <div className="w-full h-80 rounded-[3rem] border-8 border-white bg-[#F2E8D5] shadow-xl mb-8 overflow-hidden relative group">
+           {(currentNode as any)?.image ? (
+             <img src={(currentNode as any).image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s]" />
+           ) : (
+             <div className="w-full h-full flex flex-col items-center justify-center text-[#1A1A1A]/10 italic">
+                <span className="text-6xl serif opacity-20">翰墨无声</span>
+                <span className="text-[10px] tracking-[0.4em] uppercase font-black mt-4">Scene Illustration Awaiting Scroll</span>
+             </div>
+           )}
+           <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/30 to-transparent" />
+        </div>
+
+        {/* 旁白或叙述 */}
+        {(currentNode?.type === 'narration' || currentNode?.type === 'ending') && (
+          <div className="animate-in fade-in slide-in-from-bottom-10 duration-1000" style={STORY_STYLES.sceneDescription}>
+            <div className="absolute top-4 right-8 opacity-[0.03] text-8xl font-black italic serif select-none">史</div>
             {displayedText}
-            {dialogueState === 'complete' && currentNode?.nextNode && (
-              <div style={STORY_STYLES.continueIndicator}>▶ 点击继续</div>
+            {dialogueState === 'complete' && (currentNode as any)?.nextNode && (
+              <div className="mt-8 text-[11px] font-black text-[#D4AF65] tracking-[0.4em] uppercase animate-pulse border-t border-[#D4AF65]/20 pt-4">
+                 ◀ 点击宣纸 续写华章
+              </div>
             )}
           </div>
         )}
 
+        {/* 对话区 */}
         {(currentNode?.type === 'dialogue' || currentNode?.type === 'choice') && (
-          <div style={STORY_STYLES.dialogueArea}>
-            <div
-              style={{
-                ...STORY_STYLES.portrait,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#8B7355',
-                fontSize: '14px',
-              }}
-            >
-              {currentNode.speaker ? (
-                <span style={{ writingMode: 'vertical-rl' as const }}>{currentNode.speaker}</span>
-              ) : (
-                '旁白'
-              )}
+          <div className="animate-in fade-in slide-in-from-left-10 duration-700" style={STORY_STYLES.dialogueArea}>
+            <div style={STORY_STYLES.portrait}>
+               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2A1A1A] to-transparent h-1/2" />
+               <div className="absolute bottom-6 left-6 text-white text-sm font-black whitespace-pre-wrap leading-tight" style={{ writingMode: 'vertical-rl' }}>
+                  {currentNode.speaker || '轶名'}
+               </div>
+               {(currentNode as any).speakerImage && <img src={(currentNode as any).speakerImage} className="w-full h-full object-cover" />}
             </div>
 
             <div style={STORY_STYLES.dialogueBox}>
-              {currentNode.speaker && <div style={STORY_STYLES.speakerName}>{currentNode.speaker}</div>}
+              {currentNode.speaker && (
+                <div style={STORY_STYLES.speakerName}>
+                  <div className="w-2 h-2 rounded-full bg-[#8D2F2F]" />
+                  {currentNode.speaker}
+                </div>
+              )}
               <div style={STORY_STYLES.dialogueText}>{displayedText}</div>
               {dialogueState === 'complete' && !currentNode.choices && (
-                <div style={STORY_STYLES.continueIndicator}>▶ 点击继续</div>
+                 <div className="mt-8 text-[11px] font-black text-[#3A5F41] tracking-[0.4em] uppercase opacity-40 animate-pulse">
+                    Continue to Record ->
+                 </div>
               )}
             </div>
           </div>
         )}
+      </div>
 
-        {dialogueState === 'choice' && currentNode?.choices && (
-          <div
-            style={{
-              ...STORY_STYLES.choicesArea,
-              marginTop: 'auto',
-              animation: 'fadeIn 0.3s ease',
-            }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            {lastChoiceImpact && <div style={STORY_STYLES.latestImpactPanel}>上一步影响：{lastChoiceImpact}</div>}
+      {/* 抉择区 */}
+      {dialogueState === 'choice' && currentNode?.choices && (
+        <div style={STORY_STYLES.choicesArea} onClick={(e) => e.stopPropagation()} className="animate-in slide-in-from-bottom duration-1000">
+          <div className="flex items-center gap-4 mb-10">
+             <div className="h-px flex-1 bg-[#1A1A1A]/5" />
+             <span className="text-[11px] font-black text-[#1A1A1A]/30 uppercase tracking-[0.6em]">百家之决 · THE CHOICE</span>
+             <div className="h-px flex-1 bg-[#1A1A1A]/5" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 max-w-7xl mx-auto">
             {availableChoices.map((choice, index) => (
               <button
                 key={choice.id}
                 style={{
                   ...STORY_STYLES.choiceButton,
-                  ...(isHoveredChoice === index ? STORY_STYLES.choiceButtonHover : {}),
+                  borderColor: isHoveredChoice === index ? V9_COLORS.jade : `${V9_COLORS.ink}10`,
+                  boxShadow: isHoveredChoice === index ? `20px 20px 60px ${V9_COLORS.jade}15` : 'none',
+                  transform: isHoveredChoice === index ? 'translateY(-8px) scale(1.02)' : 'none',
                 }}
-                onClick={() => handleChoice(choice)}
+                onClick={() => engine.makeChoice(choice.id)}
                 onMouseEnter={() => setIsHoveredChoice(index)}
                 onMouseLeave={() => setIsHoveredChoice(null)}
               >
-                <span
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: 'rgba(139,115,85,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '14px',
-                    flexShrink: 0,
+                <div 
+                  className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-black transition-all" 
+                  style={{ 
+                    borderColor: isHoveredChoice === index ? V9_COLORS.jade : `${V9_COLORS.ink}20`,
+                    color: isHoveredChoice === index ? 'white' : V9_COLORS.ink,
+                    backgroundColor: isHoveredChoice === index ? V9_COLORS.jade : 'transparent'
                   }}
                 >
                   {String.fromCharCode(65 + index)}
-                </span>
-                <span>{choice.text}</span>
-                <span style={STORY_STYLES.choiceImpactHint}>{summarizeChoiceEffects(choice)}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="text-xl serif font-black leading-tight">{choice.text}</div>
+                  <div className="mt-2 text-[10px] font-bold text-[#3A5F41]/40 tracking-wider uppercase">
+                    {(choice.effects as any)?.hint || 'Moulding the Future Paths'}
+                  </div>
+                </div>
               </button>
             ))}
-            {availableChoices.length === 0 && (
-              <div style={STORY_STYLES.latestImpactPanel}>
-                当前没有可执行选项。请回退上一节点，或读取其他存档尝试不同分支。
-              </div>
-            )}
           </div>
-        )}
-      </div>
 
-      <div style={STORY_STYLES.relationshipBar}>
-        {visibleFactions.map((faction) => (
-          <div key={faction} style={STORY_STYLES.factionBadge}>
-            <div style={STORY_STYLES.factionName}>{FACTION_NAMES[faction] || faction}</div>
-            <div style={STORY_STYLES.reputationBar}>
-              <div
-                style={{
-                  width: `${getReputation(faction)}%`,
-                  height: '100%',
-                  background: FACTION_COLORS[faction] || '#8B7355',
-                  borderRadius: '2px',
-                  transition: 'width 0.3s ease',
-                }}
-              />
+          {lastChoiceImpact && (
+            <div className="mt-10 text-center text-[10px] font-black text-[#8D2F2F] tracking-[0.4em] uppercase opacity-50 italic">
+               * 因果流转：{lastChoiceImpact}
             </div>
-          </div>
-        ))}
+          )}
+        </div>
+      )}
+
+      {/* 底部名望条 */}
+      <div style={STORY_STYLES.reputationStrip}>
+         <span className="text-[10px] font-black text-[#1A1A1A]/20 uppercase tracking-[0.5em] mr-10 whitespace-nowrap">Faction Reputations</span>
+         <div className="flex gap-8 overflow-x-auto scrollbar-hide py-4">
+            {Object.keys(FACTION_NAMES).map(f => (
+               <div key={f} className="flex flex-col gap-2 shrink-0">
+                  <div className="flex items-center justify-between gap-10">
+                     <span className="text-[10px] font-black text-[#1A1A1A]">{FACTION_NAMES[f]}</span>
+                     <span className="text-[8px] font-black text-[#D4AF65]">{engine.getRelationships()[f]?.trust || 0}</span>
+                  </div>
+                  <div className="w-24 h-1 bg-[#1A1A1A]/5 rounded-full overflow-hidden">
+                     <div className="h-full bg-[#1A1A1A]/20" style={{ width: `${(engine.getRelationships()[f]?.trust || 0) + 50}%` }} />
+                  </div>
+               </div>
+            ))}
+         </div>
       </div>
 
-      <SaveLoadModal
-        mode="save"
-        open={showSaveModal}
-        slots={saveSlots}
-        onSave={onSave}
-        onLoad={onLoad}
-        onClose={onModalClose}
-      />
+      {/* 存档/读档弹窗 */}
+      {(showSaveModal || showLoadModal) && (
+        <SaveLoadModal
+          open={true}
+          mode={showSaveModal ? 'save' : 'load'}
+          onClose={() => { setShowSaveModal(false); setShowLoadModal(false); }}
+        />
+      )}
 
-      <SaveLoadModal
-        mode="load"
-        open={showLoadModal}
-        slots={saveSlots}
-        onSave={onSave}
-        onLoad={onLoad}
-        onClose={onModalClose}
-      />
-
+      {/* 吐司提示 */}
       {saveToast && (
-        <div style={STORY_STYLES.toastWrap}>
-          <div style={{ ...STORY_STYLES.toast, ...getToastToneStyle(saveToast.tone) }}>{saveToast.text}</div>
+        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[99999] animate-in slide-in-from-bottom-4 duration-500">
+           <div className="px-10 py-5 rounded-2xl bg-[#1A1A1A] text-white shadow-2xl border-2 border-[#D4AF65]/30">
+              <span className="text-xs font-black tracking-widest uppercase">{saveToast.text}</span>
+           </div>
         </div>
       )}
     </div>
   );
 }
+
+export default StoryScreen;
