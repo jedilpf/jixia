@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260402-122",
+  "goal": "Execute phase-0 kickoff from metaverse plan by delivering Core Data Dictionary v1 and API Contract Draft v1 for identity, cloud save, social lobby, world event, and economy modules.",
+  "constraints": [
+    "Preserve existing gameplay and story runtime baseline; this task is documentation and contract design only.",
+    "Keep backward compatibility strategy explicit for existing /api/v1 routes.",
+    "Make ownership and implementation priority clear for Codex, Antigravity, and Trae."
+  ],
+  "deliverables": [
+    "Metaverse core data dictionary v1 document with entity schemas and relationships.",
+    "Metaverse API contract draft v1 with endpoint matrix, request/response contracts, and error code policy.",
+    "Migration and rollout notes that minimize codebase churn."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/project",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-122.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-122.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-122.json"
+  ],
+  "status": "in_progress"
+}

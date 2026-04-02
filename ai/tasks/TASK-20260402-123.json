@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260402-123",
+  "goal": "Implement a minimal runnable /api/v2 backend skeleton (identity + story save + progress) with compatibility-first behavior and smoke tests.",
+  "constraints": [
+    "Do not break existing /api/v1 routes or current gameplay runtime.",
+    "Reuse existing validation and storage logic where possible.",
+    "Keep implementation lightweight and incremental."
+  ],
+  "deliverables": [
+    "Mounted /api/v2 router with identity, story, and progress endpoints.",
+    "Compatibility-aware request/response shape for v2 routes.",
+    "Automated smoke tests for v2 base functionality."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "server",
+    "tests",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-123.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-123.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-123.json"
+  ],
+  "status": "in_progress"
+}

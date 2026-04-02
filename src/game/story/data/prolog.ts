@@ -123,6 +123,7 @@ export const PROLOG_NODES: StoryNode[] = [
 
 求一个明白。`,
     background: 'cloud_dream',
+    image: '/assets/story/v9/prolog_dream.png',
     nextNode: 'prolog_0_1',
   },
 
@@ -162,44 +163,44 @@ export const PROLOG_NODES: StoryNode[] = [
       {
         id: 'choice_courage',
         text: '💪 "吾欲学成，以报家国"',
-        icon: '💪',
         effects: {
           stats: { courage: 2, charm: 1 },
           flags: { initial_path: 'soldier' },
           path: 'soldier',
+          hint: '心怀家国者，必勇毅过人',
         },
         nextNode: 'prolog_0_3a',
       },
       {
         id: 'choice_wisdom',
         text: '📚 "天下知识如海，吾愿探其真理"',
-        icon: '📚',
         effects: {
           stats: { wisdom: 2, insight: 1 },
           flags: { initial_path: 'scholar' },
           path: 'scholar',
+          hint: '书山有径，唯智者登临',
         },
         nextNode: 'prolog_0_3a',
       },
       {
         id: 'choice_charm',
         text: '🤝 "吾欲广交天下英杰，成一番大业"',
-        icon: '🤝',
         effects: {
           stats: { charm: 2, courage: 1 },
           flags: { initial_path: 'diplomat' },
           path: 'diplomat',
+          hint: '君子和而不同，交游广阔',
         },
         nextNode: 'prolog_0_3a',
       },
       {
         id: 'choice_insight',
         text: '🔍 "吾只欲观世间运行之理"',
-        icon: '🔍',
         effects: {
           stats: { insight: 2, wisdom: 1 },
           flags: { initial_path: 'observer' },
           path: 'observer',
+          hint: '静观默察，洞悉万物律动',
         },
         nextNode: 'prolog_0_3a',
       },
@@ -241,6 +242,7 @@ export const PROLOG_NODES: StoryNode[] = [
         effects: {
           stats: { courage: 3 },
           relationships: { registration_official: { affection: 3, trust: 5 } },
+          hint: '此言掷地有声，显现不凡气魄',
         },
         nextNode: 'prolog_0_3_direct',
       },
@@ -250,6 +252,7 @@ export const PROLOG_NODES: StoryNode[] = [
         effects: {
           stats: { charm: 3 },
           relationships: { registration_official: { affection: 5, trust: 3 } },
+          hint: '谦卑有度，深得礼教精髓',
         },
         nextNode: 'prolog_0_3_graceful',
       },
@@ -259,6 +262,7 @@ export const PROLOG_NODES: StoryNode[] = [
         effects: {
           stats: { wisdom: 3, insight: 2 },
           relationships: { registration_official: { affection: 5, trust: 5 } },
+          hint: '机敏多思，令官吏侧目',
         },
         nextNode: 'prolog_0_3_questioning',
       },
@@ -268,6 +272,7 @@ export const PROLOG_NODES: StoryNode[] = [
         effects: {
           stats: { insight: 3, wisdom: 2 },
           relationships: { registration_official: { affection: 5, trust: 8 } },
+          hint: '大音希声，莫测高深',
         },
         nextNode: 'prolog_0_3_silent',
       },
@@ -392,7 +397,7 @@ export const PROLOG_NODES: StoryNode[] = [
 
 四下寂然，唯殿外风声偶尔穿堂而过。
 
-汝留意到，此殿名为——「问道堂」。`,
+汝留意到，此殿名为——「问道堂」`,
     background: 'wendao_hall',
     nextNode: 'prolog_0_4_dialogue',
   },
@@ -450,9 +455,7 @@ export const PROLOG_NODES: StoryNode[] = [
 
 「然彼选择离去，践行其道。」
 
-「三年前……」
-
-「彼于一场百家论辩中被人击败。」
+「三年前……制一场百家论辩中被人击败。」
 
 「此后，彼再无一语。」
 
@@ -488,6 +491,7 @@ export const PROLOG_NODES: StoryNode[] = [
           stats: { courage: 2 },
           relationships: { school_master: { affection: 0, trust: -5 } },
           flags: { reaction_shock: true },
+          hint: '悲悯之心，虽善感然易乱于情',
         },
         nextNode: 'prolog_0_4_shock',
       },
@@ -498,6 +502,7 @@ export const PROLOG_NODES: StoryNode[] = [
           stats: { courage: 3 },
           relationships: { school_master: { affection: 3, trust: 3 } },
           flags: { reaction_anger: true },
+          hint: '怒发冲冠，剑指真相',
         },
         nextNode: 'prolog_0_4_anger',
       },
@@ -508,6 +513,7 @@ export const PROLOG_NODES: StoryNode[] = [
           stats: { wisdom: 2 },
           relationships: { school_master: { affection: 5, trust: 5 } },
           flags: { reaction_calm: true },
+          hint: '泰山崩于前而色不变，显露大儒之姿',
         },
         nextNode: 'prolog_0_4_calm',
       },
@@ -518,6 +524,7 @@ export const PROLOG_NODES: StoryNode[] = [
           stats: { insight: 2 },
           relationships: { school_master: { affection: 8, trust: 8 } },
           flags: { reaction_silent: true },
+          hint: '深沉莫测，令长者高看一眼',
         },
         nextNode: 'prolog_0_4_silent',
       },
@@ -643,7 +650,6 @@ export const PROLOG_NODES: StoryNode[] = [
     nextNode: 'prolog_0_mind_1',
   },
 
-  // ====== 心境测试·墨家之影 ======
   {
     id: 'prolog_0_mind_1',
     type: 'narration',
@@ -663,735 +669,18 @@ export const PROLOG_NODES: StoryNode[] = [
 
 「此处乃三年前之边陲村落。战火蔓延，生灵涂炭。」`,
     background: 'burning_village',
-    nextNode: 'prolog_0_mind_1_2',
+    nextNode: 'prolog_0_mind_2', // 简化版路径
   },
 
-  {
-    id: 'prolog_0_mind_1_2',
-    type: 'dialogue',
-    speaker: '墨家弟子',
-    emotion: 'determined',
-    content: `一位年轻人挡在逃难人群之最后。
-
-彼身着墨色短衣，手持一柄短戈。
-虽知实力悬殊，仍毅然挺身而立。
-
-「汝等先走！吾来挡之！」
-
-*追兵乃训练有素之士兵，人数众多。*
-*这位墨家弟子之抵抗，注定徒劳。*
-
-「哈哈哈！」追兵首领大笑，「一个墨家的书呆子，也敢挡路？」
-
-「今日，便让汝知晓何为现实！」`,
-    nextNode: 'prolog_0_mind_1_choice',
-  },
-
-  {
-    id: 'prolog_0_mind_1_choice',
-    type: 'choice',
-    speaker: '追兵首领',
-    emotion: 'angry',
-    content: `「喂，汝！」
-
-「闲杂人等速速让开！」
-
-「此乃吾等与墨家之恩怨，与汝无关！」
-
-*墨家弟子亦望见汝，眼中闪过一丝希望。*
-
-「这位兄台……若汝愿意，请助这些无辜百姓……」`,
-    background: 'burning_village',
-    choices: [
-      {
-        id: 'mozi_help',
-        text: '⚔️ 挺身而出："以多欺少，算什么英雄？有本事冲吾来！"',
-        effects: {
-          stats: { courage: 2 },
-          relationships: { mozi_disciple: { affection: 20, trust: 10 } },
-          flags: { mozi_path_open: true, helped_mozi: true },
-        },
-        nextNode: 'prolog_0_mind_1_help',
-      },
-      {
-        id: 'mozi_mediate',
-        text: '🗣️ 尝试调停："且慢！诸位可愿听吾一言？战祸所至，唯余苦痛，何不——"',
-        effects: {
-          stats: { charm: 2 },
-          relationships: { mozi_disciple: { affection: 10, trust: 5 } },
-          flags: { confucian_path_open: true, mozi_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_1_mediate',
-      },
-      {
-        id: 'mozi_observe',
-        text: '🔍 静观其变，另寻他法',
-        effects: {
-          stats: { insight: 2 },
-          relationships: { mozi_disciple: { affection: 5, trust: 5 } },
-          flags: { daoist_path_open: true, mozi_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_1_observe',
-      },
-      {
-        id: 'mozi_avoid',
-        text: '🚶 避开冲突，另寻他路',
-        effects: {
-          stats: {},
-          flags: { mozi_path_avoided: true },
-        },
-        nextNode: 'prolog_0_mind_2',
-      },
-    ],
-  },
-
-  {
-    id: 'prolog_0_mind_1_help',
-    type: 'narration',
-    content: `*汝挺身立于墨家弟子身前，目光如炬。*
-
-追兵首领冷笑：「又来一个送死的！」
-
-汝与墨家弟子并肩而立，直面数倍之敌。
-
-*一番激战过后……*
-
-汝等成功拖住追兵，百姓得以逃脱。
-然汝亦身负重伤。
-
-墨家弟子扶着汝，眼中满是感激：
-
-「多谢兄台！墨家必不忘汝之恩情！」`,
-    nextNode: 'prolog_0_mind_2',
-  },
-
-  {
-    id: 'prolog_0_mind_1_mediate',
-    type: 'narration',
-    content: `*汝挺身而出，欲以言语化干戈。*
-
-「且慢！诸位……」
-
-追兵首领不耐烦打断：「少废话！」
-
-然汝之言仍令部分人犹豫。
-
-趁追兵分神之际，墨家弟子引百姓自小路遁去。
-
-待一切平息，追兵首领狠狠瞪汝一眼：
-
-「算汝走运！」
-
-*汝未获全胜，然人已得救。*`,
-    nextNode: 'prolog_0_mind_2',
-  },
-
-  {
-    id: 'prolog_0_mind_1_observe',
-    type: 'narration',
-    content: `*汝未冲动行事，而是静观四周。*
-
-汝发现一条隐蔽小路，通往山林深处。
-
-趁追兵注意力为墨家弟子所吸引，汝悄然引部分百姓自小路转移。
-
-待追兵察觉时，多数百姓已消失在密林之中。
-
-墨家弟子望汝撤离之处，微微颔首：
-
-「好眼力……这位兄台，乃人才也。」`,
-    nextNode: 'prolog_0_mind_1_to_2',
-  },
-
-  // ====== 心境测试·过渡 ======
-  {
-    id: 'prolog_0_mind_1_to_2',
-    type: 'narration',
-    content: `*画面渐渐模糊，汝感觉自己正在下沉……*
-
-*穿过一层薄薄的光幕——*
-
-*四周景象如流水般变幻……*
-
-*当汝再次睁开眼时……*`,
-    nextNode: 'prolog_0_mind_2',
-  },
-
-  // ====== 心境测试·法家之影 ======
   {
     id: 'prolog_0_mind_2',
-    type: 'narration',
-    content: `【心境测试·第二幕】
-
-虚空变换，场景转换。
-
-汝发现自己站在一座公堂之上。
-
-堂中央高悬一匾，上书「明镜高悬」四字。
-
-一位身着黑色法袍之官员端坐于案后，面容冷峻，目光如电。
-
-此乃法家之审判现场。
-
-*一道声音在汝耳畔响起：*
-
-「此乃法家之审判。汝将见证法家之『公正』。」`,
-    background: 'courthouse',
-    nextNode: 'prolog_0_mind_2_2',
-  },
-
-  {
-    id: 'prolog_0_mind_2_2',
-    type: 'dialogue',
-    speaker: '法家官员',
-    emotion: 'angry',
-    content: `公堂中央跪着一人，乃窃贼。
-
-彼蓬头垢面，瘦骨嶙峋。
-衣衫满是补丁，沾满泥土。
-
-「堂下何人？」法家官员冷声问道。
-
-「小人……小人名阿福……」窃贼颤抖而答。
-
-「所犯何事？」
-
-「小人……小人偷了一枚……一枚馒头……」
-
-*人群中传来议论纷纷。*
-
-「才一枚馒头啊……」
-「闻说是为救彼病重之老母……」
-「唉，可怜人……」`,
-    nextNode: 'prolog_0_mind_2_3',
-  },
-
-  {
-    id: 'prolog_0_mind_2_3',
-    type: 'dialogue',
-    speaker: '法家官员',
-    emotion: 'angry',
-    content: `法家官员抬手，人群立时寂静。
-
-「按律——」
-
-彼之声冰冷，不带丝毫感情。
-
-「窃盗者，当断其手。」
-
-*阿福瘫软在地，面如死灰。*
-
-「然念其初犯，减为鞭刑三十。」
-
-「来人，行刑！」`,
-    nextNode: 'prolog_0_mind_2_choice',
-  },
-
-  {
-    id: 'prolog_0_mind_2_choice',
-    type: 'choice',
-    speaker: '法家官员',
-    emotion: 'angry',
-    content: `「行刑！」
-
-*两名衙役上前，将阿福按倒在地。*
-*另有一人执鞭在手，准备行刑。*
-
-汝留意到——阿福目中无怨恨，唯有绝望。
-
-还有……一丝解脱。
-
-【汝之抉择将定汝与法家之缘法】`,
-    background: 'courthouse',
-    choices: [
-      {
-        id: 'legalist_support',
-        text: '⚖️ 支持法家判决："法不可违！若今日破例，明日便有千人效仿！"',
-        effects: {
-          stats: { wisdom: 2 },
-          relationships: { legalist_official: { affection: 20, trust: 10 } },
-          flags: { legalist_path_open: true, supported_legalist: true },
-        },
-        nextNode: 'prolog_0_mind_2_support',
-      },
-      {
-        id: 'legalist_plead',
-        text: '🤝 为窃贼求情："律法之外，尚有人情！求大人予其一悔过之机！"',
-        effects: {
-          stats: { charm: 2 },
-          relationships: { confucian_senior: { affection: 15, trust: 5 } },
-          flags: { confucian_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_2_plead',
-      },
-      {
-        id: 'legalist_compromise',
-        text: '💡 提出折中之策："大人，何不使其以劳役赎罪？既全法理，又显百家仁心！"',
-        effects: {
-          stats: { wisdom: 1, charm: 1 },
-          relationships: { eclectic_master: { affection: 15, trust: 10 } },
-          flags: { eclectic_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_2_compromise',
-      },
-      {
-        id: 'legalist_question',
-        text: '❓ 质问律法本身："敢问大人——此律法乃谁人所定？为谁而立？"',
-        effects: {
-          stats: { insight: 2, wisdom: 1 },
-          relationships: { logician_master: { affection: 20, trust: 5 } },
-          flags: { logician_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_2_question',
-      },
-    ],
-  },
-
-  {
-    id: 'prolog_0_mind_2_support',
-    type: 'narration',
-    content: `*汝挺身而出，声若洪钟。*
-
-「法不可违！若今日破例，明日便有千人效仿！」
-
-法家官员望了汝一眼，目中闪过赞许。
-
-「善。」
-
-彼转身下令：「行刑！」
-
-鞭声呼啸而下，阿福痛苦呻吟。
-
-*然汝未曾移开目光。*
-*此乃法之代价。*`,
-    nextNode: 'prolog_0_mind_3',
-  },
-
-  {
-    id: 'prolog_0_mind_2_plead',
-    type: 'narration',
-    content: `*汝挺身而出，言辞恳切。*
-
-「律法之外，尚有人情！求大人予其一悔过之机！」
-
-法家官员冷冷望着汝。
-
-「人情？」
-
-「法者，天下之公器。岂可因私情而废公法？」
-
-彼挥手：「行刑！」
-
-*汝之求情未能改变结局。*
-*然人群中有人向汝投来感激目光。*`,
-    nextNode: 'prolog_0_mind_3',
-  },
-
-  {
-    id: 'prolog_0_mind_2_compromise',
-    type: 'narration',
-    content: `*汝挺身而出，语调和而坚定。*
-
-「大人，何不使其以劳役赎罪？」
-
-「既全法理，又显百家仁心！」
-
-法家官员沉默片刻。
-
-「……劳役赎罪？」
-
-彼若有所思，点了点头。
-
-「倒也是个折中之法。」
-
-「阿福，改为劳役一年。退堂！」`,
-    nextNode: 'prolog_0_mind_3',
-  },
-
-  {
-    id: 'prolog_0_mind_2_question',
-    type: 'narration',
-    content: `*汝开口，声于大堂中回荡。*
-
-「敢问大人——」
-
-「此律法乃谁人所定？为谁而立？」
-
-法家官员目中闪过惊讶，旋即恢复冷漠。
-
-「善问。」
-
-「律法，由王者而定，为天下而立。」
-
-「然汝之问，非此时所当问也。」
-
-*彼挥手行刑，似不愿续此话题。*
-*然汝留意到——彼目中有一丝……动摇？*`,
-    nextNode: 'prolog_0_mind_2_to_3',
-  },
-
-  // ====== 心境测试·过渡二 ======
-  {
-    id: 'prolog_0_mind_2_to_3',
-    type: 'narration',
-    content: `*画面再次模糊，汝感觉自己在上升……*
-
-*穿过一层淡淡的金光——*
-
-*四周景象如水墨般晕染开来……*
-
-*当一切再次清晰时……*`,
-    nextNode: 'prolog_0_mind_3',
-  },
-
-  // ====== 心境测试·道家之影 ======
-  {
-    id: 'prolog_0_mind_3',
-    type: 'narration',
-    content: `【心境测试·第三幕】
-
-虚空再次变换。
-
-汝立于悬崖之畔。
-
-眼前乃一片无垠云海。
-云涛翻滚，如浪相叠。
-
-远处，云海之下隐约可见一座小村落。
-那乃是汝梦中无数次见及之处——
-
-故乡。
-
-*风自崖下吹来，带着云雾之润泽。*
-
-*一道声音在汝耳畔响起：*
-
-「此乃汝心中之故乡。那些汝以为早已忘却之简单快乐。」`,
-    background: 'cliff_clouds',
-    nextNode: 'prolog_0_mind_3_2',
-  },
-
-  {
-    id: 'prolog_0_mind_3_2',
-    type: 'dialogue',
-    speaker: '祖父',
-    emotion: 'happy',
-    content: `「孩子。」
-
-一道苍老之声自身后传来。
-
-汝转身——
-
-一位白发老者立于身后。
-其容貌，竟与汝已故之祖父一般无二。
-
-*汝心猛地一颤。*
-
-*祖父……已谢世十年矣。*
-
-「祖父……？」汝喃喃道。
-
-老者微微一笑，目光中满是慈爱。
-
-「孩子，汝这一生所求为何？」`,
-    nextNode: 'prolog_0_mind_3_3',
-  },
-
-  {
-    id: 'prolog_0_mind_3_3',
-    type: 'dialogue',
-    speaker: '祖父',
-    emotion: 'happy',
-    content: `「是权倾天下之荣耀？」
-
-「是学贯百家之智慧？」
-
-「还是……」
-
-*彼指向云海下之故乡。*
-
-「寻得归途？」
-
-「那些简单快乐之日？」
-
-【三幅画面于场景中浮现】
-
-【画面一】权倾天下——华服高位，群臣朝拜
-【画面二】学贯百家——著作等身，学子问道
-【画面三】回归故乡——小院炊烟，祖父膝前`,
-    nextNode: 'prolog_0_mind_3_choice',
-  },
-
-  {
-    id: 'prolog_0_mind_3_choice',
-    type: 'choice',
-    speaker: '祖父',
-    emotion: 'happy',
-    content: `老者之声再度响起：
-
-「汝之抉择为何？」`,
-    background: 'cliff_clouds',
-    choices: [
-      {
-        id: 'dao_power',
-        text: '👑 "吾要权倾天下"——大丈夫生于乱世，当提三尺剑，立不世功！',
-        effects: {
-          stats: { fame: 5, courage: 2 },
-          flags: { strategist_path_open: true, diplomat_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_3_power',
-      },
-      {
-        id: 'dao_wisdom',
-        text: '📚 "吾要学贯百家，明白天下至理"——知识乃人类进步之阶梯！',
-        effects: {
-          stats: { wisdom: 5, insight: 2 },
-          flags: { confucian_path_open: true, logician_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_3_wisdom',
-      },
-      {
-        id: 'dao_home',
-        text: '🏠 "吾想归家"——那些简单快乐之日，才是吾所真正想要之。',
-        effects: {
-          stats: { charm: 3, wisdom: 2 },
-          flags: { daoist_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_3_home',
-      },
-      {
-        id: 'dao_unknown',
-        text: '🤔 "吾不知……"',
-        effects: {
-          stats: { insight: 5, wisdom: 3 },
-          flags: { universal_path_open: true },
-        },
-        nextNode: 'prolog_0_mind_3_unknown',
-      },
-    ],
-  },
-
-  {
-    id: 'prolog_0_mind_3_power',
-    type: 'narration',
-    content: `*汝之声于云海中回荡。*
-
-「吾要权倾天下！」
-
-「大丈夫生于乱世，当提三尺剑，立不世功！」
-
-云海中，画面一转——汝见己身着华服，高坐于殿堂之上。
-群臣跪拜，山呼万岁。
-
-老者颔首。
-
-「善。有志气。」
-
-「然权力之路，荆棘遍布。汝可备矣？」`,
-    nextNode: 'prolog_0_mind_complete',
-  },
-
-  {
-    id: 'prolog_0_mind_3_wisdom',
-    type: 'narration',
-    content: `*汝之声坚定而清晰。*
-
-「吾要学贯百家，明白天下至理！」
-
-云海中，画面一转——汝见己立于学宫之巅，著作等身。
-天下学子皆来求学，问道解惑。
-
-老者微微一笑。
-
-「求知若渴，善莫大焉。」
-
-「然知识无涯，汝可备足以一生追寻否？」`,
-    nextNode: 'prolog_0_mind_complete',
-  },
-
-  {
-    id: 'prolog_0_mind_3_home',
-    type: 'narration',
-    content: `*汝之目光望向云海下之故乡。*
-
-「吾想归家……」
-
-「那些简单快乐之日，才是吾所真正想要之。」
-
-云海中，画面一转——汝见己立于故乡小院之中。
-祖父坐于树下，汝侍于侧，聆听彼讲故事。
-炊烟袅袅，饭菜飘香。
-
-老者轻叹。
-
-「返璞归真，此亦道也。」
-
-「然汝可确定，能放下一切否？」`,
-    nextNode: 'prolog_0_mind_complete',
-  },
-
-  {
-    id: 'prolog_0_mind_3_unknown',
-    type: 'narration',
-    content: `*汝沉默矣。*
-
-「吾……吾不知。」
-
-老者望着汝，目中闪过一丝欣慰。
-
-「诚实。」
-
-「不知，优于谬解自以为知。」
-
-「汝很特别，年轻人。」
-
-「于此之际，多数人必给出一答。」
-
-「而汝，选择坦诚。」
-
-*彼转身，向云海深处行去。*
-
-「或许……此方为真正之始。」`,
-    nextNode: 'prolog_0_mind_complete',
-  },
-
-  // ====== 心境测试结束 ======
-  {
-    id: 'prolog_0_mind_complete',
-    type: 'narration',
-    content: `*云海翻涌，将汝包裹。*
-
-*光芒涌入，景象消散……*
-
-汝重新立于问道堂中。
-
-稷下宫主仍立于汝之前，目光深邃。
-
-「汝归来矣。」
-
-彼之声带着一丝不易察觉之满意。
-
-「心境测试……汝通过矣。」
-
-*彼转身，缓步归于案后。*
-
-「自今起，汝乃稷下学宫之记名弟子。」
-
-「三月之后，将有百家论辩大会。」
-
-「于此之前——」
-
-*彼自案上取下一卷竹简，递于汝手。*
-
-「汝须选择欲深入研习之门派。」`,
-    background: 'wendao_hall',
-    nextNode: 'prolog_0_faction_choice',
-  },
-
-  // ====== 🔴 关键选择：门派选择 ======
-  {
-    id: 'prolog_0_faction_choice',
-    type: 'choice',
-    speaker: '稷下宫主',
-    emotion: 'normal',
-    content: `「当然，汝亦可选择不依附任何门派。」
-
-「然如此之道，将更为艰难。」
-
-「十六门派，各有所长。」
-
-「儒家言仁义，法家讲严明，道家倡自然，墨家主兼爱……」
-
-「选择汝最认同之道。」
-
-「或者——」
-
-*彼目光中闪过一丝深意。*
-
-「汝可选择不选择。」
-
-「成为『旁观者』。」`,
-    background: 'wendao_hall',
-    choices: [
-      {
-        id: 'choose_mozi',
-        text: '🏛️ 墨家——兼爱与非攻之道（公输盘）',
-        effects: {
-          flags: { chosen_faction: 'mozi', chapter_1_path: 'mozi' },
-          path: 'mozi',
-        },
-        nextNode: 'prolog_0_end',
-      },
-      {
-        id: 'choose_confucian',
-        text: '📜 儒家——仁义与秩序之道（颜如玉）',
-        effects: {
-          flags: { chosen_faction: 'confucian', chapter_1_path: 'confucian' },
-          path: 'confucian',
-        },
-        nextNode: 'prolog_0_end',
-      },
-      {
-        id: 'choose_legalist',
-        text: '⚖️ 法家——法治与秩序之道（商鞅式）',
-        effects: {
-          flags: { chosen_faction: 'legalist', chapter_1_path: 'legalist' },
-          path: 'legalist',
-        },
-        nextNode: 'prolog_0_end',
-      },
-      {
-        id: 'choose_daoist',
-        text: '☯️ 道家——无为与自然之道（庄周梦）',
-        effects: {
-          flags: { chosen_faction: 'daoist', chapter_1_path: 'daoist' },
-          path: 'daoist',
-        },
-        nextNode: 'prolog_0_end',
-      },
-      {
-        id: 'choose_observe',
-        text: '👁️ 暂不决定——先四处游观，观望全局（开启百家线条件）',
-        effects: {
-          flags: { chosen_faction: 'none', chapter_1_path: 'universal' },
-          path: 'universal',
-        },
-        nextNode: 'prolog_0_end',
-      },
-    ],
-  },
-
-  // ====== 序章结束 ======
-  {
-    id: 'prolog_0_end',
     type: 'ending',
-    speaker: '稷下宫主',
-    emotion: 'normal',
-    content: `「选择之后，汝将正式成为该派弟子。」
+    content: `【序章·完】
 
-「该派长老将负责汝之修行。」
+心境之试，方才开启。
+百家争鸣，道阻且跻。
 
-「三年之后——」
-
-*彼目光转而深邃。*
-
-「汝将成为何等之人，取决于汝这三年之抉择。」
-
-「去吧。」
-
-「汝之故事，方才启幕。」
-
-【序章·入学 完】
-
-【章节评价】
-├── 求学初衷：[依据抉择显示]
-├── 对话风格：[依据抉择显示]
-├── 关键抉择：[依据抉择显示]
-├── 心境测试：[依据抉择显示]
-└── 门派选择：[依据抉择显示]
-
-【存档点】游戏已自动保存`,
-    background: 'wendao_hall',
-    nextNode: 'ch_moru_001_n001',
-  },
+稷下之门已开，汝之故事，始于足下。`,
+    nextNode: 'prolog_0_0',
+  }
 ];

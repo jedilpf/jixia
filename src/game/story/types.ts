@@ -7,6 +7,7 @@ export type ChoiceImpact = {
   flags?: Record<string, boolean | number | string>;
   relationships?: Partial<Record<string, { affection?: number; trust?: number }>>;
   path?: string;
+  hint?: string;
 };
 
 export interface RelationshipChange {
@@ -58,6 +59,8 @@ export interface StoryNode {
   emotion?: CharacterEmotion;
   content: string;
   background?: string;
+  image?: string;
+  speakerImage?: string;
   music?: string;
   choices?: StoryChoice[];
   effects?: ChoiceImpact;
