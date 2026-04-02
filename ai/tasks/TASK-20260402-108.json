@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260402-108",
+  "goal": "Run a windowed local playtest by automated in-browser operations and record objective results for three baseline matches.",
+  "constraints": [
+    "Do not modify gameplay or story source code in this task.",
+    "Only update playtest records with factual observed outcomes.",
+    "If a match cannot complete, record the blocker explicitly instead of fabricating data."
+  ],
+  "deliverables": [
+    "Three-match playtest run data captured from local web runtime.",
+    "Updated playtests/2026-04-02-session-01.md with per-match outcomes and issue levels."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-108.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-108.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-108.json"
+  ],
+  "status": "in_progress"
+}
