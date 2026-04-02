@@ -3,15 +3,17 @@ const { DEFAULT_DATA_DIR, DEFAULT_HOST, DEFAULT_PORT } = require('./constants.cj
 const { createInMemoryMatchStore } = require('./store/match-store.cjs');
 const { createStorySaveStore } = require('./store/story-save-store.cjs');
 const { createPlayerProgressStore } = require('./store/player-progress-store.cjs');
+const { createInMemoryIdentityStore } = require('./store/identity-store.cjs');
 const { createApp } = require('./app.cjs');
 const { attachSocketServer } = require('./socket/index.cjs');
 
 function startServer() {
   const port = DEFAULT_PORT;
   const matchStore = createInMemoryMatchStore();
+  const identityStore = createInMemoryIdentityStore();
   const storySaveStore = createStorySaveStore({ dataDir: DEFAULT_DATA_DIR });
   const progressStore = createPlayerProgressStore({ dataDir: DEFAULT_DATA_DIR });
-  const { app, origins } = createApp({ matchStore, storySaveStore, progressStore });
+  const { app, origins } = createApp({ matchStore, identityStore, storySaveStore, progressStore });
   const httpServer = http.createServer(app);
   const socket = attachSocketServer(httpServer, {
     matchStore,

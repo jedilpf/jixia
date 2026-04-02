@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260402-124",
+  "goal": "Harden /api/v2 write semantics by implementing if_revision conflict checks and idempotency_key replay protection for story saves and progress updates, with dedicated contract tests.",
+  "constraints": [
+    "Keep /api/v1 behavior unchanged.",
+    "Maintain compatibility-first response shape for /api/v2.",
+    "Use lightweight in-memory tracking for this phase without heavy new dependencies."
+  ],
+  "deliverables": [
+    "if_revision conflict validation in v2 story and v2 progress write endpoints.",
+    "idempotency replay and conflict handling in v2 story and v2 progress write endpoints.",
+    "Automated test coverage for success replay and conflict cases."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "server",
+    "tests",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-124.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-124.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-124.json"
+  ],
+  "status": "in_progress"
+}

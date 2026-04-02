@@ -7,11 +7,13 @@ const { createHealthRouter } = require('./routes/health.cjs');
 const { createMatchesRouter } = require('./routes/matches.cjs');
 const { createStoryRouter } = require('./routes/story.cjs');
 const { createProgressRouter } = require('./routes/progress.cjs');
+const { createV2Router } = require('./routes/v2/index.cjs');
 
-function createApp({ matchStore, storySaveStore, progressStore }) {
+function createApp({ matchStore, storySaveStore, progressStore, identityStore }) {
   const app = express();
   const origins = parseOrigins(process.env.CLIENT_ORIGIN);
   const getBackendStats = () => ({
+    identity: identityStore?.getStats ? identityStore.getStats() : null,
     story: storySaveStore?.getStats ? storySaveStore.getStats() : null,
     progress: progressStore?.getStats ? progressStore.getStats() : null,
   });
@@ -39,6 +41,7 @@ function createApp({ matchStore, storySaveStore, progressStore }) {
   if (progressStore) {
     app.use('/api/v1/progress', createProgressRouter({ progressStore }));
   }
+  app.use('/api/v2', createV2Router({ identityStore, storySaveStore, progressStore }));
 
   app.use(notFoundHandler);
   app.use(errorHandler);
