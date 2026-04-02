@@ -12,6 +12,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/**/*.test.cjs\"",
     "validate:structure": "node scripts/pipeline/validate-structure.cjs",
     "validate:refs": "node scripts/pipeline/validate-references.cjs",
     "validate:terms": "node scripts/pipeline/validate-terminology.cjs",
@@ -65,6 +66,9 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "wait-on": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=20.10.0"
   },
   "build": {
     "appId": "com.mutianxia.game",

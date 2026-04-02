@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
 import { SaveLoadModal } from '@/ui/components/SaveLoadModal';
 import type { SaveSlotType, SaveSlotInfo } from '@/game/story/StoryEngine';
@@ -14,14 +14,21 @@ const STORY_STYLES = {
     position: 'relative' as const,
   },
   topBar: {
-    height: '64px',
-    padding: '0 24px',
+    minHeight: '72px',
+    padding: '10px 24px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottom: '1px solid rgba(139,115,85,0.3)',
     background: 'rgba(15,15,26,0.95)',
     zIndex: 10,
+    gap: '14px',
+  },
+  topLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    minWidth: 0,
   },
   chapterBadge: {
     padding: '6px 16px',
@@ -31,6 +38,7 @@ const STORY_STYLES = {
     color: '#D4A017',
     fontSize: '14px',
     fontWeight: 600,
+    whiteSpace: 'nowrap' as const,
   },
   chapterProgressWrap: {
     display: 'flex',
@@ -54,6 +62,26 @@ const STORY_STYLES = {
     color: '#D4C5A9',
     fontSize: '12px',
     opacity: 0.9,
+  },
+  topRightPanel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  saveStatusPanel: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+    minWidth: '240px',
+    textAlign: 'right' as const,
+  },
+  saveStatusLine: {
+    color: '#D4C5A9',
+    fontSize: '12px',
+    lineHeight: 1.25,
+  },
+  saveStatusMuted: {
+    opacity: 0.8,
   },
   centerArea: {
     flex: 1,
@@ -204,6 +232,27 @@ const STORY_STYLES = {
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
+    whiteSpace: 'nowrap' as const,
+  },
+  toastWrap: {
+    position: 'fixed' as const,
+    left: '50%',
+    bottom: '88px',
+    transform: 'translateX(-50%)',
+    zIndex: 100000,
+    pointerEvents: 'none' as const,
+  },
+  toast: {
+    minWidth: '260px',
+    maxWidth: '80vw',
+    borderRadius: '10px',
+    border: '1px solid rgba(139,115,85,0.6)',
+    padding: '10px 14px',
+    boxShadow: '0 10px 28px rgba(0,0,0,0.4)',
+    color: '#f0ddbb',
+    background: 'rgba(24,24,42,0.92)',
+    fontSize: '13px',
+    lineHeight: 1.4,
   },
 };
 
@@ -246,6 +295,7 @@ const FACTION_NAMES: Record<string, string> = {
 };
 
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
+type SaveToastTone = 'success' | 'error' | 'info';
 
 interface StoryScreenProps {
   onBack?: () => void;
@@ -265,7 +315,6 @@ function formatDelta(delta: number): string {
 
 function summarizeEffects(effects: StoryChoice['effects']): string {
   const parts: string[] = [];
-
   if (effects.stats) {
     for (const [stat, delta] of Object.entries(effects.stats)) {
       if (typeof delta !== 'number' || delta === 0) continue;
@@ -287,15 +336,15 @@ function summarizeEffects(effects: StoryChoice['effects']): string {
   }
 
   if (effects.path) {
-    parts.push(`路线→${effects.path}`);
+    parts.push(`路线 -> ${effects.path}`);
   }
 
   if (effects.flags) {
-    const importantFlags = Object.entries(effects.flags)
+    const keyFlags = Object.entries(effects.flags)
       .filter(([, value]) => value === true)
       .slice(0, 2)
       .map(([flag]) => `标记:${flag}`);
-    parts.push(...importantFlags);
+    parts.push(...keyFlags);
   }
 
   return parts.slice(0, 4).join(' · ');
@@ -303,6 +352,51 @@ function summarizeEffects(effects: StoryChoice['effects']): string {
 
 function summarizeChoiceEffects(choice: StoryChoice): string {
   return summarizeEffects(choice.effects);
+}
+
+function formatSaveTime(ts?: number): string {
+  if (!ts) return '暂无';
+  const date = new Date(ts);
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  return `${mm}-${dd} ${hh}:${min}`;
+}
+
+function getSlotLabel(slot: SaveSlotType): string {
+  if (slot === 'autosave') return '自动存档';
+  if (slot === 'manual_1') return '手动存档 1';
+  if (slot === 'manual_2') return '手动存档 2';
+  return '手动存档 3';
+}
+
+function getChapterLabel(chapter: number): string {
+  if (chapter === 0) return '序章 · 入学';
+  if (chapter === 1) return '第一章 · 百家入门';
+  if (chapter === 2) return '第二章 · 论辩风云';
+  if (chapter === 3) return '第三章 · 暗流涌动';
+  if (chapter === 99) return '终章 · 问道';
+  return `第 ${chapter} 章`;
+}
+
+function getToastToneStyle(tone: SaveToastTone): { border: string; background: string } {
+  if (tone === 'success') {
+    return {
+      border: '1px solid rgba(90,180,120,0.55)',
+      background: 'rgba(20, 54, 36, 0.92)',
+    };
+  }
+  if (tone === 'error') {
+    return {
+      border: '1px solid rgba(205,90,90,0.55)',
+      background: 'rgba(63, 30, 30, 0.92)',
+    };
+  }
+  return {
+    border: '1px solid rgba(90,140,190,0.55)',
+    background: 'rgba(20, 36, 60, 0.92)',
+  };
 }
 
 export function StoryScreen({ onBack }: StoryScreenProps = {}) {
@@ -322,9 +416,22 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const [saveSlots, setSaveSlots] = useState<Record<SaveSlotType, SaveSlotInfo>>(() => engine.getSaveSlots());
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
+  const [saveToast, setSaveToast] = useState<{ tone: SaveToastTone; text: string } | null>(null);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  const showToast = useCallback((tone: SaveToastTone, text: string) => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+    setSaveToast({ tone, text });
+    toastTimerRef.current = window.setTimeout(() => {
+      setSaveToast(null);
+      toastTimerRef.current = null;
+    }, 2400);
+  }, []);
 
   const startTyping = useCallback((text: string, hasChoices: boolean) => {
     if (typingIntervalRef.current) {
@@ -338,7 +445,7 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
     typingIntervalRef.current = window.setInterval(() => {
       if (index < text.length) {
         setDisplayedText(text.slice(0, index + 1));
-        index++;
+        index += 1;
       } else {
         if (typingIntervalRef.current) {
           clearInterval(typingIntervalRef.current);
@@ -382,12 +489,16 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
     setStats(engine.getPlayerStats());
     setRelationships(engine.getRelationships());
     setChapterProgress(engine.getChapterProgress());
+    setSaveSlots(engine.getSaveSlots());
     startTyping(initialNode?.content || '', Boolean(initialNode?.choices));
 
     return () => {
       unsubscribe();
       if (typingIntervalRef.current) {
         clearInterval(typingIntervalRef.current);
+      }
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
       }
     };
   }, [engine, startTyping]);
@@ -403,19 +514,22 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
   const handleContinue = useCallback(() => {
     if (dialogueState === 'typing') {
       skipTyping();
-    } else if (dialogueState === 'complete') {
-      if (currentNode?.nextNode) {
-        setDialogueState('transition');
-        setTimeout(() => {
-          engine.goToNext();
-        }, 300);
-      }
+      return;
+    }
+    if (dialogueState === 'complete' && currentNode?.nextNode) {
+      setDialogueState('transition');
+      setTimeout(() => {
+        engine.goToNext();
+      }, 300);
     }
   }, [dialogueState, currentNode, engine, skipTyping]);
 
-  const handleChoice = useCallback((choice: StoryChoice) => {
-    engine.makeChoice(choice.id);
-  }, [engine]);
+  const handleChoice = useCallback(
+    (choice: StoryChoice) => {
+      engine.makeChoice(choice.id);
+    },
+    [engine]
+  );
 
   const handleBack = useCallback(() => {
     if (onBack) {
@@ -427,49 +541,50 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
     setSaveSlots(engine.getSaveSlots());
     setShowLoadModal(false);
     setShowSaveModal(true);
-  }, [engine]);
+    setLastChoiceImpact('');
+    showToast('info', '请选择一个手动存档槽位。');
+  }, [engine, showToast]);
 
   const handleLoad = useCallback(() => {
     setSaveSlots(engine.getSaveSlots());
     setShowSaveModal(false);
     setShowLoadModal(true);
-  }, [engine]);
+    showToast('info', '请选择要读取的存档槽位。');
+  }, [engine, showToast]);
 
-  const onSave = useCallback((slot: SaveSlotType) => {
-    const success = engine.saveManual(slot);
-    if (!success) {
-      alert('该槽位不支持手动存档。');
-      return;
-    }
-    setSaveSlots(engine.getSaveSlots());
-    setShowSaveModal(false);
-    alert('存档成功。');
-  }, [engine]);
+  const onSave = useCallback(
+    (slot: SaveSlotType) => {
+      const success = engine.saveManual(slot);
+      if (!success) {
+        showToast('error', '该槽位不支持手动存档，请选择手动槽位。');
+        return;
+      }
+      setSaveSlots(engine.getSaveSlots());
+      setShowSaveModal(false);
+      showToast('success', `${getSlotLabel(slot)} 保存成功。`);
+    },
+    [engine, showToast]
+  );
 
-  const onLoad = useCallback((slot: SaveSlotType) => {
-    const success = engine.loadSlot(slot);
-    if (success) {
+  const onLoad = useCallback(
+    (slot: SaveSlotType) => {
+      const success = engine.loadSlot(slot);
+      if (!success) {
+        showToast('error', '读取失败：槽位为空或数据损坏。');
+        return;
+      }
       setSaveSlots(engine.getSaveSlots());
       setShowLoadModal(false);
       setLastChoiceImpact('');
-    } else {
-      alert('读取存档失败。');
-    }
-  }, [engine]);
+      showToast('success', `${getSlotLabel(slot)} 读取成功，已恢复进度。`);
+    },
+    [engine, showToast]
+  );
 
   const onModalClose = useCallback(() => {
     setShowSaveModal(false);
     setShowLoadModal(false);
   }, []);
-
-  const getChapterLabel = () => {
-    if (chapter === 0) return '序章·入学';
-    if (chapter === 1) return '第一章·百家入门';
-    if (chapter === 2) return '第二章·论辩风云';
-    if (chapter === 3) return '第三章·暗流涌动';
-    if (chapter === 99) return '终章·问道';
-    return '未知章节';
-  };
 
   const getReputation = (faction: string) => {
     const rel = relationships[faction];
@@ -477,7 +592,25 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
     return Math.max(0, Math.min(100, rel.affection + rel.trust + 50));
   };
 
-  const visibleFactions = Object.keys(FACTION_NAMES).slice(0, 8);
+  const visibleFactions = useMemo(() => Object.keys(FACTION_NAMES).slice(0, 8), []);
+
+  const saveStatus = useMemo(() => {
+    const autosaveText = saveSlots.autosave.exists ? formatSaveTime(saveSlots.autosave.timestamp) : '暂无';
+    const manualOrder: SaveSlotType[] = ['manual_1', 'manual_2', 'manual_3'];
+    const latestManual = manualOrder
+      .map((slot) => ({ slot, info: saveSlots[slot] }))
+      .filter((item) => item.info.exists)
+      .sort((a, b) => (b.info.timestamp ?? 0) - (a.info.timestamp ?? 0))[0];
+
+    const manualText = latestManual
+      ? `${getSlotLabel(latestManual.slot)} ${formatSaveTime(latestManual.info.timestamp)}`
+      : '暂无';
+
+    return {
+      autosaveText,
+      manualText,
+    };
+  }, [saveSlots]);
 
   return (
     <div style={STORY_STYLES.container}>
@@ -487,29 +620,28 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
           50% { opacity: 1; }
         }
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
-      {/* Top Bar */}
       <div style={STORY_STYLES.topBar}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={STORY_STYLES.topLeft}>
           <button
             style={STORY_STYLES.backButton}
             onClick={handleBack}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#E85D04';
-              e.currentTarget.style.color = '#E85D04';
+            onMouseEnter={(event) => {
+              event.currentTarget.style.borderColor = '#E85D04';
+              event.currentTarget.style.color = '#E85D04';
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+            onMouseLeave={(event) => {
+              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              event.currentTarget.style.color = '#D4C5A9';
             }}
           >
             ← 返回
           </button>
-          <span style={STORY_STYLES.chapterBadge}>{getChapterLabel()}</span>
+          <span style={STORY_STYLES.chapterBadge}>{getChapterLabel(chapter)}</span>
           <div style={STORY_STYLES.chapterProgressWrap}>
             <div style={STORY_STYLES.chapterProgressTrack}>
               <div
@@ -524,74 +656,72 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#D4C5A9', fontSize: '14px' }}>
-            名望: {stats.fame}
-          </span>
+
+        <div style={STORY_STYLES.topRightPanel}>
+          <div style={STORY_STYLES.saveStatusPanel}>
+            <span style={STORY_STYLES.saveStatusLine}>名望：{stats.fame}</span>
+            <span style={STORY_STYLES.saveStatusLine}>自动存档：{saveStatus.autosaveText}</span>
+            <span style={{ ...STORY_STYLES.saveStatusLine, ...STORY_STYLES.saveStatusMuted }}>
+              手动最近：{saveStatus.manualText}
+            </span>
+          </div>
+
           <button
             style={STORY_STYLES.menuButton}
             onClick={handleSave}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#4CAF50';
-              e.currentTarget.style.color = '#4CAF50';
+            onMouseEnter={(event) => {
+              event.currentTarget.style.borderColor = '#4CAF50';
+              event.currentTarget.style.color = '#4CAF50';
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+            onMouseLeave={(event) => {
+              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              event.currentTarget.style.color = '#D4C5A9';
             }}
           >
-            💾 存档
+            保存
           </button>
           <button
             style={STORY_STYLES.menuButton}
             onClick={handleLoad}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#2196F3';
-              e.currentTarget.style.color = '#2196F3';
+            onMouseEnter={(event) => {
+              event.currentTarget.style.borderColor = '#2196F3';
+              event.currentTarget.style.color = '#2196F3';
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+            onMouseLeave={(event) => {
+              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              event.currentTarget.style.color = '#D4C5A9';
             }}
           >
-            📂 读档
+            读取
           </button>
           <button
             style={STORY_STYLES.menuButton}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#E85D04';
-              e.currentTarget.style.color = '#E85D04';
+            onMouseEnter={(event) => {
+              event.currentTarget.style.borderColor = '#E85D04';
+              event.currentTarget.style.color = '#E85D04';
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+            onMouseLeave={(event) => {
+              event.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
+              event.currentTarget.style.color = '#D4C5A9';
             }}
           >
-            ⚙️ 设置
+            设置
           </button>
         </div>
       </div>
 
-      {/* Center Content */}
-      <div
-        style={STORY_STYLES.centerArea}
-        ref={textContainerRef}
-        onClick={handleContinue}
-      >
-        {/* Scene Description */}
+      <div style={STORY_STYLES.centerArea} ref={textContainerRef} onClick={handleContinue}>
         {(currentNode?.type === 'narration' || currentNode?.type === 'ending' || currentNode?.type === 'transition') && (
           <div style={STORY_STYLES.sceneDescription}>
             {displayedText}
             {dialogueState === 'complete' && currentNode?.nextNode && (
-              <div style={STORY_STYLES.continueIndicator}>▼ 点击继续</div>
+              <div style={STORY_STYLES.continueIndicator}>▶ 点击继续</div>
             )}
           </div>
         )}
 
-        {/* Dialogue Area */}
         {(currentNode?.type === 'dialogue' || currentNode?.type === 'choice') && (
           <div style={STORY_STYLES.dialogueArea}>
-            {/* Portrait Placeholder */}
             <div
               style={{
                 ...STORY_STYLES.portrait,
@@ -603,34 +733,22 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
               }}
             >
               {currentNode.speaker ? (
-                <span style={{ writingMode: 'vertical-rl' }}>
-                  {currentNode.speaker}
-                </span>
+                <span style={{ writingMode: 'vertical-rl' as const }}>{currentNode.speaker}</span>
               ) : (
                 '旁白'
               )}
             </div>
 
-            {/* Dialogue Box */}
             <div style={STORY_STYLES.dialogueBox}>
-              {currentNode.speaker && (
-                <div style={STORY_STYLES.speakerName}>
-                  {currentNode.speaker}
-                </div>
-              )}
-              <div style={STORY_STYLES.dialogueText}>
-                {displayedText}
-              </div>
+              {currentNode.speaker && <div style={STORY_STYLES.speakerName}>{currentNode.speaker}</div>}
+              <div style={STORY_STYLES.dialogueText}>{displayedText}</div>
               {dialogueState === 'complete' && !currentNode.choices && (
-                <div style={STORY_STYLES.continueIndicator}>
-                  ▼ 点击继续
-                </div>
+                <div style={STORY_STYLES.continueIndicator}>▶ 点击继续</div>
               )}
             </div>
           </div>
         )}
 
-        {/* Choice Area */}
         {dialogueState === 'choice' && currentNode?.choices && (
           <div
             style={{
@@ -638,13 +756,9 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
               marginTop: 'auto',
               animation: 'fadeIn 0.3s ease',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
-            {lastChoiceImpact && (
-              <div style={STORY_STYLES.latestImpactPanel}>
-                上一步影响：{lastChoiceImpact}
-              </div>
-            )}
+            {lastChoiceImpact && <div style={STORY_STYLES.latestImpactPanel}>上一步影响：{lastChoiceImpact}</div>}
             {availableChoices.map((choice, index) => (
               <button
                 key={choice.id}
@@ -656,41 +770,38 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
                 onMouseEnter={() => setIsHoveredChoice(index)}
                 onMouseLeave={() => setIsHoveredChoice(null)}
               >
-                <span style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'rgba(139,115,85,0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '14px',
-                  flexShrink: 0,
-                }}>
+                <span
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: 'rgba(139,115,85,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    flexShrink: 0,
+                  }}
+                >
                   {String.fromCharCode(65 + index)}
                 </span>
                 <span>{choice.text}</span>
-                <span style={STORY_STYLES.choiceImpactHint}>
-                  {summarizeChoiceEffects(choice)}
-                </span>
+                <span style={STORY_STYLES.choiceImpactHint}>{summarizeChoiceEffects(choice)}</span>
               </button>
             ))}
             {availableChoices.length === 0 && (
               <div style={STORY_STYLES.latestImpactPanel}>
-                当前没有可执行选项。请回退上一步，或重新读取本章节条件。
+                当前没有可执行选项。请回退上一节点，或读取其他存档尝试不同分支。
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Relationship Bar */}
       <div style={STORY_STYLES.relationshipBar}>
         {visibleFactions.map((faction) => (
           <div key={faction} style={STORY_STYLES.factionBadge}>
-            <div style={STORY_STYLES.factionName}>
-              {FACTION_NAMES[faction] || faction}
-            </div>
+            <div style={STORY_STYLES.factionName}>{FACTION_NAMES[faction] || faction}</div>
             <div style={STORY_STYLES.reputationBar}>
               <div
                 style={{
@@ -706,7 +817,6 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
         ))}
       </div>
 
-      {/* Save Modal */}
       <SaveLoadModal
         mode="save"
         open={showSaveModal}
@@ -716,7 +826,6 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
         onClose={onModalClose}
       />
 
-      {/* Load Modal */}
       <SaveLoadModal
         mode="load"
         open={showLoadModal}
@@ -725,6 +834,12 @@ export function StoryScreen({ onBack }: StoryScreenProps = {}) {
         onLoad={onLoad}
         onClose={onModalClose}
       />
+
+      {saveToast && (
+        <div style={STORY_STYLES.toastWrap}>
+          <div style={{ ...STORY_STYLES.toast, ...getToastToneStyle(saveToast.tone) }}>{saveToast.text}</div>
+        </div>
+      )}
     </div>
   );
 }

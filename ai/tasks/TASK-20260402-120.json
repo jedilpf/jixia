@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260402-120",
+  "goal": "Close key engineering gaps: remove dual-entry ambiguity in docs, add explicit project license, establish runnable test baseline, and declare required Node.js version.",
+  "constraints": [
+    "Do not modify gameplay runtime behavior in this task.",
+    "Keep documentation aligned with single active source directory (src/).",
+    "Use lightweight test baseline without introducing heavy new dependencies."
+  ],
+  "deliverables": [
+    "README updated with clear single-entry structure and environment/testing guidance.",
+    "Root LICENSE file added.",
+    "Node version requirement documented and machine-readable.",
+    "At least one runnable automated test under tests/ with npm script entry."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "README.md",
+    "LICENSE",
+    ".nvmrc",
+    "package.json",
+    "tests",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-120.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-120.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-120.json"
+  ],
+  "status": "in_progress"
+}

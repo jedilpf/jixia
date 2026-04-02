@@ -332,17 +332,15 @@ export default function BattleFrameV2({
   // 渲染
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="w-full h-screen bg-[#FDFBF7] flex flex-col overflow-hidden relative">
-      {/* 背景纹理：名士论道背景装饰 */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0">
-        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+    <div className="w-full h-screen bg-[#FDFBF7] flex flex-col overflow-hidden relative selection:bg-[#3A5F41] selection:text-white">
+      {/* 全局场景层：远古气象与内发光 */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-[0.05]" />
+        {/* 四周内发光：聚焦论战中央 */}
+        <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(26,26,26,0.1)]" />
       </div>
 
-      {/* ═══════════════════════════════════════════════════════
-          第一层：常驻主战斗层
-         ═══════════════════════════════════════════════════════ */}
-
-      {/* 顶部状态栏 */}
+      {/* 顶部状态栏 (与下方有木质隔断) */}
       <TopStatusBar
         state={state}
         onOpenCardLibrary={() => setIsCardLibraryOpen(true)}
@@ -352,13 +350,18 @@ export default function BattleFrameV2({
         onMenu={handleMenuClick}
       />
 
+      {/* 结构性隔断：乌金木条线 */}
+      <div className="h-2 w-full bg-[#3D2B1F] relative z-20 shadow-md" />
+
       {/* 主内容区 */}
-      <div className="flex-1 flex min-h-0 overflow-hidden relative z-10">
-        {/* 左侧日志按钮 */}
-        <LogButton
-          onClick={() => setIsLogDrawerOpen(true)}
-          unreadCount={logs.length}
-        />
+      <div className="flex-1 flex min-h-0 overflow-hidden relative z-10 bg-gradient-to-b from-[#FDFBF7] to-[#EBF5EE]/20">
+        {/* 左侧实录按钮：像卷轴边缘的标签 */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-40">
+           <LogButton
+             onClick={() => setIsLogDrawerOpen(true)}
+             unreadCount={logs.length}
+           />
+        </div>
 
         {/* 中央战斗区 */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -368,14 +371,17 @@ export default function BattleFrameV2({
           />
         </div>
 
-        {/* 右侧操作提示区 */}
-        <div className="hidden xl:flex shrink-0">
+        {/* 右侧操作提示区：悬浮丝帛感 */}
+        <div className="hidden xl:flex shrink-0 border-l-2 border-[#1A1A1A]/5 shadow-[-10px_0_30px_rgba(0,0,0,0.02)]">
           <OperationHints
             state={state}
             selectedCardId={selectedCardId}
           />
         </div>
       </div>
+
+      {/* 结构性隔断：乌金木条线 (衔接底部案头) */}
+      <div className="h-1.5 w-full bg-[#3D2B1F] relative z-20" />
 
       {/* 底部操作区 */}
       <BottomControls

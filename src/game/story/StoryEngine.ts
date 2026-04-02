@@ -19,6 +19,8 @@ import { CHAPTER_MORU_003_NODES } from './data/chapterMoru003';
 import { CHAPTER_MORU_004_NODES } from './data/chapterMoru004';
 import { CHAPTER_MORU_005_NODES } from './data/chapterMoru005';
 import { CHAPTER_MORU_006_NODES } from './data/chapterMoru006';
+import { CHAPTER_MORU_007_NODES } from './data/chapterMoru007';
+import { CHAPTER_MORU_008_NODES } from './data/chapterMoru008';
 
 export type SaveSlotType = 'autosave' | 'manual_1' | 'manual_2' | 'manual_3';
 
@@ -84,7 +86,7 @@ export class StoryEngine {
   }
 
   private loadNodes() {
-    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES, ...CHAPTER_MORU_001_PART2_NODES, ...CHAPTER_MORU_002_NODES, ...CHAPTER_MORU_003_NODES, ...CHAPTER_MORU_004_NODES, ...CHAPTER_MORU_005_NODES, ...CHAPTER_MORU_006_NODES];
+    const storyNodes = [...PROLOG_NODES, ...CHAPTER_MORU_001_NODES, ...CHAPTER_MORU_001_PART2_NODES, ...CHAPTER_MORU_002_NODES, ...CHAPTER_MORU_003_NODES, ...CHAPTER_MORU_004_NODES, ...CHAPTER_MORU_005_NODES, ...CHAPTER_MORU_006_NODES, ...CHAPTER_MORU_007_NODES, ...CHAPTER_MORU_008_NODES];
     for (const node of storyNodes) {
       if (this.nodeMap.has(node.id)) {
         console.warn(`StoryEngine: duplicated node id ${node.id} ignored.`);

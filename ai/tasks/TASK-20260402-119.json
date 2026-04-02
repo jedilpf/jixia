@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260402-119",
+  "goal": "Optimize Story save/load experience from a product perspective: clearer slot information, non-blocking feedback UX, safer overwrite/load interactions, and cleaner top-bar save status visibility.",
+  "constraints": [
+    "Do not break existing save schema compatibility for autosave and manual slots.",
+    "Keep current story progression and choice logic unchanged.",
+    "Scope changes to save/load UX and related metadata readability only."
+  ],
+  "deliverables": [
+    "Refined SaveLoadModal interactions and visual hierarchy for save/load actions.",
+    "StoryScreen save/load feedback upgraded from browser alert to in-screen productized messaging.",
+    "Top bar save status hints for autosave/manual readability and confidence.",
+    "Minimal StoryEngine metadata tuning only if needed for UI consistency."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/ui/components/SaveLoadModal.tsx",
+    "src/ui/screens/StoryScreen.tsx",
+    "src/game/story/StoryEngine.ts",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-119.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-119.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-119.json"
+  ],
+  "status": "in_progress"
+}
