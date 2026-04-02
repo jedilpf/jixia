@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260402-111",
+  "goal": "Draft a complete game planning document for 3-tier card progression (1-star/2-star/3-star), including unlock logic, balance boundaries, UX rules, and rollout plan.",
+  "constraints": [
+    "This task is documentation-only; do not modify gameplay/runtime code.",
+    "Use current repository facts as baseline and clearly separate current state from proposed design.",
+    "Plan must be executable and include acceptance criteria and risk controls."
+  ],
+  "deliverables": [
+    "A markdown planning document for card tiering strategy and implementation guidance."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-111.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-111.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-111.json"
+  ],
+  "status": "completed"
+}
