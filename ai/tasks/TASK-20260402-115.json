@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260402-115",
+  "goal": "Keep the main development branch single-track by archiving src_new on a dedicated branch, removing src_new from current branch, and cleaning active config/docs references.",
+  "constraints": [
+    "Do not change runtime logic under src/.",
+    "Preserve src_new history via a dedicated archive branch before deletion.",
+    "Only clean active-path references; keep historical docs unchanged unless required."
+  ],
+  "deliverables": [
+    "Archive branch created for src_new snapshot.",
+    "src_new removed from current branch.",
+    "tsconfig path alias @new removed.",
+    "README directory description updated to single active source tree."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src_new",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-115.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-115.json",
+    "git branch --list archive/src_new_snapshot_20260402",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-115.json"
+  ],
+  "status": "completed"
+}

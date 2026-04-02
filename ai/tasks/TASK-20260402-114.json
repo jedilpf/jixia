@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260402-114",
+  "goal": "Restore TypeScript compile pass by resolving CharacterEmotion literal mismatch and removing a no-use local variable in BottomControls.",
+  "constraints": [
+    "Keep current story content semantics unchanged; do not rewrite chapter scripts.",
+    "Prefer minimal, low-risk type/domain alignment over broad refactors.",
+    "Do not change card corpus size or battle core mechanics in this task."
+  ],
+  "deliverables": [
+    "CharacterEmotion type accepts currently used story literal values.",
+    "BottomControls has no TS6133 unused local variable warning.",
+    "typecheck passes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/game/story",
+    "src/components/battle/layers/BottomControls.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-114.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-114.json",
+    "npm run typecheck",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-114.json"
+  ],
+  "status": "completed"
+}
