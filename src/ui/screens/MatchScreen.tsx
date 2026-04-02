@@ -1,4 +1,4 @@
-﻿import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
+import { asset } from '@/ui/screens/visualAssets';
 
 interface MatchScreenProps {
   onContinue: () => void;
@@ -6,51 +6,53 @@ interface MatchScreenProps {
 
 export function MatchScreen({ onContinue }: MatchScreenProps) {
   return (
-    <div
-      className="relative flex h-full items-center justify-center overflow-hidden"
-      style={{
-        backgroundImage: `linear-gradient(120deg, rgba(9,6,4,0.84), rgba(29,18,12,0.76)), url(${PRE_BATTLE_BACKGROUND})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_22%,rgba(194,120,58,0.18),transparent_42%)]" />
+    <div className="relative h-full w-full overflow-hidden bg-[#FDFBF7] text-[#1A1A1A]">
+      {/* 矿物辉光背景 */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(58,95,65,0.05),transparent_45%),radial-gradient(circle_at_70%_70%,rgba(141,47,47,0.05),transparent_45%)]" />
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/handmade-paper.png")' }} />
 
-      <div
-        className="relative w-[760px] rounded-2xl border p-6 text-center"
-        style={{ borderColor: PRE_BATTLE_COLORS.border, background: PRE_BATTLE_COLORS.panel }}
-      >
-        <div className="text-2xl font-semibold tracking-[0.1em]" style={{ color: PRE_BATTLE_COLORS.textMain }}>正在匹配对手</div>
-        <div className="mt-2 text-sm" style={{ color: PRE_BATTLE_COLORS.textMuted }}>稷下学宫已发出辩帖，请稍候…</div>
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-black tracking-[0.3em] text-[#1A1A1A]">辩帖传书</h2>
+          <p className="mt-2 text-sm font-medium tracking-wide text-[#5C4033]/60">稷下学宫正在为您调停对手，请稍候…</p>
+        </div>
 
-        <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-          <div className="overflow-hidden rounded-xl border" style={{ borderColor: 'rgba(184,136,84,0.45)' }}>
-            <img src={asset('/assets/chars/stand/kongqiu.png')} alt="我方" className="h-52 w-full object-cover" />
+        <div className="flex w-full max-w-4xl items-center justify-center gap-12">
+          {/* 我方名士 */}
+          <div className="group relative overflow-hidden rounded-2xl border-4 border-[#3A5F41] bg-white p-1 shadow-xl transition duration-500 hover:scale-105">
+            <div className="overflow-hidden rounded-xl bg-[#F2ECD9]">
+              <img src={asset('/assets/chars/stand/kongqiu.png')} alt="我方名士" className="h-64 w-48 object-cover opacity-90" />
+            </div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#3A5F41] px-4 py-1 text-xs font-bold text-white shadow-lg">
+              我方
+            </div>
           </div>
 
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full border" style={{ borderColor: '#a97a47', background: 'rgba(20,14,9,0.86)' }}>
-            <div className="absolute h-16 w-16 animate-spin rounded-full border-2 border-[#c99657] border-t-transparent" />
-            <span className="text-xs tracking-[0.2em]" style={{ color: '#e8d1ad' }}>匹配中</span>
+          {/* 匹配仪：太极流转感 */}
+          <div className="relative flex h-32 w-32 items-center justify-center">
+            <div className="absolute h-full w-full animate-spin rounded-full border-4 border-[#D4AF65]/20 border-t-[#3A5F41] border-r-[#8D2F2F]/40" />
+            <div className="absolute h-[80%] w-[80%] animate-spin rounded-full border-4 border-[#D4AF65]/20 border-b-[#3A5F41]/60" style={{ animationDirection: 'reverse' }} />
+            <span className="text-sm font-black tracking-widest text-[#3A5F41]">寻觅中</span>
           </div>
 
-          <div className="overflow-hidden rounded-xl border" style={{ borderColor: 'rgba(184,136,84,0.45)' }}>
-            <img src={asset('/assets/chars/stand/hanfeizi.png')} alt="对手" className="h-52 w-full object-cover" />
+          {/* 对手名士 */}
+          <div className="group relative overflow-hidden rounded-2xl border-4 border-[#8D2F2F] bg-white p-1 shadow-xl transition duration-500 hover:scale-105">
+            <div className="overflow-hidden rounded-xl bg-[#F2ECD9]">
+              <img src={asset('/assets/chars/stand/hanfeizi.png')} alt="对手名士" className="h-64 w-48 object-cover opacity-90" />
+            </div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#8D2F2F] px-4 py-1 text-xs font-bold text-white shadow-lg">
+              对手
+            </div>
           </div>
         </div>
 
         <button
           type="button"
-          className="mt-7 rounded-lg border px-6 py-2 text-sm transition"
-          style={{ borderColor: '#b88a53', background: PRE_BATTLE_COLORS.button, color: '#f6e4c3' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = PRE_BATTLE_COLORS.buttonHover;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = PRE_BATTLE_COLORS.button;
-          }}
           onClick={onContinue}
+          className="group mt-16 flex items-center gap-4 rounded-lg bg-[#1A1A1A] px-16 py-4 text-lg font-bold text-[#FDFBF7] transition-all hover:bg-[#3A5F41] active:scale-95 shadow-2xl"
         >
-          继续
+          赴约论战
+          <span className="transition-transform group-hover:translate-x-2">→</span>
         </button>
       </div>
     </div>

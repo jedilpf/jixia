@@ -1,4 +1,4 @@
-﻿import type { CardDefinition, IssueDirectionId } from '@/core/types';
+import type { CardDefinition, IssueDirectionId } from '@/core/types';
 
 type LegacyIssueTag = 'ritual_law' | 'diplomacy' | 'people' | 'war_peace' | 'prosperity' | 'neutral';
 
@@ -248,6 +248,73 @@ const RAW_CARDS: LegacyCard[] = [
     issueTag: 'neutral',
     category: 'support',
     description: '中立支援卡，补足曲线。',
+  },
+  // ====== V9 华彩系列 (对齐图鉴) ======
+  {
+    id: 'rujia1',
+    name: '宣仁立论',
+    factionId: 'confucian',
+    cost: 1,
+    baseAttack: 1,
+    baseHealth: 3,
+    issueTag: 'ritual_law',
+    category: 'argument',
+    description: '仁者爱人，以礼立序。',
+  },
+  {
+    id: 'rujia2',
+    name: '思无邪',
+    factionId: 'confucian',
+    cost: 2,
+    baseAttack: 0,
+    baseHealth: 4,
+    issueTag: 'neutral',
+    category: 'strategy',
+    description: '诗三百，一言以蔽之，曰思无邪。',
+  },
+  {
+    id: 'rujia3',
+    name: '中庸守道',
+    factionId: 'confucian',
+    cost: 3,
+    baseAttack: 2,
+    baseHealth: 5,
+    issueTag: 'prosperity',
+    category: 'strategy',
+    description: '不偏之谓中，不易之谓庸。',
+  },
+  {
+    id: 'fajia1',
+    name: '峻法立论',
+    factionId: 'legalist',
+    cost: 1,
+    baseAttack: 2,
+    baseHealth: 2,
+    issueTag: 'ritual_law',
+    category: 'argument',
+    description: '法不阿贵，绳不挠曲。',
+  },
+  {
+    id: 'fajia2',
+    name: '权柄之链',
+    factionId: 'legalist',
+    cost: 2,
+    baseAttack: 3,
+    baseHealth: 2,
+    issueTag: 'diplomacy',
+    category: 'strategy',
+    description: '权者势也，法之疆域。',
+  },
+  {
+    id: 'fajia3',
+    name: '铁律门客',
+    factionId: 'legalist',
+    cost: 4,
+    baseAttack: 4,
+    baseHealth: 5,
+    issueTag: 'ritual_law',
+    category: 'support',
+    description: '法在人在，唯律命是从。',
   },
 ];
 

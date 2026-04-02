@@ -24,14 +24,14 @@ interface ChatFloatProps {
 }
 
 const QUICK_MESSAGES = [
-  { text: '你好', icon: '👋' },
-  { text: '来吧', icon: '⚔️' },
-  { text: '好险', icon: '😰' },
-  { text: '精彩', icon: '🎉' },
-  { text: '厉害', icon: '💪' },
-  { text: '承让', icon: '🙏' },
-  { text: '思考中', icon: '🤔' },
-  { text: '再来一局', icon: '🔄' },
+  { text: '见礼', icon: '🙏' },
+  { text: '请论', icon: '⚔️' },
+  { text: '且慢', icon: '😰' },
+  { text: '妙笔', icon: '🎉' },
+  { text: '折服', icon: '💪' },
+  { text: '受教', icon: '🙏' },
+  { text: '研考', icon: '🤔' },
+  { text: '再叙', icon: '🔄' },
 ];
 
 const EMOJI_CATEGORIES = [
@@ -55,8 +55,6 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
   onSendMessage,
   onSendEmoji,
   messages = [],
-  playerName = '我方',
-  enemyName = '敌方',
 }) => {
   const [activeTab, setActiveTab] = useState<'emoji' | 'message' | 'history'>('emoji');
   const [selectedCategory, setSelectedCategory] = useState(0);
@@ -101,64 +99,69 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto animate-in fade-in duration-200"
+        className="absolute inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm animate-in fade-in duration-300 pointer-events-auto"
         onClick={onClose}
       />
 
-      <div className="relative bg-gradient-to-b from-[#1a1510] via-[#151210] to-[#0d0b08] rounded-2xl border border-[#5c4d3a]/50 shadow-2xl pointer-events-auto w-[340px] overflow-hidden animate-in zoom-in-95 fade-in duration-200">
-        <div className="h-14 px-5 flex items-center justify-between border-b border-[#3d3225]/50 bg-gradient-to-r from-[#1a1510] to-[#151210]">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c9952a] to-[#8a6a1a] flex items-center justify-center">
-              <span className="text-white text-sm">💬</span>
+      <div className="relative bg-[#FDFBF7] rounded-[2.5rem] border-4 border-white shadow-[0_50px_100px_rgba(0,0,0,0.3)] w-[360px] overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 pointer-events-auto">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-[#1A1A1A]/5 bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center text-[#1A1A1A]">
+               <span className="text-[10px] font-black uppercase tracking-widest">声</span>
             </div>
-            <span className="text-[#c9b896] font-medium">快捷交流</span>
+            <span className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest">声息互通</span>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-[#2a2318] border border-[#3d3225] text-[#8a7a6a] hover:text-[#c9725a] hover:border-[#c9725a]/50 transition-all flex items-center justify-center"
+            className="w-10 h-10 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all active:scale-90 shadow-sm"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex border-b border-[#3d3225]/30">
+        <div className="flex border-b border-[#1A1A1A]/5 bg-white/40">
           {[
             { key: 'emoji', label: '表情', icon: '😊' },
-            { key: 'message', label: '消息', icon: '💬' },
+            { key: 'message', label: '寒暄', icon: '🙏' },
             { key: 'history', label: '记录', icon: '📜' },
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as typeof activeTab)}
-              className={`flex-1 py-3 text-sm font-medium transition-all relative ${
+              className={`flex-1 py-4 text-xs font-black transition-all relative ${
                 activeTab === tab.key
-                  ? 'text-[#c9952a]'
-                  : 'text-[#8a7a6a] hover:text-[#b8a88a]'
+                  ? 'text-[#3A5F41]'
+                  : 'text-[#5C4033]/40 hover:text-[#1A1A1A]'
               }`}
             >
-              <span className="mr-1">{tab.icon}</span>
+              <span className="mr-1 opacity-60">{tab.icon}</span>
               {tab.label}
               {activeTab === tab.key && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-[#c9952a] rounded-full" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#3A5F41] rounded-full" />
               )}
             </button>
           ))}
         </div>
 
-        <div className="min-h-[280px] max-h-[360px] overflow-hidden flex flex-col">
+        <div className="min-h-[320px] max-h-[400px] overflow-hidden flex flex-col relative">
+           <div className="absolute inset-0 pointer-events-none opacity-[0.02] z-0">
+             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+          </div>
+
+          <div className="relative z-10 flex-1 flex flex-col">
           {activeTab === 'emoji' && (
             <>
-              <div className="flex gap-1 px-4 py-2 border-b border-[#3d3225]/20 bg-[#0d0b08]/30">
+              <div className="flex gap-2 px-6 py-3 border-b border-[#1A1A1A]/5 bg-white/20 overflow-x-auto scrollbar-hide">
                 {EMOJI_CATEGORIES.map((category, index) => (
                   <button
                     key={category.name}
                     onClick={() => setSelectedCategory(index)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest transition-all shrink-0 uppercase ${
                       selectedCategory === index
-                        ? 'bg-[#c9952a]/20 text-[#c9952a] border border-[#c9952a]/30'
-                        : 'text-[#8a7a6a] hover:text-[#b8a88a] hover:bg-[#2a2318]'
+                        ? 'bg-[#1A1A1A] text-white shadow-md'
+                        : 'text-[#5C4033]/40 hover:text-[#1A1A1A] hover:bg-white'
                     }`}
                   >
                     {category.name}
@@ -166,13 +169,13 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
                 ))}
               </div>
 
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="grid grid-cols-6 gap-2">
+              <div className="flex-1 p-6 overflow-y-auto scrollbar-hide">
+                <div className="grid grid-cols-4 gap-3">
                   {EMOJI_CATEGORIES[selectedCategory].emojis.map((emoji) => (
                     <button
                       key={emoji}
                       onClick={() => handleSendEmoji(emoji)}
-                      className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2a2318] to-[#1f1a12] border border-[#3d3225]/50 hover:border-[#c9952a]/50 hover:from-[#3d3225] hover:to-[#2a2318] transition-all text-xl flex items-center justify-center transform hover:scale-110 active:scale-95 shadow-sm hover:shadow-md"
+                      className="w-14 h-14 rounded-2xl bg-white border-2 border-[#1A1A1A]/5 hover:border-[#3A5F41] hover:shadow-xl transition-all text-2xl flex items-center justify-center transform hover:scale-110 active:scale-90"
                     >
                       {emoji}
                     </button>
@@ -183,15 +186,15 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
           )}
 
           {activeTab === 'message' && (
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="flex-1 p-6 overflow-y-auto scrollbar-hide">
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {QUICK_MESSAGES.map((item) => (
                   <button
                     key={item.text}
                     onClick={() => handleSendMessage(item.text)}
-                    className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#2a2318] to-[#1f1a12] border border-[#3d3225]/50 text-sm text-[#b8a88a] hover:border-[#c9952a]/50 hover:text-[#c9b896] transition-all flex items-center gap-2 group"
+                    className="px-4 py-3 rounded-2xl bg-white border-2 border-[#1A1A1A]/5 text-sm font-bold text-[#1A1A1A] hover:border-[#3A5F41] hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
                   >
-                    <span className="text-base group-hover:scale-110 transition-transform">{item.icon}</span>
+                    <span className="text-base grayscale group-hover:grayscale-0 transition-all">{item.icon}</span>
                     <span>{item.text}</span>
                   </button>
                 ))}
@@ -200,80 +203,82 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
               {!showInput ? (
                 <button
                   onClick={() => setShowInput(true)}
-                  className="w-full py-2.5 rounded-xl border border-dashed border-[#3d3225] text-[#8a7a6a] hover:border-[#c9952a]/50 hover:text-[#b8a88a] transition-all text-sm flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl border-2 border-dashed border-[#1A1A1A]/10 text-[10px] font-black text-[#5C4033]/40 hover:border-[#3A5F41] hover:text-[#3A5F41] transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
                 >
                   <span>✏️</span>
-                  自定义消息
+                  自定义寒暄
                 </button>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-3">
                   <input
                     ref={inputRef}
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="输入消息..."
+                    placeholder="请输入..."
                     maxLength={20}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-[#0d0b08] border border-[#3d3225] text-[#c9b896] placeholder-[#5c4d3a] focus:border-[#c9952a]/50 focus:outline-none transition-all text-sm"
+                    className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-[#1A1A1A]/5 text-sm font-bold text-[#1A1A1A] placeholder-[#5C4033]/30 focus:border-[#3A5F41] focus:outline-none transition-all shadow-sm"
                   />
-                  <button
-                    onClick={() => inputMessage.trim() && handleSendMessage(inputMessage.trim())}
-                    disabled={!inputMessage.trim()}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#c9952a] to-[#a87a1a] text-white font-medium hover:from-[#d9a53a] hover:to-[#b88a2a] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
-                  >
-                    发送
-                  </button>
+                   <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowInput(false)}
+                      className="flex-1 py-3.5 rounded-2xl bg-[#1A1A1A]/5 text-[10px] font-black text-[#1A1A1A]/40 hover:bg-[#1A1A1A]/10 transition-all uppercase tracking-widest"
+                    >
+                      取消
+                    </button>
+                    <button
+                      onClick={() => inputMessage.trim() && handleSendMessage(inputMessage.trim())}
+                      disabled={!inputMessage.trim()}
+                      className="flex-[2] py-3.5 rounded-2xl bg-[#3A5F41] text-white font-black hover:shadow-xl disabled:opacity-30 transition-all text-xs uppercase tracking-widest"
+                    >
+                      发送翰墨
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {activeTab === 'history' && (
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-[#5c4d3a]">
-                  <div className="w-16 h-16 rounded-2xl bg-[#1a1510] border border-[#3d3225]/30 flex items-center justify-center mb-3">
-                    <span className="text-2xl">📭</span>
-                  </div>
-                  <p className="text-sm">暂无聊天记录</p>
-                  <p className="text-xs mt-1 text-[#4a3d2a]">发送消息后将在此显示</p>
+                <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                  <div className="text-6xl font-black italic mb-4 text-[#1A1A1A]">静</div>
+                  <p className="text-[10px] font-black tracking-[0.3em] uppercase">虚位以待，墨香尚存于心</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`flex gap-2 ${
+                      className={`flex gap-3 ${
                         msg.sender === 'player' ? 'flex-row-reverse' : 'flex-row'
                       }`}
                     >
                       <div
-                        className={`px-3 py-2 rounded-xl max-w-[80%] ${
+                        className={`p-4 rounded-[1.5rem] max-w-[85%] border-2 transition-all relative ${
                           msg.sender === 'player'
-                            ? 'bg-gradient-to-r from-[#c9952a]/20 to-[#a87a1a]/20 border border-[#c9952a]/30'
+                            ? 'bg-white border-[#3A5F41]/10 shadow-sm'
                             : msg.sender === 'enemy'
-                            ? 'bg-gradient-to-r from-[#5a3a2a]/20 to-[#4a2a1a]/20 border border-[#5a3a2a]/30'
-                            : 'bg-[#1a1510] border border-[#3d3225]/30'
+                            ? 'bg-white border-[#8D2F2F]/10 shadow-sm'
+                            : 'bg-[#FDFBF7] border-[#1A1A1A]/5 opacity-60'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className={`flex items-center gap-2 mb-2 ${msg.sender === 'player' ? 'flex-row-reverse text-right' : ''}`}>
                           <span
-                            className={`text-xs font-medium ${
-                              msg.sender === 'player'
-                                ? 'text-[#c9952a]'
-                                : msg.sender === 'enemy'
-                                ? 'text-[#c9725a]'
-                                : 'text-[#8a7a6a]'
-                            }`}
+                            className={`w-5 h-5 rounded-sm flex items-center justify-center text-[8px] font-black text-white shadow-sm`}
+                            style={{ 
+                              backgroundColor: msg.sender === 'player' ? '#3A5F41' : msg.sender === 'enemy' ? '#8D2F2F' : '#1A1A1A',
+                            }}
                           >
-                            {msg.sender === 'player' ? playerName : msg.sender === 'enemy' ? enemyName : '系统'}
+                            {msg.sender === 'player' ? '予' : msg.sender === 'enemy' ? '彼' : '司'}
                           </span>
-                          <span className="text-xs text-[#5c4d3a]">{formatTime(msg.timestamp)}</span>
+                          <span className="text-[9px] font-black text-[#5C4033]/30 tabular-nums">{formatTime(msg.timestamp)}</span>
                         </div>
                         <p
-                          className={`text-sm ${
-                            msg.type === 'emoji' ? 'text-2xl' : 'text-[#c9b896]'
+                          className={`font-black tracking-tight ${
+                             msg.type === 'emoji' ? 'text-3xl' : 'text-sm text-[#1A1A1A]'
                           }`}
                         >
                           {msg.content}
@@ -286,14 +291,15 @@ const ChatFloat: React.FC<ChatFloatProps> = ({
               )}
             </div>
           )}
+          </div>
         </div>
 
-        <div className="h-10 px-4 flex items-center justify-between border-t border-[#3d3225]/30 bg-[#0d0b08]/50 text-xs text-[#5c4d3a]">
-          <span>点击发送后自动关闭</span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            在线
-          </span>
+        <div className="h-12 px-6 flex items-center justify-between border-t border-[#1A1A1A]/5 bg-white uppercase overflow-hidden">
+          <div className="flex items-center gap-2 animate-pulse">
+            <span className="w-2 h-2 rounded-full bg-[#3A5F41]" />
+            <span className="text-[8px] font-black text-[#3A5F41] tracking-widest">CONNECTED TO ACADEMY</span>
+          </div>
+          <span className="text-[8px] font-black text-[#5C4033]/20 tracking-widest italic">V9 Refined Social</span>
         </div>
       </div>
     </div>

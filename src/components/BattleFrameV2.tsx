@@ -332,7 +332,12 @@ export default function BattleFrameV2({
   // 渲染
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="w-full h-screen bg-gradient-to-b from-[#0d0b08] to-[#1a1510] flex flex-col overflow-hidden">
+    <div className="w-full h-screen bg-[#FDFBF7] flex flex-col overflow-hidden relative">
+      {/* 背景纹理：名士论道背景装饰 */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0">
+        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+      </div>
+
       {/* ═══════════════════════════════════════════════════════
           第一层：常驻主战斗层
          ═══════════════════════════════════════════════════════ */}
@@ -348,7 +353,7 @@ export default function BattleFrameV2({
       />
 
       {/* 主内容区 */}
-      <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex min-h-0 overflow-hidden relative z-10">
         {/* 左侧日志按钮 */}
         <LogButton
           onClick={() => setIsLogDrawerOpen(true)}
@@ -386,7 +391,6 @@ export default function BattleFrameV2({
           第二层：信息面板层（弹层/抽屉）
          ═══════════════════════════════════════════════════════ */}
 
-      {/* 图鉴面板 */}
       <CardLibraryPanel
         isOpen={isCardLibraryOpen}
         onClose={() => setIsCardLibraryOpen(false)}
@@ -394,25 +398,18 @@ export default function BattleFrameV2({
         currentPlayerLevel={currentPlayerLevel}
       />
 
-      {/* 状态面板 */}
       <StatusPanel
         isOpen={isStatusPanelOpen}
         onClose={() => setIsStatusPanelOpen(false)}
         state={state}
       />
 
-      {/* 日志抽屉 */}
       <LogDrawer
         isOpen={isLogDrawerOpen}
         onClose={() => setIsLogDrawerOpen(false)}
         logs={logs}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          第三层：轻社交层（轻量浮层）
-         ═══════════════════════════════════════════════════════ */}
-
-      {/* 消息/表情浮层 */}
       <ChatFloat
         isOpen={isChatFloatOpen}
         onClose={() => setIsChatFloatOpen(false)}
@@ -421,37 +418,54 @@ export default function BattleFrameV2({
         messages={chatMessages}
       />
 
-      {/* 退出确认对话框 */}
       <ExitConfirmModal
         isOpen={isExitConfirmOpen}
         onConfirm={handleExitConfirm}
         onCancel={handleExitCancel}
       />
 
+      {/* 议题选择弹窗 (雅化版) */}
       {isTopicSelectionWindow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-4xl rounded-2xl border-2 border-[#c9952a] bg-gradient-to-b from-[#1a1510] to-[#0d0b08] p-5 md:p-6">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A1A]/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-5xl rounded-[2.5rem] border-4 border-white bg-white p-8 md:p-12 shadow-[0_50px_100px_rgba(0,0,0,0.3)] relative overflow-hidden">
+            {/* 矿物辉光背景 */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF65]/10 blur-[100px]" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#3A5F41]/10 blur-[100px]" />
+            </div>
+
+            <div className="mb-10 flex items-end justify-between relative z-10 border-b-2 border-[#1A1A1A]/5 pb-6">
               <div>
-                <h3 className="text-xl font-semibold tracking-wide text-[#f0ddb1]">选择本局议题</h3>
-                <p className="mt-1 text-sm text-[#b8a88a]">
-                  第 {state.round} 回合触发。确定后继续明辩与暗策流程。
+                <h3 className="text-3xl font-black tracking-tight text-[#1A1A1A] uppercase">议题待定</h3>
+                <p className="mt-2 text-sm font-bold text-[#5C4033]/40 uppercase tracking-widest">
+                  ROUND {state.round} · TOPIC SELECTION
                 </p>
               </div>
-              <div className="rounded border border-[#8b6e44] bg-[#322717] px-3 py-1 text-sm text-[#ffd48a]">
-                自动选择倒计时 {state.topicSelectionSecondsLeft ?? '--'}s
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black text-[#5C4033]/40 mb-1">REMAINING TIME</span>
+                <div className="rounded-full bg-[#1A1A1A] px-5 py-2 text-xl font-black italic tabular-nums text-white shadow-lg">
+                   {state.topicSelectionSecondsLeft ?? '--'}s
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 relative z-10">
               {topicOptions.map((topic) => (
                 <button
                   key={topic.id}
                   onClick={() => handleSelectTopic(topic.id)}
-                  className="rounded-xl border border-[#5c4d3a] bg-[#1f1a12]/70 p-4 text-left transition hover:border-[#d4af65] hover:bg-[#2a2116]"
+                  className="group rounded-[1.5rem] border-2 border-[#1A1A1A]/5 bg-[#FDFBF7] p-8 text-left transition-all hover:border-[#1A1A1A] hover:bg-white hover:shadow-2xl hover:-translate-y-2 relative"
                 >
-                  <div className="text-base text-[#f7dfb0]">{topic.title}</div>
-                  <p className="mt-2 text-xs leading-5 text-[#c6d3df]">{topic.summary ?? '无摘要'}</p>
+                  <div className="absolute top-4 right-4 w-6 h-6 rounded-full border border-[#1A1A1A]/10 flex items-center justify-center text-[10px] font-black text-[#1A1A1A]/20 group-hover:text-[#1A1A1A] transition-colors">
+                    帖
+                  </div>
+                  <div className="text-xl font-black text-[#1A1A1A] group-hover:text-[#3A5F41] transition-colors">{topic.title}</div>
+                  <p className="mt-4 text-xs font-medium leading-6 text-[#5C4033]/60 line-clamp-4">{topic.summary ?? '圣哲遗训，明辨自得。'}</p>
+                  
+                  <div className="mt-8 pt-4 border-t border-[#1A1A1A]/5 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#3A5F41] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-[10px] font-black text-[#1A1A1A]/0 group-hover:text-[#1A1A1A] transition-all uppercase tracking-widest">择此议题</span>
+                  </div>
                 </button>
               ))}
             </div>
@@ -460,36 +474,49 @@ export default function BattleFrameV2({
       )}
 
       {/* ═══════════════════════════════════════════════════════
-          战斗结束遮罩
+          战斗结束遮罩 (雅化版)
          ═══════════════════════════════════════════════════════ */}
       {isFinished && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="p-8 rounded-2xl bg-gradient-to-b from-[#1a1510] to-[#0d0b08] border-2 border-[#c9952a] shadow-2xl text-center">
-            <h2 className="text-3xl font-bold text-[#c9952a] mb-4">
-              {state.winner === 'player' ? '胜利' : state.winner === 'enemy' ? '失败' : '平局'}
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#FDFBF7] p-4">
+          <div className="w-full max-w-2xl text-center">
+            {/* 结语标题 */}
+            <div className="mb-4">
+              <span className="text-[10px] font-black text-[#5C4033]/40 uppercase tracking-[0.4em]">Battle Outcome</span>
+            </div>
+            
+            <h2 className={`text-7xl md:text-9xl font-black italic mb-8 tracking-tighter ${
+              state.winner === 'player' ? 'text-[#3A5F41]' : state.winner === 'enemy' ? 'text-[#8D2F2F]' : 'text-[#1A1A1A]'
+            }`}>
+              {state.winner === 'player' ? '胜天半子' : state.winner === 'enemy' ? '惜败一筹' : '旗鼓相当'}
             </h2>
-            <p className="text-[#c9b896] mb-6">
-              {state.winner === 'player'
-                ? '你赢得了这场辩论！'
-                : state.winner === 'enemy'
-                ? '对手技高一筹...'
-                : '双方势均力敌'}
-            </p>
-            <div className="flex gap-4 justify-center">
+
+            <div className="max-w-md mx-auto mb-16">
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#1A1A1A]/10 to-transparent mb-4" />
+              <p className="text-base font-medium text-[#5C4033]/60 italic serif">
+                {state.winner === 'player'
+                  ? '“学宫策辩，君子之风。阁下言辞犀利，见识卓绝，此番论战当推首功。”'
+                  : state.winner === 'enemy'
+                  ? '“胜败兵家常事，策论亦有穷时。阁下虽锋芒稍挫，他日卷土重来未可知也。”'
+                  : '“论道至此，双方见解不分轩轾，各领风骚。此乃稷下之幸，百家之福。”'}
+              </p>
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#1A1A1A]/10 to-transparent mt-4" />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {onReselectArena && (
                 <button
                   onClick={onReselectArena}
-                  className="px-6 py-3 rounded-lg bg-[#2a2318] border border-[#5c4d3a] text-[#b8a88a] hover:bg-[#3d3225] transition-all"
+                  className="w-48 py-4 rounded-xl bg-white border-2 border-[#1A1A1A]/10 text-[#1A1A1A] font-black text-xs hover:bg-[#1A1A1A] hover:text-white transition-all shadow-sm active:scale-95 uppercase tracking-widest"
                 >
-                  选择其他论场
+                  易地再战
                 </button>
               )}
               {onMenu && (
                 <button
                   onClick={onMenu}
-                  className="px-6 py-3 rounded-lg bg-gradient-to-r from-[#c9952a] to-[#b88520] text-white font-medium hover:from-[#d9a53a] hover:to-[#c89530] transition-all"
+                  className="w-48 py-4 rounded-xl bg-[#1A1A1A] text-white font-black text-xs hover:shadow-2xl transition-all active:scale-95 uppercase tracking-widest shadow-xl"
                 >
-                  返回主菜单
+                  撤离讲坛
                 </button>
               )}
             </div>

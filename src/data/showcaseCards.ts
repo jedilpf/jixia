@@ -271,4 +271,5 @@ export const CARDS: CardData[] = [
     { id: 'rujia3', name: '中庸守道', faction: '礼心殿', type: '策术', rarity: '传奇', cost: 3, background: '不偏之谓中，不易之谓庸。执其两端，用其中于民。', skill: '底蕴上限+2；获得【护持5】。' },
     { id: 'fajia1', name: '峻法立论', faction: '衡戒廷', type: '立论', rarity: '常见', cost: 1, background: '法不阿贵，绳不挠曲。唯有峻法，方能绝天下之乱。', skill: '对目标造成2点伤害；若目标有【怀疑】，额外抽1。' },
     { id: 'fajia2', name: '权柄之链', faction: '衡戒廷', type: '策术', rarity: '稀有', cost: 2, background: '权者，势也。锁链所及之处，皆为法之疆域。', skill: '指定一个单位，令其下回合无法使用【技能】。' },
+    { id: 'fajia3', name: '铁律门客', faction: '衡戒廷', type: '门客', rarity: '史诗', cost: 4, attack: 4, hp: 5, background: '法在人在，法亡人亡。铁骑甲卫，唯律命是从。', skill: '登场：对目标造成3点伤害；被动：该角色在场时，对手无法使用【反诘】。' },
 ];

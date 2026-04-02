@@ -16,6 +16,9 @@ export interface PlayerProgressState {
   totalCards: number;
   opportunity: number;
   lastSettlementKey: string | null;
+  // V2 雅化扩展：
+  unlockedPersonages: string[];   // 已解锁的名士录 ID
+  factionReputation: Record<string, number>; // 各门派声望：{ 'rujia': 100, 'fajia': 50 }
 }
 
 export interface BattleSettlementSummary {
@@ -27,7 +30,7 @@ export interface BattleSettlementSummary {
   won: boolean;
 }
 
-const STORAGE_KEY = 'jixia.mvp.playerProgress.v1';
+const STORAGE_KEY = 'jixia.mvp.playerProgress.v2'; // 升级为 v2 存档
 
 export const DEFAULT_PLAYER_PROGRESS: PlayerProgressState = {
   level: 1,
@@ -41,6 +44,15 @@ export const DEFAULT_PLAYER_PROGRESS: PlayerProgressState = {
   totalCards: 160,
   opportunity: 0,
   lastSettlementKey: null,
+  unlockedPersonages: [], // 初始无名士
+  factionReputation: {
+    'rujia': 0,
+    'fajia': 0,
+    'mojia': 0,
+    'daojia': 0,
+    'mingjia': 0,
+    'yinyang': 0,
+  },
 };
 
 export function loadPlayerProgress(): PlayerProgressState {

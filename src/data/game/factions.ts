@@ -1,11 +1,11 @@
-﻿import type { FactionDefinition } from '@/core/types';
+import type { FactionDefinition } from '@/core/types';
 
 export const FACTIONS: FactionDefinition[] = [
-  { id: 'confucian', name: '儒家', style: '秩序与教化', color: '#B58A52' },
-  { id: 'legalist', name: '法家', style: '法术与威势', color: '#8D4E3E' },
-  { id: 'daoist', name: '道家', style: '无为与借势', color: '#5E8F7E' },
-  { id: 'mohist', name: '墨家', style: '守御与节用', color: '#4E6A88' },
-  { id: 'strategist', name: '兵家', style: '攻势与调度', color: '#A85C45' },
+  { id: 'confucian', name: '礼心殿', style: '秩序与教化', color: '#3A5F41' }, // 石绿 Malachite
+  { id: 'legalist', name: '衡戒廷', color: '#8D2F2F', style: '法术与威势' }, // 朱砂 Cinnabar
+  { id: 'daoist', name: '虚静居', color: '#2C5F78', style: '无为与借势' }, // 石青 Azure
+  { id: 'mohist', name: '天工坊', color: '#3E4E5E', style: '守御与节用' }, // 玄铁 Iron-Ink
+  { id: 'strategist', name: '兵戈楼', style: '攻势与调度', color: '#A85C45' },
   { id: 'diplomat', name: '纵横家', style: '博弈与连锁', color: '#7C5FA3' },
   { id: 'logician', name: '名家', style: '诘辩与反制', color: '#5C6D9E' },
   { id: 'eclectic', name: '杂家', style: '融合与适配', color: '#80755A' },

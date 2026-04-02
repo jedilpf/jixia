@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PRE_BATTLE_BACKGROUND, PRE_BATTLE_COLORS, asset } from '@/ui/screens/visualAssets';
+import { asset } from '@/ui/screens/visualAssets';
 import { LevelDetailModal } from '@/ui/components/LevelDetailModal';
 import { PlayerLevelBadge } from '@/ui/components/PlayerLevelBadge';
 import { PlayerStatsPanelV2 } from '@/ui/components/PlayerStatsPanelV2';
@@ -26,22 +26,15 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
   const [showStats, setShowStats] = useState(false);
 
   return (
-    <div
-      className="relative flex h-full items-center justify-center overflow-hidden"
-      style={{
-        backgroundImage: `linear-gradient(125deg, rgba(10,7,5,0.78), rgba(34,18,10,0.7)), url(${PRE_BATTLE_BACKGROUND})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(190,118,63,0.18),transparent_42%),radial-gradient(circle_at_78%_72%,rgba(140,78,42,0.2),transparent_42%)]" />
+    <div className="relative flex h-full items-center justify-center overflow-hidden bg-[#FDFBF7] text-[#1A1A1A]">
+      {/* 矿物辉光背景与绢帛纹理 */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(58,95,65,0.06),transparent_40%),radial-gradient(circle_at_85%_75%,rgba(141,47,47,0.06),transparent_40%)]" />
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/handmade-paper.png")' }} />
 
-      <div className="absolute left-6 top-6 z-30 flex max-w-[460px] flex-col gap-3">
-        <div
-          className="rounded-xl border p-3"
-          style={{ borderColor: 'rgba(184,136,84,0.45)', background: 'rgba(15,10,7,0.72)' }}
-        >
-          <div className="flex items-start justify-between gap-3">
+      {/* 左上角：学说造诣（原等级信息） */}
+      <div className="absolute left-10 top-10 z-30 flex flex-col gap-4">
+        <div className="rounded-2xl border-2 border-[#B8A48D]/30 bg-white/60 p-4 shadow-xl backdrop-blur-md">
+          <div className="flex items-center justify-between gap-6 pb-4 border-b border-[#B8A48D]/20">
             <PlayerLevelBadge
               compact
               level={progress.level}
@@ -54,117 +47,105 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
                 collectedCards: progress.collectedCards,
               }}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
               <button
                 type="button"
-                className="rounded-lg border px-3 py-1.5 text-xs transition"
-                style={{ borderColor: '#7a5a34', color: '#f3debc', background: 'rgba(33,24,17,0.8)' }}
+                className="whitespace-nowrap px-4 py-1.5 text-xs font-bold text-[#3A5F41] border border-[#3A5F41]/30 rounded-md bg-[#EBF5EE] hover:bg-[#3A5F41] hover:text-white transition-all"
                 onClick={() => setShowLevelDetail(true)}
               >
-                等级详情
+                学说造诣
               </button>
               <button
                 type="button"
-                className="rounded-lg border px-3 py-1.5 text-xs transition"
-                style={{ borderColor: '#7a5a34', color: '#f3debc', background: 'rgba(33,24,17,0.8)' }}
+                className="whitespace-nowrap px-4 py-1.5 text-xs font-bold text-[#8D2F2F] border border-[#8D2F2F]/30 rounded-md bg-[#F5E6E6] hover:bg-[#8D2F2F] hover:text-white transition-all"
                 onClick={() => setShowStats(true)}
               >
-                我的战绩
+                名士战绩
               </button>
             </div>
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-            <div
-              className="rounded border p-2"
-              style={{ borderColor: 'rgba(184,136,84,0.35)', background: 'rgba(18,13,10,0.5)' }}
-            >
-              <div className="text-[#bca47f]">当前机遇</div>
-              <div className="mt-1 text-lg font-semibold text-[#f3debc]">{progress.opportunity}</div>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="p-3 bg-[#FDFBF7] border border-[#B8A48D]/20 rounded-lg">
+              <div className="text-[10px] uppercase tracking-widest text-[#5C4033]/50">Current Opportunity</div>
+              <div className="mt-1 text-2xl font-black text-[#1A1A1A]">{progress.opportunity}</div>
             </div>
-            <div
-              className="rounded border p-2"
-              style={{ borderColor: 'rgba(184,136,84,0.35)', background: 'rgba(18,13,10,0.5)' }}
-            >
-              <div className="text-[#bca47f]">大势转化规则</div>
-              <div className="mt-1 text-sm font-semibold text-[#f3debc]">每 1 点大势 = 1 点机遇</div>
+            <div className="p-3 bg-[#FDFBF7] border border-[#B8A48D]/20 rounded-lg">
+              <div className="text-[10px] uppercase tracking-widest text-[#5C4033]/50">World Sentiment</div>
+              <div className="mt-1 text-sm font-bold text-[#3A5F41]">大势一引·机遇即呈</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        className="relative flex w-[880px] items-stretch gap-4 rounded-2xl border p-6"
-        style={{ borderColor: PRE_BATTLE_COLORS.border, background: PRE_BATTLE_COLORS.panel }}
-      >
-        <div
-          className="flex-1 rounded-xl border p-6"
-          style={{ borderColor: 'rgba(184,136,84,0.45)', background: PRE_BATTLE_COLORS.panelSoft }}
-        >
-          <h1 className="text-4xl font-bold tracking-[0.08em]" style={{ color: PRE_BATTLE_COLORS.textMain }}>
-            百家争鸣
+      {/* 中心内容区：漆艺中轴布局 */}
+      <div className="relative z-10 flex w-full max-w-6xl items-stretch gap-8 px-10">
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="mb-4 flex items-center gap-4">
+            <div className="h-0.5 w-12 bg-[#3A5F41]" />
+            <span className="text-sm font-black tracking-[0.3em] text-[#3A5F41] uppercase">Asking the Tao</span>
+          </div>
+          
+          <h1 className="text-7xl font-black tracking-[0.1em] text-[#1A1A1A] leading-tight">
+            问道<span className="text-[#3A5F41]">百家</span>
           </h1>
-          <p className="mt-3 text-sm" style={{ color: PRE_BATTLE_COLORS.textMuted }}>
-            明辩暗辩 · 议题争夺 · 门派对战
-          </p>
-          <p className="mt-8 text-sm leading-7" style={{ color: '#d4bf99' }}>
-            围绕中央议题，在主议与旁议中提交牌组组合。每 3 轮将触发一次议题引爆判定，争夺方向优势与大势胜机。
-          </p>
-          <button
-            type="button"
-            className="mt-10 rounded-lg border px-8 py-3 text-base font-semibold transition"
-            style={{
-              borderColor: '#b88a53',
-              background: PRE_BATTLE_COLORS.button,
-              color: '#f6e4c3',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = PRE_BATTLE_COLORS.buttonHover;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = PRE_BATTLE_COLORS.button;
-            }}
-            onClick={onStart}
-          >
-            开始对战
-          </button>
-          {onStoryMode && (
-            <button
-              type="button"
-              className="relative mt-4 w-full rounded-lg border px-6 py-3 text-sm font-semibold transition"
-              style={{
-                borderColor: 'rgba(139,115,85,0.6)',
-                background: 'rgba(26,26,46,0.8)',
-                color: '#D4C5A9',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#E85D04';
-                e.currentTarget.style.color = '#E85D04';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(139,115,85,0.6)';
-                e.currentTarget.style.color = '#D4C5A9';
-              }}
-              onClick={onStoryMode}
-            >
-              📜 争鸣史
-              <RedDot className="absolute -right-1 -top-1" pulse />
-            </button>
-          )}
+          
+          <div className="mt-8 flex flex-col gap-6 max-w-lg">
+            <p className="text-lg leading-relaxed text-[#5C4033] font-medium opacity-80">
+              围席而坐，笔墨齐发。于主议旁辩之间，夺天下大势。
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <button
+                onClick={onStart}
+                className="group flex flex-col items-center justify-center h-32 rounded-2xl bg-[#1A1A1A] text-white transition-all hover:bg-[#3A5F41] shadow-2xl hover:-translate-y-2"
+              >
+                <span className="text-2xl font-black tracking-widest">入局争鸣</span>
+                <span className="mt-2 text-[10px] opacity-40 uppercase tracking-tighter">Enter the Contention</span>
+              </button>
+              
+              {onStoryMode && (
+                <button
+                  onClick={onStoryMode}
+                  className="group relative flex flex-col items-center justify-center h-32 rounded-2xl bg-white border-2 border-[#1A1A1A]/10 transition-all hover:border-[#8D2F2F]/40 hover:bg-[#F5E6E6]/30 hover:-translate-y-2"
+                >
+                  <span className="text-2xl font-black tracking-widest text-[#1A1A1A]">争鸣史</span>
+                  <span className="mt-2 text-[10px] text-[#5C4033]/50 uppercase tracking-tighter">Story Chronicles</span>
+                  <RedDot className="absolute right-4 top-4" pulse />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div
-          className="relative w-[300px] overflow-hidden rounded-xl border"
-          style={{ borderColor: 'rgba(184,136,84,0.45)' }}
-        >
-          <img src={asset('/assets/chars/stand/sunwu.png')} alt="门派立绘" className="h-full w-full object-cover" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3 text-xs" style={{ color: '#e6d0aa' }}>
-            天下纷争，百家争鸣
+        {/* 侧边名士鉴赏 */}
+        <div className="relative w-[400px] overflow-hidden rounded-[2.5rem] border-8 border-white bg-[#FDFBF7] shadow-[0_45px_70px_rgba(0,0,0,0.15)] transition-transform duration-700 hover:scale-[1.02]">
+          <img 
+            src={asset('/assets/chars/stand/sunwu.png')} 
+            alt="兵家名士·孙武" 
+            className="h-full w-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-1000"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/60 via-transparent to-transparent" />
+          <div className="absolute bottom-10 left-10 text-white">
+            <div className="text-xs font-bold tracking-[0.3em] opacity-80 uppercase">Faction Master</div>
+            <div className="text-3xl font-black tracking-widest mt-1">兵家 · 孙武</div>
           </div>
         </div>
       </div>
 
-      {showLevelDetail ? (
+      {/* 背景装饰：流云与印章 */}
+      <div className="absolute bottom-10 right-10 flex items-center gap-6 opacity-30">
+        <div className="text-right">
+          <div className="text-[10px] font-bold tracking-[0.2em]">Alpha Version 1.0.0</div>
+          <div className="text-[9px] tracking-widest uppercase">Jixia Academy · 2026</div>
+        </div>
+        <div className="w-12 h-12 border-2 border-[#8D2F2F] rounded-md flex items-center justify-center">
+          <span className="text-[#8D2F2F] font-black text-xl">稷</span>
+        </div>
+      </div>
+
+      {/* 弹窗逻辑保持不变 */}
+      {showLevelDetail && (
         <LevelDetailModal
           level={progress.level}
           exp={progress.exp}
@@ -177,10 +158,10 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
           }}
           onClose={() => setShowLevelDetail(false)}
         />
-      ) : null}
+      )}
 
-      {showStats ? (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+      {showStats && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-md animate-fade-in">
           <PlayerStatsPanelV2
             playerName="游学者"
             stats={{
@@ -196,7 +177,7 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
             onClose={() => setShowStats(false)}
           />
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

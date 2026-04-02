@@ -1,4 +1,5 @@
-﻿import { resolveBattle } from '@/core/battleResolver';
+import { formatYahuaLog } from '@/utils/yahuaLogs';
+import { resolveBattle } from '@/core/battleResolver';
 import { getNextBattlePhase } from '@/core/phaseMachine';
 import {
   addIssueDirectionScore,
@@ -368,7 +369,7 @@ export function startBattle(state: GameState): GameState {
     },
   };
 
-  return appendLog(next, `对局开始：${playerFaction} vs ${enemyFaction}，中央议题：${issueDef.seedPrompt}`);
+  return appendLog(next, formatYahuaLog('BATTLE_START', { faction: playerFaction }));
 }
 
 export function advanceBattlePhase(state: GameState): GameState {
@@ -438,7 +439,11 @@ export function playCardToZone(
 
   return appendLog(
     next,
-    `${playerId === 'player' ? '我方' : '对手'}暗辩提交 ${card.name} 至${zone === 'main' ? '主议' : '旁议'}（${nextPlayer.cardsPlayedThisTurn}/${state.battle.maxCardsPerTurn}）`,
+    formatYahuaLog('PLAY_CARD', {
+      playerName: playerId === 'player' ? '我方' : '对手',
+      value: card.name as any,
+      targetName: zone === 'main' ? '主议位' : '旁议位',
+    }),
   );
 }
 
@@ -449,7 +454,7 @@ export function passAction(state: GameState): GameState {
     battle: {
       ...state.battle,
       phase: 'submission_lock',
-      logs: [...state.battle.logs, '本轮提交已锁定，进入明辩揭示。'],
+      logs: [...state.battle.logs, '论点既定，名实自见。诸子请入明辩揭示。'],
     },
   };
 }
@@ -529,10 +534,11 @@ export function resolveRound(state: GameState): GameState {
   };
 
   const roundLogs: string[] = [
-    `主议论势：我方 ${result.main.playerPower} / 对手 ${result.main.enemyPower}（胜者：${
+    formatYahuaLog('ROUND_RESULT', {}),
+    `【主议】我方 ${result.main.playerPower} / 对手 ${result.main.enemyPower}（胜者：${
       result.main.winner === 'draw' ? '平' : result.main.winner === 'player' ? '我方' : '对手'
     }）`,
-    `旁议论势：我方 ${result.side.playerPower} / 对手 ${result.side.enemyPower}（胜者：${
+    `【旁议】我方 ${result.side.playerPower} / 对手 ${result.side.enemyPower}（胜者：${
       result.side.winner === 'draw' ? '平' : result.side.winner === 'player' ? '我方' : '对手'
     }）`,
   ];
@@ -598,7 +604,7 @@ export function resolveRound(state: GameState): GameState {
         logs: [
           ...state.battle.logs,
           ...roundLogs,
-          winnerId === 'draw' ? '本局平局' : `${winnerId === 'player' ? '我方' : '对手'}获得胜利`,
+          formatYahuaLog(winnerId === 'player' ? 'BATTLE_WIN' : 'BATTLE_LOSE', { playerName: '君' }),
         ],
       },
     };
