@@ -5,11 +5,18 @@
 
 import React, { useState, useMemo } from 'react';
 import { DebateCard, CardTypeV2 } from '@/battleV2/types';
+import {
+  getDeckTierQuotaForLevel,
+  getCardUnlockLevel,
+  isCardUnlockedForLevel,
+  resolveCardStarTier,
+} from '@/battleV2/tierSystem';
 
 interface CardLibraryPanelProps {
   isOpen: boolean;
   onClose: () => void;
   allCards: DebateCard[];
+  currentPlayerLevel?: number;
 }
 
 const CARD_TYPES: { type: CardTypeV2 | 'all'; label: string; color: string; icon: string }[] = [
@@ -25,6 +32,7 @@ const CardLibraryPanel: React.FC<CardLibraryPanelProps> = ({
   isOpen,
   onClose,
   allCards,
+  currentPlayerLevel = 1,
 }) => {
   const [selectedType, setSelectedType] = useState<CardTypeV2 | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +48,14 @@ const CardLibraryPanel: React.FC<CardLibraryPanelProps> = ({
       return matchesType && matchesSearch;
     });
   }, [allCards, selectedType, searchQuery]);
+  const unlockedCount = useMemo(
+    () => allCards.filter((card) => isCardUnlockedForLevel(card, currentPlayerLevel)).length,
+    [allCards, currentPlayerLevel],
+  );
+  const currentQuota = useMemo(
+    () => getDeckTierQuotaForLevel(currentPlayerLevel),
+    [currentPlayerLevel],
+  );
 
   if (!isOpen) return null;
 
@@ -55,7 +71,12 @@ const CardLibraryPanel: React.FC<CardLibraryPanelProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-[#c9b896]">卡牌图鉴</h2>
-              <p className="text-xs text-[#8a7a6a]">共 {allCards.length} 张卡牌</p>
+              <p className="text-xs text-[#8a7a6a]">
+                Lv.{currentPlayerLevel} · 已解锁 {unlockedCount}/{allCards.length}
+              </p>
+              <p className="text-[11px] text-[#7f8f9f]">
+                配额：2★ ≤ {currentQuota.maxTwoStar}，3★ ≤ {currentQuota.maxThreeStar}
+              </p>
             </div>
           </div>
           <button
@@ -151,6 +172,7 @@ const CardLibraryPanel: React.FC<CardLibraryPanelProps> = ({
                     key={card.id}
                     card={card}
                     isSelected={selectedCard?.id === card.id}
+                    currentPlayerLevel={currentPlayerLevel}
                     onClick={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
                   />
                 ))}
@@ -180,8 +202,9 @@ const CardLibraryPanel: React.FC<CardLibraryPanelProps> = ({
 const CardLibraryItem: React.FC<{
   card: DebateCard;
   isSelected: boolean;
+  currentPlayerLevel: number;
   onClick: () => void;
-}> = ({ card, isSelected, onClick }) => {
+}> = ({ card, isSelected, currentPlayerLevel, onClick }) => {
   const frameColors: Record<string, string> = {
     '立论': '#9EAD8A',
     '策术': '#C06F6F',
@@ -190,6 +213,10 @@ const CardLibraryItem: React.FC<{
     '玄章': '#909BA6',
   };
   const color = frameColors[card.type] || '#b8a88a';
+  const starTier = resolveCardStarTier(card);
+  const unlockLevel = getCardUnlockLevel(card);
+  const unlocked = isCardUnlockedForLevel(card, currentPlayerLevel);
+  const starText = '★'.repeat(starTier);
 
   return (
     <div
@@ -202,16 +229,22 @@ const CardLibraryItem: React.FC<{
       style={{
         borderColor: isSelected ? color : `${color}30`,
         boxShadow: isSelected ? `0 0 20px ${color}30, inset 0 0 20px ${color}10` : 'none',
+        opacity: unlocked ? 1 : 0.6,
       }}
     >
       <div className="flex items-start justify-between mb-2">
         <span className="font-medium text-[#c9b896] truncate flex-1">{card.name}</span>
-        <span
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold ml-2 shrink-0"
-          style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}50` }}
-        >
-          {card.cost}
-        </span>
+        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+          <span className="px-1.5 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-[#f4d58a] bg-[#3b2d17] border border-[#8a6a34]/60">
+            {starText}
+          </span>
+          <span
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold"
+            style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}50` }}
+          >
+            {card.cost}
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 mb-2">
@@ -244,6 +277,12 @@ const CardLibraryItem: React.FC<{
           </div>
         )}
       </div>
+
+      {!unlocked && (
+        <div className="mt-2 rounded-md border border-[#7a5b2f]/60 bg-[#2a1f12]/70 px-2 py-1 text-[11px] text-[#f0c97a]">
+          未解锁：Lv.{unlockLevel} 开放
+        </div>
+      )}
     </div>
   );
 };
@@ -257,6 +296,9 @@ const CardDetail: React.FC<{ card: DebateCard }> = ({ card }) => {
     '玄章': '#909BA6',
   };
   const color = frameColors[card.type] || '#b8a88a';
+  const starTier = resolveCardStarTier(card);
+  const starText = '★'.repeat(starTier);
+  const unlockLevel = getCardUnlockLevel(card);
 
   return (
     <div>
@@ -270,6 +312,9 @@ const CardDetail: React.FC<{ card: DebateCard }> = ({ card }) => {
         <div>
           <h3 className="text-lg font-bold text-[#c9b896]">{card.name}</h3>
           <div className="flex items-center gap-2 mt-1">
+            <span className="px-2 py-0.5 rounded text-xs font-medium text-[#f4d58a] bg-[#3b2d17] border border-[#8a6a34]/60">
+              {starText}
+            </span>
             <span
               className="px-2 py-0.5 rounded text-xs font-medium"
               style={{ backgroundColor: `${color}20`, color }}
@@ -280,6 +325,7 @@ const CardDetail: React.FC<{ card: DebateCard }> = ({ card }) => {
               <span className="text-xs text-[#8a7a6a]">{card.faction}</span>
             )}
           </div>
+          <p className="mt-1 text-[11px] text-[#8a7a6a]">解锁等级：Lv.{unlockLevel}</p>
         </div>
       </div>
 

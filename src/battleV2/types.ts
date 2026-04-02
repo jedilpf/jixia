@@ -20,6 +20,9 @@ export interface DebateCard {
   id: string;
   name: string;
   type: CardTypeV2;
+  rarity?: string;
+  starTier?: 1 | 2 | 3;
+  unlockLevel?: number;
   cost: number;
   effectKind: EffectKind;
   effectValue: number;

@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260402-112",
+  "goal": "Implement phase-A integration for 3-tier card system: add tier metadata on battle cards, expose level/tier validation helpers, and update card library UI to show stars and unlock status.",
+  "constraints": [
+    "Do not alter card source chain or reduce the 170-card runtime baseline.",
+    "Prioritize additive, low-risk changes; avoid broad refactors.",
+    "If gameplay enforcement is not fully wired, keep logic as helper functions and reflect status clearly in UI."
+  ],
+  "deliverables": [
+    "Tier-system utility module with unlock and quota validation helpers.",
+    "battleV2 card objects enriched with tier metadata (star tier + unlock level + rarity pass-through).",
+    "Card library panel updates showing star tier and lock hints based on current player level.",
+    "A short implementation note documenting what is active now vs reserved for next step."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/battleV2",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "docs/project",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-112.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-112.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-112.json"
+  ],
+  "status": "completed"
+}

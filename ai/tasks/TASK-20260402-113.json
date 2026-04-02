@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260402-113",
+  "goal": "Enforce hard 2-star/3-star quota constraints in battle startup flow: generated decks must satisfy tier quota by level and battle start should block on any quota violation.",
+  "constraints": [
+    "Keep cardsSource chain and runtime baseline checks intact.",
+    "Implement quota enforcement in a deterministic and low-risk way.",
+    "Do not remove existing 170+ card corpus; only constrain per-level deck composition."
+  ],
+  "deliverables": [
+    "Tier quota enforcement wired into deck generation pipeline.",
+    "Battle startup pre-check that blocks invalid decks with explicit logs.",
+    "UI-level quota hint for current player level in card library panel.",
+    "Updated implementation note documenting hard enforcement."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/battleV2",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "docs/project",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-113.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-113.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-113.json"
+  ],
+  "status": "completed"
+}

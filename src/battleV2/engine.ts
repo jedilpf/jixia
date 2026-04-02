@@ -31,6 +31,7 @@ import {
 } from './laneSystem';
 import { DEFAULT_DECK_BUILD_DEFAULTS } from './meta';
 import { getTopicById, getTopicConfig, getTopicEffectMultiplier } from './topics';
+import { validateDeckTierQuota } from './tierSystem';
 
 export const PHASE_DURATION: Record<Exclude<DebatePhase, 'finished'>, number> = {
   ming_bian: 25,
@@ -57,6 +58,8 @@ export const SLOT_CARD_RULES: Record<PlanSlot, CardTypeV2[]> = {
 export interface CreateBattleStateOptions {
   arenaId?: ArenaId;
   forcedTopicId?: string;
+  playerLevel?: number;
+  enemyLevel?: number;
   useFactionFramework?: boolean;
   useFullCardPool?: boolean;
   playerMainFaction?: string;
@@ -295,6 +298,7 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
     ? {
         useFactionFramework: true,
         useFullCardPool,
+        playerLevel: options?.playerLevel,
         mainFaction: playerMainFaction,
         guestFactions: playerGuestFactions,
         enabledFactions: options?.enabledFactions,
@@ -309,6 +313,7 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
     ? {
         useFactionFramework: true,
         useFullCardPool,
+        playerLevel: options?.enemyLevel ?? options?.playerLevel,
         mainFaction: enemyMainFaction,
         guestFactions: enemyGuestFactions,
         enabledFactions: options?.enabledFactions,
@@ -331,6 +336,47 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
   const topic = forcedTopic ?? null;
   const topicOptions = pickTopicOptions(3, forcedTopic?.id);
   const topicSelectionPending = topic === null;
+  const safePlayerLevel = Math.max(1, Math.floor(options?.playerLevel ?? 1));
+  const safeEnemyLevel = Math.max(1, Math.floor(options?.enemyLevel ?? safePlayerLevel));
+  const player = createPlayer('player', '我方', initialHuYin, playerDeckOptions);
+  const enemy = createPlayer('enemy', '敌方', initialHuYin, enemyDeckOptions);
+  const playerTierValidation = validateDeckTierQuota(player.deck, safePlayerLevel);
+  const enemyTierValidation = validateDeckTierQuota(enemy.deck, safeEnemyLevel);
+
+  const tierValidationErrors: string[] = [];
+  if (!playerTierValidation.ok) {
+    tierValidationErrors.push(`我方牌组配额不合法：${playerTierValidation.errors.join('；')}`);
+  }
+  if (!enemyTierValidation.ok) {
+    tierValidationErrors.push(`敌方牌组配额不合法：${enemyTierValidation.errors.join('；')}`);
+  }
+
+  if (tierValidationErrors.length > 0) {
+    return {
+      round: 1,
+      maxRounds: MAX_ROUNDS,
+      phase: 'finished',
+      secondsLeft: 0,
+      activeTopicId: topic?.id ?? null,
+      activeTopic: topic?.title ?? '',
+      topicSelectionPending,
+      topicSelectionRound: TOPIC_SELECTION_ROUND,
+      topicSelectionSecondsLeft: null,
+      topicOptions,
+      arenaId,
+      arenaName: arena.name,
+      player,
+      enemy,
+      logs: [
+        makeLog(1, startLog),
+        ...tierValidationErrors.map((line) => makeLog(1, `[配额拦截] ${line}`)),
+        makeLog(1, '对局未开始：星级配额校验未通过，请调整牌组后重试'),
+      ],
+      resolveFeed: [],
+      internalAudit: [auditLine, '[R1] tier-quota-blocked'],
+      winner: 'draw',
+    };
+  }
 
   return {
     round: 1,
@@ -345,8 +391,8 @@ export function createInitialBattleState(options?: CreateBattleStateOptions): De
     topicOptions,
     arenaId,
     arenaName: arena.name,
-    player: createPlayer('player', '我方', initialHuYin, playerDeckOptions),
-    enemy: createPlayer('enemy', '敌方', initialHuYin, enemyDeckOptions),
+    player,
+    enemy,
     logs: [
       makeLog(1, startLog),
       ...(topicSelectionPending

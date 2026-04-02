@@ -20,6 +20,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
 import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
 import { getTopicById } from '@/battleV2/topics';
+import { usePlayerLevelState } from '@/game/hooks/usePlayerLevelSystem';
 import {
   ArenaId,
   SeatId,
@@ -103,6 +104,9 @@ export default function BattleFrameV2({
   onReselectArena,
   onFinished,
 }: BattleFrameV2Props) {
+  const playerLevelState = usePlayerLevelState();
+  const currentPlayerLevel = Math.max(1, playerLevelState.level || 1);
+
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
   // ═══════════════════════════════════════════════════════════
@@ -111,6 +115,8 @@ export default function BattleFrameV2({
     forcedTopicId,
     playerMainFaction,
     enemyMainFaction,
+    playerLevel: currentPlayerLevel,
+    enemyLevel: currentPlayerLevel,
   });
 
   const { phase, player, logs, winner } = state;
@@ -385,6 +391,7 @@ export default function BattleFrameV2({
         isOpen={isCardLibraryOpen}
         onClose={() => setIsCardLibraryOpen(false)}
         allCards={allCards}
+        currentPlayerLevel={currentPlayerLevel}
       />
 
       {/* 状态面板 */}

@@ -17,6 +17,13 @@ import {
   DEFAULT_DECK_BUILD_DEFAULTS,
   normalizeEnabledFactions,
 } from './meta';
+import {
+  enforceDeckTierQuota,
+  getCardUnlockLevel,
+  getDeckTierQuotaForLevel,
+  isCardUnlockedForLevel,
+  resolveStarTierByRarity,
+} from './tierSystem';
 
 export function artPathForId(id: string, cardName?: string): string {
   return getCardImageUrl(id, cardName);
@@ -68,6 +75,7 @@ export interface CreateStarterDeckOptions {
   includeCommons?: number;
   deckSize?: number;
   forceClassicStarter?: boolean;
+  playerLevel?: number;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -146,10 +154,15 @@ function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
   const frameworkFaction = toFrameworkFactionName(src.faction);
   const blueprint = FRAMEWORK_FACTION_BY_NAME[frameworkFaction];
   const sceneBias = blueprint ? pickSceneBiasFromRoutePreference(blueprint.routePreference) : 'all';
+  const starTier = resolveStarTierByRarity(src.rarity);
+  const unlockLevel = getCardUnlockLevel({ starTier, rarity: src.rarity });
 
   return {
     name: src.name,
     type: normalizedType,
+    rarity: src.rarity,
+    starTier,
+    unlockLevel,
     cost: Math.max(1, src.cost <= 3 ? src.cost : Math.round(src.cost / 2)),
     effectKind: effectKindMap[src.type] ?? effectKindMap[normalizedType] ?? 'draw',
     effectValue: src.attack ?? src.shield ?? (src.hp ? Math.ceil(src.hp / 2) : 1),
@@ -217,6 +230,50 @@ function createClassicStarterDeck(side: Side): DebateCard[] {
   return deck.slice(0, 20);
 }
 
+function applyTierUnlockFilter(deck: DebateCard[], playerLevel?: number): DebateCard[] {
+  if (typeof playerLevel !== 'number' || !Number.isFinite(playerLevel)) return deck;
+  const safeLevel = Math.max(1, Math.floor(playerLevel));
+  return deck.filter((card) => isCardUnlockedForLevel(card, safeLevel));
+}
+
+function applyTierRules(deck: DebateCard[], playerLevel?: number): DebateCard[] {
+  if (typeof playerLevel !== 'number' || !Number.isFinite(playerLevel)) return deck;
+  const safeLevel = Math.max(1, Math.floor(playerLevel));
+  const unlockedDeck = applyTierUnlockFilter(deck, safeLevel);
+  const enforced = enforceDeckTierQuota(unlockedDeck, safeLevel);
+  return enforced.deck;
+}
+
+function getTierFallbackDeck(side: Side, playerLevel?: number): DebateCard[] {
+  const safeLevel = typeof playerLevel === 'number' && Number.isFinite(playerLevel)
+    ? Math.max(1, Math.floor(playerLevel))
+    : 1;
+  const quota = getDeckTierQuotaForLevel(safeLevel);
+  const byTier = {
+    one: [] as CardData[],
+    two: [] as CardData[],
+    three: [] as CardData[],
+  };
+
+  for (const src of ACTIVE_CARDS) {
+    const tier = resolveStarTierByRarity(src.rarity);
+    if (tier === 3) byTier.three.push(src);
+    else if (tier === 2) byTier.two.push(src);
+    else byTier.one.push(src);
+  }
+
+  const deckSource = [
+    ...byTier.one,
+    ...byTier.two.slice(0, quota.maxTwoStar),
+    ...byTier.three.slice(0, quota.maxThreeStar),
+  ];
+
+  return deckSource.map((src, idx) => ({
+    ...showcaseToDebateCardFromSource(src),
+    id: `${side}-tier-fallback-${idx}-${src.id}`,
+  }));
+}
+
 export function getActiveCardPoolSize(): number {
   return ACTIVE_CARDS.length;
 }
@@ -230,7 +287,7 @@ export function listAllDebateCardsForLibrary(): DebateCard[] {
     .sort((a, b) => (a.cost - b.cost) || a.name.localeCompare(b.name, 'zh-Hans-CN'));
 }
 
-function createFullCardPoolDeck(side: Side, enabledFactions: string[]): DebateCard[] {
+function createFullCardPoolDeck(side: Side, enabledFactions: string[], playerLevel?: number): DebateCard[] {
   const enabledShowcaseFactions = buildEnabledShowcaseFactionSet(enabledFactions);
   const isFactionEnabled = (faction: string): boolean =>
     enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
@@ -239,10 +296,11 @@ function createFullCardPoolDeck(side: Side, enabledFactions: string[]): DebateCa
   if (selected.length === 0) return [];
 
   const shuffled = shuffleArray([...selected]);
-  return shuffled.map((src, idx) => ({
+  const fullDeck = shuffled.map((src, idx) => ({
     ...showcaseToDebateCardFromSource(src),
     id: `${side}-p${idx}-${src.id}`,
   }));
+  return applyTierRules(fullDeck, playerLevel);
 }
 
 function getDeckIdsForFactionFramework(
@@ -317,13 +375,17 @@ export function rollGuestFactions(mainFaction: string, count = DEFAULT_GUEST_COU
 }
 
 export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions): DebateCard[] {
-  if (options?.forceClassicStarter) return createClassicStarterDeck(side);
+  if (options?.forceClassicStarter) {
+    const forceClassicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
+    return forceClassicDeck.length > 0 ? forceClassicDeck : getTierFallbackDeck(side, options?.playerLevel);
+  }
 
   const enabledFactions = normalizeEnabledFactions(options?.enabledFactions ?? DEFAULT_CARD_POOL_CONFIG.enabledFactions);
   const useFullCardPool = options?.useFullCardPool ?? true;
   if (useFullCardPool) {
-    const fullPoolDeck = createFullCardPoolDeck(side, enabledFactions);
+    const fullPoolDeck = createFullCardPoolDeck(side, enabledFactions, options?.playerLevel);
     if (fullPoolDeck.length > 0) return fullPoolDeck;
+    return getTierFallbackDeck(side, options?.playerLevel);
   }
 
   const useFramework = Boolean(
@@ -331,7 +393,10 @@ export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions
     options?.mainFaction ||
     (options?.guestFactions && options.guestFactions.length > 0)
   );
-  if (!useFramework) return createClassicStarterDeck(side);
+  if (!useFramework) {
+    const classicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
+    return classicDeck.length > 0 ? classicDeck : getTierFallbackDeck(side, options?.playerLevel);
+  }
 
   const mainFaction = toFrameworkFactionName(options?.mainFaction ?? CORE_FACTION_NAMES[0]);
   const genericCardIds = options?.genericCardIds ?? DEFAULT_CARD_POOL_CONFIG.genericCardIds;
@@ -365,6 +430,11 @@ export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions
     deck.push({ ...base, id: `${side}-f${idx}-${id}` });
   });
 
-  if (deck.length === 0) return createClassicStarterDeck(side);
-  return deck;
+  if (deck.length === 0) {
+    const classicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
+    return classicDeck.length > 0 ? classicDeck : getTierFallbackDeck(side, options?.playerLevel);
+  }
+  const tierAppliedDeck = applyTierRules(deck, options?.playerLevel);
+  if (tierAppliedDeck.length > 0) return tierAppliedDeck;
+  return getTierFallbackDeck(side, options?.playerLevel);
 }
