@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260402-107",
+  "goal": "Execute Day-1 baseline runbook and record objective environment/check results into playtest session file without altering gameplay design content.",
+  "constraints": [
+    "Do not modify gameplay logic or narrative data.",
+    "Only record factual run results and current blockers.",
+    "Keep existing template structure; only fill or append execution-status fields."
+  ],
+  "deliverables": [
+    "Updated Day-1 playtest session file with baseline command outcomes.",
+    "Current local run URL and process note recorded.",
+    "Workflow finalize evidence."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-107.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-107.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-107.json"
+  ],
+  "status": "in_progress"
+}
