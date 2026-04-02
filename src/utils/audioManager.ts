@@ -17,7 +17,13 @@
     public init() {
         if (this.ctx) return;
         try {
-            this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const audioContextCtor: typeof AudioContext | undefined =
+                window.AudioContext ||
+                (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+            if (!audioContextCtor) {
+                throw new Error('AudioContext constructor unavailable');
+            }
+            this.ctx = new audioContextCtor();
             this.masterGain = this.ctx.createGain();
             this.masterGain.gain.value = this.sfxVolume;
             this.masterGain.connect(this.ctx.destination);

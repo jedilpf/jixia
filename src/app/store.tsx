@@ -1,4 +1,5 @@
-﻿import { createContext, useContext, useMemo, useReducer } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useMemo, useReducer } from 'react';
 import type { Dispatch, PropsWithChildren } from 'react';
 import type { AppAction } from '@/app/actions';
 import { appReducer, createAppInitialState } from '@/app/reducer';

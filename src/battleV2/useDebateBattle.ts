@@ -40,7 +40,13 @@ export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattl
       dispatch({ type: 'AI_AUTO_PLAN' });
     }, waitMs);
     return () => window.clearTimeout(timer);
-  }, [state.phase, state.round, state.enemy.plan.lockedPublic]);
+  }, [
+    state.phase,
+    state.round,
+    state.enemy.plan.lockedPublic,
+    state.topicSelectionPending,
+    state.topicSelectionRound,
+  ]);
 
   useEffect(() => {
     if (state.phase !== 'an_mou' || state.enemy.plan.lockedSecret) return undefined;

@@ -14,6 +14,8 @@ module.exports = {
     'backups/**',
     'misc/**',
     'src/App_legacy.tsx',
+    // Legacy battle stack kept for reference; active runtime uses BattleV2 chain.
+    'src/components/battle/**',
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],

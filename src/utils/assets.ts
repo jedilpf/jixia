@@ -3,6 +3,8 @@ const CARD_IMAGE_EXT_OVERRIDES: Record<string, 'png' | 'jpg'> = {
   liangyi: 'png',
   ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`tiangong${i + 1}`, 'png'])),
   ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`liangyi${i + 1}`, 'png'])),
+  ...Object.fromEntries(Array.from({ length: 5 }, (_, i) => [`rujia${i + 1}`, 'png'])),
+  ...Object.fromEntries(Array.from({ length: 5 }, (_, i) => [`fajia${i + 1}`, 'png'])),
 };
 
 // BS01 主线卡在迁移前使用过旧图 id；这里保留兼容映射，避免迁移期卡图“看起来丢失”。

@@ -38,7 +38,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
             </div>
 
             {/* 列表滚动容器 - 按门派分类 */}
-            <div className="w-[96%] mx-auto flex-1 custom-scrollbar px-[6%] z-10 pb-12" style={{ overflowY: 'overlay' as any }}>
+            <div className="w-[96%] mx-auto flex-1 custom-scrollbar px-[6%] z-10 pb-12" style={{ overflowY: 'auto' }}>
                 {Array.from(new Set(CARDS.map(c => c.faction))).map(faction => {
                     const factionCards = CARDS.filter(c => c.faction === faction);
                     return (

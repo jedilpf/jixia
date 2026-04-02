@@ -1,0 +1,40 @@
+{
+  "task_id": "TASK-20260402-104",
+  "goal": "Continue project hardening by reducing lint blockers in active runtime files and quarantining legacy battle component lint debt without deleting code.",
+  "constraints": [
+    "Do not change active gameplay behavior in BattleV2 or story flow.",
+    "Keep fixes low-risk: typing cleanup, lint hygiene, and deterministic dependency declarations only.",
+    "Legacy modules may be lint-ignored only when not imported by active flow."
+  ],
+  "deliverables": [
+    "Active-path lint errors fixed (no-explicit-any, prefer-const, irregular-whitespace, unused vars).",
+    "React-hook and react-refresh warnings in active files resolved.",
+    "Legacy battle component directory lint debt isolated via eslint ignore patterns.",
+    "Validation rerun and workflow finalize pass."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    ".eslintrc.cjs",
+    "src/app/reducer.ts",
+    "src/app/store.tsx",
+    "src/battleV2/useDebateBattle.ts",
+    "src/components/showcase/CardGrid.tsx",
+    "src/contexts/ThemeContext.tsx",
+    "src/core/gameEngine.ts",
+    "src/data/cards.ts",
+    "src/game/story/data/chapterMoru001_part2.ts",
+    "src/utils/audioManager.ts",
+    "src/utils/commandSystem.ts",
+    "src/utils/layoutMath.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-104.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-104.json",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-104.json"
+  ],
+  "status": "in_progress"
+}

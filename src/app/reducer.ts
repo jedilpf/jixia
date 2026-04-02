@@ -48,9 +48,15 @@ export function appReducer(state: GameState, action: AppAction): GameState {
     case 'RESOLVE_ROUND':
       return resolveRound(state);
     case 'FINISH_BATTLE':
-      return { ...state, screen: 'result', winnerId: action.winnerId as any };
+      return {
+        ...state,
+        screen: 'result',
+        winnerId:
+          action.winnerId === 'player' || action.winnerId === 'enemy' || action.winnerId === 'draw'
+            ? action.winnerId
+            : null,
+      };
     default:
       return state;
   }
 }
-

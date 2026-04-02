@@ -1,5 +1,6 @@
-﻿import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { ThemeId, ThemeColors, themes, defaultTheme, getTheme } from '@/config/themes';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { type ThemeId, type ThemeColors, themes, defaultTheme, getTheme } from '@/config/themes';
 
 interface ThemeContextType {
   currentTheme: ThemeId;
@@ -39,7 +40,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     const root = document.documentElement;
     const colors = theme.colors;
-    
+
     root.style.setProperty('--color-primary', colors.primary);
     root.style.setProperty('--color-primary-light', colors.primaryLight);
     root.style.setProperty('--color-primary-dark', colors.primaryDark);

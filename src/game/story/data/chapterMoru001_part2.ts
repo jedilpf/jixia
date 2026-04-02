@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 import type { StoryNode } from '../types';
 
 export const CHAPTER_MORU_001_PART2_NODES: StoryNode[] = [

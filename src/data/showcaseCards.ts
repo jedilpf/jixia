@@ -1,4 +1,4 @@
-﻿// 稀有度颜色映射
+// 稀有度颜色映射
 export const rarityColor: Record<string, string> = {
     '常见': '#9ca3af',
     '稀有': '#60a5fa',
@@ -265,4 +265,10 @@ export const CARDS: CardData[] = [
     { id: 'gonglunchengshi', name: '公论成势', faction: '通用', type: '策术', rarity: '稀有', cost: 4, background: '公论既成，势不可逆；守其主议，便可再进一步。', skill: '若你本回合赢得主议，且该主议上的己方立论本回合未发生移动，额外 +1 大势。每回合最多使用1张。' },
     { id: 'shouchengzhiyi', name: '守成之议', faction: '通用', type: '门客', rarity: '常见', cost: 3, attack: 2, hp: 3, background: '守成之议，贵在稳心稳局，不求一时锋芒。', skill: '进场时，若置于主议，+1 根基。' },
     { id: 'jiantingzeming', name: '兼听则明', faction: '通用', type: '策术', rarity: '稀有', cost: 4, background: '兼听可明，偏听则暗；先广闻，后定断。', skill: '抽2张牌；然后一张己方立论 +1 根基。' },
+    // ====== V9 华彩系列 (儒法补全) ======
+    { id: 'rujia1', name: '宣仁立论', faction: '礼心殿', type: '立论', rarity: '常见', cost: 1, background: '仁者爱人，克己复礼。此鼎既出，天下气象归于秩序。', skill: '抽1；你本回合受到所有伤害减少1点。' },
+    { id: 'rujia2', name: '思无邪', faction: '礼心殿', type: '策术', rarity: '稀有', cost: 2, background: '诗三百，一言以蔽之，曰思无邪。', skill: '净化一个负面状态；回复3点底蕴。' },
+    { id: 'rujia3', name: '中庸守道', faction: '礼心殿', type: '策术', rarity: '传奇', cost: 3, background: '不偏之谓中，不易之谓庸。执其两端，用其中于民。', skill: '底蕴上限+2；获得【护持5】。' },
+    { id: 'fajia1', name: '峻法立论', faction: '衡戒廷', type: '立论', rarity: '常见', cost: 1, background: '法不阿贵，绳不挠曲。唯有峻法，方能绝天下之乱。', skill: '对目标造成2点伤害；若目标有【怀疑】，额外抽1。' },
+    { id: 'fajia2', name: '权柄之链', faction: '衡戒廷', type: '策术', rarity: '稀有', cost: 2, background: '权者，势也。锁链所及之处，皆为法之疆域。', skill: '指定一个单位，令其下回合无法使用【技能】。' },
 ];

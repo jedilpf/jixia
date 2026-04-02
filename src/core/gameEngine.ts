@@ -461,8 +461,8 @@ export function resolveRound(state: GameState): GameState {
   const result = resolveBattle(state.players.player, state.players.enemy);
 
   let issueState = state.issueState;
-  let supportScore = { ...state.supportScore };
-  let factionResonance = { ...state.factionResonance };
+  const supportScore = { ...state.supportScore };
+  const factionResonance = { ...state.factionResonance };
 
   const mainLosingSide = result.main.winner === 'player' ? 'enemy' : result.main.winner === 'enemy' ? 'player' : null;
 

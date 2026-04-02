@@ -217,7 +217,7 @@ export function buildRandomDeck(size: number = 30, options?: {
     faction?: string;
     rarity?: RarityZh;
 }): Card[] {
-    let availableCards = options 
+    const availableCards = options 
         ? filterCardCollection(options)
         : [...ALL_CARDS];
     

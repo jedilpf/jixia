@@ -51,7 +51,7 @@ export function computeHandFan(
 
         // 垂直：圆弧抬起
         const arcLift = (1 - Math.cos(a)) * radius;
-        let y = baseY + signY * arcLift;
+        const y = baseY + signY * arcLift;
 
         // 旋转角度：正常或反转
         let rot = (a * 180) / Math.PI;

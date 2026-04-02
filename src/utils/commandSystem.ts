@@ -161,7 +161,8 @@ export class LockDecisionCommand extends GameCommandBase {
     return {};
   }
 
-  validate(_game: GameState): boolean {
+  validate(game: GameState): boolean {
+    void game;
     return true;
   }
 
