@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260402-110",
+  "goal": "Optimize battleV2 balance values (AI planning aggressiveness and round-end safety), produce a concrete tuning plan, and self-check with project gates.",
+  "constraints": [
+    "Keep the active card pool baseline at 170 and do not alter card source chain.",
+    "Do not perform broad architecture refactors; only make targeted numeric/logic tuning in battleV2 flow.",
+    "Document every tuning item with gameplay meaning and expected impact.",
+    "Run self-check commands and record outputs in a project-facing report."
+  ],
+  "deliverables": [
+    "Updated battleV2 tuning values and end-condition safeguards in source code.",
+    "A planning document describing tuning rationale, gameplay interpretation, and acceptance targets.",
+    "A self-check report with executed commands and observed results."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/battleV2",
+    "docs/project",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-110.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-110.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-110.json"
+  ],
+  "status": "completed"
+}

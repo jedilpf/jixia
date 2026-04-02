@@ -73,8 +73,19 @@ export interface CreateBattleStateOptions {
 }
 
 const ALL_SEATS: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
-const MAX_ROUNDS = 99;            // 无固定回合上限，以血量归零结束
+const MAX_ROUNDS = 40;            // 兜底回合上限：超限后进入裁决收束
 const HERO_MAX_XIN_ZHENG = 20;    // 主辩者初始心证
+const AI_TUNING = {
+  playMainChance: 0.74,
+  playResponseChance: 0.52,
+  playSecretChance: 0.62,
+  writeChance: 0.42,
+  passChance: 0.22,
+  useTokenChance: 0.38,
+  targetWeakSeatChance: 0.72,
+  preferTopCostChance: 0.75,
+  candidateWindow: 3,
+} as const;
 
 let logSeq = 0;
 let unitSeq = 0;
@@ -991,6 +1002,16 @@ function advancePhase(state: DebateBattleState): void {
       return;
     }
 
+    if (state.round >= state.maxRounds) {
+      setPhase(state, 'finished');
+      const roundLimitResult = resolveRoundLimitWinner(state);
+      state.winner = roundLimitResult.winner;
+      state.logs.push(makeLog(state.round, roundLimitResult.resultText));
+      if (roundLimitResult.winner === 'player') state.player.gold += 100;
+      else if (roundLimitResult.winner === 'enemy') state.enemy.gold += 100;
+      return;
+    }
+
     state.round += 1;
     beginNewRound(state);
     setPhase(state, 'ming_bian');
@@ -1047,7 +1068,65 @@ function chooseTargetSeat(defender: BattlePlayer): SeatId {
     };
   });
   seatScores.sort((a, b) => a.score - b.score);
-  return seatScores[0].seat;
+  if (seatScores.length === 1) return seatScores[0].seat;
+  if (Math.random() < AI_TUNING.targetWeakSeatChance) return seatScores[0].seat;
+  const alternatives = seatScores.slice(1);
+  return alternatives[Math.floor(Math.random() * alternatives.length)].seat;
+}
+
+function pickAiCandidate(candidates: DebateCard[]): DebateCard | null {
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  const window = candidates.slice(0, Math.min(AI_TUNING.candidateWindow, candidates.length));
+  if (Math.random() < AI_TUNING.preferTopCostChance) return window[0];
+  return window[Math.floor(Math.random() * window.length)];
+}
+
+function getSeatTotalHp(player: BattlePlayer): number {
+  return ALL_SEATS.reduce((total, seat) => {
+    const lane = player.seats[seat];
+    return total + (lane.front?.hp ?? 0) + (lane.back?.hp ?? 0);
+  }, 0);
+}
+
+function resolveRoundLimitWinner(state: DebateBattleState): { winner: Side | 'draw'; resultText: string } {
+  const playerDaShi = state.player.resources.daShi;
+  const enemyDaShi = state.enemy.resources.daShi;
+  if (playerDaShi !== enemyDaShi) {
+    const winner = playerDaShi > enemyDaShi ? 'player' : 'enemy';
+    const resultText =
+      winner === 'player'
+        ? `对局结束：达到 ${state.maxRounds} 回合上限，按大势裁决，我方胜`
+        : `对局结束：达到 ${state.maxRounds} 回合上限，按大势裁决，敌方胜`;
+    return { winner, resultText };
+  }
+
+  const playerXin = state.player.resources.xinZheng;
+  const enemyXin = state.enemy.resources.xinZheng;
+  if (playerXin !== enemyXin) {
+    const winner = playerXin > enemyXin ? 'player' : 'enemy';
+    const resultText =
+      winner === 'player'
+        ? `对局结束：达到 ${state.maxRounds} 回合上限，大势持平，按心证裁决，我方胜`
+        : `对局结束：达到 ${state.maxRounds} 回合上限，大势持平，按心证裁决，敌方胜`;
+    return { winner, resultText };
+  }
+
+  const playerSeatHp = getSeatTotalHp(state.player);
+  const enemySeatHp = getSeatTotalHp(state.enemy);
+  if (playerSeatHp !== enemySeatHp) {
+    const winner = playerSeatHp > enemySeatHp ? 'player' : 'enemy';
+    const resultText =
+      winner === 'player'
+        ? `对局结束：达到 ${state.maxRounds} 回合上限，大势与心证持平，按席位总血量裁决，我方胜`
+        : `对局结束：达到 ${state.maxRounds} 回合上限，大势与心证持平，按席位总血量裁决，敌方胜`;
+    return { winner, resultText };
+  }
+
+  return {
+    winner: 'draw',
+    resultText: `对局结束：达到 ${state.maxRounds} 回合上限，核心指标持平，平局`,
+  };
 }
 
 function aiPlanForMingBian(state: DebateBattleState): void {
@@ -1057,28 +1136,34 @@ function aiPlanForMingBian(state: DebateBattleState): void {
   const mainCandidates = findAffordableByType(enemy, 'main', budget);
   const responseCandidates = findAffordableByType(enemy, 'response', budget);
 
-  const playMain = Math.random() < 0.82;
-  const playResponse = Math.random() < 0.63;
+  const playMain = Math.random() < AI_TUNING.playMainChance;
+  const playResponse = Math.random() < AI_TUNING.playResponseChance;
 
   if (playMain && mainCandidates.length > 0) {
-    const main = mainCandidates[0];
-    updatePlanCard(enemy, 'main', main.id);
-    enemy.plan.mainTargetSeat = chooseTargetSeat(state.player);
-    budget -= main.cost;
-  }
-
-  if (playResponse && responseCandidates.length > 0 && budget > 0) {
-    const affordableResponse = responseCandidates.find((card) => card.cost <= budget);
-    if (affordableResponse) {
-      updatePlanCard(enemy, 'response', affordableResponse.id);
-      budget -= affordableResponse.cost;
+    const main = pickAiCandidate(mainCandidates);
+    if (main) {
+      updatePlanCard(enemy, 'main', main.id);
+      enemy.plan.mainTargetSeat = chooseTargetSeat(state.player);
+      budget -= main.cost;
     }
   }
 
-  const canWrite = enemy.resources.maxLingShi < 8 && Math.random() < 0.55;
+  if (playResponse && responseCandidates.length > 0 && budget > 0) {
+    const affordableResponses = responseCandidates.filter((card) => card.cost <= budget);
+    const response = pickAiCandidate(affordableResponses);
+    if (response) {
+      updatePlanCard(enemy, 'response', response.id);
+      budget -= response.cost;
+    }
+  }
+
+  const canWrite = enemy.resources.maxLingShi < 8 && Math.random() < AI_TUNING.writeChance;
   if (canWrite) {
-    const writingCandidate = enemy.hand.find((card) => !getPlanCardIds(enemy).includes(card.id));
-    if (writingCandidate) updateWriting(enemy, writingCandidate.id);
+    const writingCandidates = enemy.hand.filter((card) => !getPlanCardIds(enemy).includes(card.id));
+    if (writingCandidates.length > 0) {
+      const writingCandidate = writingCandidates[Math.floor(Math.random() * writingCandidates.length)];
+      updateWriting(enemy, writingCandidate.id);
+    }
   }
 
   enemy.plan.lockedPublic = true;
@@ -1089,10 +1174,12 @@ function aiPlanForAnMou(state: DebateBattleState): void {
   const budget = Math.max(0, enemy.resources.lingShi - enemy.plan.usedLingShi);
   const secretCandidates = findAffordableByType(enemy, 'secret', budget);
 
-  if (Math.random() < 0.72 && secretCandidates.length > 0) {
-    const secret = secretCandidates[0];
-    updatePlanCard(enemy, 'secret', secret.id);
-    enemy.plan.secretTargetSeat = chooseTargetSeat(state.player);
+  if (Math.random() < AI_TUNING.playSecretChance && secretCandidates.length > 0) {
+    const secret = pickAiCandidate(secretCandidates);
+    if (secret) {
+      updatePlanCard(enemy, 'secret', secret.id);
+      enemy.plan.secretTargetSeat = chooseTargetSeat(state.player);
+    }
   }
   enemy.plan.lockedSecret = true;
 }
@@ -1103,7 +1190,7 @@ function aiAutoSubmit(state: DebateBattleState): void {
   
   const playableCards = enemy.hand.filter(card => card.cost <= budget);
   
-  if (playableCards.length === 0 || Math.random() < 0.15) {
+  if (playableCards.length === 0 || Math.random() < AI_TUNING.passChance) {
     enemy.submitAction = {
       type: 'pass',
       cardId: null,
@@ -1120,7 +1207,7 @@ function aiAutoSubmit(state: DebateBattleState): void {
       type: 'play_card',
       cardId: card.id,
       zone,
-      useToken: enemy.resources.chou > 0 && Math.random() < 0.5,
+      useToken: enemy.resources.chou > 0 && Math.random() < AI_TUNING.useTokenChance,
     };
     
     if (enemy.submitAction.useToken && enemy.resources.chou > 0) {

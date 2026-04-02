@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260402-109",
+  "goal": "Deeply review current game loop risks and produce a practical optimization brief with external reference materials from the web.",
+  "constraints": [
+    "Do not modify gameplay/runtime code in this task.",
+    "Use factual current project findings and external references with source links.",
+    "Recommendations must map to current known issues: match non-termination risk and AI win-rate calibration."
+  ],
+  "deliverables": [
+    "A project-facing analysis document with prioritized fixes and acceptance metrics.",
+    "A curated reference list with direct links and how each source applies to this project."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-109.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-109.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-109.json"
+  ],
+  "status": "completed"
+}

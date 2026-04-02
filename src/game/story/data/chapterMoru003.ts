@@ -1075,7 +1075,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「《观心论》……」
 
-「你从哪里听来的这个名字？」
+「汝从哪里听来的这个名字？」
 
 汝没有隐瞒。
 
@@ -1201,7 +1201,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「果然是孟伯达之子。」
 
-「这股执拗劲，与汝父一模一样。」
+「那股执拗劲，与令尊一模一样。」
 
 言罢，祭酒大人将令牌抛向汝。
 
@@ -1370,7 +1370,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「三十年来，老夫从未拆开过。」
 
-「那是汝父的遗物，理应由汝亲自开启。」
+「那是令尊的遗物，理应由汝亲自开启。」
 
 汝的眼眶微微泛红。
 
@@ -1849,7 +1849,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「果然是孟伯达之子。」
 
-「那股气势，与汝父一模一样。」
+「那股气势，与令尊一模一样。」
 
 汝心头一震。
 
@@ -1859,7 +1859,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「岂止认识。」
 
-「吾与汝父，曾是同门。」
+「吾与令尊，曾是同门。」
 
 「也曾是……至交好友。」
 
@@ -1945,7 +1945,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 彼淡淡道。
 
-「汝的气息，汝父亦有之。」
+「汝的气息，令尊亦有之。」
 
 「吾……不会认错的。」`,
     background: 'secret_library',
@@ -1957,7 +1957,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
     type: 'dialogue',
     speaker: '秦冉',
     emotion: 'normal',
-    content: `「秦冉……」汝的声音沙哑，「父亲口中的'吾兄'。」
+    content: `「秦冉……」汝的声音沙哑，「令尊口中的'吾兄'。」
 
 秦冉微微点头。
 
@@ -1991,7 +1991,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 秦冉沉默了片刻。
 
-「那一夜，汝父发现了《观心论》的秘密。」
+「那一夜，令尊发现了《观心论》的秘密。」
 
 「他想要将此学公之于众。」
 
@@ -2029,11 +2029,11 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 秦冉叹息一声。
 
-「汝父那一夜，约吾在明德殿相见。」
+「令尊那一夜，约吾在明德殿相见。」
 
 「他说，有要事相商。」
 
-「吾去时，发现汝父已倒在血泊之中。」
+「吾去时，发现令尊已倒在血泊之中。」
 
 秦冉的声音微微颤抖。
 
@@ -2101,7 +2101,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「这是……」
 
-「这是汝父临终前，交给吾的东西。」
+「这是令尊临终前，交给吾的东西。」
 
 秦冉将纸张递给汝。
 
@@ -2174,7 +2174,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「汝果然是孟伯达之子。」
 
-「这股……执拗劲，与汝父一模一样。」
+「这股……执拗劲，与令尊一模一样。」
 
 秦冉转过身，望向密室的墙壁。
 
@@ -2220,7 +2220,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 秦冉深吸一口气。
 
-「汝父临终前，留下了一个名字。」
+「令尊临终前，留下了一个名字。」
 
 「那个名字……」
 
@@ -2282,11 +2282,11 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「嗯？」
 
-「你与我父亲……究竟是什么关系？」
+「汝与令尊……究竟是什么关系？」
 
 秦冉沉默了片刻。
 
-「吾与汝父，曾是同门。」
+「吾与令尊，曾是同门。」
 
 「也曾是……志同道合的挚友。」
 
@@ -2296,7 +2296,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 秦冉的声音低沉下去。
 
-「那一切……都随着汝父的死，化为泡影。」
+「那一切……都随着令尊的死，化为泡影。」
 
 「这些年，吾一直在暗中调查。」
 
@@ -2318,9 +2318,9 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「是。」
 
-「是汝父的至交好友。」
+「是令尊的至交好友。」
 
-「是……你最信任的人之一。」
+「是……汝最信任的人之一。」
 
 汝心头一震。
 
@@ -2344,7 +2344,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「但汝可以自己想一想。」
 
-「汝父在稷下时，与谁最为亲近？」
+「令尊在稷下时，与谁最为亲近？」
 
 「除了吾之外，还有谁？」
 
