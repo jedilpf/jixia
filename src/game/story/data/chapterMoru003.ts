@@ -217,7 +217,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
     type: 'dialogue',
     speaker: '无名老者',
     emotion: 'normal',
-    content: `「《观心论》……」汝沉声道，「我父亲留下的那半卷。」
+    content: `「《观心论》……」汝沉声道，「吾父留下的那半卷。」
 
 老者闻言，眼中闪过一丝复杂的情绪。
 
@@ -225,7 +225,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 汝心头剧震。
 
-「你认识我父亲？！」
+「汝认识吾父？！」
 
 老者没有回答，只是缓缓道：
 
@@ -241,7 +241,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 汝的声音微微颤抖：
 
-「我父亲……究竟是怎么死的？」
+「吾父……究竟是怎么死的？」
 
 老者沉默良久。
 
@@ -458,7 +458,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 汝深吸一口气。
 
-「我明白了。」
+「吾明白了。」
 
 「那……藏书阁中的那部分在哪里？」`,
     background: 'mountain_pavilion',
@@ -787,7 +787,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
     type: 'dialogue',
     speaker: '苏秦',
     emotion: 'normal',
-    content: `「苏秦，」汝直视着他，「我需要见鬼谷子。」
+    content: `「苏秦，」汝直视着他，「吾需要见鬼谷子。」
 
 苏秦闻言，眼中闪过一丝复杂的情绪。
 
@@ -795,7 +795,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「是。」汝点头，「老者说，下半篇《观心论》在鬼谷子手中。」
 
-「若想集齐完整的《观心论》，我必须见他。」
+「若想集齐完整的《观心论》，吾必须见他。」
 
 苏秦沉默了片刻。
 
@@ -847,13 +847,13 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
     type: 'dialogue',
     speaker: '苏秦',
     emotion: 'sad',
-    content: `「苏秦，」汝的语气带着一丝质疑，「你口口声声说没有害我父亲。」
+    content: `「苏秦，」汝的语气带着一丝质疑，「汝口口声声说没有害吾父。」
 
-「但你也没有救他。」
+「但汝也没有救他。」
 
-「你明明知道凶手就在稷下学宫，却没有揭发。」
+「汝明明知道凶手就在稷下学宫，却没有揭发。」
 
-「你究竟站在哪一边？！」
+「汝究竟站在哪一边？！」
 
 苏秦闻言，神色一黯。
 
@@ -867,7 +867,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「因为吾害怕。」
 
-「害怕？」汝难以置信，「你苏秦，战国时期纵横天下的名士，竟会害怕？」
+「害怕？」汝难以置信，「汝苏秦，战国时期纵横天下的名士，竟会害怕？」
 
 「正因为吾经历过太多，」苏秦缓缓道，「才知道那幕后之人的可怕。」
 
@@ -875,7 +875,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「吾若贸然行动，不仅报不了仇，还会白白送命。」
 
-「所以你选择独善其身？」
+「所以汝选择独善其身？」
 
 苏秦点头。
 
@@ -1568,9 +1568,9 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「因为孩儿知道——」
 
-「真凶若不伏法，汝便永无昭雪之日。」
+「真凶若不伏法，您便永无昭雪之日。」
 
-「那害汝之人，依旧会逍遥法外。」
+「那害您之人，依旧会逍遥法外。」
 
 「依旧会在暗处嘲笑。」
 
@@ -1636,9 +1636,9 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「您这一生，追求真理，探寻正道。」
 
-「孩儿不能让汝死得不明不白。」
+「孩儿不能让您死得不明不白。」
 
-「不能让汝的冤屈，永远埋葬。」
+「不能让您的冤屈，永远埋葬。」
 
 汝将信笺收入怀中，目光坚定。
 
@@ -1788,7 +1788,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 那人淡淡道。
 
-「我知道汝在这里。」`,
+「吾知道汝在这里。」`,
     background: 'secret_library',
     choices: [
       {
@@ -1827,7 +1827,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 汝心头一震。
 
-「你认识我父亲？」
+「认识。」
 
 那人冷笑一声。
 
@@ -1843,7 +1843,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 难道……就是祭酒大人说的那个人？！
 
-「你是谁？」汝的声音微微颤抖，「我父亲的死……与你有关？」
+「汝是谁？」汝的声音微微颤抖，「吾父之死……与汝有关？」
 
 那人没有回答。
 
@@ -1937,19 +1937,19 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「没想到，汝还记得吾。」
 
-「我曾无数次听父亲提起你。」
+「吾曾无数次听令尊提起汝。」
 
 汝的声音带着一丝颤抖。
 
-「父亲说，你是他在稷下最信任的人。」
+「令尊说，汝是他在稷下最信任的人。」
 
-「你们曾立下誓言，要一起探究大道。」
+「汝等曾立下誓言，要一起探究大道。」
 
 「可后来……」
 
 汝的目光变得锐利。
 
-「你却背叛了他！」
+「汝却背叛了他！」
 
 秦冉闻言，神色一黯。
 
@@ -2134,11 +2134,11 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
     emotion: 'serious',
     content: `汝直视着秦冉的双眼。
 
-「我想知道。」
+「吾想知道。」
 
 「即使前路荆棘，即使粉身碎骨——」
 
-「我也要知道真相。」
+「吾也要知道真相。」
 
 秦冉凝视着汝良久。
 
@@ -2240,7 +2240,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 汝深吸一口气。
 
-「我明白。」
+「吾明白。」
 
 秦冉将那份证词递给汝。
 
@@ -2264,7 +2264,7 @@ export const CHAPTER_MORU_003_NODES: StoryNode[] = [
 
 「也曾是……志同道合的挚友。」
 
-「我们曾约定，要一起探究大道，要一起匡扶天下。」
+「吾等曾约定，要一起探究大道，要一起匡扶天下。」
 
 「然而——」
 

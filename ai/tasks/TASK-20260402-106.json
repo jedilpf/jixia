@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260402-106",
+  "goal": "Kick off the next game-design phase with an executable 7-day vertical-slice plan and a ready-to-run playtest session sheet.",
+  "constraints": [
+    "Plan must follow existing game-core loop and current project priorities.",
+    "Do not change runtime code in this task.",
+    "Output must be directly actionable for day-by-day execution and acceptance."
+  ],
+  "deliverables": [
+    "A practical vertical-slice execution plan document with milestones, metrics, and risk gates.",
+    "A dated playtest session markdown template prefilled for immediate use."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/project",
+    "playtests"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-106.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-106.json",
+    "npm run gate:daily",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-106.json"
+  ],
+  "status": "in_progress"
+}
