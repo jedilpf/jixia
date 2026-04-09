@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260409-175",
+  "goal": "Inspect earlier dangling Git commits and recover any still-useful 争鸣史 / 真名相关 local work that predates the latest recoverable snapshot, while preserving the current workspace first.",
+  "constraints": [
+    "Create a fresh local safety snapshot before restoring any earlier file version.",
+    "Prefer precise per-file recovery over broad branch or commit resets.",
+    "Do not overwrite a current file with an older version unless the recovered content is demonstrably additive or otherwise explicitly useful to the user's request.",
+    "Record what was recovered and what was inspected but intentionally left unchanged."
+  ],
+  "deliverables": [
+    "A fresh local safety snapshot before earlier-history recovery.",
+    "Recovered earlier story-related files restored into the working tree where appropriate.",
+    "A short audit note describing which earlier dangling commits were used."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/components/MainMenu.tsx",
+    "src/game/story",
+    "src/ui/screens/StoryScreen.tsx",
+    "docs/story",
+    "docs/PROJECT_MEMORY.md",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-175-recover-earlier-story-history.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-175-recover-earlier-story-history.json"
+  ],
+  "status": "completed"
+}

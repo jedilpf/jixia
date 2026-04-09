@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebSearch",
+      "Bash(gh search:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(mkdir -p memory/user memory/project memory/decisions memory/skills memory/incidents)",
+      "Bash(mkdir -p ai/agents)"
     ]
   }
 }

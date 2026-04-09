@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260409-179",
+  "goal": "Restore the previously implemented 1/2/3 card tier presentation and literary Chinese tier copy (一等/二等/三等) on top of the current restored 170-card source / 169-card collection baseline.",
+  "constraints": [
+    "Do not regress the restored 170-card source or 169-card collection baseline.",
+    "Use the existing battle tier system as the source of truth instead of hand-editing 170 card records.",
+    "Restore display and helper behavior for tier labels without touching unrelated story, menu, or community files.",
+    "Keep the card art relink work intact."
+  ],
+  "deliverables": [
+    "Shared helper(s) that return 一等/二等/三等 from the existing tier system.",
+    "Showcase card grid/detail views display the tier badge again.",
+    "Battle card library panel uses the restored literary tier labels instead of plain star strings.",
+    "A short audit note documenting how the tier setup was restored on top of the recovered card baseline."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/battleV2/tierSystem.ts",
+    "src/data/cardsSource.ts",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-179-restore-tier-label-system.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-179-restore-tier-label-system.json"
+  ],
+  "status": "in_progress"
+}

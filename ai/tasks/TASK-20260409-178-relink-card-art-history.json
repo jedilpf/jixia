@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260409-178",
+  "goal": "Relink the restored 169-card collection / 170-card source to the actual historical card art files already present under public/assets/cards so the card showcase uses each card's dedicated artwork again instead of falling back due to extension mismatches.",
+  "constraints": [
+    "Do not change the restored 170-card source records unless absolutely necessary.",
+    "Prefer fixing the card art resolution layer over editing showcase UI components.",
+    "Use the actual physical asset inventory and repository history as the source of truth for extension and alias mapping.",
+    "Do not modify unrelated story, menu, or community files."
+  ],
+  "deliverables": [
+    "Update src/utils/assets.ts so getCardImageUrl resolves to the correct historical physical art files for the restored 170-card source.",
+    "Add a short audit note documenting the recovered mapping basis and the extension-mismatch root cause.",
+    "Record any durable card-art lookup convention if confirmed."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/utils/assets.ts",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-178-relink-card-art-history.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-178-relink-card-art-history.json"
+  ],
+  "status": "completed"
+}

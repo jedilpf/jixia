@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260409-176",
+  "goal": "Continue recovering additional still-useful 争鸣史 / 真名相关 local work by identifying current files that are demonstrably thinner than earlier dangling commit versions and restoring the richer versions where appropriate.",
+  "constraints": [
+    "Create a fresh local safety snapshot before applying any additional recovery.",
+    "Prefer per-file recovery based on concrete evidence such as richer content or meaningful missing sections.",
+    "Do not overwrite current files if the older version is clearly just an obsolete UI variant or otherwise not an improvement.",
+    "Keep a short audit trail of the files restored in this round."
+  ],
+  "deliverables": [
+    "A fresh local safety snapshot before continuing recovery.",
+    "Additional recovered story-related files restored into the working tree where useful.",
+    "An updated audit note describing this round's recovered files."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/components/MainMenu.tsx",
+    "src/game/story",
+    "src/ui/screens/StoryScreen.tsx",
+    "docs/story",
+    "docs/PROJECT_MEMORY.md",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-176-continue-story-recovery.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-176-continue-story-recovery.json"
+  ],
+  "status": "completed"
+}

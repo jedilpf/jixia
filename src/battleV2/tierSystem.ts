@@ -51,9 +51,19 @@ export function getRequiredLevelForTier(
   return config[tier];
 }
 
+export function getTierLabel(tier: CardStarTier): '一等' | '二等' | '三等' {
+  if (tier === 3) return '三等';
+  if (tier === 2) return '二等';
+  return '一等';
+}
+
 export function resolveCardStarTier(card: Pick<DebateCard, 'starTier' | 'rarity'>): CardStarTier {
   if (card.starTier === 1 || card.starTier === 2 || card.starTier === 3) return card.starTier;
   return resolveStarTierByRarity(card.rarity);
+}
+
+export function getCardTierLabel(card: Pick<DebateCard, 'starTier' | 'rarity'>): '一等' | '二等' | '三等' {
+  return getTierLabel(resolveCardStarTier(card));
 }
 
 export function getCardUnlockLevel(
@@ -94,10 +104,10 @@ export function validateDeckTierQuota(
   const errors: string[] = [];
 
   if (usedTwoStar > quota.maxTwoStar) {
-    errors.push(`2★ 数量超限：${usedTwoStar}/${quota.maxTwoStar}`);
+    errors.push(`二等数量超限：${usedTwoStar}/${quota.maxTwoStar}`);
   }
   if (usedThreeStar > quota.maxThreeStar) {
-    errors.push(`3★ 数量超限：${usedThreeStar}/${quota.maxThreeStar}`);
+    errors.push(`三等数量超限：${usedThreeStar}/${quota.maxThreeStar}`);
   }
 
   return {

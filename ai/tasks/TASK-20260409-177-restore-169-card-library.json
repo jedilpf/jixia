@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260409-177",
+  "goal": "Restore the card corpus from the regressed 65-card local state back to the last validated 169-card collection baseline (170 raw showcase records with 1 intentional duplicate-name pair in collection dedupe).",
+  "constraints": [
+    "Do not alter unrelated story, menu, or community recovery work.",
+    "Prefer restoring the exact last validated card-source file rather than re-authoring card content by hand.",
+    "Keep the existing cardsSource/catalogAdapter chain intact unless a card-count regression requires a minimal fix.",
+    "If the 169-card collection baseline depends on a known duplicate-name pair, preserve that behavior and record it clearly."
+  ],
+  "deliverables": [
+    "Restore src/data/showcaseCards.ts to the last trusted 170-record card source that yields a 169-card collection view.",
+    "Document the recovery basis in a short audit note.",
+    "Update durable project memory only if a stable baseline lesson was confirmed.",
+    "Clean up any incidental temporary files created while auditing the card corpus."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/data/showcaseCards.ts",
+    "docs/project",
+    ".knowledge/project-notes.md",
+    "console.log(JSON.stringify({CARDS",
+    "{console.log(JSON.stringify({CARDS"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-177-restore-169-card-library.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-177-restore-169-card-library.json"
+  ],
+  "status": "completed"
+}

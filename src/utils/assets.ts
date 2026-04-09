@@ -1,10 +1,40 @@
+function buildSequentialImageExtMap(
+  prefix: string,
+  start: number,
+  end: number,
+  ext: 'png' | 'jpg' = 'png'
+): Record<string, 'png' | 'jpg'> {
+  return Object.fromEntries(
+    Array.from({ length: end - start + 1 }, (_, index) => [`${prefix}${start + index}`, ext])
+  );
+}
+
+// 2026-04-09 牌库恢复后，图鉴重新回到 170 原始卡 / 169 图鉴卡基线。
+// 历史资产核对显示：这批卡里有大量物理文件实际是 .png，而旧 helper 只覆盖了少量扩展名映射，
+// 结果图鉴仍按 .jpg 去找，导致“明明画好了但显示不出来/显示成保底图”。
+// 这里按现存历史资产库存补齐扩展名偏好，优先命中单卡原画。
 const CARD_IMAGE_EXT_OVERRIDES: Record<string, 'png' | 'jpg'> = {
   xingpan: 'png',
   liangyi: 'png',
-  ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`tiangong${i + 1}`, 'png'])),
-  ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`liangyi${i + 1}`, 'png'])),
-  ...Object.fromEntries(Array.from({ length: 5 }, (_, i) => [`rujia${i + 1}`, 'png'])),
-  ...Object.fromEntries(Array.from({ length: 5 }, (_, i) => [`fajia${i + 1}`, 'png'])),
+  pangtong: 'png',
+  jianai: 'png',
+  mingxiang10: 'png',
+  xinglvxuezi: 'png',
+  xiangyishuli: 'png',
+  ...buildSequentialImageExtMap('tiangong', 1, 10),
+  ...buildSequentialImageExtMap('liangyi', 1, 10),
+  ...buildSequentialImageExtMap('xinglin', 1, 10),
+  ...buildSequentialImageExtMap('baiyan', 1, 10),
+  ...buildSequentialImageExtMap('yangzhen', 1, 10),
+  ...buildSequentialImageExtMap('choutian', 1, 10),
+  ...buildSequentialImageExtMap('lixindian', 6, 10),
+  ...buildSequentialImageExtMap('hengjieting', 6, 10),
+  ...buildSequentialImageExtMap('guizhen', 6, 10),
+  ...buildSequentialImageExtMap('youce', 6, 10),
+  ...buildSequentialImageExtMap('wannong', 6, 10),
+  ...buildSequentialImageExtMap('jianai', 2, 6),
+  ...buildSequentialImageExtMap('rujia', 1, 5),
+  ...buildSequentialImageExtMap('fajia', 1, 5),
 };
 
 // BS01 主线卡在迁移前使用过旧图 id；这里保留兼容映射，避免迁移期卡图“看起来丢失”。
@@ -52,7 +82,8 @@ const CARD_NAME_TO_IMAGE_ID: Record<string, string> = {
 
 export function getAssetUrl(assetPath: string): string {
   const normalized = assetPath.replace(/^\/+/, '');
-  return `${import.meta.env.BASE_URL}${normalized}`;
+  const baseUrl = import.meta.env?.BASE_URL ?? '/';
+  return `${baseUrl}${normalized}`;
 }
 
 export function asset(assetPath: string): string {

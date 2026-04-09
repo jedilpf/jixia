@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260409-174",
+  "goal": "Recover the latest still-recoverable 争鸣史 / Story Mode related local work from dangling Git objects and preserved local snapshots, while protecting the current workspace first.",
+  "constraints": [
+    "Create a fresh local safety snapshot before overwriting any tracked file.",
+    "Prefer the newest recoverable Git object that clearly contains lost story-related work.",
+    "Restore only files whose recovered content is demonstrably newer or richer than the current workspace version.",
+    "Do not rewrite history or discard the current workspace without a backup."
+  ],
+  "deliverables": [
+    "A fresh local safety snapshot created before recovery.",
+    "Recovered story-related files restored into the working tree.",
+    "A short report of what was restored and what still could not be recovered."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/components/MainMenu.tsx",
+    "src/game/story",
+    "src/ui/screens/StoryScreen.tsx",
+    "docs/story",
+    "docs/PROJECT_MEMORY.md",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-174-recover-story-references.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-174-recover-story-references.json"
+  ],
+  "status": "completed"
+}
