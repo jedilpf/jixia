@@ -1,0 +1,21 @@
+{
+  "task_id": "TASK-20260409-157",
+  "goal": "Review the fourth-round community-module fixes claimed by another AI and identify any remaining bugs, regressions, incomplete implementations, or misleading completion claims so the user can direct follow-up work precisely.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only task.",
+    "Focus on the updated community-module files and any directly related storage/navigation behavior.",
+    "Verify claimed fixes against the actual code rather than the other AI summary.",
+    "Prioritize behavioral correctness over compile/lint status."
+  ],
+  "deliverables": [
+    "A concise code-review report with prioritized findings and actionable follow-up items."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-157-community-module-review-round4.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-157-community-module-review-round4.json"
+  ],
+  "status": "completed"
+}

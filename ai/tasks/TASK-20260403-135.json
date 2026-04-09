@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-20260403-135",
+  "goal": "Create a durable conversation memory 'hangar' and record recent recurring mistakes plus must-follow collaboration rules.",
+  "constraints": [
+    "Capture only durable, high-signal lessons from recent collaboration.",
+    "No gameplay or UI behavior changes in this task.",
+    "Update repository memory files using concise, actionable statements."
+  ],
+  "deliverables": [
+    "A new memory-hangar document for our collaboration context.",
+    "Updated .knowledge notes with recurring pitfalls and operating rules.",
+    "No code-path behavior change."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs",
+    ".knowledge",
+    "open_questions.md",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-135.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-135.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-135.json"
+  ],
+  "status": "in_progress"
+}

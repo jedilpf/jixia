@@ -1,0 +1,23 @@
+{
+  "task_id": "TASK-20260407-148",
+  "goal": "Continue testing card numeric interactions and research GitHub card-balance training/testing skills, then summarize actionable methods for this project.",
+  "constraints": [
+    "Do not modify gameplay code in this task unless explicitly requested in a follow-up.",
+    "Focus on diagnostics, reproducible testing signals, and practical balancing workflow.",
+    "Research should prioritize primary sources (official repos/docs/papers) and include links."
+  ],
+  "deliverables": [
+    "Local testing findings on current card interaction and numeric behavior risks.",
+    "GitHub-derived skill/method summary for card training and balancing.",
+    "Concrete next-step plan tailored to current battleV2 architecture."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260407-148-battle-balance-test-and-github-research.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260407-148-battle-balance-test-and-github-research.json",
+    "npm run test"
+  ],
+  "status": "in_progress"
+}

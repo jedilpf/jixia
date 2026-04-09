@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260403-131",
+  "goal": "Redesign the Story button emblem to be unique from Card Collection and align the title typography with the other main menu buttons.",
+  "constraints": [
+    "Keep button behavior and routing unchanged.",
+    "Do not reuse the same emblem motif as Card Collection.",
+    "Keep title content as '争鸣史'."
+  ],
+  "deliverables": [
+    "A refreshed `public/assets/btn-story.png` with a distinct emblem.",
+    "Title typography visually aligned with other main buttons.",
+    "No duplicate emblem appearance with Card Collection."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-131.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-131.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-131.json"
+  ],
+  "status": "in_progress"
+}

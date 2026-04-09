@@ -32,7 +32,10 @@
     "server:dev": "node --watch server/index.cjs",
     "electron:dev": "node scripts/electron-dev.cjs",
     "electron:dev:legacy": "set \"ELECTRON_RUN_AS_NODE=\" && concurrently \"npm run dev -- --host 127.0.0.1 --port 5173 --strictPort\" \"wait-on tcp:127.0.0.1:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder"
+    "electron:build": "npm run build && electron-builder",
+    "git:snapshot": "powershell -ExecutionPolicy Bypass -File scripts/repo/create-local-snapshot.ps1",
+    "git:snapshots": "powershell -ExecutionPolicy Bypass -File scripts/repo/list-local-snapshots.ps1",
+    "git:restore": "powershell -ExecutionPolicy Bypass -File scripts/repo/restore-local-snapshot.ps1"
   },
   "dependencies": {
     "@pixi/react": "^7.1.2",

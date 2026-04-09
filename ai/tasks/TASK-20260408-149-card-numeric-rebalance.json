@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260408-149",
+  "goal": "Continue card numeric balancing by reworking the battleV2 card abstraction so runtime costs, effect values, and summon stats better reflect source card strength.",
+  "constraints": [
+    "Keep the full active card pool and cardsSource chain unchanged.",
+    "Do not rewrite individual 170-card source records unless strictly required; prefer deterministic battleV2 mapping fixes.",
+    "Preserve the existing five battle card semantic buckets (立论/策术/玄章/门客/反诘) while improving numeric fairness.",
+    "Limit changes to targeted balance logic and avoid broad UI or architecture refactors."
+  ],
+  "deliverables": [
+    "Updated runtime mapping for battle card cost/effectValue generation.",
+    "Summoned unit stats use better-balanced source-derived combat numbers.",
+    "Verification notes for the new numeric distribution and battle-facing impact."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/utils/assets.ts",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-149-card-numeric-rebalance.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-149-card-numeric-rebalance.json",
+    "npm run typecheck",
+    "npm run test"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "TASK-20260408-154",
+  "goal": "Review the current community-module implementation against docs/community/COMMUNITY_MODULE_SPEC.md and identify concrete gaps, bugs, integration risks, or false-positive completion claims so the user can redirect another AI to continue implementation.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only task.",
+    "Focus on src/community, src/components/community, src/hooks/useCommunityState.ts, and related MainMenu integration only.",
+    "Prefer concrete findings with file references over general commentary.",
+    "Do not assume the other AI's summary is correct; verify against the actual files."
+  ],
+  "deliverables": [
+    "A review summary with prioritized findings, file references, and residual risks."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-154-community-module-review.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-154-community-module-review.json"
+  ],
+  "status": "completed"
+}

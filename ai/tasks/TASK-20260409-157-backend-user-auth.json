@@ -1,0 +1,75 @@
+{
+  "id": "TASK-20260409-157-backend-user-auth",
+  "title": "用户认证系统",
+  "status": "in_progress",
+  "created": "2026-04-09",
+  "scope": "backend",
+  "priority": "high",
+
+  "description": "实现用户注册/登录、权限管理、数据隔离的完整认证系统",
+
+  "requirements": {
+    "user_registration": {
+      "endpoint": "POST /api/v1/auth/register",
+      "fields": ["username", "password", "email(optional)"],
+      "validation": "用户名唯一性、密码强度"
+    },
+    "user_login": {
+      "endpoint": "POST /api/v1/auth/login",
+      "response": "JWT token + 用户信息",
+      "expiry": "7天可刷新"
+    },
+    "token_refresh": {
+      "endpoint": "POST /api/v1/auth/refresh",
+      "description": "刷新访问令牌"
+    },
+    "logout": {
+      "endpoint": "POST /api/v1/auth/logout",
+      "description": "使令牌失效"
+    },
+    "user_profile": {
+      "endpoint": "GET /api/v1/auth/me",
+      "description": "获取当前用户信息"
+    }
+  },
+
+  "tech_stack": {
+    "password_hashing": "bcrypt",
+    "token": "JWT (jsonwebtoken)",
+    "storage": "JSON文件 (可后续迁移数据库)",
+    "middleware": "Express中间件"
+  },
+
+  "data_isolation": {
+    "story_saves": "按userId隔离存档数据",
+    "player_progress": "按userId隔离进度数据",
+    "matches": "可选：按userId关联对局记录"
+  },
+
+  "files_to_create": [
+    "server/store/user-store.cjs - 用户数据存储",
+    "server/routes/auth.cjs - 认证路由",
+    "server/middleware/auth.cjs - JWT验证中间件",
+    "server/utils/jwt.cjs - JWT工具函数",
+    "server/utils/password.cjs - 密码哈希工具"
+  ],
+
+  "files_to_modify": [
+    "server/app.cjs - 注册认证路由",
+    "server/index.cjs - 初始化用户存储",
+    "server/routes/v2/*.cjs - 添加认证保护",
+    "server/README.md - 更新API文档"
+  ],
+
+  "security_notes": {
+    "password": "bcrypt加密，cost factor 12",
+    "jwt_secret": "从环境变量读取，有默认值",
+    "token_expiry": "access: 1小时, refresh: 7天",
+    "rate_limiting": "登录接口限流（可选）"
+  },
+
+  "testing": {
+    "manual": "使用curl或Postman测试API",
+    "integration": "前端登录/注册流程联调"
+  }
+}

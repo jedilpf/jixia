@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260402-126",
+  "goal": "Refine the main menu Story button to clearly use the term '争鸣史', keep visual style aligned with other menu buttons, and apply a distinct new color palette.",
+  "constraints": [
+    "Only adjust main menu presentation and copy for the Story entry button.",
+    "Do not alter menu navigation behavior or callback wiring.",
+    "Preserve overall button layout rhythm and interaction feedback."
+  ],
+  "deliverables": [
+    "Main menu Story button text confirmed as '争鸣史'.",
+    "Story button visual restyle with a new color family while staying consistent with other menu buttons.",
+    "No regression to existing start/characters/collection button interactions."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-126.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-126.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-126.json"
+  ],
+  "status": "in_progress"
+}

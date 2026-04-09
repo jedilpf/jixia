@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260403-130",
+  "goal": "Redesign the '争鸣史' main entry button so its visual style is consistent with the other three art buttons while keeping a distinct color family.",
+  "constraints": [
+    "Do not change existing navigation callbacks or menu order.",
+    "Keep art-button visual language aligned with start/characters/collection entries.",
+    "Apply consistency fix to both MainMenu and HomeScreen entry chains."
+  ],
+  "deliverables": [
+    "Story button uses the same base art texture language as peer buttons.",
+    "Story button text is clearly '争鸣史' with no English subtitle.",
+    "Story button remains visually distinct by color, not by structural style divergence."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-130.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-130.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-130.json"
+  ],
+  "status": "in_progress"
+}

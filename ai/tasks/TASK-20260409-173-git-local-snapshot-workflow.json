@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260409-173",
+  "goal": "Add a safe local Git snapshot workflow for this repository so the user can quickly save current work, list recoverable snapshots, and restore a prior local state without relying on ad hoc reset commands.",
+  "constraints": [
+    "Prefer additive tooling and documentation; do not rewrite repository history.",
+    "Snapshot creation must preserve the current working tree after saving a recoverable copy.",
+    "Restore tooling must create a fresh safety backup before any destructive action.",
+    "Keep the workflow Windows-friendly and usable from the existing repository package scripts."
+  ],
+  "deliverables": [
+    "PowerShell script to create a local snapshot of HEAD plus current working tree.",
+    "PowerShell script to list recent local snapshots and restore references.",
+    "PowerShell script to restore a chosen local snapshot with an automatic safety backup.",
+    "package.json command entries for the new workflow.",
+    "A short Chinese developer guide explaining when and how to use the workflow."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "scripts/repo",
+    "docs/dev",
+    ".knowledge/project-notes.md",
+    "package.json"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-173-git-local-snapshot-workflow.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-173-git-local-snapshot-workflow.json"
+  ],
+  "status": "completed"
+}

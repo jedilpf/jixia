@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260403-133",
+  "goal": "Produce Phase-1 planning spec for Story button redesign by reverse engineering the existing three menu buttons and defining a strict redraw blueprint.",
+  "constraints": [
+    "This phase is planning only: no asset redraw and no code integration.",
+    "Document layer model, geometry, typography, icon semantics, and acceptance gates.",
+    "Mark unknown source facts as UNKNOWN and register them in open_questions.md."
+  ],
+  "deliverables": [
+    "A phase-1 planning document for Story button redesign.",
+    "A reproducible design blueprint based on existing button system.",
+    "Open-questions update for unresolved source-layer information."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs",
+    "open_questions.md",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-133.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-133.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-133.json"
+  ],
+  "status": "in_progress"
+}

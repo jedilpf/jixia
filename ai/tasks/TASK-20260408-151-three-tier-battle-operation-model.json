@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260408-151",
+  "goal": "Define an original three-tier card battle operation model for battleV2 that gives tier 1/2/3 cards distinct in-battle roles, trigger windows, and pacing hooks while staying inside the repository's existing phase skeleton and avoiding external structure imitation.",
+  "constraints": [
+    "Do not introduce shop/XP/triple-merge, auto-battler-equivalent, or externally mirrored progression structures.",
+    "Do not modify runtime battle code during this task; this task is design alignment and implementation-facing documentation only.",
+    "All tier operation rules must attach to the current battleV2 skeleton: ming_bian, an_mou, reveal, resolve, topic, writing, playerLevel, and deck tier quota.",
+    "The design must stay grounded in the current 170-card corpus and existing card types/effect kinds."
+  ],
+  "deliverables": [
+    "A project design note defining tier 1/2/3 battle identities, trigger windows, and how each card type should behave within those tiers.",
+    "A concise implementation-facing section describing what future runtime hooks or metadata would be sufficient if this design is later implemented.",
+    "If a durable design decision is made, record it in repository knowledge."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project",
+    ".knowledge/decisions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-151-three-tier-battle-operation-model.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-151-three-tier-battle-operation-model.json"
+  ],
+  "status": "completed"
+}

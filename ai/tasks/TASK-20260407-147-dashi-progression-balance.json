@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260407-147",
+  "goal": "Fix and rebalance DaShi progression so the DaShi victory path is reachable and logically consistent with battle phase settlement.",
+  "constraints": [
+    "Do not remove existing battle framework or UI architecture.",
+    "Keep the DaShi victory threshold and core battle loop stable unless needed for consistency.",
+    "Unify resource semantics: DaShi as cumulative win resource, ZhengLi as tactical/round-scale value."
+  ],
+  "deliverables": [
+    "Center lane reward contributes to DaShi progression instead of transient ZhengLi-only accumulation.",
+    "Remove conflicting win-termination logic that bypasses main winner settlement path.",
+    "Battle logs and lane descriptions align with updated resource semantics."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/battleV2/laneSystem.ts",
+    "src/battleV2/engine.ts",
+    "src/battleV2/types.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260407-147-dashi-progression-balance.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260407-147-dashi-progression-balance.json",
+    "npm run typecheck",
+    "npm run build",
+    "npm run test"
+  ],
+  "status": "in_progress"
+}

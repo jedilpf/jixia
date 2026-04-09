@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260403-128",
+  "goal": "Restyle the HomeScreen '争鸣史' button to match the same art-textured style as the other three main entry buttons, using a distinct new color palette while preserving current behavior.",
+  "constraints": [
+    "Do not change any navigation or game-state logic.",
+    "Apply visual style changes only to the HomeScreen story button block.",
+    "Keep wording fixed as '争鸣史'."
+  ],
+  "deliverables": [
+    "HomeScreen story button uses the same art composition pattern as peer buttons.",
+    "Story button color scheme is visibly different from the other three buttons.",
+    "Button remains clickable and responsive with existing interactions."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-128.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-128.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-128.json"
+  ],
+  "status": "in_progress"
+}

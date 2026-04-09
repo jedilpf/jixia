@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260403-127",
+  "goal": "Restyle the main menu Story entry as an art-textured button matching the visual language of the other three menu buttons, with a new color palette and fixed text '争鸣史'.",
+  "constraints": [
+    "Keep current menu navigation behavior unchanged.",
+    "Follow existing art-button composition style used by start/characters/collection buttons.",
+    "Only adjust Story button presentation and wording."
+  ],
+  "deliverables": [
+    "Story button uses textured image style consistent with other menu buttons.",
+    "Story button color scheme changed to a distinct new palette.",
+    "Story button visible title fixed to '争鸣史'."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-127.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-127.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-127.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260409-162",
+  "goal": "Physically fill all remaining missing card-art files in public/assets/cards using the current verified faction/universal fallback assets, so every showcase card ID resolves to a real on-disk file.",
+  "constraints": [
+    "Create and reference a conflict arbitration record before implementation because the implementation path differs from another AI proposal.",
+    "Do not change card IDs or card-data sources.",
+    "Match file extensions to the current asset resolution rules so runtime loads the new files directly."
+  ],
+  "deliverables": [
+    "Remaining missing card-art files physically created in public/assets/cards.",
+    "A conflict arbitration record documenting why physical fallback copies were chosen first.",
+    "A verification report with the final missing-count result."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/standards",
+    "public/assets/cards"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-162-card-art-physical-fill.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-162-card-art-physical-fill.json"
+  ],
+  "status": "completed"
+}

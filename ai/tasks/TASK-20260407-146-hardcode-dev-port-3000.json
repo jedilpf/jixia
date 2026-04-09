@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260407-146",
+  "goal": "Hardcode project development startup to port 3000 so both npm scripts and direct vite startup use the same fixed port.",
+  "constraints": [
+    "Do not remove existing game framework or runtime modules.",
+    "Port should be fixed to 3000 in project configuration, not only via temporary CLI usage.",
+    "Keep startup behavior stable for web and electron development flows."
+  ],
+  "deliverables": [
+    "Vite dev server defaults to port 3000 with strict port behavior.",
+    "Package scripts and electron dev helper use port 3000 consistently.",
+    "Core startup and build checks still pass."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "package.json",
+    "vite.config.ts",
+    "scripts/electron-dev.cjs"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260407-146-hardcode-dev-port-3000.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260407-146-hardcode-dev-port-3000.json",
+    "npm run typecheck",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "TASK-20260409-161",
+  "goal": "Review another AI's latest claim that six missing card-art files were physically added to public/assets/cards, verify actual file presence and remaining gaps, and report the truth concisely.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only verification task.",
+    "Verify claims against actual filesystem contents and current card-art inventory.",
+    "Focus on the six newly claimed files and the remaining missing-art count."
+  ],
+  "deliverables": [
+    "A concise review report with prioritized findings and the verified remaining missing file list/count."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-161-card-art-claim-review-batch2.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-161-card-art-claim-review-batch2.json"
+  ],
+  "status": "completed"
+}

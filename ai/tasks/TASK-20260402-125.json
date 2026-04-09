@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260402-125",
+  "goal": "Unify card catalog faction/type/rarity semantics for the full 16-faction view, keep Legalist cards grouped together, and remove remaining English copy in card presentation UI.",
+  "constraints": [
+    "Keep total card corpus baseline unchanged and do not reduce below runtime gate requirements.",
+    "Do not change gameplay mechanics; this task is data normalization and display grouping only.",
+    "Preserve existing component structure and route flow while improving card catalog consistency."
+  ],
+  "deliverables": [
+    "Card source normalization for faction/type/rarity values into consistent Chinese presentation values.",
+    "Stable 16-faction display order with Legalist cards grouped under one faction heading in card grid.",
+    "Card-facing UI text updated to Chinese where English placeholders currently appear."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src",
+    "tests",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260402-125.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260402-125.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260402-125.json"
+  ],
+  "status": "in_progress"
+}

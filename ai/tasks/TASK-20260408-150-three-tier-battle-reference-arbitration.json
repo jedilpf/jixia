@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260408-150",
+  "goal": "Research publicly available Night of the Full Moon combat/tier progression references, arbitrate conflicts against the repository's existing 3-tier plan, and record an original direction for our own three-tier battle operation model without copying external structure.",
+  "constraints": [
+    "Do not copy external game structures, terminology, upgrade loops, or card templates directly.",
+    "Treat external references only as high-level pacing and system-design inspiration.",
+    "Preserve the repository's existing three-tier baseline unless arbitration explicitly decides otherwise.",
+    "Do not introduce new gameplay mechanics in code during this task; this task is research, arbitration, and design-direction alignment only."
+  ],
+  "deliverables": [
+    "A mandatory conflict arbitration record comparing the current repo 3-tier plan with externally inspired progression ideas.",
+    "A concise project note describing which external principles are reusable and which are explicitly rejected.",
+    "If a durable decision is made, record it in repository knowledge."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/standards",
+    "docs/project",
+    ".knowledge/decisions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-150-three-tier-battle-reference-arbitration.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-150-three-tier-battle-reference-arbitration.json"
+  ],
+  "status": "completed"
+}

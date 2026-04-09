@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260408-152",
+  "goal": "Rewrite and strengthen docs/community/COMMUNITY_MODULE_SPEC.md into an implementation-facing specification that aligns with the current repository architecture, clarifies scope and phases, and turns the existing broad proposal into a grounded community feature plan.",
+  "constraints": [
+    "Keep the document aligned with the repository's current main flow and component structure.",
+    "Do not implement runtime code in this task; this task is documentation refinement only.",
+    "Prefer MVP decisions that fit the current MainMenu/App integration pattern instead of inventing a disconnected new flow.",
+    "Clarify scope, non-goals, data model, persistence, moderation, and phased rollout so future implementation can proceed with less ambiguity."
+  ],
+  "deliverables": [
+    "An updated COMMUNITY_MODULE_SPEC document with clearer architecture alignment, user flows, module boundaries, data contracts, and phased implementation plan.",
+    "If a durable architectural choice is made by the document rewrite, record it in repository knowledge."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/community",
+    ".knowledge/decisions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-152-community-module-spec-rewrite.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-152-community-module-spec-rewrite.json"
+  ],
+  "status": "completed"
+}

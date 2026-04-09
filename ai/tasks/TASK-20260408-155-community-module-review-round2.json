@@ -1,0 +1,21 @@
+{
+  "task_id": "TASK-20260408-155",
+  "goal": "Review the second-round community-module fixes against the previously reported findings and identify any remaining bugs, regressions, incomplete implementations, or misleading completion claims so the user can direct another AI precisely.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only task.",
+    "Focus on the updated community-module files, App integration, and MainMenu integration.",
+    "Verify fixes against the actual code rather than the other AI's summary.",
+    "Present concrete findings with file references and prioritize behavioral correctness over compile/lint status."
+  ],
+  "deliverables": [
+    "A concise code-review report with prioritized findings and actionable follow-up items."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-155-community-module-review-round2.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-155-community-module-review-round2.json"
+  ],
+  "status": "completed"
+}

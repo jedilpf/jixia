@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260405-140",
+  "goal": "Replace card strength tier copy from numeric format (1级/2级/3级) to literary Chinese format (一等/二等/三等) in showcase badge displays.",
+  "constraints": [
+    "Do not change tier scoring logic or distribution.",
+    "Only adjust display copy for tier labels.",
+    "Keep active card count unchanged."
+  ],
+  "deliverables": [
+    "Tier label helper returns 一等/二等/三等.",
+    "Showcase badge displays new wording consistently.",
+    "No regression in card data logic."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260405-140-tier-label-copy.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260405-140-tier-label-copy.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260405-140-tier-label-copy.json"
+  ],
+  "status": "in_progress"
+}

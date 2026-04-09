@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260403-132",
+  "goal": "Reverse engineer the existing three main menu button design system (layer model, composition rules, typography/icon constraints) before redrawing the Story button.",
+  "constraints": [
+    "Do not redraw or replace button assets in this task.",
+    "Focus on extracting reproducible design rules from existing assets.",
+    "If source layered files are missing, mark exact-layer count as inferred from flattened PNGs."
+  ],
+  "deliverables": [
+    "A written reverse-engineering spec for main menu button composition.",
+    "An inferred layer count model with per-layer responsibility.",
+    "A concrete redraw checklist for the next task."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs",
+    "public/assets",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-132.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-132.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-132.json"
+  ],
+  "status": "in_progress"
+}

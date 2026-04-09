@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-20260405-141",
+  "goal": "Remove one duplicate card named 舆论漩涡 from the card showcase (图鉴) while keeping showcase navigation and detail indexing consistent.",
+  "constraints": [
+    "Apply the change only to showcase display flow.",
+    "Do not alter battle runtime deck composition.",
+    "Keep CardGrid, CardDetail, and CardShowcase indexing aligned."
+  ],
+  "deliverables": [
+    "A dedicated showcase card list excluding one 舆论漩涡 entry.",
+    "Card grid no longer displays duplicate 舆论漩涡.",
+    "Detail page navigation and counts remain consistent with displayed cards."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/data/cardsSource.ts",
+    "src/components/CardShowcase.tsx",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260405-141-remove-duplicate-yulunxuanwo.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260405-141-remove-duplicate-yulunxuanwo.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260405-141-remove-duplicate-yulunxuanwo.json"
+  ],
+  "status": "in_progress"
+}

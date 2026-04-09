@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260403-129",
+  "goal": "Fix the story button label issue where the second main entry visually appears as '开始辩斗', and ensure it consistently presents as '争鸣史' with matching art style.",
+  "constraints": [
+    "Do not change navigation logic or button order.",
+    "Keep visual language aligned with existing art-style menu buttons.",
+    "Apply the fix to both active menu entry chains."
+  ],
+  "deliverables": [
+    "Second main button no longer visually appears as '开始辩斗'.",
+    "Story button text is clearly and consistently '争鸣史'.",
+    "No English subtitle is shown for the story button."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-129.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-129.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-129.json"
+  ],
+  "status": "in_progress"
+}

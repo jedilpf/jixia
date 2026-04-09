@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260403-134",
+  "goal": "Phase-2 produce two Story button draft images (A/B) based on the approved phase-1 blueprint, without integrating into UI.",
+  "constraints": [
+    "Drafts only: do not wire into UI in this task.",
+    "Both drafts must keep the same button family structure as existing menu buttons.",
+    "Story emblem must be distinct from Card Collection emblem."
+  ],
+  "deliverables": [
+    "public/assets/btn-story-draft-a.png",
+    "public/assets/btn-story-draft-b.png",
+    "Both drafts displayed in-chat for user selection."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "open_questions.md",
+    "docs"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-134.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-134.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-134.json"
+  ],
+  "status": "in_progress"
+}

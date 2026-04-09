@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260407-145",
+  "goal": "Implement dual difficulty hand-limit rules (normal and novice), add enforced discard flow in battleV2, and integrate novice tutorial trigger without removing existing game framework.",
+  "constraints": [
+    "Do not remove or replace existing battle/menu/story framework.",
+    "Implement as additive changes: keep current flow and add difficulty + discard behaviors.",
+    "Normal mode uses hand limit 8 and discard timeout 15s.",
+    "Novice mode uses hand limit 9 and discard timeout 18s.",
+    "Discard flow must be deterministic and non-blocking (timeout auto-discard)."
+  ],
+  "deliverables": [
+    "battleV2 state supports difficulty rules and discard phase state machine.",
+    "Pre-battle flow exposes difficulty selection and passes it into battle runtime.",
+    "Battle UI supports player discard selection/confirmation with countdown.",
+    "Novice mode triggers tutorial onboarding at battle start."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/App.tsx",
+    "src/components/PreBattleFlow.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/battleV2/types.ts",
+    "src/battleV2/engine.ts",
+    "src/battleV2/useDebateBattle.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260407-145-difficulty-handlimit-tutorial-integration.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260407-145-difficulty-handlimit-tutorial-integration.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260407-145-difficulty-handlimit-tutorial-integration.json"
+  ],
+  "status": "in_progress"
+}

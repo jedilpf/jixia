@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260405-143",
+  "goal": "Move only the title text 争鸣史 inside btn-story.png by +10px on X axis, keeping all other visual elements unchanged.",
+  "constraints": [
+    "Do not move frame, icon, ornaments, glow bars, or canvas bounds.",
+    "Only shift the three Chinese title characters by exactly 10px.",
+    "Preserve final asset path used by main menu."
+  ],
+  "deliverables": [
+    "public/assets/btn-story.png updated with 争鸣史 moved right by 10px only.",
+    "public/assets/btn-story-shift-preview.png for visual check."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets/btn-story.png",
+    "public/assets/btn-story-shift-preview.png",
+    "public/assets/btn-story-noop-test.png",
+    "src/components/MainMenu.tsx",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260405-143-story-text-right-10px.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260405-143-story-text-right-10px.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260405-143-story-text-right-10px.json"
+  ],
+  "status": "in_progress"
+}

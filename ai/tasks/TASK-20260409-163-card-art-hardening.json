@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260409-163",
+  "goal": "Harden the card-art pipeline after the physical backfill by adding an automated showcase-card asset audit and documenting the current fallback/backfill baseline.",
+  "constraints": [
+    "Do not undo the current physical card-art files.",
+    "Keep runtime behavior compatible with the existing asset resolution rules in src/utils/assets.ts.",
+    "Prefer lightweight automation and documentation over speculative visual redesign."
+  ],
+  "deliverables": [
+    "An automated script that audits showcase card art presence on disk.",
+    "A package script or equivalent entry point to run the audit easily.",
+    "A short documentation update capturing the new verification baseline."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "package.json",
+    "scripts",
+    "docs",
+    ".knowledge",
+    "public/assets/cards"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-163-card-art-hardening.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-163-card-art-hardening.json"
+  ],
+  "status": "completed"
+}

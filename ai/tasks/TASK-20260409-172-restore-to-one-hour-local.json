@@ -1,0 +1,35 @@
+{
+  "task_id": "TASK-20260409-172",
+  "goal": "Restore the repository working tree to the closest recoverable local state from approximately one hour before the current local time, preferring preserved local snapshots over older commit history and preserving a fresh safety snapshot first.",
+  "constraints": [
+    "Treat 'one hour ago local' as the nearest recoverable working-tree snapshot rather than blindly picking an older commit.",
+    "Create a new safety backup before any destructive restore action.",
+    "Preserve the existing preserved local snapshot reference before creating any new stash entry.",
+    "Prefer Git-native restore mechanisms so the exact recovery source can be reported."
+  ],
+  "deliverables": [
+    "A fresh safety backup of the current state before this restore.",
+    "The repository restored to the nearest recoverable local snapshot matching the user's intent.",
+    "A clear report of the stash/commit references used for the restore."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src",
+    "public",
+    "server",
+    "scripts",
+    "docs",
+    ".knowledge",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "eslint.config.js",
+    "index.html"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-172-restore-to-one-hour-local.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-172-restore-to-one-hour-local.json"
+  ],
+  "status": "completed"
+}

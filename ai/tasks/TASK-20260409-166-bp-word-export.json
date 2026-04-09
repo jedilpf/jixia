@@ -1,0 +1,22 @@
+{
+  "task_id": "TASK-20260409-166",
+  "goal": "将现有《谋天下·问道百家》BP 初稿导出为 Word 文档并保存到桌面，供用户直接查看和转发。",
+  "constraints": [
+    "不得改写 BP 的核心内容，只允许做排版级导出。",
+    "桌面导出文件必须是可由 Microsoft Word 打开的文档格式。",
+    "仓库内改动仅限任务文件本身，不新增无关实现文件。"
+  ],
+  "deliverables": [
+    "一个保存到桌面的《谋天下·问道百家》BP Word 文档。",
+    "一份用于记录本次导出动作的任务文件。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "C:/Users/21389/Desktop"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-166-bp-word-export.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-166-bp-word-export.json"
+  ],
+  "status": "completed"
+}

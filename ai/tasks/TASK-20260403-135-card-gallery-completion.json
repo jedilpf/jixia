@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260403-135",
+  "goal": "Complete the card gallery by generating missing card images for factions (杏林馆, 稗言社, 养真院, 筹天阁) in the V9 ink-wash aesthetic.",
+  "constraints": [
+    "Style: V9 Ink-wash aesthetic (水墨风), consistent with existing card art.",
+    "Output: public/assets/cards/{id}.jpg (unless png is required).",
+    "Cards to cover: xinglin1-5, baiyan1-5, yangzhen1-5 (excluding 2, 5 which exist), choutian2-5.",
+    "Do not modify UI logic, only add assets and update assets.ts if needed."
+  ],
+  "deliverables": [
+    "Images for xinglin1, xinglin2, xinglin3, xinglin4, xinglin5",
+    "Images for baiyan1, baiyan2, baiyan3, baiyan4, baiyan5",
+    "Images for yangzhen1, yangzhen3, yangzhen4",
+    "Images for choutian2, choutian3, choutian4, choutian5"
+  ],
+  "allowed_write_paths": [
+    "public/assets/cards",
+    "src/utils/assets.ts",
+    "ai/tasks",
+    "ai/out"
+  ],
+  "acceptance_commands": [
+    "ls public/assets/cards/xinglin*",
+    "ls public/assets/cards/baiyan*",
+    "ls public/assets/cards/yangzhen*",
+    "ls public/assets/cards/choutian*"
+  ],
+  "status": "in_progress"
+}

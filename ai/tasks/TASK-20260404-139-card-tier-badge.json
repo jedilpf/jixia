@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-20260404-139",
+  "goal": "Audit the full 170-card dataset, assign strength tiers 1/2/3, and display the tier on the top-left yellow badge in card showcase views.",
+  "constraints": [
+    "Use the full active card pool (170 cards) as the source of truth.",
+    "Tier must be derived from card strength, not random assignment.",
+    "Badge copy must use Chinese level labels and remove accidental English fragments.",
+    "Do not refactor unrelated systems in this task."
+  ],
+  "deliverables": [
+    "A deterministic 1/2/3 tier assignment strategy applied to card data.",
+    "Top-left yellow badge in card showcase cards displays the tier label.",
+    "No regression to card count: active pool remains 170."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260404-139-card-tier-badge.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260404-139-card-tier-badge.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260404-139-card-tier-badge.json"
+  ],
+  "status": "in_progress"
+}

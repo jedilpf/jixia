@@ -1,0 +1,22 @@
+{
+  "task_id": "TASK-20260409-165",
+  "goal": "为《谋天下·问道百家》撰写一版可直接复用的 BP 初稿文档，结合仓库现有项目设定与公开市场数据，形成对外沟通用商业计划书草案。",
+  "constraints": [
+    "文档应以当前仓库可证明的产品能力为基础，不虚构已达成的商业成绩。",
+    "涉及市场数据与竞品趋势时，应基于已检索到的公开资料写作。",
+    "未知的人名、真实融资条款或实际经营数据不得伪造，可明确标注为占位信息或假设。"
+  ],
+  "deliverables": [
+    "一份存放在 docs/project 下的《谋天下·问道百家》BP 初稿 Markdown 文档。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-165-game-bp-draft.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-165-game-bp-draft.json"
+  ],
+  "status": "completed"
+}

@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260409-171",
+  "goal": "Restore the repository working tree to the closest recoverable state from approximately three hours before the current local time, while preserving a safety snapshot of the current state first.",
+  "constraints": [
+    "Determine the actual local current time before interpreting 'three hours ago'.",
+    "Create a safety snapshot before any destructive restore action.",
+    "Prefer Git-native recovery points from reflog/history over ad hoc file copying.",
+    "Do not permanently discard recoverable current work; preserve it in a named stash or equivalent backup first."
+  ],
+  "deliverables": [
+    "A safety snapshot of the pre-restore state.",
+    "The repository restored to the nearest recoverable state from roughly three hours earlier.",
+    "A clear report of the exact timestamp and commit/reflog point used for restoration."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-171-restore-to-three-hours-ago.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-171-restore-to-three-hours-ago.json"
+  ],
+  "status": "in_progress"
+}

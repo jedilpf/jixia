@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260403-137",
+  "goal": "Draw a final gold-tone Story button asset in the established main-menu style, preview it in chat, and place a copy on the user's desktop.",
+  "constraints": [
+    "Output must be a single complete button image (no nested sub-button composition).",
+    "Keep visual language 90% aligned with existing main menu buttons.",
+    "Use gold-tone palette and fixed text '争鸣史'."
+  ],
+  "deliverables": [
+    "public/assets/btn-story.png updated to final gold-tone version.",
+    "Desktop copy at C:/Users/21389/Desktop/btn-story.png.",
+    "In-chat image preview."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "C:/Users/21389/Desktop",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-137.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-137.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-137.json"
+  ],
+  "status": "in_progress"
+}

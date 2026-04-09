@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260409-158",
+  "goal": "Diagnose and fix missing or partially missing card artwork in the card codex so all current cards render their intended images consistently.",
+  "constraints": [
+    "Follow the existing card codex and asset-loading architecture unless a clear bug requires a targeted fix.",
+    "Investigate actual causes before editing code or data.",
+    "Do not change unrelated gameplay, balance, or combat logic.",
+    "If asset gaps or naming mismatches are found, document the exact scope in the final response."
+  ],
+  "deliverables": [
+    "A root-cause diagnosis for missing card artwork in the card codex.",
+    "A targeted fix in code and/or data if feasible within the existing architecture.",
+    "Verification evidence showing which cards were missing and whether they now resolve correctly."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    ".knowledge/project-notes.md",
+    "src/components",
+    "src/data",
+    "src/utils",
+    "src/assets",
+    "scripts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-158-card-codex-missing-art-diagnosis.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-158-card-codex-missing-art-diagnosis.json"
+  ],
+  "status": "completed"
+}

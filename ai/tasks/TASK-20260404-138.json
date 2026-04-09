@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260404-138",
+  "goal": "Redraw Story button to remove inner framed panel so the button has only one primary outer frame while keeping gold family style.",
+  "constraints": [
+    "No inner rectangular frame/border inside the main button.",
+    "Keep one coherent single-piece button composition.",
+    "Keep wording fixed as '争鸣史'."
+  ],
+  "deliverables": [
+    "public/assets/btn-story.png updated with no inner-frame visual.",
+    "Desktop copy at C:/Users/21389/Desktop/btn-story.png.",
+    "In-chat preview for confirmation."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "C:/Users/21389/Desktop",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260404-138.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260404-138.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260404-138.json"
+  ],
+  "status": "in_progress"
+}

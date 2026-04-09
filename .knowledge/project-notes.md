@@ -14,3 +14,6 @@
 - Daily gate now includes `scripts/pipeline/validate-runtime-baseline.cjs` to enforce runtime safety and card-corpus baseline consistency.
 - `docs/data-contract.json` is expected to track actual `BattleV2` runtime state shape (not legacy `playerA/playerB/currentTurn` schema), and runtime baseline validation should fail on contract drift.
 - Backend local-safe default is `BACKEND_HOST=127.0.0.1`; `0.0.0.0` should be an explicit opt-in via environment variable.
+- For code-loss audits in this repo, check both `git reflog` and filesystem mtimes: recent work may split into tracked files overwritten by `git reset` and separate untracked files that still exist on disk.
+- Before risky local Git operations in this repo, prefer `npm run git:snapshot -- -Label <name>` so HEAD is bookmarked to a backup branch and the full working tree is copied to a stash without clearing the current workspace.
+- When restoring local snapshots, prefer the explicit stash hash shown by `npm run git:snapshots` instead of relative refs like `stash@{0}`, because new stashes will renumber relative positions.

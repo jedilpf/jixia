@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260409-170",
+  "goal": "Audit the repository for the user's report that a lot of code written in the last two days appears lost, and identify whether files were overwritten, reverted, left uncommitted, or are still recoverable.",
+  "constraints": [
+    "Do not revert or restore anything automatically during the audit.",
+    "Differentiate committed history, current worktree, and untracked files.",
+    "Use git history and filesystem evidence before concluding code is lost.",
+    "If recovery candidates are found, report them clearly before editing anything."
+  ],
+  "deliverables": [
+    "A concrete diagnosis of what changed in the last two days.",
+    "A list of files likely overwritten, reverted, deleted, or still recoverable.",
+    "Recommended next-step recovery options without performing destructive actions."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-170-recent-code-loss-audit.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-170-recent-code-loss-audit.json"
+  ],
+  "status": "completed"
+}

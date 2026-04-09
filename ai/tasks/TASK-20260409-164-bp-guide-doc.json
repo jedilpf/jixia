@@ -1,0 +1,21 @@
+{
+  "task_id": "TASK-20260409-164",
+  "goal": "整理并存档一份标准 BP（商业计划书）写作指南文档，便于后续直接复用。",
+  "constraints": [
+    "以用户提供的内容为核心，不引入与当前需求无关的扩展讨论。",
+    "输出为清晰、可直接阅读的 Markdown 文档。",
+    "本任务只处理文档，不修改运行时代码。"
+  ],
+  "deliverables": [
+    "一份存放在 docs/project 下的 BP 写作指南 Markdown 文档。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-164-bp-guide-doc.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-164-bp-guide-doc.json"
+  ],
+  "status": "completed"
+}

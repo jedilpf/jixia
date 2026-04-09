@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260408-153",
+  "goal": "Expand docs/community/COMMUNITY_MODULE_SPEC.md from a rewritten product spec into an implementation handoff document that other AI workers can execute against with clearer state flows, file responsibilities, operation contracts, delivery order, and explicit unresolved questions.",
+  "constraints": [
+    "Keep the document aligned with the repository's current MainMenu/App modal-first integration pattern.",
+    "Do not implement runtime code in this task; this task is documentation and handoff refinement only.",
+    "Prefer concrete execution guidance over aspirational feature expansion.",
+    "If implementation-critical information is still unknown, mark it as UNKNOWN in the spec and record it in open_questions.md."
+  ],
+  "deliverables": [
+    "An expanded COMMUNITY_MODULE_SPEC document with implementation-facing state model, ownership boundaries, component contracts, operation flows, and execution breakdown for other AI workers.",
+    "Updated open_questions.md for any durable UNKNOWN items surfaced during the handoff refinement."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/community",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260408-153-community-spec-handoff-expansion.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260408-153-community-spec-handoff-expansion.json"
+  ],
+  "status": "completed"
+}

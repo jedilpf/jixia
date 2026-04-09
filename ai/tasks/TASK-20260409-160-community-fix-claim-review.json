@@ -1,0 +1,20 @@
+{
+  "task_id": "TASK-20260409-160",
+  "goal": "Review another AI's claimed community-module fixes, verify them against the actual codebase, and report any remaining bugs, regressions, or misleading completion claims.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only task.",
+    "Verify claims against actual file contents and current type/lint diagnostics when relevant.",
+    "Focus on the specific fixes claimed in the pasted summary."
+  ],
+  "deliverables": [
+    "A concise review report with prioritized findings and concrete follow-up items."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-160-community-fix-claim-review.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-160-community-fix-claim-review.json"
+  ],
+  "status": "completed"
+}

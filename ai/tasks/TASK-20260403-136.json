@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-20260403-136",
+  "goal": "Discard previous story button drafts and redraw a complete final single-piece Story button asset with unified menu style.",
+  "constraints": [
+    "Produce a single complete button image (no nested sub-button visual structure).",
+    "Do not keep old draft composition as final output.",
+    "Keep wording fixed as '争鸣史' and ensure unique emblem semantics."
+  ],
+  "deliverables": [
+    "Updated public/assets/btn-story.png as final full redraw.",
+    "In-chat preview of the new final button image."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "open_questions.md",
+    "docs",
+    ".knowledge"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260403-136.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260403-136.json",
+    "npm run test",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260403-136.json"
+  ],
+  "status": "in_progress"
+}

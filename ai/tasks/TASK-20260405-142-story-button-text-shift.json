@@ -1,0 +1,33 @@
+{
+  "task_id": "TASK-20260405-142",
+  "goal": "Shift the embedded title text 争鸣史 to the right inside public/assets/btn-story.png while keeping the original single-frame button style and aligned composition.",
+  "constraints": [
+    "Do not add nested frames or extra boxes.",
+    "Keep the existing ornate button frame unchanged.",
+    "Only adjust text position and local background cleanup as needed.",
+    "Preserve final asset path used by main menu."
+  ],
+  "deliverables": [
+    "Updated public/assets/btn-story.png with 争鸣史 shifted right and visually aligned.",
+    "Preview image for user confirmation before/after check."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets/btn-story.png",
+    "public/assets/btn-story-shift-preview.png",
+    "src/components/MainMenu.tsx",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260405-142-story-button-text-shift.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260405-142-story-button-text-shift.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260405-142-story-button-text-shift.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "TASK-20240404-001-card-illustrations",
+  "goal": "Generate missing card illustrations for the Card Gallery (图鉴) Phase 2, focusing on 杏林馆, 稗言社, 养真院, and 筹天阁.",
+  "constraints": [
+    "Use V9 ink-wash aesthetic for all card images.",
+    "Follow naming conventions: faction_name + number for Phase 2 cards.",
+    "Update assets.ts to support newly generated extensions (PNG/JPG).",
+    "Ensure CARD_NAME_TO_IMAGE_ID in assets.ts is updated."
+  ],
+  "deliverables": [
+    "Missing card illustrations in public/assets/cards/",
+    "Updated src/utils/assets.ts"
+  ],
+  "allowed_write_paths": [
+    "public/assets/cards",
+    "src/utils/assets.ts"
+  ],
+  "acceptance_commands": [
+    "npm run build"
+  ],
+  "status": "draft"
+}

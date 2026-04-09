@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260406-144",
+  "goal": "Design a clear hand size cap and discard mechanism for battleV2, including recommended parameters, UX flow, and implementation-ready rules.",
+  "constraints": [
+    "Planning first: do not change runtime gameplay logic in this task.",
+    "Design must align with existing battleV2 round flow and terminology.",
+    "Must include player-side and AI-side discard behavior.",
+    "Must define timeout fallback behavior to prevent deadlock."
+  ],
+  "deliverables": [
+    "A planning document under docs/battle with recommended hand cap and discard rules.",
+    "A short implementation checklist with target files and sequencing."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/battle",
+    "public/assets/btn-story.png",
+    "public/assets/btn-story-shift-preview.png",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/data/cardsSource.ts",
+    "src/data/showcaseCards.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260406-144-hand-limit-discard-design.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260406-144-hand-limit-discard-design.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260406-144-hand-limit-discard-design.json"
+  ],
+  "status": "in_progress"
+}

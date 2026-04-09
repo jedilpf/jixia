@@ -1,0 +1,20 @@
+{
+  "task_id": "TASK-20260409-159",
+  "goal": "Review another AI's claim about card-codex artwork completion, verify the actual filesystem and rendering state, and report what is truly complete versus still missing.",
+  "constraints": [
+    "Do not modify runtime code in this task; this is a review-only task.",
+    "Verify claims against actual files and current code, not the AI summary.",
+    "Prioritize factual verification of missing artwork files and current fallback behavior."
+  ],
+  "deliverables": [
+    "A concise code-review style report on which artwork claims are true, false, or incomplete."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-159-card-art-claim-review.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-159-card-art-claim-review.json"
+  ],
+  "status": "completed"
+}
