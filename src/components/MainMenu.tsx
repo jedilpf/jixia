@@ -553,7 +553,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
 
         <div className="flex flex-col gap-5 w-72">
           <button onClick={() => { uiAudio.playClick(); onStartGame(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('start'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-8 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
+            className="relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'start' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'start' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
             <img src={asset('assets/btn-start.png')} alt="开始辩斗" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
@@ -563,7 +563,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
           </button>
 
           <button onClick={() => { uiAudio.playClick(); if (onStory) onStory(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('story'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-2 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
+            className="relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'story' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'story' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
             <img src={asset('assets/btn-story.png')} alt="争鸣史" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
@@ -573,7 +573,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
           </button>
 
           <button onClick={() => { uiAudio.playClick(); onCharacters(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('characters'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-2 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
+            className="relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'characters' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'characters' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
             <img src={asset('assets/btn-characters.png')} alt="问道百家人物志" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
