@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260410-182",
+  "goal": "Remove the opaque white outer background from the four main-menu button images so the initial menu buttons render cleanly against the hall background.",
+  "constraints": [
+    "Only touch the four main-menu button raster assets unless a minimal audit note is needed.",
+    "Preserve the button frame artwork, text, and interior glow details.",
+    "Prefer non-destructive background transparency cleanup over redesigning the buttons.",
+    "Do not modify unrelated gameplay, menu logic, or card assets."
+  ],
+  "deliverables": [
+    "Identify the button assets used by the four initial main-menu buttons.",
+    "Remove the connected white outer background from each button image.",
+    "Document the cleanup approach in a short audit note."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "public/assets",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-182-main-menu-button-white-bg-cleanup.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-182-main-menu-button-white-bg-cleanup.json"
+  ],
+  "status": "completed"
+}

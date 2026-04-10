@@ -6,7 +6,9 @@
       "Bash(gh search:*)",
       "WebFetch(domain:github.com)",
       "Bash(mkdir -p memory/user memory/project memory/decisions memory/skills memory/incidents)",
-      "Bash(mkdir -p ai/agents)"
+      "Bash(mkdir -p ai/agents)",
+      "Bash(ls -la ai/tasks/TASK-20260408*.json)",
+      "Bash(ls -la docs/project/*20260408*)"
     ]
   }
 }

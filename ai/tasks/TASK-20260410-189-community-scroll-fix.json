@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260410-189",
+  "goal": "Fix the community home view so the post list under the '全部' category can scroll reliably on desktop without changing content, layout intent, or community behavior.",
+  "constraints": [
+    "Do not change community copy or data logic.",
+    "Keep the existing community structure and visual hierarchy intact.",
+    "Limit edits to community UI containers and directly related task records.",
+    "Prefer a minimal container/flex overflow fix over interaction rewrites."
+  ],
+  "deliverables": [
+    "Restore reliable vertical scrolling for the community list in the default '全部' view.",
+    "Keep related list views stable after the scroll fix.",
+    "Validate the fix with a production build and finalize workflow."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/community",
+    "src/components/MainMenu.tsx",
+    "src/ui/screens/StoryScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-189-community-scroll-fix.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-189-community-scroll-fix.json",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

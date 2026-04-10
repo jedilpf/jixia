@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260410-191",
+  "goal": "Restore StoryScreen to a normal blue-themed interface by fixing UI-layer styling issues only, without changing story text, chapter content, or gameplay/story logic.",
+  "constraints": [
+    "Do not modify story copy, dialogue content, chapter data, or visible narrative text.",
+    "Do not change StoryScreen behavior beyond what is required to fix the abnormal interface presentation.",
+    "Limit edits to the StoryScreen presentation layer and directly related task records.",
+    "Do not modify community, battle, or unrelated menu screens."
+  ],
+  "deliverables": [
+    "StoryScreen displays a stable blue-themed interface instead of the current abnormal gold/brown presentation.",
+    "Story text and chapter content remain unchanged.",
+    "Project builds successfully after the UI fix."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/ui/screens/StoryScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-191-storyscreen-blue-restore.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-191-storyscreen-blue-restore.json",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

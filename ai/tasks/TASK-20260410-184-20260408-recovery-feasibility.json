@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260410-184",
+  "goal": "Assess whether the work associated with 2026-04-08 can still be recovered from local repository history, snapshots, or artifacts, and summarize the feasibility without performing a restore yet.",
+  "constraints": [
+    "Do not modify runtime code or assets during the feasibility check.",
+    "Do not restore or reset anything yet; this task is read-only assessment.",
+    "Use concrete evidence from git history, reflog, stash, dangling objects, tasks, and audit docs.",
+    "If an exact 2026-04-08 state cannot be proven, say so clearly."
+  ],
+  "deliverables": [
+    "Determine whether 2026-04-08 work is recoverable in full, in part, or only indirectly.",
+    "Identify the strongest local anchors that still preserve 2026-04-08 work.",
+    "Write a concise feasibility note for later recovery work."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-184-20260408-recovery-feasibility.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-184-20260408-recovery-feasibility.json"
+  ],
+  "status": "completed"
+}

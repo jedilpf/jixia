@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { CommunityHome } from './CommunityHome';
-import { useCommunityState } from '../../hooks/useCommunityState';
 import { uiAudio } from '@/utils/audioManager';
+import { useCommunityState } from '../../hooks/useCommunityState';
+import { CommunityHome } from './CommunityHome';
 
 interface CommunityModalProps {
   isOpen: boolean;
@@ -9,18 +9,21 @@ interface CommunityModalProps {
 }
 
 export function CommunityModal({ isOpen, onClose }: CommunityModalProps) {
-  const { actions } = useCommunityState();
+  const {
+    actions: { openHome, openComposer, closeCommunity },
+  } = useCommunityState();
 
   useEffect(() => {
     if (isOpen) {
-      actions.openHome();
+      openHome();
     }
-  }, [isOpen, actions]);
+  }, [isOpen, openHome]);
 
   if (!isOpen) return null;
 
   const handleClose = () => {
     uiAudio.playClick();
+    closeCommunity();
     onClose();
   };
 
@@ -28,69 +31,92 @@ export function CommunityModal({ isOpen, onClose }: CommunityModalProps) {
     <div
       className="absolute inset-0 z-[9999] flex items-center justify-center p-4 md:p-8"
       style={{
-        background: 'rgba(0, 0, 0, 0.75)',
-        backdropFilter: 'blur(4px)',
+        background:
+          'radial-gradient(circle at top, rgba(214, 151, 73, 0.16) 0%, rgba(76, 22, 18, 0.84) 40%, rgba(16, 6, 8, 0.92) 100%)',
+        backdropFilter: 'blur(10px)',
         animation: 'modal-fade-in 0.2s ease-out',
       }}
     >
       <div
-        className="w-full max-w-4xl h-[90vh] rounded-xl overflow-hidden flex flex-col"
+        className="relative flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-[24px]"
         style={{
-          background: 'linear-gradient(180deg, #10192e 0%, #0a1020 100%)',
-          border: '2px solid rgba(212, 165, 32, 0.5)',
-          boxShadow: '0 0 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 165, 32, 0.1)',
+          background:
+            'linear-gradient(180deg, rgba(43, 16, 14, 0.98) 0%, rgba(20, 8, 10, 0.98) 100%)',
+          border: '1px solid rgba(214, 151, 73, 0.34)',
+          boxShadow:
+            '0 22px 60px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255,244,230,0.04), 0 0 0 1px rgba(214,151,73,0.12)',
           animation: 'modal-scale-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         }}
       >
         <div
-          className="h-14 flex items-center justify-between px-6 shrink-0"
+          className="pointer-events-none absolute inset-0"
           style={{
-            background: 'linear-gradient(90deg, #1a2840 0%, #2a3c66 50%, #1a2840 100%)',
-            borderBottom: '1px solid rgba(212, 165, 32, 0.3)',
+            background:
+              'radial-gradient(circle at top left, rgba(214,151,73,0.16) 0%, transparent 28%), radial-gradient(circle at bottom right, rgba(158,61,43,0.16) 0%, transparent 30%)',
+          }}
+        />
+
+        <div
+          className="relative flex h-16 shrink-0 items-center justify-between px-6 md:px-7"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(78, 25, 18, 0.98) 0%, rgba(122, 42, 28, 0.98) 50%, rgba(78, 25, 18, 0.98) 100%)',
+            borderBottom: '1px solid rgba(214, 151, 73, 0.24)',
           }}
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(212, 165, 32, 0.2)' }}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+              style={{
+                background: 'linear-gradient(180deg, rgba(214, 151, 73, 0.34), rgba(158, 61, 43, 0.14))',
+                border: '1px solid rgba(214, 151, 73, 0.32)',
+                boxShadow: '0 0 24px rgba(214,151,73,0.2)',
+              }}
             >
               🏛️
             </div>
-            <div className="w-0.5 h-5 bg-[#d4a520] rounded-full" />
-            <span className="text-[#f5e6b8] font-serif text-lg tracking-widest">稷下学宫·社区</span>
+            <div className="h-6 w-0.5 rounded-full bg-[#d4a520]" />
+            <div className="flex flex-col">
+              <span className="font-serif text-lg tracking-[0.28em] text-[#f5e6b8]">稷下学宫·社区</span>
+              <span className="text-[11px] uppercase tracking-[0.24em]" style={{ color: 'rgba(214, 177, 140, 0.72)' }}>
+                discourse / archive / q&amp;a
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
                 uiAudio.playClick();
+                openComposer('create');
               }}
-              className="px-3 py-1 rounded-lg text-sm transition-colors"
+              className="rounded-xl px-4 py-2 text-sm transition-all duration-200"
               style={{
-                background: 'rgba(212, 165, 32, 0.1)',
-                border: '1px solid rgba(212, 165, 32, 0.3)',
-                color: '#a7c5ba',
+                background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
+                border: '1px solid rgba(214, 151, 73, 0.34)',
+                color: '#f5e6b8',
+                boxShadow: '0 10px 24px rgba(122,42,28,0.22)',
               }}
               onMouseEnter={() => uiAudio.playHover()}
             >
-              📝 发布
+              发帖
             </button>
             <button
               onClick={handleClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xl transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-xl transition-colors"
               style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(212, 165, 32, 0.2)',
-                color: '#a7c5ba',
+                background: 'rgba(35, 10, 11, 0.34)',
+                border: '1px solid rgba(214, 151, 73, 0.18)',
+                color: '#d9c3a0',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(212, 165, 32, 0.2)';
+                e.currentTarget.style.background = 'rgba(176, 83, 39, 0.28)';
                 e.currentTarget.style.color = '#f5e6b8';
                 uiAudio.playHover();
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-                e.currentTarget.style.color = '#a7c5ba';
+                e.currentTarget.style.background = 'rgba(35, 10, 11, 0.34)';
+                e.currentTarget.style.color = '#d9c3a0';
               }}
             >
               ×
@@ -98,7 +124,7 @@ export function CommunityModal({ isOpen, onClose }: CommunityModalProps) {
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden p-4 md:p-6">
+        <div className="relative flex-1 overflow-hidden p-4 md:p-6">
           <CommunityHome />
         </div>
 

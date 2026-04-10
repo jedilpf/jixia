@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260409-180",
+  "goal": "Correct the restored tier presentation so that 一等/二等/三等 appears inside the original top-left yellow circular badge in showcase card views, instead of as a separate added badge block.",
+  "constraints": [
+    "Do not change the restored 170-card source / 169-card collection baseline.",
+    "Do not change tier scoring logic or the shared helper behavior.",
+    "Only adjust showcase badge placement in CardGrid and CardDetail.",
+    "Do not refactor unrelated battle, story, or menu files."
+  ],
+  "deliverables": [
+    "CardGrid top-left yellow circular badge displays 一等/二等/三等.",
+    "CardDetail top-left yellow circular badge displays 一等/二等/三等.",
+    "Remove the extra rectangular tier badge added in the previous restore.",
+    "A short audit note recording the placement correction."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/components/showcase/CardGrid.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-180-fix-tier-badge-placement.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260409-180-fix-tier-badge-placement.json"
+  ],
+  "status": "completed"
+}

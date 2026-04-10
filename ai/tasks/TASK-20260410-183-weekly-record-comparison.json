@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260410-183",
+  "goal": "Compare the key work records from the past week and summarize the concrete differences between major commits, recovery points, and task clusters.",
+  "constraints": [
+    "Do not modify gameplay, UI, or asset files.",
+    "Focus on record comparison and repository history only.",
+    "Use concrete commit ids, task ids, and file groups instead of vague summaries.",
+    "If a comparison cannot be proven from local history, mark it as UNKNOWN."
+  ],
+  "deliverables": [
+    "Compare the main weekly save/restore commits and explain how they differ.",
+    "Compare the week's task clusters by topic and output shape.",
+    "Write a concise comparison report the user can read later."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-183-weekly-record-comparison.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-183-weekly-record-comparison.json"
+  ],
+  "status": "completed"
+}

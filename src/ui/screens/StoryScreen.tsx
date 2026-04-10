@@ -6,7 +6,7 @@ const STORY_STYLES = {
   container: {
     width: '100%',
     height: '100dvh',
-    background: '#0f0f1a',
+    background: '#081423',
     display: 'flex',
     flexDirection: 'column' as const,
     overflow: 'hidden',
@@ -18,16 +18,16 @@ const STORY_STYLES = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottom: '1px solid rgba(139,115,85,0.3)',
-    background: 'rgba(15,15,26,0.95)',
+    borderBottom: '1px solid rgba(96,165,250,0.28)',
+    background: 'rgba(7,17,34,0.95)',
     zIndex: 10,
   },
   chapterBadge: {
     padding: '6px 16px',
-    background: 'rgba(26,26,46,0.9)',
+    background: 'rgba(17,34,64,0.92)',
     borderRadius: '20px',
-    border: '1px solid rgba(139,115,85,0.5)',
-    color: '#D4A017',
+    border: '1px solid rgba(96,165,250,0.42)',
+    color: '#bfdbfe',
     fontSize: '14px',
     fontWeight: 600,
   },
@@ -41,12 +41,12 @@ const STORY_STYLES = {
   sceneDescription: {
     fontSize: '16px',
     lineHeight: 1.8,
-    color: '#D4C5A9',
+    color: '#dbeafe',
     marginBottom: '24px',
     padding: '16px 24px',
-    background: 'rgba(26,26,46,0.6)',
+    background: 'rgba(15,23,42,0.72)',
     borderRadius: '8px',
-    borderLeft: '3px solid #8B7355',
+    borderLeft: '3px solid #60a5fa',
     whiteSpace: 'pre-wrap' as const,
   },
   dialogueArea: {
@@ -58,50 +58,50 @@ const STORY_STYLES = {
     width: '160px',
     height: '240px',
     borderRadius: '8px',
-    border: '2px solid #8B7355',
+    border: '2px solid #60a5fa',
     objectFit: 'cover' as const,
-    background: 'rgba(26,26,46,0.8)',
+    background: 'rgba(15,23,42,0.85)',
     flexShrink: 0,
   },
   dialogueBox: {
     flex: 1,
-    background: 'rgba(26,26,46,0.85)',
+    background: 'rgba(15,23,42,0.88)',
     borderRadius: '12px',
-    border: '1px solid rgba(139,115,85,0.5)',
+    border: '1px solid rgba(96,165,250,0.35)',
     padding: '20px 24px',
   },
   speakerName: {
     fontSize: '15px',
     fontWeight: 700,
-    color: '#D4A017',
+    color: '#93c5fd',
     marginBottom: '8px',
   },
   dialogueText: {
     fontSize: '17px',
     lineHeight: 1.7,
-    color: '#f0ddbb',
+    color: '#e0f2fe',
     whiteSpace: 'pre-wrap' as const,
   },
   continueIndicator: {
     textAlign: 'right' as const,
     marginTop: '12px',
-    color: '#8B7355',
+    color: '#60a5fa',
     fontSize: '14px',
     animation: 'pulse 1.5s ease-in-out infinite',
   },
   choicesArea: {
     padding: '24px 48px',
-    background: 'rgba(15,15,26,0.95)',
-    borderTop: '1px solid rgba(139,115,85,0.3)',
+    background: 'rgba(7,17,34,0.95)',
+    borderTop: '1px solid rgba(96,165,250,0.28)',
   },
   choiceButton: {
     width: '100%',
     padding: '16px 24px',
     marginBottom: '12px',
-    background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-    border: '1px solid rgba(139,115,85,0.6)',
+    background: 'linear-gradient(135deg, #10213f 0%, #081423 100%)',
+    border: '1px solid rgba(96,165,250,0.42)',
     borderRadius: '8px',
-    color: '#f0ddbb',
+    color: '#e0f2fe',
     fontSize: '16px',
     textAlign: 'left' as const,
     cursor: 'pointer',
@@ -111,15 +111,15 @@ const STORY_STYLES = {
     gap: '12px',
   },
   choiceButtonHover: {
-    background: 'linear-gradient(135deg, #2a2a3e 0%, #1a1a2a 100%)',
-    borderColor: '#E85D04',
+    background: 'linear-gradient(135deg, #17305c 0%, #0d1c36 100%)',
+    borderColor: '#60a5fa',
     transform: 'translateX(8px)',
   },
   relationshipBar: {
     height: '56px',
     padding: '0 24px',
-    background: 'rgba(15,15,26,0.98)',
-    borderTop: '1px solid rgba(139,115,85,0.3)',
+    background: 'rgba(7,17,34,0.98)',
+    borderTop: '1px solid rgba(96,165,250,0.28)',
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
@@ -128,29 +128,29 @@ const STORY_STYLES = {
   factionBadge: {
     minWidth: '72px',
     padding: '6px 10px',
-    background: 'rgba(26,26,46,0.8)',
+    background: 'rgba(15,23,42,0.82)',
     borderRadius: '6px',
-    border: '1px solid rgba(139,115,85,0.4)',
+    border: '1px solid rgba(96,165,250,0.28)',
     textAlign: 'center' as const,
     flexShrink: 0,
   },
   factionName: {
     fontSize: '11px',
-    color: '#D4C5A9',
+    color: '#cbd5e1',
     marginBottom: '4px',
   },
   reputationBar: {
     height: '3px',
-    background: 'rgba(139,115,85,0.3)',
+    background: 'rgba(96,165,250,0.24)',
     borderRadius: '2px',
     overflow: 'hidden',
   },
   backButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(139,115,85,0.5)',
+    border: '1px solid rgba(96,165,250,0.42)',
     borderRadius: '6px',
-    color: '#D4C5A9',
+    color: '#dbeafe',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -158,9 +158,9 @@ const STORY_STYLES = {
   menuButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(139,115,85,0.5)',
+    border: '1px solid rgba(96,165,250,0.42)',
     borderRadius: '6px',
-    color: '#D4C5A9',
+    color: '#dbeafe',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -207,7 +207,7 @@ const FACTION_NAMES: Record<string, string> = {
 
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
 
-export function StoryScreen() {
+export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   const { dispatch } = useAppStore();
   const engine = getStoryEngine();
 
@@ -303,8 +303,12 @@ export function StoryScreen() {
   }, [engine]);
 
   const handleBack = useCallback(() => {
-    dispatch({ type: 'NAVIGATE', screen: 'home' });
-  }, [dispatch]);
+    if (onBack) {
+      onBack();
+    } else {
+      dispatch({ type: 'NAVIGATE', screen: 'home' });
+    }
+  }, [dispatch, onBack]);
 
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';
@@ -343,12 +347,12 @@ export function StoryScreen() {
             style={STORY_STYLES.backButton}
             onClick={handleBack}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#E85D04';
-              e.currentTarget.style.color = '#E85D04';
+              e.currentTarget.style.borderColor = '#60a5fa';
+              e.currentTarget.style.color = '#60a5fa';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+              e.currentTarget.style.borderColor = 'rgba(96,165,250,0.42)';
+              e.currentTarget.style.color = '#dbeafe';
             }}
           >
             ← 返回
@@ -356,18 +360,18 @@ export function StoryScreen() {
           <span style={STORY_STYLES.chapterBadge}>{getChapterLabel()}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#D4C5A9', fontSize: '14px' }}>
+          <span style={{ color: '#dbeafe', fontSize: '14px' }}>
             名望: {stats.fame}
           </span>
           <button
             style={STORY_STYLES.menuButton}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#E85D04';
-              e.currentTarget.style.color = '#E85D04';
+              e.currentTarget.style.borderColor = '#60a5fa';
+              e.currentTarget.style.color = '#60a5fa';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,115,85,0.5)';
-              e.currentTarget.style.color = '#D4C5A9';
+              e.currentTarget.style.borderColor = 'rgba(96,165,250,0.42)';
+              e.currentTarget.style.color = '#dbeafe';
             }}
           >
             ⚙️ 设置
@@ -398,7 +402,7 @@ export function StoryScreen() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#8B7355',
+                color: '#60a5fa',
                 fontSize: '14px',
               }}
             >
@@ -455,7 +459,7 @@ export function StoryScreen() {
                   width: '28px',
                   height: '28px',
                   borderRadius: '50%',
-                  background: 'rgba(139,115,85,0.3)',
+                  background: 'rgba(96,165,250,0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

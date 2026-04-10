@@ -21,3 +21,6 @@
 - When restoring local snapshots, prefer the explicit stash hash shown by `npm run git:snapshots` instead of relative refs like `stash@{0}`, because new stashes will renumber relative positions.
 - During recovery work in this repo, compare the current saved commit against older dangling commits before overwriting tracked files; often only a few story files are actually richer in the older object, while most other files are already newer in the latest local save.
 - Card tier presentation (`一等 / 二等 / 三等`) should derive from shared helpers in `src/battleV2/tierSystem.ts`; do not hand-annotate recovered showcase source files just to restore badge copy.
+- In showcase views, tier text belongs inside the original top-left yellow circular badge; adding a separate rectangular tier strip on the card face is considered placement drift.
+- After bulk physical card-art fills, audit same-series files by hash and not just by filename; `jianai4/5/6` once resolved correctly but still rendered the same image because the three PNG files were byte-identical.
+- Main-menu button art under `public/assets/btn-*.png` should keep transparent outer background; if hall buttons suddenly show white rectangles, inspect the raster alpha channel first before changing menu JSX or CSS.

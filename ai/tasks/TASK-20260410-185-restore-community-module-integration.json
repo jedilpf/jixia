@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260410-185",
+  "goal": "Safely restore the community module entry and modal integration in the current app shell while preserving all current local code and avoiding destructive repository operations.",
+  "constraints": [
+    "Do not reset, checkout, or delete unrelated local changes.",
+    "Treat the current workspace snapshot as protected and restore only the missing community integration points.",
+    "Prefer minimal scoped edits in App.tsx, MainMenu.tsx, and the existing community modal/hook wiring.",
+    "Do not rewrite the community data layer unless required for the restored entry flow to work."
+  ],
+  "deliverables": [
+    "Wrap the app with the existing CommunityProvider so the community module has a shared state root.",
+    "Restore a MainMenu entry that opens the existing CommunityModal without disturbing other menu flows.",
+    "Ensure the community modal can open home and jump to composer from its header action.",
+    "Document the restore scope and preservation approach in a short audit note."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/App.tsx",
+    "src/components/MainMenu.tsx",
+    "src/components/community/CommunityModal.tsx",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-185-restore-community-module-integration.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-185-restore-community-module-integration.json"
+  ],
+  "status": "completed"
+}

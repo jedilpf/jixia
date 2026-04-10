@@ -146,19 +146,13 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         <div className="absolute top-6 left-5 z-30 w-[54px] h-[54px] flex flex-col items-center justify-center rounded-full cursor-pointer transition-transform duration-300 hover:scale-125 hover:drop-shadow-[0_0_12px_rgba(212,165,32,0.8)]">
           <img
             src={getAssetUrl('assets/cost.png')}
-            alt="cost"
+            alt="tier"
             className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
           />
           <span
-            className="relative z-10 text-[22px] font-bold text-[#f5e6b8] leading-none mb-0.5"
+            className="relative z-10 text-[12px] font-bold text-[#f5e6b8] leading-tight tracking-[0.08em] text-center"
             style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 6px rgba(212,165,32,0.6)' }}
           >
-            {card.cost}
-          </span>
-        </div>
-
-        <div className="absolute top-8 left-[88px] z-30 min-w-[4.25rem] px-3 py-1 rounded-md border border-[#f5e6b8]/70 bg-[#d4a520]/95 shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
-          <span className="block text-xs font-bold text-[#1a1107] tracking-[0.18em] text-center whitespace-nowrap">
             {tierLabel}
           </span>
         </div>

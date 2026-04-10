@@ -608,7 +608,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             <div style={{ height: '1px', width: '60px', background: 'linear-gradient(90deg, rgba(212,165,32,0.6), transparent)' }} />
           </div>
         </div>
-        <div className="mb-12" style={{ color: 'rgba(212,197,169,0.55)', fontSize: '14px', letterSpacing: '3px', fontFamily: 'serif' }}>包罗万象，百家永生。</div>
+        <div className="mb-12" style={{ color: 'rgba(212,197,169,0.55)', fontSize: '18px', letterSpacing: '3px', fontFamily: 'serif' }}>包罗万象，百家永生。</div>
 
         <div className="flex flex-col gap-3 w-72">
           <button onClick={() => { uiAudio.playClick(); onStartGame(); }} onMouseEnter={() => uiAudio.playHover()}

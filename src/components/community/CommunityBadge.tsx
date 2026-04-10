@@ -12,7 +12,7 @@ export function CommunityBadge() {
     <span
       className="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-black"
       style={{
-        background: hasDraft ? '#d4a520' : '#f97316',
+        background: hasDraft ? '#d69849' : '#b73621',
         animation: 'badge-pulse 2s ease-in-out infinite',
       }}
     />

@@ -1,6 +1,6 @@
 export type StoryNodeType = 'narration' | 'dialogue' | 'choice' | 'scene' | 'transition' | 'ending' | 'qte';
 
-export type CharacterEmotion = 'normal' | 'happy' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'determined' | 'scared' | 'serious' | 'worried' | 'interested';
+export type CharacterEmotion = 'normal' | 'happy' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'determined' | 'scared' | 'serious' | 'worried' | 'interested' | 'peaceful';
 
 export type ChoiceImpact = {
   stats?: Partial<Record<'fame' | 'wisdom' | 'charm' | 'courage' | 'insight', number>>;

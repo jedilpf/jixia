@@ -89,22 +89,16 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
 
                         <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/70 to-transparent pointer-events-none z-20" />
 
-                        <div className="absolute top-3 left-3 w-7 h-7 flex items-center justify-center shadow-md rounded-full z-30">
+                        <div className="absolute top-2.5 left-2.5 w-10 h-10 flex items-center justify-center shadow-md rounded-full z-30">
                           <img
                             src={getAssetUrl('assets/cost.png')}
-                            alt="cost"
+                            alt="tier"
                             className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                           />
                           <span
-                            className="relative z-10 text-[13px] font-bold text-[#f5e6b8] leading-none mb-0.5"
+                            className="relative z-10 text-[9px] font-bold text-[#f5e6b8] leading-tight tracking-[0.08em] text-center"
                             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
                           >
-                            {card.cost}
-                          </span>
-                        </div>
-
-                        <div className="absolute top-3 left-12 min-w-[3.2rem] px-2 py-1 rounded-md border border-[#f5e6b8]/70 bg-[#d4a520]/95 shadow-[0_2px_8px_rgba(0,0,0,0.45)] z-30">
-                          <span className="block text-[10px] font-bold text-[#1a1107] tracking-[0.18em] text-center whitespace-nowrap">
                             {tierLabel}
                           </span>
                         </div>
@@ -114,6 +108,9 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
                             {card.name}
                           </h4>
                           <div className="flex items-center gap-1 mt-1">
+                            <span className="text-[10px] scale-90 px-1 border border-[#d4a520]/60 text-[#f5e6b8] rounded-sm opacity-90">
+                              {card.cost}费
+                            </span>
                             <span
                               className="text-[10px] scale-90 px-1 border border-current rounded-sm opacity-90"
                               style={{ color: rarityColor[card.rarity] || '#aaa' }}

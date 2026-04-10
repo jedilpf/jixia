@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260410-181",
+  "goal": "Fix the duplicate-looking card art for jianai4, jianai5, and jianai6 so these three 兼采楼 cards no longer show the same image in the showcase.",
+  "constraints": [
+    "Do not change card ids, names, costs, rarity, or gameplay data.",
+    "Prefer local asset relinking or safe non-destructive bitmap replacement over large UI refactors.",
+    "Keep current card art loading/fallback logic intact unless a mapping fix is required.",
+    "Do not touch unrelated story, menu, or community files."
+  ],
+  "deliverables": [
+    "Identify why jianai4, jianai5, and jianai6 currently render the same artwork.",
+    "Make the three cards display distinct images in showcase views.",
+    "Document the asset/source decision in a short audit note."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "public/assets/cards",
+    "src/utils/assets.ts",
+    "docs/project",
+    ".knowledge/project-notes.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-181-fix-jianai-duplicate-art.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-181-fix-jianai-duplicate-art.json"
+  ],
+  "status": "completed"
+}

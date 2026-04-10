@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260410-187",
+  "goal": "Make returning from the sub-screens back to the initial four-button main menu feel smoother and more natural without rewriting the app navigation structure.",
+  "constraints": [
+    "Keep the existing screen model and core navigation behavior intact.",
+    "Prefer a lightweight shared transition or staged handoff over large routing changes.",
+    "Do not alter gameplay logic or story content to solve the visual transition issue.",
+    "Limit edits to app shell and directly related screen transition components."
+  ],
+  "deliverables": [
+    "Inspect how non-battle screens currently return to the main menu.",
+    "Implement a smoother shared return-to-menu transition.",
+    "Document the transition polish scope in a short audit note."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/App.tsx",
+    "src/components",
+    "src/ui/screens",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-187-main-menu-return-transition-polish.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-187-main-menu-return-transition-polish.json"
+  ],
+  "status": "in_progress"
+}

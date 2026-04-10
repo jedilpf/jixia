@@ -27,5 +27,5 @@
     "npm run ai:task:validate -- --task ai/tasks/TASK-20260409-179-restore-tier-label-system.json",
     "npm run ai:prompt -- --task ai/tasks/TASK-20260409-179-restore-tier-label-system.json"
   ],
-  "status": "in_progress"
+  "status": "completed"
 }

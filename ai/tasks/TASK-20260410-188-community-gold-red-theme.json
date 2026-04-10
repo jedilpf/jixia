@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260410-188",
+  "goal": "Adjust the community module visual theme from the current cool blue direction to a gold-red palette that better matches the overall game tone, without changing community content, structure, or behavior.",
+  "constraints": [
+    "Do not delete or rewrite any community content copy.",
+    "Keep the existing community information architecture and interaction flow intact.",
+    "Limit the change to community UI presentation and directly related task records.",
+    "Prefer palette, surface, border, and emphasis adjustments over structural rewrites."
+  ],
+  "deliverables": [
+    "Retheme the community modal shell and main community views to a gold-red direction.",
+    "Update post list, detail, drafts, comments, and composer surfaces so the module feels visually consistent.",
+    "Validate that the project still builds after the UI theme changes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/community",
+    "src/components/MainMenu.tsx",
+    "src/ui/screens/StoryScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-188-community-gold-red-theme.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-188-community-gold-red-theme.json",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

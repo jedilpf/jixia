@@ -15,9 +15,9 @@ interface CommunityCommentSectionProps {
 function formatTimeAgo(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp;
-  const minute = 60000;
-  const hour = 3600000;
-  const day = 86400000;
+  const minute = 60_000;
+  const hour = 3_600_000;
+  const day = 86_400_000;
 
   if (diff < minute) return '刚刚';
   if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
@@ -33,17 +33,27 @@ interface CommentItemProps {
   isLiked: boolean;
   isAccepted: boolean;
   canAccept: boolean;
+  nested?: boolean;
   onLike: () => void;
   onAccept: () => void;
   onReply: (parentId: string) => void;
 }
 
-function CommentItem({ comment, isLiked, isAccepted, canAccept, onLike, onAccept, onReply }: CommentItemProps) {
+function CommentItem({
+  comment,
+  isLiked,
+  isAccepted,
+  canAccept,
+  nested = false,
+  onLike,
+  onAccept,
+  onReply,
+}: CommentItemProps) {
   const isDeleted = comment.status === 'deleted' || comment.status === 'hidden';
 
   if (isDeleted) {
     return (
-      <div className="py-3 text-sm italic" style={{ color: '#6b7280' }}>
+      <div className="py-3 text-sm italic text-[#6b7280]">
         此评论已删除
       </div>
     );
@@ -51,68 +61,71 @@ function CommentItem({ comment, isLiked, isAccepted, canAccept, onLike, onAccept
 
   return (
     <div
-      className="py-3"
-      style={{ borderBottom: '1px solid rgba(212, 165, 32, 0.1)' }}
+      className="rounded-2xl border p-4"
+      style={{
+        background: nested ? 'rgba(35, 12, 13, 0.72)' : 'rgba(45, 18, 16, 0.8)',
+        borderColor: nested ? 'rgba(214, 151, 73, 0.08)' : 'rgba(214, 151, 73, 0.12)',
+      }}
     >
       <div className="flex items-start gap-3">
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-          style={{ background: 'linear-gradient(135deg, #1a2840, #2a3c66)', color: '#f5e6b8' }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm"
+          style={{
+            background: 'linear-gradient(135deg, #5a221b, #8f3827)',
+            color: '#f5e6b8',
+            border: '1px solid rgba(214, 151, 73, 0.18)',
+          }}
         >
           {comment.authorName.charAt(0)}
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium" style={{ color: '#f5e6b8' }}>
-              {comment.authorName}
-            </span>
-            {isAccepted && (
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-[#f5e6b8]">{comment.authorName}</span>
+            {isAccepted ? (
               <span
-                className="px-1.5 py-0.5 text-xs rounded"
-                style={{ background: 'rgba(74, 175, 80, 0.2)', color: '#4ade80' }}
+                className="rounded-full px-2 py-0.5 text-[11px]"
+                style={{ background: 'rgba(214, 151, 73, 0.18)', color: '#f2c36d' }}
               >
-                ✅ 已采纳
+                已采纳
               </span>
-            )}
-            <span className="text-xs" style={{ color: '#6b7280' }}>
-              {formatTimeAgo(comment.createdAt)}
-            </span>
+            ) : null}
+            <span className="text-xs text-[#a87a5d]">{formatTimeAgo(comment.createdAt)}</span>
           </div>
 
-          <p className="text-sm mb-2 whitespace-pre-wrap" style={{ color: '#d4bf99' }}>
+          <p className="mb-3 whitespace-pre-wrap text-sm leading-7 text-[#d4bf99]">
             {comment.content}
           </p>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <button
               onClick={onLike}
               className="flex items-center gap-1 text-xs transition-colors"
-              style={{ color: isLiked ? '#f97316' : '#6b7280' }}
+              style={{ color: isLiked ? '#ff8a5b' : '#b89372' }}
             >
-              {isLiked ? '❤️' : '🤍'} {comment.likeCount}
+              <span>{isLiked ? '♥' : '♡'}</span>
+              <span>{comment.likeCount}</span>
             </button>
 
             <button
               onClick={() => onReply(comment.id)}
-              className="text-xs transition-colors"
-              style={{ color: '#6b7280' }}
+              className="text-xs text-[#b89372] transition-colors"
             >
               回复
             </button>
 
-            {canAccept && !isAccepted && (
+            {canAccept && !isAccepted ? (
               <button
                 onClick={onAccept}
-                className="text-xs px-2 py-0.5 rounded transition-colors"
+                className="rounded-full px-2.5 py-1 text-xs transition-colors"
                 style={{
-                  background: 'rgba(74, 175, 80, 0.1)',
-                  border: '1px solid rgba(74, 175, 80, 0.3)',
-                  color: '#4ade80',
+                  background: 'rgba(214, 151, 73, 0.14)',
+                  border: '1px solid rgba(214, 151, 73, 0.28)',
+                  color: '#f2c36d',
                 }}
               >
                 采纳答案
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -132,10 +145,9 @@ export function CommunityCommentSection({
   const [newComment, setNewComment] = useState('');
   const [replyToId, setReplyToId] = useState<string | null>(null);
 
-  const rootComments = comments.filter(c => c.parentId === null);
-  const childComments = comments.filter(c => c.parentId !== null);
-
-  const getChildren = (parentId: string) => childComments.filter(c => c.parentId === parentId);
+  const rootComments = comments.filter((c) => c.parentId === null);
+  const childComments = comments.filter((c) => c.parentId !== null);
+  const getChildren = (parentId: string) => childComments.filter((c) => c.parentId === parentId);
 
   const handleSubmit = () => {
     if (!newComment.trim()) return;
@@ -144,84 +156,102 @@ export function CommunityCommentSection({
     setReplyToId(null);
   };
 
-  const handleReply = (parentId: string) => {
-    setReplyToId(parentId);
-  };
-
   return (
-    <div>
-      <h3 className="text-sm font-serif mb-3" style={{ color: '#f5e6b8' }}>
-        评论 ({comments.length})
-      </h3>
+    <div
+      className="rounded-[22px] border p-5"
+      style={{
+        background:
+          'linear-gradient(180deg, rgba(49, 20, 17, 0.9) 0%, rgba(24, 9, 11, 0.88) 100%)',
+        borderColor: 'rgba(214, 151, 73, 0.14)',
+      }}
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex flex-col">
+          <h3 className="text-base font-serif text-[#f5e6b8]">评论区</h3>
+          <span className="text-xs text-[#b89372]">共 {comments.length} 条讨论</span>
+        </div>
+      </div>
 
-      <div className="space-y-1 mb-4">
-        {rootComments.map(comment => (
-          <div key={comment.id}>
-            <CommentItem
-              comment={comment}
-              isLiked={likedCommentIds.includes(comment.id)}
-              isAccepted={acceptedCommentId === comment.id}
-              canAccept={canAcceptAnswer}
-              onLike={() => onLikeComment(comment.id)}
-              onAccept={() => onAcceptAnswer?.(comment.id)}
-              onReply={handleReply}
-            />
-            {getChildren(comment.id).map(child => (
-              <div key={child.id} className="ml-8">
-                <CommentItem
-                  comment={child}
-                  isLiked={likedCommentIds.includes(child.id)}
-                  isAccepted={acceptedCommentId === child.id}
-                  canAccept={false}
-                  onLike={() => onLikeComment(child.id)}
-                  onAccept={() => {}}
-                  onReply={handleReply}
-                />
-              </div>
-            ))}
+      <div className="mb-5 space-y-3">
+        {rootComments.length === 0 ? (
+          <div
+            className="rounded-2xl border px-4 py-8 text-center text-sm text-[#b89372]"
+            style={{ background: 'rgba(35, 12, 13, 0.64)', borderColor: 'rgba(214, 151, 73, 0.08)' }}
+          >
+            还没有评论，来留下第一条看法吧。
           </div>
-        ))}
+        ) : (
+          rootComments.map((comment) => (
+            <div key={comment.id} className="space-y-3">
+              <CommentItem
+                comment={comment}
+                isLiked={likedCommentIds.includes(comment.id)}
+                isAccepted={acceptedCommentId === comment.id}
+                canAccept={canAcceptAnswer}
+                onLike={() => onLikeComment(comment.id)}
+                onAccept={() => onAcceptAnswer?.(comment.id)}
+                onReply={setReplyToId}
+              />
+              {getChildren(comment.id).length > 0 ? (
+                <div className="ml-6 space-y-3 border-l border-[rgba(214,151,73,0.1)] pl-4">
+                  {getChildren(comment.id).map((child) => (
+                    <CommentItem
+                      key={child.id}
+                      comment={child}
+                      isLiked={likedCommentIds.includes(child.id)}
+                      isAccepted={acceptedCommentId === child.id}
+                      canAccept={false}
+                      nested
+                      onLike={() => onLikeComment(child.id)}
+                      onAccept={() => {}}
+                      onReply={setReplyToId}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ))
+        )}
       </div>
 
       <div
-        className="rounded-lg border p-3"
+        className="rounded-2xl border p-4"
         style={{
-          background: 'rgba(16, 25, 46, 0.6)',
-          borderColor: 'rgba(212, 165, 32, 0.2)',
+          background: 'rgba(35, 12, 13, 0.72)',
+          borderColor: 'rgba(214, 151, 73, 0.1)',
         }}
       >
-        {replyToId && (
-          <div className="flex items-center gap-2 mb-2 text-xs" style={{ color: '#a7c5ba' }}>
-            <span>回复评论</span>
-            <button
-              onClick={() => setReplyToId(null)}
-              className="text-xs"
-              style={{ color: '#f97316' }}
-            >
+        {replyToId ? (
+          <div className="mb-3 flex items-center gap-2 text-xs text-[#d9c3a0]">
+            <span>正在回复一条评论</span>
+            <button onClick={() => setReplyToId(null)} className="text-[#f97316]">
               取消
             </button>
           </div>
-        )}
+        ) : null}
+
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="发表你的看法..."
-          rows={3}
-          className="w-full px-3 py-2 rounded text-sm resize-none outline-none"
+          placeholder="写下你的看法..."
+          rows={4}
+          className="w-full resize-none rounded-2xl border px-4 py-3 text-sm outline-none"
           style={{
-            background: 'rgba(10, 15, 30, 0.6)',
-            border: '1px solid rgba(212, 165, 32, 0.2)',
+            background: 'rgba(34, 12, 13, 0.84)',
+            borderColor: 'rgba(214, 151, 73, 0.16)',
             color: '#f5e6b8',
           }}
         />
-        <div className="flex justify-end mt-2">
+
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <span className="text-xs text-[#a87a5d]">支持主评与楼中回复</span>
           <button
             onClick={handleSubmit}
             disabled={!newComment.trim()}
-            className="px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50"
+            className="rounded-xl px-4 py-2 text-sm transition-colors disabled:opacity-50"
             style={{
-              background: 'rgba(212, 165, 32, 0.2)',
-              border: '1px solid rgba(212, 165, 32, 0.4)',
+              background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
+              border: '1px solid rgba(214, 151, 73, 0.32)',
               color: '#f5e6b8',
             }}
           >

@@ -1,4 +1,5 @@
 import type { CommunityDraft } from '../../community/types';
+import { CommunityEmptyState } from './CommunityEmptyState';
 
 interface CommunityDraftsListProps {
   drafts: CommunityDraft[];
@@ -11,9 +12,9 @@ interface CommunityDraftsListProps {
 function formatTimeAgo(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp;
-  const minute = 60000;
-  const hour = 3600000;
-  const day = 86400000;
+  const minute = 60_000;
+  const hour = 3_600_000;
+  const day = 86_400_000;
 
   if (diff < minute) return '刚刚';
   if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
@@ -30,69 +31,79 @@ export function CommunityDraftsList({
 }: CommunityDraftsListProps) {
   if (drafts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="text-4xl mb-4">📁</div>
-        <p className="text-lg font-serif mb-2" style={{ color: '#f5e6b8' }}>草稿箱为空</p>
-        <p className="text-sm mb-4" style={{ color: '#a7c5ba' }}>发布帖子时可以选择保存草稿</p>
-        <button
-          onClick={onBack}
-          className="px-4 py-2 rounded-lg text-sm"
-          style={{
-            background: 'rgba(212, 165, 32, 0.2)',
-            border: '1px solid rgba(212, 165, 32, 0.4)',
-            color: '#f5e6b8',
-          }}
-        >
-          返回首页
-        </button>
+      <div className="flex h-full flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="rounded-xl px-3 py-2 text-sm"
+            style={{
+              background: 'rgba(212, 165, 32, 0.1)',
+              border: '1px solid rgba(212, 165, 32, 0.24)',
+              color: '#d9c3a0',
+            }}
+          >
+            返回
+          </button>
+        </div>
+        <CommunityEmptyState icon="📝" title="草稿箱为空" message="发布内容时可以先保存草稿，晚点再回来继续编辑。" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
+      <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="px-3 py-1.5 rounded-lg text-sm"
+          className="rounded-xl px-3 py-2 text-sm"
           style={{
             background: 'rgba(212, 165, 32, 0.1)',
-            border: '1px solid rgba(212, 165, 32, 0.3)',
-            color: '#a7c5ba',
+            border: '1px solid rgba(212, 165, 32, 0.24)',
+            color: '#d9c3a0',
           }}
         >
-          ← 返回
+          返回
         </button>
-        <span className="text-sm font-serif" style={{ color: '#f5e6b8' }}>草稿箱</span>
+        <div className="flex flex-col">
+          <span className="font-serif text-[#f5e6b8]">草稿箱</span>
+          <span className="text-xs text-[#b89372]">共 {drafts.length} 份未发布内容</span>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-3" style={{ maxHeight: 'calc(100vh - 280px)' }}>
-        {drafts.map(draft => (
+      <div className="flex-1 min-h-0 space-y-4 overflow-y-auto pr-1" style={{ overscrollBehavior: 'contain' }}>
+        {drafts.map((draft) => (
           <div
             key={draft.id}
-            className="p-4 rounded-lg border"
+            className="rounded-[20px] border p-5"
             style={{
-              background: 'rgba(16, 25, 46, 0.8)',
-              borderColor: 'rgba(212, 165, 32, 0.2)',
+              background:
+                'linear-gradient(180deg, rgba(47, 18, 15, 0.94) 0%, rgba(22, 8, 10, 0.94) 100%)',
+              borderColor: 'rgba(214, 151, 73, 0.14)',
             }}
           >
-            <h3 className="text-base font-serif mb-2" style={{ color: '#f5e6b8' }}>
-              {draft.title || '无标题'}
-            </h3>
-            <p className="text-sm line-clamp-2 mb-3" style={{ color: '#a7c5ba' }}>
-              {draft.summary || draft.content.slice(0, 80) + '...'}
-            </p>
-            <div className="flex items-center justify-between">
-              <span className="text-xs" style={{ color: '#6b7280' }}>
-                保存于 {formatTimeAgo(draft.updatedAt)}
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <h3 className="mb-2 line-clamp-1 text-lg font-serif text-[#f5e6b8]">
+                  {draft.title || '未命名草稿'}
+                </h3>
+                <p className="line-clamp-2 text-sm leading-7 text-[#d9c3a0]">
+                  {draft.summary || `${draft.content.slice(0, 80)}...`}
+                </p>
+              </div>
+              <span className="rounded-full px-2.5 py-1 text-[11px]" style={{ background: 'rgba(214,151,73,0.1)', color: '#e7c484' }}>
+                草稿
               </span>
-              <div className="flex gap-2">
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{ borderColor: 'rgba(212, 165, 32, 0.1)' }}>
+              <span className="text-xs text-[#a87a5d]">更新于 {formatTimeAgo(draft.updatedAt)}</span>
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => onDeleteDraft(draft.id)}
-                  className="px-3 py-1 rounded text-xs"
+                  className="rounded-xl px-3 py-1.5 text-xs"
                   style={{
                     background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    border: '1px solid rgba(239, 68, 68, 0.24)',
                     color: '#ef4444',
                   }}
                 >
@@ -100,21 +111,21 @@ export function CommunityDraftsList({
                 </button>
                 <button
                   onClick={() => onEditDraft(draft.id)}
-                  className="px-3 py-1 rounded text-xs"
+                  className="rounded-xl px-3 py-1.5 text-xs"
                   style={{
-                    background: 'rgba(212, 165, 32, 0.1)',
-                    border: '1px solid rgba(212, 165, 32, 0.3)',
-                    color: '#a7c5ba',
+                    background: 'rgba(70, 21, 18, 0.26)',
+                    border: '1px solid rgba(214, 151, 73, 0.16)',
+                    color: '#d9c3a0',
                   }}
                 >
                   编辑
                 </button>
                 <button
                   onClick={() => onPublishDraft(draft.id)}
-                  className="px-3 py-1 rounded text-xs"
+                  className="rounded-xl px-3 py-1.5 text-xs"
                   style={{
-                    background: 'rgba(212, 165, 32, 0.2)',
-                    border: '1px solid rgba(212, 165, 32, 0.4)',
+                    background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
+                    border: '1px solid rgba(214, 151, 73, 0.3)',
                     color: '#f5e6b8',
                   }}
                 >

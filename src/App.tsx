@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import BattleFrameV2 from '@/components/BattleFrameV2';
 import { BattleSetup } from '@/components/BattleSetup';
 import { MainMenu, AppSettings, BrightnessOverlay } from '@/components/MainMenu';
@@ -11,6 +11,7 @@ import { StoryScreen } from '@/ui/screens/StoryScreen';
 import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { CommunityProvider } from '@/hooks/useCommunityState';
 
 /**
  * App - 谋天下：问道百家 主入口
@@ -44,6 +45,9 @@ const HALL_BGM_SCREENS: ReadonlyArray<LegacyScreen> = [
   'battle_setup',
   'pre_battle',
 ];
+
+const MENU_RETURN_COVER_MS = 180;
+const MENU_RETURN_REVEAL_MS = 260;
 
 function App() {
   const isElectronRuntime =
@@ -82,11 +86,13 @@ function App() {
 
   return (
     <ThemeProvider>
-      <AppMainContent
-        settings={settings}
-        onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
-        isElectronRuntime={isElectronRuntime}
-      />
+      <CommunityProvider>
+        <AppMainContent
+          settings={settings}
+          onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
+          isElectronRuntime={isElectronRuntime}
+        />
+      </CommunityProvider>
     </ThemeProvider>
   );
 }
@@ -106,9 +112,19 @@ function AppMainContent({
   const [battleSessionKey, setBattleSessionKey] = useState(1);
   const [preBattleResult, setPreBattleResult] = useState<PreBattleResult | null>(null);
   const [screenRecoveryKey, setScreenRecoveryKey] = useState(0);
+  const [menuReturnPhase, setMenuReturnPhase] = useState<'hidden' | 'cover' | 'reveal'>('hidden');
   const audioHallRef = useRef<HTMLAudioElement | null>(null);
   const audioBattleRef = useRef<HTMLAudioElement | null>(null);
+  const menuReturnTimersRef = useRef<number[]>([]);
+  const menuReturnBusyRef = useRef(false);
   const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+
+  const clearMenuReturnTimers = useCallback(() => {
+    for (const timer of menuReturnTimersRef.current) {
+      window.clearTimeout(timer);
+    }
+    menuReturnTimersRef.current = [];
+  }, []);
 
   useEffect(() => {
     if (isElectronRuntime) return;
@@ -122,6 +138,12 @@ function AppMainContent({
       audioBattleRef.current?.pause();
     };
   }, [isElectronRuntime]);
+
+  useEffect(() => {
+    return () => {
+      clearMenuReturnTimers();
+    };
+  }, [clearMenuReturnTimers]);
 
   useEffect(() => {
     if (isElectronRuntime) return;
@@ -177,11 +199,34 @@ function AppMainContent({
     setTimeout(() => setBattleFadeIn(false), 50);
   };
 
-  const handleBackToMenu = () => {
-    setBattleFadeIn(false);
-    setPreBattleResult(null);
-    setScreen('menu');
-  };
+  const runReturnToMenuTransition = useCallback((beforeSwitch?: () => void) => {
+    if (menuReturnBusyRef.current) return;
+    menuReturnBusyRef.current = true;
+    clearMenuReturnTimers();
+    setMenuReturnPhase('cover');
+
+    const switchTimer = window.setTimeout(() => {
+      beforeSwitch?.();
+      setScreen('menu');
+      setMenuReturnPhase('reveal');
+
+      const finishTimer = window.setTimeout(() => {
+        setMenuReturnPhase('hidden');
+        menuReturnBusyRef.current = false;
+      }, MENU_RETURN_REVEAL_MS);
+
+      menuReturnTimersRef.current.push(finishTimer);
+    }, MENU_RETURN_COVER_MS);
+
+    menuReturnTimersRef.current.push(switchTimer);
+  }, [clearMenuReturnTimers]);
+
+  const handleBackToMenu = useCallback(() => {
+    runReturnToMenuTransition(() => {
+      setBattleFadeIn(false);
+      setPreBattleResult(null);
+    });
+  }, [runReturnToMenuTransition]);
 
   const handleReselectArena = () => {
     setBattleFadeIn(false);
@@ -295,6 +340,26 @@ function AppMainContent({
 
       {screen === 'collection' ? <CardShowcase onBack={handleBackToMenu} /> : null}
       {screen === 'characters' ? <CharactersView onBack={handleBackToMenu} /> : null}
+
+      {menuReturnPhase !== 'hidden' ? (
+        <div
+          className="pointer-events-none absolute inset-0 z-[120]"
+          style={{
+            background:
+              'radial-gradient(circle at center, rgba(212,165,32,0.12) 0%, rgba(18,12,6,0.78) 42%, rgba(0,0,0,0.92) 100%)',
+            opacity: menuReturnPhase === 'cover' ? 1 : 0,
+            transition: `opacity ${menuReturnPhase === 'cover' ? MENU_RETURN_COVER_MS : MENU_RETURN_REVEAL_MS}ms ease`,
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(74,124,111,0.08) 0%, transparent 30%, transparent 70%, rgba(212,165,32,0.08) 100%)',
+            }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260410-192",
+  "goal": "Enable custom user-defined tags in the community post composer while keeping the existing recommended tag choices and current publishing flow intact.",
+  "constraints": [
+    "Do not modify community feed, sorting, filtering, or post detail behavior beyond what is required for composer tag entry.",
+    "Keep the existing recommended category tag chips available; add custom tag input in addition to them.",
+    "Respect the current tag validation limits: maximum 5 tags total and maximum 20 characters per tag.",
+    "Limit code changes to the community composer and directly related task records."
+  ],
+  "deliverables": [
+    "Community composer supports adding custom tags entered by the user.",
+    "Existing preset tag chips remain usable alongside custom tags.",
+    "Composer prevents duplicate tags and respects the existing max-tag constraints.",
+    "Project checks for the touched files pass after the change."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/community/CommunityComposer.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-192-community-custom-tags.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-192-community-custom-tags.json"
+  ],
+  "status": "in_progress"
+}

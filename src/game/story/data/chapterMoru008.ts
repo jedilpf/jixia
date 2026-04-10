@@ -3386,6 +3386,5 @@ export const CHAPTER_MORU_008_NODES: StoryNode[] = [
 
 ---`,
     background: 'hangu_pass_sunset',
-    nextNode: null,
   },
 ];

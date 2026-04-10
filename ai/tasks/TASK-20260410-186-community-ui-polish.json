@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260410-186",
+  "goal": "Polish the current community module UI so it feels more intentional and visually pleasant without altering or repainting any existing image assets.",
+  "constraints": [
+    "Do not modify raster assets or replace existing images.",
+    "Keep the current community information architecture and interaction flow intact.",
+    "Prefer visual hierarchy, spacing, surface, and typography improvements over structural rewrites.",
+    "Limit edits to existing community UI components unless a minimal integration touch is necessary."
+  ],
+  "deliverables": [
+    "Refine the community modal shell and main community views for stronger visual hierarchy.",
+    "Improve card/list/detail/composer surfaces so the module reads as a cohesive polished space.",
+    "Document the polish scope in a short audit note."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/components/community",
+    "docs/project"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-186-community-ui-polish.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-186-community-ui-polish.json"
+  ],
+  "status": "completed"
+}
