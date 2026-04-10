@@ -217,15 +217,15 @@ export function CommunityHome() {
 
           <div className="grid min-w-[220px] grid-cols-2 gap-3">
             <div
-              className="rounded-2xl border px-4 py-3"
-              style={{ background: 'rgba(39, 14, 14, 0.72)', borderColor: 'rgba(214, 151, 73, 0.12)' }}
+              className="rounded-2xl px-4 py-3"
+              style={{ background: 'rgba(39, 14, 14, 0.72)', border: '1px solid rgba(214, 151, 73, 0.12)' }}
             >
               <div className="text-xs uppercase tracking-[0.16em] text-[#a87a5d]">posts</div>
               <div className="mt-1 text-xl font-serif text-[#f5e6b8]">{visiblePosts.length}</div>
             </div>
             <div
-              className="rounded-2xl border px-4 py-3"
-              style={{ background: 'rgba(39, 14, 14, 0.72)', borderColor: 'rgba(214, 151, 73, 0.12)' }}
+              className="rounded-2xl px-4 py-3"
+              style={{ background: 'rgba(39, 14, 14, 0.72)', border: '1px solid rgba(214, 151, 73, 0.12)' }}
             >
               <div className="text-xs uppercase tracking-[0.16em] text-[#a87a5d]">drafts</div>
               <div className="mt-1 text-xl font-serif text-[#f5e6b8]">{runtime.drafts.length}</div>

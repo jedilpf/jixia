@@ -129,8 +129,8 @@ export function CommunityPostCard({
       </div>
 
       <div
-        className="relative mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4"
-        style={{ borderColor: 'rgba(212, 165, 32, 0.12)' }}
+        className="relative mt-4 flex flex-wrap items-center justify-between gap-3 pt-4"
+        style={{ borderTop: '1px solid rgba(212, 165, 32, 0.12)' }}
       >
         <div className="flex flex-wrap items-center gap-2 text-xs text-[#b89372]">
           <span>{post.authorName}</span>

@@ -175,8 +175,8 @@ export function CommunityCommentSection({
       <div className="mb-5 space-y-3">
         {rootComments.length === 0 ? (
           <div
-            className="rounded-2xl border px-4 py-8 text-center text-sm text-[#b89372]"
-            style={{ background: 'rgba(35, 12, 13, 0.64)', borderColor: 'rgba(214, 151, 73, 0.08)' }}
+            className="rounded-2xl px-4 py-8 text-center text-sm text-[#b89372]"
+            style={{ background: 'rgba(35, 12, 13, 0.64)', border: '1px solid rgba(214, 151, 73, 0.08)' }}
           >
             还没有评论，来留下第一条看法吧。
           </div>

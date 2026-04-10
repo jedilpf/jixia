@@ -73,7 +73,7 @@ export const PlayerStatsPanelV2: React.FC<PlayerStatsPanelV2Props> = ({
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-6 mb-8">
           {yahuraStats.map((s, i) => (
-            <div key={i} className="flex flex-col border-l-2 pl-3" style={{ borderColor: s.color }}>
+            <div key={i} className="flex flex-col pl-3" style={{ borderLeftWidth: '2px', borderLeftColor: s.color }}>
               <span className="text-[10px] text-[#999] tracking-widest mb-1">{s.label}</span>
               <span className="text-xl font-medium text-[#333] tabular-nums">{s.value}</span>
             </div>

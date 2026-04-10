@@ -1,0 +1,36 @@
+{
+  "task_id": "TASK-20260410-196",
+  "goal": "Polish the battle entry flow and core battle UI into a unified red-gold theme without changing battle logic, card rules, or gameplay behavior.",
+  "constraints": [
+    "Do not modify battleV2 gameplay logic, phase rules, or balance numbers.",
+    "Do not change card data, topics, or gameplay text beyond visual labeling needed for theme polish.",
+    "Limit edits to battle-facing presentation files and shared battle visual assets.",
+    "Keep existing navigation and screen flow intact."
+  ],
+  "deliverables": [
+    "Battle setup, loading, topic selection, pre-faction loading, and main battle screens share a coherent red-gold visual language.",
+    "The main battle frame and top/bottom battle chrome feel more polished and less white/green.",
+    "Build passes after the UI-only changes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/ui/screens/visualAssets.ts",
+    "src/ui/screens/LoadingScreen.tsx",
+    "src/ui/screens/LoadingScreenV2.tsx",
+    "src/ui/screens/TopicScreen.tsx",
+    "src/ui/screens/PreFactionLoading.tsx",
+    "src/ui/screens/BattleScreen.tsx",
+    "src/components/BattleSetup.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-196-battle-red-gold-ui-polish.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-196-battle-red-gold-ui-polish.json",
+    "npm run build"
+  ],
+  "status": "completed"
+}

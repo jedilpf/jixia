@@ -1,84 +1,93 @@
 /**
- * JWT认证中间件
- *
- * 验证请求中的JWT令牌，将用户信息注入req.user
+ * 认证中间件
+ * 验证 JWT 令牌并提取用户信息
  */
 
-const { verifyAccessToken, extractToken } = require('../utils/jwt.cjs');
-const { HttpError } = require('../utils/http-error.cjs');
+const { verifyToken } = require('../utils/jwt.cjs');
 
 /**
- * 认证中间件 - 要求请求必须携带有效令牌
+ * 认证中间件 - 验证用户身份
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @param {Function} next - 下一个中间件
  */
-function authRequired(req, res, next) {
-  const token = extractToken(req);
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return next(new HttpError(401, '未提供认证令牌', { code: 'NO_TOKEN' }));
+  if (!authHeader) {
+    return res.status(401).json({
+      error: 'UNAUTHORIZED',
+      message: 'Authorization header is required'
+    });
   }
 
-  const decoded = verifyAccessToken(token);
-
-  if (!decoded) {
-    return next(new HttpError(401, '令牌无效或已过期', { code: 'INVALID_TOKEN' }));
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return res.status(401).json({
+      error: 'INVALID_TOKEN_FORMAT',
+      message: 'Authorization header must be: Bearer <token>'
+    });
   }
 
-  // 将用户信息注入请求对象
-  req.user = {
-    userId: decoded.userId,
-    username: decoded.username,
-  };
+  const token = parts[1];
 
-  next();
+  try {
+    const decoded = verifyToken(token);
+    req.user = {
+      userId: decoded.userId,
+      username: decoded.username
+    };
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        error: 'TOKEN_EXPIRED',
+        message: 'Token has expired'
+      });
+    }
+    return res.status(401).json({
+      error: 'INVALID_TOKEN',
+      message: 'Invalid token'
+    });
+  }
 }
 
 /**
- * 可选认证中间件 - 如果有令牌则验证，无令牌也放行
+ * 可选认证中间件 - 如果有令牌则验证，没有则继续
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @param {Function} next - 下一个中间件
  */
-function authOptional(req, res, next) {
-  const token = extractToken(req);
+function optionalAuthenticate(req, _res, next) {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader) {
     req.user = null;
     return next();
   }
 
-  const decoded = verifyAccessToken(token);
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    req.user = null;
+    return next();
+  }
 
-  if (decoded) {
+  const token = parts[1];
+
+  try {
+    const decoded = verifyToken(token);
     req.user = {
       userId: decoded.userId,
-      username: decoded.username,
+      username: decoded.username
     };
-  } else {
+  } catch {
     req.user = null;
   }
 
   next();
 }
 
-/**
- * 检查用户是否为资源拥有者
- * @param {string} resourceUserIdParam - 路径参数名，如 'userId'
- */
-function requireOwnership(resourceUserIdParam = 'userId') {
-  return (req, res, next) => {
-    if (!req.user) {
-      return next(new HttpError(401, '未认证', { code: 'UNAUTHORIZED' }));
-    }
-
-    const resourceUserId = req.params[resourceUserIdParam] || req.body[resourceUserIdParam];
-
-    if (resourceUserId && req.user.userId !== resourceUserId) {
-      return next(new HttpError(403, '无权访问该资源', { code: 'FORBIDDEN' }));
-    }
-
-    next();
-  };
-}
-
 module.exports = {
-  authRequired,
-  authOptional,
-  requireOwnership,
+  authenticate,
+  optionalAuthenticate
 };

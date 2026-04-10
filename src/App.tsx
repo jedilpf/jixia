@@ -12,6 +12,7 @@ import { ArenaId } from '@/battleV2/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CommunityProvider } from '@/hooks/useCommunityState';
+import { AppStoreProvider } from '@/app/store';
 
 /**
  * App - 谋天下：问道百家 主入口
@@ -86,13 +87,15 @@ function App() {
 
   return (
     <ThemeProvider>
-      <CommunityProvider>
-        <AppMainContent
-          settings={settings}
-          onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
-          isElectronRuntime={isElectronRuntime}
-        />
-      </CommunityProvider>
+      <AppStoreProvider>
+        <CommunityProvider>
+          <AppMainContent
+            settings={settings}
+            onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
+            isElectronRuntime={isElectronRuntime}
+          />
+        </CommunityProvider>
+      </AppStoreProvider>
     </ThemeProvider>
   );
 }

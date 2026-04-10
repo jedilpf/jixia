@@ -1,0 +1,42 @@
+{
+  "task_id": "TASK-20260411-197",
+  "goal": "Unify the app-facing gold-red visual theme more broadly and fix Esc-based skip behavior in StoryScreen without changing gameplay logic or story content.",
+  "constraints": [
+    "Do not modify battleV2 gameplay logic, card rules, or balance numbers.",
+    "Do not change story text or story branching content.",
+    "Limit edits to theme tokens and the relevant presentation screens/components.",
+    "Keep existing navigation and screen flow intact."
+  ],
+  "deliverables": [
+    "The global app-facing theme reads more gold-red instead of blue-black in the main shell.",
+    "StoryScreen responds to Escape as a skip/continue shortcut while preserving existing typing and navigation behavior.",
+    "Build passes after the UI-only changes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/config/themes.ts",
+    "src/App.tsx",
+    "src/ui/screens/StoryScreen.tsx",
+    "src/components/TransitionScreen.tsx",
+    "src/ui/screens/visualAssets.ts",
+    "src/components/BattleSetup.tsx",
+    "src/components/PreBattleFlow.tsx",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "src/components/battle/PhaseTransition.tsx",
+    "src/ui/screens/LoadingScreen.tsx",
+    "src/ui/screens/LoadingScreenV2.tsx",
+    "src/ui/screens/TopicScreen.tsx",
+    "src/ui/screens/PreFactionLoading.tsx",
+    "src/ui/screens/BattleScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-197-gold-red-theme-and-story-esc.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-197-gold-red-theme-and-story-esc.json",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

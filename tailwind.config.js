@@ -10,6 +10,10 @@ export default {
         'battle-bg': '#1a1a2e',
         'battle-board': '#16213e',
         'debug-box': '#e94560',
+        'battle-border': '#7a5a34',
+        'battle-border-light': 'rgba(184,136,84,0.45)',
+        'battle-border-medium': 'rgba(184,136,84,0.5)',
+        'battle-gold': '#b88a53',
         theme: {
           primary: 'var(--color-primary)',
           'primary-light': 'var(--color-primary-light)',

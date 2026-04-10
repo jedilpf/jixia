@@ -3,13 +3,13 @@
 }
 
 export const PRE_BATTLE_COLORS = {
-  textMain: '#f3debc',
-  textMuted: '#bca47f',
-  border: '#7a5a34',
-  panel: 'rgba(26, 18, 12, 0.88)',
-  panelSoft: 'rgba(39, 28, 18, 0.76)',
-  button: '#6b3d1f',
-  buttonHover: '#844b25',
+  textMain: '#f8e6be',
+  textMuted: '#d1b185',
+  border: '#7d3d23',
+  panel: 'rgba(33, 11, 8, 0.9)',
+  panelSoft: 'rgba(55, 22, 15, 0.8)',
+  button: '#7a2f1d',
+  buttonHover: '#9a4126',
 };
 
 export const PRE_BATTLE_BACKGROUND = asset('/assets/bg-main1.png');

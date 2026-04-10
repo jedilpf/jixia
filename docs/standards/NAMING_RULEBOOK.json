@@ -1,7 +1,7 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://jixia.game/schemas/naming-rules.json",
-  "title": "《谋天下·问道百家》命名规则规则书",
+  "title": "《思筹之录》命名规则规则书",
   "version": "2.0.0",
   "updated_at": "2026-03-23",
   "description": "机器可读的命名规范规则定义，供AI系统和自动化工具使用",
@@ -453,3 +453,4 @@
     ]
   }
 }
+

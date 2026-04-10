@@ -95,7 +95,7 @@ export function CommunityDraftsList({
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{ borderColor: 'rgba(212, 165, 32, 0.1)' }}>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4" style={{ borderTop: '1px solid rgba(212, 165, 32, 0.1)' }}>
               <span className="text-xs text-[#a87a5d]">更新于 {formatTimeAgo(draft.updatedAt)}</span>
               <div className="flex flex-wrap gap-2">
                 <button

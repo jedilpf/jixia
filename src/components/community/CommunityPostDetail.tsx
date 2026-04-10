@@ -129,7 +129,7 @@ export function CommunityPostDetail({
             {post.content}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 border-t pt-4" style={{ borderColor: 'rgba(212, 165, 32, 0.12)' }}>
+          <div className="flex flex-wrap items-center gap-3 pt-4" style={{ borderTop: '1px solid rgba(212, 165, 32, 0.12)' }}>
             <button
               onClick={onLike}
               className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-colors"

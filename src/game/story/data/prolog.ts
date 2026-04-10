@@ -112,7 +112,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'choice_wisdom',
-        text: '📚 "天下知识如海，吾愿探其真？',
+        text: "📚 \"天下知识如海，吾愿探其真？",
         icon: '📚',
         effects: {
           stats: { wisdom: 2, insight: 1 },
@@ -123,7 +123,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'choice_charm',
-        text: '🤝 "吾欲广交天下英杰，成一番大业？',
+        text: "🤝 \"吾欲广交天下英杰，成一番大业？",
         icon: '🤝',
         effects: {
           stats: { charm: 2, courage: 1 },
@@ -380,7 +380,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'anger_question',
-        text: '😤 怒而质问："请宫主示下真相！吾必为彼讨回公道！',
+        text: "😤 怒而质问：\"请宫主示下真相！吾必为彼讨回公道！",
         effects: {
           stats: { courage: 3 },
           relationships: { school_master: { affection: 3, trust: 3 } },
@@ -901,7 +901,7 @@ export const PROLOG_NODES: StoryNode[] = [
     choices: [
       {
         id: 'dao_power',
-        text: '👑 "吾要权倾天下！——大丈夫生于乱世，当提三尺剑，立不世功！',
+        text: "👑 \"吾要权倾天下！——大丈夫生于乱世，当提三尺剑，立不世功！",
         effects: {
           stats: { fame: 5, courage: 2 },
           flags: { strategist_path_open: true, diplomat_path_open: true },
@@ -910,7 +910,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'dao_wisdom',
-        text: '📚 "吾要学贯百家，明白天下至理！——知识乃人类进步之阶梯！',
+        text: "📚 \"吾要学贯百家，明白天下至理！——知识乃人类进步之阶梯！",
         effects: {
           stats: { wisdom: 5, insight: 2 },
           flags: { confucian_path_open: true, logician_path_open: true },
@@ -919,7 +919,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'dao_home',
-        text: '🏠 "吾想归家"——那些简单快乐之日，才是吾所真正想要之。',
+        text: "🏠 \"吾想归家\"——那些简单快乐之日，才是吾所真正想要之。",
         effects: {
           stats: { charm: 3, wisdom: 2 },
           flags: { daoist_path_open: true },
@@ -928,7 +928,7 @@ export const PROLOG_NODES: StoryNode[] = [
       },
       {
         id: 'dao_unknown',
-        text: '🤔 "吾不知……',
+        text: "🤔 \"吾不知……",
         effects: {
           stats: { insight: 5, wisdom: 3 },
           flags: { universal_path_open: true },

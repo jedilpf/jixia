@@ -104,22 +104,26 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
     tryNextSource();
   };
 
-  const handleSkip = useCallback(() => {
-    if (!skipEnabled) return;
+  const handleSkip = useCallback((force = false) => {
+    if (!force && !skipEnabled) return;
     triggerExit();
   }, [skipEnabled, triggerExit]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleSkip();
+      if (e.key === 'Escape' || e.key === 'Esc' || e.code === 'Escape') { e.preventDefault(); handleSkip(true); }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey, true);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      window.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('keydown', onKey, true);
+    };
   }, [handleSkip]);
 
   return (
     <div
-      onClick={handleSkip}
+      onClick={() => handleSkip()}
       style={{
         position: 'fixed',
         inset: 0,
@@ -227,23 +231,28 @@ export function TransitionScreen({ onComplete }: TransitionScreenProps) {
         }}
       />
 
-      <div
+      <button
+        type="button"
+        onClick={() => handleSkip()}
+        disabled={!skipEnabled}
         style={{
           position: 'absolute',
           bottom: '32px',
           right: '40px',
-          color: 'rgba(212,197,169,0.55)',
+          color: skipEnabled ? 'rgba(212,197,169,0.75)' : 'rgba(212,197,169,0.35)',
           fontSize: '13px',
           letterSpacing: '2px',
           fontFamily: 'serif',
-          pointerEvents: 'none',
-          animation: 'skip-blink 2s ease-in-out infinite',
-          opacity: overlay > 0 || !skipEnabled ? 0 : 1,
-          transition: 'opacity 0.3s',
+          cursor: skipEnabled ? 'pointer' : 'default',
+          border: 'none',
+          background: 'transparent',
+          padding: '8px 16px',
+          opacity: overlay > 0 ? 0 : 1,
+          transition: 'opacity 0.3s, color 0.3s',
         }}
       >
         点击或 ESC 跳过
-      </div>
+      </button>
 
       <style>{`
         @keyframes skip-blink {

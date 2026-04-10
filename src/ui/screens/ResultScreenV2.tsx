@@ -62,7 +62,7 @@ export function ResultScreenV2({ state, progress, settlement, onRestart }: Resul
           </div>
 
           {/* 标题区 */}
-          <div className="mb-12 border-l-4 pl-6" style={{ borderColor: primaryColor }}>
+          <div className="mb-12 pl-6" style={{ borderLeftWidth: '4px', borderLeftColor: primaryColor }}>
             <h1 className="text-6xl font-bold tracking-[0.2em] text-[#1a1a1a]">{mainTitle}</h1>
             <p className="mt-4 text-lg italic text-[#666]">{subTitle}</p>
           </div>

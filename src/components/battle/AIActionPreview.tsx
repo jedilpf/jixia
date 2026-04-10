@@ -130,8 +130,8 @@ function ThinkingIndicator() {
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-        className="w-5 h-5 rounded-full border-2 border-t-transparent"
-        style={{ borderColor: '#8b5cf6', borderTopColor: 'transparent' }}
+        className="w-5 h-5 rounded-full"
+        style={{ borderWidth: '2px', borderColor: '#8b5cf6', borderTopColor: 'transparent' }}
       />
       <span className="text-sm" style={{ color: '#8b5cf6' }}>
         敌方思考中{dots[dotIndex]}

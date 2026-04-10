@@ -1,4 +1,4 @@
-# 稷下学宫·问道百家 - 后端产品需求文档（PRD）
+﻿# 思筹之录 - 后端产品需求文档（PRD）
 
 > 版本：1.0.0
 > 创建日期：2026-04-10
@@ -11,7 +11,7 @@
 
 ### 1.1 项目背景
 
-**稷下学宫·问道百家**是一款以战国时期诸子百家为背景的辩论卡牌对战游戏。项目当前已有前端原型和基础后端框架，需要完善后端系统以支撑完整游戏功能。
+**思筹之录**是一款以战国时期诸子百家为背景的辩论卡牌对战游戏。项目当前已有前端原型和基础后端框架，需要完善后端系统以支撑完整游戏功能。
 
 ### 1.2 文档目的
 
@@ -356,6 +356,97 @@ server/
 | trusted | INTEGER | DEFAULT 1 | 是否受信任 |
 | last_seen_at | TEXT | DEFAULT datetime('now') | 最后活跃 |
 | created_at | TEXT | DEFAULT datetime('now') | 创建时间 |
+
+### 3.3 数据库索引设计
+
+#### 3.3.1 索引列表
+
+| 索引名 | 表名 | 字段 | 类型 | 说明 |
+|--------|------|------|------|------|
+| idx_users_username | users | username | UNIQUE | 用户名唯一索引 |
+| idx_users_email | users | email | UNIQUE | 邮箱唯一索引 |
+| idx_users_status | users | status | INDEX | 用户状态筛选 |
+| idx_user_cards_user_id | user_cards | user_id | INDEX | 用户卡牌查询 |
+| idx_user_cards_card_id | user_cards | card_id | INDEX | 卡牌归属查询 |
+| idx_user_decks_user_id | user_decks | user_id | INDEX | 用户牌组查询 |
+| idx_matches_player1 | matches | player1_id | INDEX | 玩家1对局查询 |
+| idx_matches_player2 | matches | player2_id | INDEX | 玩家2对局查询 |
+| idx_matches_status | matches | status | INDEX | 对局状态筛选 |
+| idx_matches_created | matches | created_at | INDEX | 对局时间排序 |
+| idx_match_logs_match | match_logs | match_id | INDEX | 对局日志查询 |
+| idx_match_logs_round | match_logs | match_id, round | INDEX | 回合日志查询 |
+| idx_player_progress_user | player_progress | user_id | UNIQUE | 用户进度唯一索引 |
+| idx_story_saves_user | story_saves | user_id | INDEX | 用户存档查询 |
+| idx_story_saves_slot | story_saves | user_id, slot_type | UNIQUE | 用户槽位唯一索引 |
+| idx_posts_category | posts | category | INDEX | 板块筛选 |
+| idx_posts_user | posts | user_id | INDEX | 用户帖子查询 |
+| idx_posts_status | posts | status | INDEX | 帖子状态筛选 |
+| idx_posts_created | posts | created_at | INDEX | 帖子时间排序 |
+| idx_posts_hot | posts | category, view_count, created_at | INDEX | 热门帖子查询 |
+| idx_comments_post | comments | post_id | INDEX | 帖子评论查询 |
+| idx_comments_user | comments | user_id | INDEX | 用户评论查询 |
+| idx_interactions_user | user_interactions | user_id | INDEX | 用户互动查询 |
+| idx_interactions_target | user_interactions | target_type, target_id | INDEX | 目标互动查询 |
+| idx_refresh_tokens_user | refresh_tokens | user_id | INDEX | 用户令牌查询 |
+| idx_refresh_tokens_token | refresh_tokens | token | UNIQUE | 令牌唯一索引 |
+| idx_device_bindings_user | device_bindings | user_id | INDEX | 用户设备查询 |
+| idx_device_bindings_device | device_bindings | device_id | INDEX | 设备查询 |
+
+#### 3.3.2 migrations/init.sql 索引定义示例
+
+```sql
+-- 用户表索引
+CREATE UNIQUE INDEX idx_users_username ON users(username);
+CREATE UNIQUE INDEX idx_users_email ON users(email) WHERE email IS NOT NULL;
+CREATE INDEX idx_users_status ON users(status);
+
+-- 用户卡牌表索引
+CREATE INDEX idx_user_cards_user_id ON user_cards(user_id);
+CREATE INDEX idx_user_cards_card_id ON user_cards(card_id);
+
+-- 用户牌组表索引
+CREATE INDEX idx_user_decks_user_id ON user_decks(user_id);
+
+-- 对局表索引
+CREATE INDEX idx_matches_player1 ON matches(player1_id);
+CREATE INDEX idx_matches_player2 ON matches(player2_id);
+CREATE INDEX idx_matches_status ON matches(status);
+CREATE INDEX idx_matches_created ON matches(created_at);
+
+-- 对局日志表索引
+CREATE INDEX idx_match_logs_match ON match_logs(match_id);
+CREATE INDEX idx_match_logs_round ON match_logs(match_id, round);
+
+-- 玩家进度表索引
+CREATE UNIQUE INDEX idx_player_progress_user ON player_progress(user_id);
+
+-- 争鸣史存档表索引
+CREATE INDEX idx_story_saves_user ON story_saves(user_id);
+CREATE UNIQUE INDEX idx_story_saves_slot ON story_saves(user_id, slot_type);
+
+-- 社区帖子表索引
+CREATE INDEX idx_posts_category ON posts(category);
+CREATE INDEX idx_posts_user ON posts(user_id);
+CREATE INDEX idx_posts_status ON posts(status);
+CREATE INDEX idx_posts_created ON posts(created_at);
+CREATE INDEX idx_posts_hot ON posts(category, view_count DESC, created_at DESC);
+
+-- 评论表索引
+CREATE INDEX idx_comments_post ON comments(post_id);
+CREATE INDEX idx_comments_user ON comments(user_id);
+
+-- 用户互动表索引
+CREATE INDEX idx_interactions_user ON user_interactions(user_id);
+CREATE INDEX idx_interactions_target ON user_interactions(target_type, target_id);
+
+-- 刷新令牌表索引
+CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE UNIQUE INDEX idx_refresh_tokens_token ON refresh_tokens(token);
+
+-- 设备绑定表索引
+CREATE INDEX idx_device_bindings_user ON device_bindings(user_id);
+CREATE INDEX idx_device_bindings_device ON device_bindings(device_id);
+```
 
 ---
 
@@ -1216,6 +1307,185 @@ const socket = io('ws://localhost:8787', {
 }
 ```
 
+### 5.4 服务层Socket接口预留（Phase 2设计）
+
+在Phase 2服务层设计时，需要为Phase 4的Socket.IO实时通信预留接口。
+
+#### 5.4.1 MatchService Socket接口
+
+```javascript
+// services/match.service.cjs - Socket接口预留
+
+class MatchService {
+  /**
+   * 创建对局（供HTTP路由和Socket调用）
+   * @param {Object} params - 创建参数
+   * @returns {Promise<Match>} 对局对象
+   */
+  async createMatch(params) {
+    // 实现...
+  }
+
+  /**
+   * 玩家加入对局 - Socket事件处理器预留
+   * @param {string} matchId - 对局ID
+   * @param {string} playerId - 玩家ID
+   * @param {Socket} socket - Socket实例（Phase 4注入）
+   * @returns {Promise<void>}
+   */
+  async joinMatch(matchId, playerId, socket) {
+    // Phase 4实现：加入房间、广播状态
+  }
+
+  /**
+   * 玩家提交出牌 - Socket事件处理器预留
+   * @param {string} matchId - 对局ID
+   * @param {string} playerId - 玩家ID
+   * @param {Array} cards - 出牌数据
+   * @param {Socket} socket - Socket实例（Phase 4注入）
+   * @returns {Promise<Object>} 提交结果
+   */
+  async submitCards(matchId, playerId, cards, socket) {
+    // Phase 4实现：验证、存储、广播
+  }
+
+  /**
+   * 结算回合 - Socket事件处理器预留
+   * @param {string} matchId - 对局ID
+   * @param {SocketServer} io - Socket.IO服务器（Phase 4注入）
+   * @returns {Promise<Object>} 结算结果
+   */
+  async resolveRound(matchId, io) {
+    // Phase 4实现：计算结果、广播给房间所有玩家
+  }
+
+  /**
+   * 获取对局状态（供HTTP和Socket共享）
+   * @param {string} matchId - 对局ID
+   * @returns {Promise<MatchState>} 对局状态
+   */
+  async getMatchState(matchId) {
+    // 实现...
+  }
+
+  /**
+   * 广播对局状态更新 - Socket方法预留
+   * @param {string} matchId - 对局ID
+   * @param {Object} state - 状态数据
+   * @param {SocketServer} io - Socket.IO服务器（Phase 4注入）
+   * @returns {Promise<void>}
+   */
+  async broadcastMatchState(matchId, state, io) {
+    // Phase 4实现：io.to(`match:${matchId}`).emit('match:state', state)
+  }
+}
+```
+
+#### 5.4.2 MatchmakingService Socket接口
+
+```javascript
+// services/matchmaking.service.cjs - Socket接口预留
+
+class MatchmakingService {
+  /**
+   * 开始匹配 - Socket事件处理器预留
+   * @param {string} playerId - 玩家ID
+   * @param {Object} preferences - 匹配偏好
+   * @param {Socket} socket - Socket实例（Phase 4注入）
+   * @returns {Promise<void>}
+   */
+  async startMatchmaking(playerId, preferences, socket) {
+    // Phase 4实现：加入匹配队列、监听匹配成功
+  }
+
+  /**
+   * 取消匹配 - Socket事件处理器预留
+   * @param {string} playerId - 玩家ID
+   * @param {Socket} socket - Socket实例（Phase 4注入）
+   * @returns {Promise<void>}
+   */
+  async cancelMatchmaking(playerId, socket) {
+    // Phase 4实现：从队列移除
+  }
+
+  /**
+   * 匹配成功回调 - Socket广播预留
+   * @param {Array<string>} playerIds - 匹配到的玩家ID列表
+   * @param {Match} match - 对局对象
+   * @param {SocketServer} io - Socket.IO服务器（Phase 4注入）
+   * @returns {Promise<void>}
+   */
+  async onMatchFound(playerIds, match, io) {
+    // Phase 4实现：向匹配玩家发送 matchmaking:found 事件
+  }
+}
+```
+
+#### 5.4.3 Socket与Service集成架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Socket.IO Layer                          │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  socket/index.cjs                                   │    │
+│  │  - 连接认证 (JWT验证)                                │    │
+│  │  - 事件路由                                          │    │
+│  │  - 房间管理                                          │    │
+│  └─────────────────────────────────────────────────────┘    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ 调用
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Service Layer                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │MatchService  │  │BattleService │  │MMService     │       │
+│  │- Socket接口  │  │- Socket接口  │  │- Socket接口  │       │
+│  │  预留        │  │  预留        │  │  预留        │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ 调用
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Model/Store Layer                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │  User Model  │  │  Match Model │  │  Card Model  │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 5.4.4 Phase 2 Service层设计要点
+
+在Phase 2设计服务层时，需要遵循以下原则以便Phase 4集成Socket：
+
+1. **依赖注入**：Service方法接收socket/io参数，但不直接依赖Socket.IO
+2. **事件驱动**：Service层通过回调或事件通知Socket层广播
+3. **状态隔离**：业务逻辑在Service层，通信逻辑在Socket层
+4. **接口预留**：为所有需要实时通知的操作预留Socket参数
+
+```javascript
+// 示例：Phase 2实现业务逻辑，Phase 4注入Socket能力
+
+// Phase 2: 纯业务逻辑
+async submitCards(matchId, playerId, cards) {
+  // 1. 验证玩家是否在对局中
+  // 2. 验证出牌合法性
+  // 3. 存储出牌数据
+  // 4. 返回结果（不处理广播）
+  return result;
+}
+
+// Phase 4: 添加Socket广播
+async submitCardsWithBroadcast(matchId, playerId, cards, socket) {
+  const result = await this.submitCards(matchId, playerId, cards);
+  // 广播给对手
+  socket.to(`match:${matchId}`).emit('match:opponent-submitted', {
+    playerId,
+    submitted: true
+  });
+  return result;
+}
+```
+
 ---
 
 ## 六、安全设计
@@ -1349,28 +1619,32 @@ CLIENT_ORIGIN=https://jixia.game
 
 ## 九、实施计划
 
-### 9.1 里程碑
+### 9.1 里程碑（调整后）
 
-| 阶段 | 内容 | 预计工时 |
-|------|------|----------|
-| Phase 1 | 用户认证系统 | 2天 |
-| Phase 2 | 用户/卡牌/牌组模块 | 3天 |
-| Phase 3 | 匹配/对战模块 | 3天 |
-| Phase 4 | 存档/进度模块 | 2天 |
-| Phase 5 | 社区模块 | 3天 |
-| Phase 6 | 测试与优化 | 2天 |
+| 阶段 | 内容 | 预计工时 | 关键产出 |
+|------|------|----------|----------|
+| Phase 1 | 数据库 + 模型层（含索引） | 2天 | `migrations/init.sql`、所有Model文件 |
+| Phase 2 | 服务层（预留Socket接口） | 2天 | `services/*.service.cjs`、Socket接口定义 |
+| Phase 3 | 用户/卡牌/牌组路由 | 3天 | `routes/auth.cjs`、`routes/users.cjs`、`routes/cards.cjs` |
+| Phase 4 | 匹配/对战路由 + Socket.IO实时通信 | 4天 | `routes/matches.cjs`、`routes/battle.cjs`、完整Socket事件实现 |
+| Phase 5 | 存档/进度路由 | 2天 | `routes/story.cjs`、`routes/progress.cjs` |
+| Phase 6 | 社区模块 | 3天 | `routes/community.cjs`、帖子/评论/互动功能 |
+| Phase 7 | 限流/优化/测试 | 2天 | `middleware/rate-limit.cjs`、性能优化、测试覆盖 |
 
 ### 9.2 优先级
 
 | 优先级 | 模块 | 说明 |
 |--------|------|------|
-| P0 | 用户认证 | 基础设施 |
-| P0 | 用户管理 | 基础设施 |
+| P0 | 数据库设计 | 基础设施，必须先到位 |
+| P0 | 模型层 | 数据访问基础 |
+| P0 | 服务层 | 业务逻辑核心，需预留Socket接口 |
+| P1 | 用户认证 | 核心功能 |
 | P1 | 卡牌/牌组 | 核心玩法 |
-| P1 | 匹配/对战 | 核心玩法 |
+| P1 | 匹配/对战 + Socket.IO | 核心玩法，实时通信是重点 |
 | P2 | 存档系统 | 用户体验 |
 | P2 | 进度系统 | 用户留存 |
-| P3 | 社区模块 | 内容生态 |
+| P3 | 社区模块 | 内容生态，可延后 |
+| P3 | 限流/优化 | 性能保障 |
 
 ---
 
@@ -1400,4 +1674,4 @@ CLIENT_ORIGIN=https://jixia.game
 ---
 
 *文档维护：开发团队*
-*最后更新：2026-04-10*
+*最后更新：2026-04-10（已根据评审意见调整实施计划）*

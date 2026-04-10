@@ -24,36 +24,36 @@ const PHASE_CONFIG: Record<DebatePhase, {
     title: '明辩',
     subtitle: '光明正大地陈述观点',
     icon: '☀️',
-    color: '#d4a520',
-    bgColor: 'rgba(212, 165, 32, 0.15)',
+    color: '#f0c36e',
+    bgColor: 'rgba(240,195,110,0.18)',
   },
   an_mou: {
     title: '暗谋',
     subtitle: '暗中布局，出奇制胜',
     icon: '🌙',
-    color: '#8b5cf6',
-    bgColor: 'rgba(139, 92, 246, 0.15)',
+    color: '#7d3d23',
+    bgColor: 'rgba(125,61,35,0.18)',
   },
   reveal: {
     title: '揭示',
     subtitle: '真相大白于天下',
     icon: '✨',
-    color: '#10b981',
-    bgColor: 'rgba(16, 185, 129, 0.15)',
+    color: '#d46b42',
+    bgColor: 'rgba(212,102,66,0.18)',
   },
   resolve: {
     title: '结算',
     subtitle: '胜负在此一决',
     icon: '⚖️',
-    color: '#f59e0b',
-    bgColor: 'rgba(245, 158, 11, 0.15)',
+    color: '#f0c36e',
+    bgColor: 'rgba(240,195,110,0.18)',
   },
   finished: {
     title: '终局',
     subtitle: '辩论结束',
     icon: '🏆',
-    color: '#d4a520',
-    bgColor: 'rgba(212, 165, 32, 0.2)',
+    color: '#f0c36e',
+    bgColor: 'rgba(240,195,110,0.22)',
   },
 };
 
@@ -116,7 +116,7 @@ export function PhaseTransitionOverlay({
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
               className="text-lg font-serif tracking-wider"
-              style={{ color: '#a7c5ba' }}
+              style={{ color: '#d1b185' }}
             >
               {config.subtitle}
             </motion.div>
@@ -220,7 +220,7 @@ export function RoundStartAnimation({
             <div
               className="text-5xl font-serif font-black tracking-[0.2em] mb-2"
               style={{
-                color: '#d4a520',
+                color: '#f0c36e',
                 textShadow: '0 0 40px rgba(212, 165, 32, 0.8)',
               }}
             >
@@ -228,7 +228,7 @@ export function RoundStartAnimation({
             </div>
             <div
               className="text-xl font-serif tracking-wider"
-              style={{ color: '#a7c5ba' }}
+              style={{ color: '#d1b185' }}
             >
               开始辩论
             </div>

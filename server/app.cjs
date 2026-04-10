@@ -8,8 +8,13 @@ const { createMatchesRouter } = require('./routes/matches.cjs');
 const { createStoryRouter } = require('./routes/story.cjs');
 const { createProgressRouter } = require('./routes/progress.cjs');
 const { createV2Router } = require('./routes/v2/index.cjs');
+const { createAuthRouter } = require('./routes/auth.cjs');
+const { createUsersRouter } = require('./routes/users.cjs');
+const { createCardsRouter } = require('./routes/cards.cjs');
+const { createDecksRouter } = require('./routes/decks.cjs');
+const { createCommunityRouter } = require('./routes/community.cjs');
 
-function createApp({ matchStore, storySaveStore, progressStore, identityStore }) {
+function createApp({ matchStore, storySaveStore, progressStore, identityStore, models, services }) {
   const app = express();
   const origins = parseOrigins(process.env.CLIENT_ORIGIN);
   const getBackendStats = () => ({
@@ -34,12 +39,24 @@ function createApp({ matchStore, storySaveStore, progressStore, identityStore })
   });
 
   app.use('/health', createHealthRouter({ getBackendStats }));
-  app.use('/api/v1/matches', createMatchesRouter({ matchStore }));
-  if (storySaveStore) {
-    app.use('/api/v1/story', createStoryRouter({ storySaveStore }));
+
+  // API v1 路由
+  if (services) {
+    app.use('/api/v1/auth', createAuthRouter({ services }));
+    app.use('/api/v1/users', createUsersRouter({ services }));
+    app.use('/api/v1/cards', createCardsRouter({ services }));
+    app.use('/api/v1/decks', createDecksRouter({ services }));
   }
-  if (progressStore) {
-    app.use('/api/v1/progress', createProgressRouter({ progressStore }));
+
+  app.use('/api/v1/matches', createMatchesRouter({ matchStore }));
+  if (models?.story && storySaveStore) {
+    app.use('/api/v1/story', createStoryRouter({ models, storySaveStore }));
+  }
+  if (models?.progress && progressStore) {
+    app.use('/api/v1/progress', createProgressRouter({ models, progressStore }));
+  }
+  if (models?.leaderboard && models?.achievement && models?.progress) {
+    app.use('/api/v1/community', createCommunityRouter({ models }));
   }
   app.use('/api/v2', createV2Router({ identityStore, storySaveStore, progressStore }));
 

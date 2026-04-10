@@ -332,7 +332,7 @@ export default function BattleFrameV2({
   // 渲染
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="w-full h-screen bg-[#FDFBF7] flex flex-col overflow-hidden relative selection:bg-[#3A5F41] selection:text-white">
+    <div className="w-full h-screen bg-[#1b0c0a] flex flex-col overflow-hidden relative selection:bg-[#d29648] selection:text-[#f8e6be]">
       {/* 全局场景层：远古气象与内发光 */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-[0.05]" />
@@ -351,10 +351,10 @@ export default function BattleFrameV2({
       />
 
       {/* 结构性隔断：乌金木条线 */}
-      <div className="h-2 w-full bg-[#3D2B1F] relative z-20 shadow-md" />
+      <div className="h-2 w-full bg-[#7d3d23] relative z-20 shadow-md" />
 
       {/* 主内容区 */}
-      <div className="flex-1 flex min-h-0 overflow-hidden relative z-10 bg-gradient-to-b from-[#FDFBF7] to-[#EBF5EE]/20">
+      <div className="flex-1 flex min-h-0 overflow-hidden relative z-10 bg-gradient-to-b from-[#1b0c0a] to-[#2b100c]/20">
         {/* 左侧实录按钮：像卷轴边缘的标签 */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 z-40">
            <LogButton
@@ -372,7 +372,7 @@ export default function BattleFrameV2({
         </div>
 
         {/* 右侧操作提示区：悬浮丝帛感 */}
-        <div className="hidden xl:flex shrink-0 border-l-2 border-[#1A1A1A]/5 shadow-[-10px_0_30px_rgba(0,0,0,0.02)]">
+        <div className="hidden xl:flex shrink-0 border-l-2 border-[#d29648]/10 shadow-[-10px_0_30px_rgba(0,0,0,0.02)]">
           <OperationHints
             state={state}
             selectedCardId={selectedCardId}
@@ -381,7 +381,7 @@ export default function BattleFrameV2({
       </div>
 
       {/* 结构性隔断：乌金木条线 (衔接底部案头) */}
-      <div className="h-1.5 w-full bg-[#3D2B1F] relative z-20" />
+      <div className="h-1.5 w-full bg-[#7d3d23] relative z-20" />
 
       {/* 底部操作区 */}
       <BottomControls
@@ -432,24 +432,24 @@ export default function BattleFrameV2({
 
       {/* 议题选择弹窗 (雅化版) */}
       {isTopicSelectionWindow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A1A]/80 backdrop-blur-md p-4">
-          <div className="w-full max-w-5xl rounded-[2.5rem] border-4 border-white bg-white p-8 md:p-12 shadow-[0_50px_100px_rgba(0,0,0,0.3)] relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a0e0a]/86 backdrop-blur-md p-4">
+          <div className="w-full max-w-5xl rounded-[2.5rem] border-4 border-[#d29648]/20 bg-[#1b0c0a] p-8 md:p-12 shadow-[0_50px_100px_rgba(40,10,8,0.45)] relative overflow-hidden">
             {/* 矿物辉光背景 */}
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF65]/10 blur-[100px]" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#3A5F41]/10 blur-[100px]" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#d29648]/14 blur-[100px]" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#7d3d23]/14 blur-[100px]" />
             </div>
 
-            <div className="mb-10 flex items-end justify-between relative z-10 border-b-2 border-[#1A1A1A]/5 pb-6">
+            <div className="mb-10 flex items-end justify-between relative z-10 border-b-2 border-[#d29648]/10 pb-6">
               <div>
-                <h3 className="text-3xl font-black tracking-tight text-[#1A1A1A] uppercase">议题待定</h3>
-                <p className="mt-2 text-sm font-bold text-[#5C4033]/40 uppercase tracking-widest">
+                <h3 className="text-3xl font-black tracking-tight text-[#f8e6be] uppercase">议题待定</h3>
+                <p className="mt-2 text-sm font-bold text-[#d1b185]/55 uppercase tracking-widest">
                   ROUND {state.round} · TOPIC SELECTION
                 </p>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] font-black text-[#5C4033]/40 mb-1">REMAINING TIME</span>
-                <div className="rounded-full bg-[#1A1A1A] px-5 py-2 text-xl font-black italic tabular-nums text-white shadow-lg">
+                <span className="text-[10px] font-black text-[#d1b185]/55 mb-1">REMAINING TIME</span>
+                <div className="rounded-full bg-[#2a0e0a] px-5 py-2 text-xl font-black italic tabular-nums text-[#f8e6be] shadow-lg">
                    {state.topicSelectionSecondsLeft ?? '--'}s
                 </div>
               </div>
@@ -460,17 +460,17 @@ export default function BattleFrameV2({
                 <button
                   key={topic.id}
                   onClick={() => handleSelectTopic(topic.id)}
-                  className="group rounded-[1.5rem] border-2 border-[#1A1A1A]/5 bg-[#FDFBF7] p-8 text-left transition-all hover:border-[#1A1A1A] hover:bg-white hover:shadow-2xl hover:-translate-y-2 relative"
+                  className="group rounded-[1.5rem] border-2 border-[#d29648]/10 bg-[#1b0c0a] p-8 text-left transition-all hover:border-[#f0c36e] hover:bg-[#341410] hover:shadow-2xl hover:-translate-y-2 relative"
                 >
-                  <div className="absolute top-4 right-4 w-6 h-6 rounded-full border border-[#1A1A1A]/10 flex items-center justify-center text-[10px] font-black text-[#1A1A1A]/20 group-hover:text-[#1A1A1A] transition-colors">
+                  <div className="absolute top-4 right-4 w-6 h-6 rounded-full border border-[#d29648]/20 flex items-center justify-center text-[10px] font-black text-[#f8e6be]/20 group-hover:text-[#f8e6be] transition-colors">
                     帖
                   </div>
-                  <div className="text-xl font-black text-[#1A1A1A] group-hover:text-[#3A5F41] transition-colors">{topic.title}</div>
-                  <p className="mt-4 text-xs font-medium leading-6 text-[#5C4033]/60 line-clamp-4">{topic.summary ?? '圣哲遗训，明辨自得。'}</p>
+                  <div className="text-xl font-black text-[#f8e6be] group-hover:text-[#f0c36e] transition-colors">{topic.title}</div>
+                  <p className="mt-4 text-xs font-medium leading-6 text-[#d1b185]/60 line-clamp-4">{topic.summary ?? '圣哲遗训，明辨自得。'}</p>
                   
-                  <div className="mt-8 pt-4 border-t border-[#1A1A1A]/5 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#3A5F41] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-[10px] font-black text-[#1A1A1A]/0 group-hover:text-[#1A1A1A] transition-all uppercase tracking-widest">择此议题</span>
+                  <div className="mt-8 pt-4 border-t border-[#d29648]/10 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#f0c36e] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-[10px] font-black text-[#f8e6be]/0 group-hover:text-[#f8e6be] transition-all uppercase tracking-widest">择此议题</span>
                   </div>
                 </button>
               ))}
@@ -483,36 +483,36 @@ export default function BattleFrameV2({
           战斗结束遮罩 (雅化版)
          ═══════════════════════════════════════════════════════ */}
       {isFinished && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#FDFBF7] p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1b0c0a] p-4">
           <div className="w-full max-w-2xl text-center">
             {/* 结语标题 */}
             <div className="mb-4">
-              <span className="text-[10px] font-black text-[#5C4033]/40 uppercase tracking-[0.4em]">Battle Outcome</span>
+              <span className="text-[10px] font-black text-[#d1b185]/55 uppercase tracking-[0.4em]">Battle Outcome</span>
             </div>
             
             <h2 className={`text-7xl md:text-9xl font-black italic mb-8 tracking-tighter ${
-              state.winner === 'player' ? 'text-[#3A5F41]' : state.winner === 'enemy' ? 'text-[#8D2F2F]' : 'text-[#1A1A1A]'
+              state.winner === 'player' ? 'text-[#f0c36e]' : state.winner === 'enemy' ? 'text-[#d46b42]' : 'text-[#f8e6be]'
             }`}>
               {state.winner === 'player' ? '胜天半子' : state.winner === 'enemy' ? '惜败一筹' : '旗鼓相当'}
             </h2>
 
             <div className="max-w-md mx-auto mb-16">
-              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#1A1A1A]/10 to-transparent mb-4" />
-              <p className="text-base font-medium text-[#5C4033]/60 italic serif">
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#d29648]/12 to-transparent mb-4" />
+              <p className="text-base font-medium text-[#d1b185]/60 italic serif">
                 {state.winner === 'player'
                   ? '“学宫策辩，君子之风。阁下言辞犀利，见识卓绝，此番论战当推首功。”'
                   : state.winner === 'enemy'
                   ? '“胜败兵家常事，策论亦有穷时。阁下虽锋芒稍挫，他日卷土重来未可知也。”'
                   : '“论道至此，双方见解不分轩轾，各领风骚。此乃稷下之幸，百家之福。”'}
               </p>
-              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#1A1A1A]/10 to-transparent mt-4" />
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#d29648]/12 to-transparent mt-4" />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {onReselectArena && (
                 <button
                   onClick={onReselectArena}
-                  className="w-48 py-4 rounded-xl bg-white border-2 border-[#1A1A1A]/10 text-[#1A1A1A] font-black text-xs hover:bg-[#1A1A1A] hover:text-white transition-all shadow-sm active:scale-95 uppercase tracking-widest"
+                  className="w-48 py-4 rounded-xl bg-[#f8e6be] border-2 border-[#d29648]/20 text-[#1b0c0a] font-black text-xs hover:bg-[#2a0e0a] hover:text-[#f8e6be] transition-all shadow-sm active:scale-95 uppercase tracking-widest"
                 >
                   易地再战
                 </button>
@@ -520,7 +520,7 @@ export default function BattleFrameV2({
               {onMenu && (
                 <button
                   onClick={onMenu}
-                  className="w-48 py-4 rounded-xl bg-[#1A1A1A] text-white font-black text-xs hover:shadow-2xl transition-all active:scale-95 uppercase tracking-widest shadow-xl"
+                  className="w-48 py-4 rounded-xl bg-[#7d3d23] text-[#f8e6be] font-black text-xs hover:shadow-2xl transition-all active:scale-95 uppercase tracking-widest shadow-xl"
                 >
                   撤离讲坛
                 </button>

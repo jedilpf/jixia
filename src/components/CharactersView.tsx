@@ -208,7 +208,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
     };
 
     return (
-        <div className="w-full h-screen overflow-hidden flex relative select-none text-[#a7c5ba]">
+        <div className="w-full h-screen overflow-hidden flex relative select-none text-[#f5e6b8]">
             {/* ── 全屏沉浸背景 ── */}
             <div className="absolute inset-0 z-0">
                 {/* 背景原图：轻微模糊，保留氛围感 */}
@@ -230,11 +230,11 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     className="absolute inset-0"
                     style={{
                         backdropFilter: 'blur(4px)',
-                        backgroundColor: 'rgba(8, 12, 24, 0.65)',
+                        backgroundColor: 'rgba(26, 10, 10, 0.65)',
                     }}
                 />
                 {/* 左侧导航遮罩 */}
-                <div className="absolute inset-y-0 left-0 w-[32%] bg-[#080c18]/70" />
+                <div className="absolute inset-y-0 left-0 w-[32%] bg-[#1a0a0a]/70" />
             </div>
 
             {/* ── 左侧：百家名录 ── */}
@@ -265,7 +265,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                                     onMouseEnter={() => uiAudio.playHover()}
                                     className={`relative px-4 py-2 text-sm font-serif tracking-widest transition-all duration-300 overflow-hidden group ${isSelected
                                         ? 'text-[#1a1107] font-bold shadow-[0_2px_10px_rgba(212,165,32,0.4)]'
-                                        : 'text-[#a7c5ba] hover:text-[#f5e6b8]'
+                                        : 'text-[#d4a520]/80 hover:text-[#f5e6b8]'
                                         }`}
                                 >
                                     {/* 背景竹简材质模拟 */}
@@ -335,7 +335,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                                     {/* 头像圆圈（玉佩/铜镜感） */}
                                     <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4 flex-shrink-0 transition-all duration-500 z-10 ${isActive
                                         ? 'bg-[#1a1107] border border-[#d4a520] shadow-[0_0_15px_rgba(212,165,32,0.4)]'
-                                        : 'bg-black/60 border border-[#A7C5BA]/20 group-hover:border-[#d4a520]/50'
+                                        : 'bg-black/60 border border-[#d4a520]/20 group-hover:border-[#d4a520]/50'
                                         }`}>
                                         <span className="relative z-10 transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{char.avatar}</span>
                                         {/* 内圈细线 */}
@@ -343,28 +343,28 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                                     </div>
 
                                     <div className="relative z-10 flex-1">
-                                        <div className={`text-2xl font-serif tracking-[0.15em] mb-1 transition-colors duration-300 ${isActive ? 'text-[#f5e6b8] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#a0bddc] group-hover:text-[#e2e8f0]'
+                                        <div className={`text-2xl font-serif tracking-[0.15em] mb-1 transition-colors duration-300 ${isActive ? 'text-[#f5e6b8] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#d4a520]/80 group-hover:text-[#f5e6b8]'
                                             }`}>
                                             {char.name}
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-[10px] px-1.5 py-0.5 border rounded-sm font-serif tracking-widest ${isActive ? 'text-[#d4a520] border-[#d4a520]/40 bg-[#d4a520]/10' : 'text-[#A7C5BA]/60 border-[#A7C5BA]/20'
+                                            <span className={`text-[10px] px-1.5 py-0.5 border rounded-sm font-serif tracking-widest ${isActive ? 'text-[#d4a520] border-[#d4a520]/40 bg-[#d4a520]/10' : 'text-[#8B7355]/60 border-[#8B7355]/20'
                                                 }`}>
                                                 {char.school.split(' / ')[1] || char.school}
                                             </span>
-                                            <span className="text-xs text-[rgba(167,197,186,0.5)] font-serif tracking-wider">
+                                            <span className="text-xs text-[rgba(212,165,32,0.5)] font-serif tracking-wider">
                                                 · {char.title}
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* 右侧渐变遮罩虚化 */}
-                                    <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#080c18] to-transparent pointer-events-none z-20" />
+                                    <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#1a0a0a] to-transparent pointer-events-none z-20" />
                                 </button>
                             );
                         })}
                         {filteredChars.length === 0 && (
-                            <div className="text-center text-[rgba(167,197,186,0.4)] py-12 font-serif text-lg tracking-widest">
+                            <div className="text-center text-[rgba(212,165,32,0.4)] py-12 font-serif text-lg tracking-widest">
                                 此学派暂无收录人物
                             </div>
                         )}
@@ -407,7 +407,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     </div>
 
                     {/* 铭牌底座 */}
-                    <div className="mt-4 px-10 py-2 border border-[#d4a520] bg-[rgba(10,15,26,0.85)] shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
+                    <div className="mt-4 px-10 py-2 border border-[#d4a520] bg-[rgba(26,10,10,0.85)] shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
                         <div className="text-[#f5e6b8] font-serif text-lg tracking-[0.4em] text-center whitespace-nowrap">
                             {selectedChar.title}
                         </div>
@@ -448,10 +448,10 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     </div>
 
                     {/* 战斗风格 */}
-                    <div className="bg-black/40 backdrop-blur-md border border-[rgba(74,124,111,0.3)] p-5 rounded-lg relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-[#4a7c6f] shadow-[0_0_15px_#4a7c6f]" />
-                        <h3 className="text-[#a0bddc] text-xs tracking-[0.25em] mb-2 font-serif uppercase opacity-70">辩斗风格 · Combat Style</h3>
-                        <p className="text-[#a7c5ba] text-base font-serif tracking-wide leading-relaxed">
+                    <div className="bg-black/40 backdrop-blur-md border border-[rgba(139,69,19,0.3)] p-5 rounded-lg relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[#8b2e2e] shadow-[0_0_15px_#8b2e2e]" />
+                        <h3 className="text-[#d4a520] text-xs tracking-[0.25em] mb-2 font-serif uppercase opacity-70">辩斗风格 · Combat Style</h3>
+                        <p className="text-[#f5e6b8] text-base font-serif tracking-wide leading-relaxed">
                             {selectedChar.playstyle}
                         </p>
                     </div>
@@ -475,8 +475,8 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
         .custom-scrollbar::-webkit-scrollbar { 
             width: 8px; 
         }
-        .custom-scrollbar::-webkit-scrollbar-track { 
-            background: rgba(10, 15, 26, 0.4); 
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(26, 10, 10, 0.4);
             border-left: 1px solid rgba(212, 165, 32, 0.15);
             border-radius: 4px;
         }

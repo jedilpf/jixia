@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260410-195",
+  "goal": "Restore the full prolog narrative content in src/game/story/data/prolog.ts so the opening story text returns to the longer, original version without changing engine logic or later chapters.",
+  "constraints": [
+    "Do not modify StoryEngine behavior or any chapter files outside prolog.ts.",
+    "Do not change gameplay logic, save logic, or unrelated UI.",
+    "Restore only the prolog narrative text and its immediate formatting where needed."
+  ],
+  "deliverables": [
+    "src/game/story/data/prolog.ts matches the fuller prolog narrative version for the opening sections.",
+    "Story loading remains unchanged and build passes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/game/story/data/prolog.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-195-restore-prolog-full-content.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-195-restore-prolog-full-content.json",
+    "npm run build"
+  ],
+  "status": "completed"
+}

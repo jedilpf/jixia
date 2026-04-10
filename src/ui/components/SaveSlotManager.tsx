@@ -181,8 +181,8 @@ export function SaveSlotManager({
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-4 h-4 rounded-full border-2 border-t-transparent"
-                    style={{ borderColor: '#5ac972', borderTopColor: 'transparent' }}
+                    className="w-4 h-4 rounded-full"
+                    style={{ borderWidth: '2px', borderColor: '#5ac972', borderTopColor: 'transparent' }}
                   />
                 )}
               </div>

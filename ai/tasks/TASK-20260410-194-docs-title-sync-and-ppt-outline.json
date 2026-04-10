@@ -1,0 +1,36 @@
+{
+  "task_id": "TASK-20260410-194-docs-title-sync-and-ppt-outline",
+  "goal": "Synchronize the active documentation to the new game title '思筹之录' and add a PPT outline for the current game progress and presentation needs.",
+  "constraints": [
+    "Only touch active documentation and the PPT outline; do not modify runtime code, image assets, or archive/history docs unless explicitly required.",
+    "Preserve existing gameplay facts and unresolved items; use UNKNOWN for anything not yet confirmed.",
+    "Do not rewrite story history or old archived materials that intentionally preserve the former project name."
+  ],
+  "deliverables": [
+    "Updated active docs that reflect the new game title/subtitle where appropriate",
+    "A new PPT outline document under docs/project/",
+    "Optional knowledge updates if a durable naming convention change is recorded"
+  ],
+  "allowed_write_paths": [
+    "docs",
+    "docs/project",
+    "docs/backend",
+    "docs/community",
+    "docs/dev",
+    "docs/battle",
+    "docs/faction",
+    "docs/standards",
+    "docs/AI_TEAM.md",
+    "docs/GAME_RULES.md",
+    "docs/PROJECT_MEMORY.md",
+    "docs/index.md",
+    "docs/project",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-194-docs-title-sync-and-ppt-outline.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-194-docs-title-sync-and-ppt-outline.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260410-194-docs-title-sync-and-ppt-outline.json"
+  ],
+  "status": "in_progress"
+}

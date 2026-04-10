@@ -616,17 +616,19 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-start.png')} alt="开始辩斗" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '16px 32px', background: 'linear-gradient(180deg, #8B4513 0%, #5D3A1A 100%)', border: '2px solid #D4A520', borderRadius: '8px' }}>
+            <div style={{ display: 'none', width: '100%', padding: '16px 32px', background: 'linear-gradient(180deg, #8B4513 0%, #5D3A1A 100%)', border: '2px solid #D4A520', borderRadius: '8px', pointerEvents: 'auto' }}
+              onClick={(e) => { e.stopPropagation(); uiAudio.playClick(); onStartGame(); }}>
               <span style={{ color: '#fef3c7', fontSize: '20px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>开始辩斗</span>
             </div>
           </button>
 
-          <button onClick={() => { uiAudio.playClick(); if (onStory) onStory(); }} onMouseEnter={() => uiAudio.playHover()}
+          <button onClick={() => { console.log('Story button clicked'); uiAudio.playClick(); if (onStory) { console.log('Calling onStory'); onStory(); } else { console.log('onStory is undefined'); } }} onMouseEnter={() => uiAudio.playHover()}
             className="btn-ripple relative transition-all duration-200 flex items-center justify-center outline-none focus:outline-none hover:opacity-90"
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-story.png')} alt="争鸣史" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #2f1f3f 0%, #1f2a4d 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+              onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex'; }} />
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #2f1f3f 0%, #1f2a4d 100%)', border: '2px solid #8B7355', borderRadius: '8px', pointerEvents: 'auto' }}
+              onClick={(e) => { e.stopPropagation(); uiAudio.playClick(); if (onStory) onStory(); }}>
               <span style={{ color: '#d8c7f3', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>争鸣史</span>
             </div>
           </button>
@@ -636,7 +638,8 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-characters.png')} alt="问道百家人物志" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #10192e 0%, #172440 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #10192e 0%, #172440 100%)', border: '2px solid #8B7355', borderRadius: '8px', pointerEvents: 'auto' }}
+              onClick={(e) => { e.stopPropagation(); uiAudio.playClick(); onCharacters(); }}>
               <span style={{ color: '#a0bddc', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>问道百家人物志</span>
             </div>
           </button>
@@ -646,7 +649,8 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-collection.png')} alt="卡牌图鉴" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #1a2820 0%, #243530 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #1a2820 0%, #243530 100%)', border: '2px solid #8B7355', borderRadius: '8px', pointerEvents: 'auto' }}
+              onClick={(e) => { e.stopPropagation(); uiAudio.playClick(); onCollection(); }}>
               <span style={{ color: '#a7c5ba', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>卡牌图鉴</span>
             </div>
           </button>

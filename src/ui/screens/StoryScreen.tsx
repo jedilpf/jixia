@@ -6,7 +6,7 @@ const STORY_STYLES = {
   container: {
     width: '100%',
     height: '100dvh',
-    background: 'linear-gradient(180deg, #1a0a0a 0%, #0d0505 100%)',
+    background: 'linear-gradient(180deg, #2a0e0a 0%, #120604 100%)',
     display: 'flex',
     flexDirection: 'column' as const,
     overflow: 'hidden',
@@ -18,16 +18,16 @@ const STORY_STYLES = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottom: '1px solid rgba(212,165,32,0.35)',
-    background: 'rgba(13,5,5,0.95)',
+    borderBottom: '1px solid rgba(236,185,87,0.22)',
+    background: 'rgba(39,12,8,0.94)',
     zIndex: 10,
   },
   chapterBadge: {
     padding: '6px 16px',
-    background: 'rgba(139,69,19,0.6)',
+    background: 'rgba(88,35,16,0.76)',
     borderRadius: '20px',
-    border: '1px solid rgba(212,165,32,0.5)',
-    color: '#f5e6b8',
+    border: '1px solid rgba(236,185,87,0.5)',
+    color: '#fff0d1',
     fontSize: '14px',
     fontWeight: 600,
   },
@@ -40,13 +40,13 @@ const STORY_STYLES = {
   },
   sceneDescription: {
     fontSize: '16px',
-    lineHeight: 1.8,
-    color: '#f5e6b8',
+    lineHeight: 2,
+    color: '#fff3de',
     marginBottom: '24px',
     padding: '16px 24px',
-    background: 'rgba(60,30,20,0.5)',
+    background: 'rgba(48,18,10,0.55)',
     borderRadius: '8px',
-    borderLeft: '3px solid #d4a520',
+    borderLeft: '3px solid #d9a23a',
     whiteSpace: 'pre-wrap' as const,
   },
   dialogueArea: {
@@ -58,50 +58,50 @@ const STORY_STYLES = {
     width: '160px',
     height: '240px',
     borderRadius: '8px',
-    border: '2px solid #d4a520',
+    border: '2px solid #d9a23a',
     objectFit: 'cover' as const,
-    background: 'rgba(60,30,20,0.6)',
+    background: 'rgba(48,18,10,0.55)',
     flexShrink: 0,
   },
   dialogueBox: {
     flex: 1,
-    background: 'rgba(40,20,15,0.8)',
+    background: 'rgba(36,12,8,0.8)',
     borderRadius: '12px',
-    border: '1px solid rgba(212,165,32,0.4)',
+    border: '1px solid rgba(236,185,87,0.38)',
     padding: '20px 24px',
   },
   speakerName: {
     fontSize: '15px',
     fontWeight: 700,
-    color: '#d4a520',
+    color: '#f1c56a',
     marginBottom: '8px',
   },
   dialogueText: {
     fontSize: '17px',
-    lineHeight: 1.7,
-    color: '#f5e6b8',
+    lineHeight: 1.8,
+    color: '#fff3de',
     whiteSpace: 'pre-wrap' as const,
   },
   continueIndicator: {
     textAlign: 'right' as const,
     marginTop: '12px',
-    color: '#d4a520',
+    color: '#f1c56a',
     fontSize: '14px',
     animation: 'pulse 1.5s ease-in-out infinite',
   },
   choicesArea: {
     padding: '24px 48px',
-    background: 'rgba(13,5,5,0.95)',
-    borderTop: '1px solid rgba(212,165,32,0.35)',
+    background: 'rgba(39,12,8,0.94)',
+    borderTop: '1px solid rgba(236,185,87,0.22)',
   },
   choiceButton: {
     width: '100%',
     padding: '16px 24px',
     marginBottom: '12px',
-    background: 'linear-gradient(135deg, #3d1f1f 0%, #1a0a0a 100%)',
-    border: '1px solid rgba(212,165,32,0.45)',
+    background: 'linear-gradient(135deg, #5a1c14 0%, #2e120d 100%)',
+    border: '1px solid rgba(236,185,87,0.42)',
     borderRadius: '8px',
-    color: '#f5e6b8',
+    color: '#fff3de',
     fontSize: '16px',
     textAlign: 'left' as const,
     cursor: 'pointer',
@@ -111,15 +111,15 @@ const STORY_STYLES = {
     gap: '12px',
   },
   choiceButtonHover: {
-    background: 'linear-gradient(135deg, #5c2a2a 0%, #2d1515 100%)',
-    borderColor: '#d4a520',
+    background: 'linear-gradient(135deg, #7c2a18 0%, #4a180f 100%)',
+    borderColor: '#f1c56a',
     transform: 'translateX(8px)',
   },
   relationshipBar: {
     height: '56px',
     padding: '0 24px',
-    background: 'rgba(13,5,5,0.98)',
-    borderTop: '1px solid rgba(212,165,32,0.35)',
+    background: 'rgba(36,11,8,0.96)',
+    borderTop: '1px solid rgba(236,185,87,0.22)',
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
@@ -128,29 +128,29 @@ const STORY_STYLES = {
   factionBadge: {
     minWidth: '72px',
     padding: '6px 10px',
-    background: 'rgba(40,20,15,0.7)',
+    background: 'rgba(52,20,12,0.62)',
     borderRadius: '6px',
-    border: '1px solid rgba(212,165,32,0.3)',
+    border: '1px solid rgba(236,185,87,0.28)',
     textAlign: 'center' as const,
     flexShrink: 0,
   },
   factionName: {
     fontSize: '11px',
-    color: '#d4a520',
+    color: '#f1c56a',
     marginBottom: '4px',
   },
   reputationBar: {
     height: '3px',
-    background: 'rgba(212,165,32,0.2)',
+    background: 'rgba(236,185,87,0.18)',
     borderRadius: '2px',
     overflow: 'hidden',
   },
   backButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(212,165,32,0.45)',
+    border: '1px solid rgba(236,185,87,0.42)',
     borderRadius: '6px',
-    color: '#f5e6b8',
+    color: '#fff3de',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -158,9 +158,9 @@ const STORY_STYLES = {
   menuButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(212,165,32,0.45)',
+    border: '1px solid rgba(236,185,87,0.42)',
     borderRadius: '6px',
-    color: '#f5e6b8',
+    color: '#fff3de',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -168,22 +168,22 @@ const STORY_STYLES = {
 };
 
 const FACTION_COLORS: Record<string, string> = {
-  confucian: '#B58A52',
-  legalist: '#8D4E3E',
-  daoist: '#5E8F7E',
-  mozi: '#4E6A88',
-  strategist: '#A85C45',
-  diplomat: '#7C5FA3',
-  logician: '#5C6D9E',
-  eclectic: '#80755A',
-  agronomist: '#6B8D4F',
-  yin_yang: '#6C6A89',
-  novelist: '#8E6B6B',
-  healer: '#5F8D8B',
-  musician: '#92713D',
-  calendar: '#536A76',
-  ritualist: '#8B6A4E',
-  merchant: '#9A7E3B',
+  confucian: '#f2c56d',
+  legalist: '#d9813f',
+  daoist: '#e5a657',
+  mozi: '#c77d2b',
+  strategist: '#e29a50',
+  diplomat: '#f0b35c',
+  logician: '#d6a24d',
+  eclectic: '#c89d63',
+  agronomist: '#bc8a45',
+  yin_yang: '#e1b873',
+  novelist: '#ce8f4b',
+  healer: '#e7b66a',
+  musician: '#d89f4d',
+  calendar: '#f4c76f',
+  ritualist: '#d7a24d',
+  merchant: '#b97d3b',
 };
 
 const FACTION_NAMES: Record<string, string> = {
@@ -207,6 +207,19 @@ const FACTION_NAMES: Record<string, string> = {
 
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
 
+interface StorySettings {
+  textSpeed: 'slow' | 'normal' | 'fast' | 'instant';
+  autoPlay: boolean;
+  showRelationshipChanges: boolean;
+}
+
+const TEXT_SPEED_MAP: Record<StorySettings['textSpeed'], number> = {
+  slow: 60,
+  normal: 30,
+  fast: 15,
+  instant: 0,
+};
+
 export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   const { dispatch } = useAppStore();
   const engine = getStoryEngine();
@@ -219,6 +232,12 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   const [, setScene] = useState(0);
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<StorySettings>({
+    textSpeed: 'normal',
+    autoPlay: false,
+    showRelationshipChanges: true,
+  });
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
@@ -228,9 +247,16 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
       clearInterval(typingIntervalRef.current);
     }
 
+    const speed = TEXT_SPEED_MAP[settings.textSpeed];
+
+    if (speed === 0) {
+      setDisplayedText(text);
+      setDialogueState(hasChoices ? 'choice' : 'complete');
+      return;
+    }
+
     setDisplayedText('');
     let index = 0;
-    const speed = 30;
 
     typingIntervalRef.current = window.setInterval(() => {
       if (index < text.length) {
@@ -243,7 +269,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
         setDialogueState(hasChoices ? 'choice' : 'complete');
       }
     }, speed);
-  }, []);
+  }, [settings.textSpeed]);
 
   useEffect(() => {
     const unsubscribe = engine.subscribe((event) => {
@@ -338,6 +364,10 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(100%); }
+          to { opacity: 1; transform: translateX(0); }
+        }
       `}</style>
 
       {/* Top Bar */}
@@ -347,12 +377,12 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
             style={STORY_STYLES.backButton}
             onClick={handleBack}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#d4a520';
-              e.currentTarget.style.color = '#d4a520';
+              e.currentTarget.style.borderColor = '#f1c56a';
+              e.currentTarget.style.color = '#f1c56a';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(212,165,32,0.45)';
-              e.currentTarget.style.color = '#f5e6b8';
+              e.currentTarget.style.borderColor = 'rgba(236,185,87,0.42)';
+              e.currentTarget.style.color = '#fff3de';
             }}
           >
             ← 返回
@@ -360,23 +390,157 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
           <span style={STORY_STYLES.chapterBadge}>{getChapterLabel()}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#f5e6b8', fontSize: '14px' }}>
+          <span style={{ color: '#fff3de', fontSize: '14px' }}>
             名望: {stats.fame}
           </span>
           <button
             style={STORY_STYLES.menuButton}
+            onClick={() => setShowSettings(!showSettings)}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#d4a520';
-              e.currentTarget.style.color = '#d4a520';
+              e.currentTarget.style.borderColor = '#f1c56a';
+              e.currentTarget.style.color = '#f1c56a';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(212,165,32,0.45)';
-              e.currentTarget.style.color = '#f5e6b8';
+              e.currentTarget.style.borderColor = 'rgba(236,185,87,0.42)';
+              e.currentTarget.style.color = '#fff3de';
             }}
           >
             ⚙️ 设置
           </button>
         </div>
+      </div>
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <div style={{
+          position: 'absolute',
+          top: '64px',
+          right: 0,
+          width: '320px',
+          height: 'calc(100% - 64px)',
+          background: 'rgba(39,12,8,0.98)',
+          borderLeft: '1px solid rgba(236,185,87,0.38)',
+          zIndex: 20,
+          animation: 'slideIn 0.3s ease',
+          padding: '24px',
+          overflowY: 'auto',
+        }}>
+          <h3 style={{ color: '#f1c56a', fontSize: '18px', marginBottom: '24px', fontWeight: 700 }}>
+            故事设置
+          </h3>
+
+          {/* Text Speed */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ color: '#fff3de', fontSize: '14px', display: 'block', marginBottom: '8px' }}>
+              文字速度
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {(['slow', 'normal', 'fast', 'instant'] as const).map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => setSettings(s => ({ ...s, textSpeed: speed }))}
+                  style={{
+                    flex: 1,
+                    padding: '8px',
+                    background: settings.textSpeed === speed
+                      ? 'rgba(236,185,87,0.3)'
+                      : 'rgba(52,20,12,0.62)',
+                    border: settings.textSpeed === speed
+                      ? '1px solid #f1c56a'
+                      : '1px solid rgba(236,185,87,0.28)',
+                    borderRadius: '6px',
+                    color: settings.textSpeed === speed ? '#f1c56a' : '#fff3de',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {speed === 'slow' ? '慢' : speed === 'normal' ? '中' : speed === 'fast' ? '快' : '即时'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Auto Play */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              color: '#fff3de',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer',
+            }}>
+              <input
+                type="checkbox"
+                checked={settings.autoPlay}
+                onChange={(e) => setSettings(s => ({ ...s, autoPlay: e.target.checked }))}
+                style={{ width: '18px', height: '18px', accentColor: '#f1c56a' }}
+              />
+              自动播放
+            </label>
+          </div>
+
+          {/* Show Relationship Changes */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              color: '#fff3de',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer',
+            }}>
+              <input
+                type="checkbox"
+                checked={settings.showRelationshipChanges}
+                onChange={(e) => setSettings(s => ({ ...s, showRelationshipChanges: e.target.checked }))}
+                style={{ width: '18px', height: '18px', accentColor: '#f1c56a' }}
+              />
+              显示好感度变化
+            </label>
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={() => setShowSettings(false)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(236,185,87,0.2)',
+              border: '1px solid rgba(236,185,87,0.42)',
+              borderRadius: '8px',
+              color: '#fff3de',
+              cursor: 'pointer',
+              fontSize: '14px',
+              marginTop: '16px',
+            }}
+          >
+            关闭
+          </button>
+        </div>
+      )}
+
+      <div
+        style={{
+          position: 'absolute',
+          top: '76px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 11,
+          padding: '8px 22px',
+          borderRadius: '999px',
+          border: '1px solid rgba(236,185,87,0.38)',
+          background: 'rgba(39,12,8,0.78)',
+          color: '#f4d28a',
+          fontSize: '26px',
+          fontWeight: 900,
+          letterSpacing: '0.18em',
+          textShadow: '0 0 14px rgba(241,197,106,0.22)',
+          pointerEvents: 'none',
+        }}
+      >
+        争鸣史
       </div>
 
       {/* Center Content */}
@@ -402,7 +566,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#d4a520',
+                color: '#f1c56a',
                 fontSize: '14px',
               }}
             >
@@ -455,11 +619,11 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
                 onMouseEnter={() => setIsHoveredChoice(index)}
                 onMouseLeave={() => setIsHoveredChoice(null)}
               >
-                <span style={{
+                  <span style={{
                   width: '28px',
                   height: '28px',
                   borderRadius: '50%',
-                  background: 'rgba(212,165,32,0.25)',
+                  background: 'rgba(236,185,87,0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -488,7 +652,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
                   width: `${getReputation(faction)}%`,
 
                   height: '100%',
-                  background: FACTION_COLORS[faction] || '#8B7355',
+                  background: FACTION_COLORS[faction] || '#d7a24d',
                   borderRadius: '2px',
                   transition: 'width 0.3s ease',
                 }}

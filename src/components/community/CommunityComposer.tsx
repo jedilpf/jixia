@@ -364,7 +364,7 @@ export function CommunityComposer({
               })}
             </div>
 
-            <div className="rounded-2xl border p-3" style={{ background: 'rgba(34, 12, 13, 0.52)', borderColor: 'rgba(214, 151, 73, 0.1)' }}>
+            <div className="rounded-2xl p-3" style={{ background: 'rgba(34, 12, 13, 0.52)', border: '1px solid rgba(214, 151, 73, 0.1)' }}>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <span className="text-sm text-[#d9c3a0]">自定义标签</span>
                 <span className="text-xs text-[#a87a5d]">按回车或点击添加</span>
