@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { uiAudio } from '@/utils/audioManager';
+import { CommunityBadge } from '@/components/community/CommunityBadge';
+import { CommunityModal } from '@/components/community/CommunityModal';
 
 // ─── 设置状态接口 ────────────────────────────────────────────────────────────
 export interface AppSettings {
@@ -381,7 +383,6 @@ function loadMainMenuState(): MainMenuPersistedState {
 // ─── 主组件 ───────────────────────────────────────────────────────────────────
 export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onCollection, onCharacters }: MainMenuProps) {
   const initialState = useMemo(() => loadMainMenuState(), []);
-  const [hoveredBtn, setHoveredBtn] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [profileTab, setProfileTab] = useState<ProfileTab>('overview');
   const [coinBalance, setCoinBalance] = useState(initialState.coinBalance);
@@ -471,6 +472,54 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
         @keyframes forge-pulse { 0%,100% { opacity:0.15; transform: scale(1); } 50% { opacity: 0.35; transform: scale(1.08); } }
         @keyframes title-glow { 0%,100% { text-shadow: 0 0 20px rgba(184,134,11,0.6), 0 0 40px rgba(184,134,11,0.3); } 50% { text-shadow: 0 0 40px rgba(255,180,30,0.9), 0 0 80px rgba(255,140,0,0.5); } }
         @keyframes border-glow { 0%,100% { box-shadow: 0 0 10px rgba(255,120,0,0.3); } 50% { box-shadow: 0 0 25px rgba(255,150,0,0.6); } }
+        @keyframes particle-glow {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.9; transform: scale(1.1); }
+        }
+        @keyframes particle-float {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(2px, -1px); }
+          50% { transform: translate(-1px, 2px); }
+          75% { transform: translate(1px, 1px); }
+        }
+        .btn-ripple {
+          position: relative;
+          overflow: hidden;
+        }
+        .btn-ripple::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 50%;
+          height: 25%;
+          background: 
+            radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.9) 0%, transparent 8%),
+            radial-gradient(ellipse at 70% 20%, rgba(255,240,180,0.8) 0%, transparent 6%),
+            radial-gradient(ellipse at 40% 70%, rgba(255,220,150,0.7) 0%, transparent 5%),
+            radial-gradient(ellipse at 80% 60%, rgba(255,255,255,0.6) 0%, transparent 4%),
+            radial-gradient(ellipse at 30% 50%, rgba(212,165,32,0.5) 0%, transparent 50%);
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          animation: particle-glow 2s ease-in-out infinite;
+        }
+        .btn-ripple::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 45%;
+          height: 22%;
+          background: 
+            radial-gradient(ellipse at 60% 40%, rgba(255,255,255,0.8) 0%, transparent 7%),
+            radial-gradient(ellipse at 25% 60%, rgba(255,230,160,0.7) 0%, transparent 5%),
+            radial-gradient(ellipse at 75% 30%, rgba(255,255,255,0.6) 0%, transparent 4%),
+            radial-gradient(ellipse at 45% 25%, rgba(255,220,150,0.5) 0%, transparent 6%);
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          animation: particle-glow 2s ease-in-out infinite, particle-float 3s ease-in-out infinite;
+          animation-delay: 0.5s, 0s;
+        }
       `}</style>
 
       {/* 炉火光晕背景 */}
@@ -529,6 +578,16 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             ✉️
             {hasMailNotice ? <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-black rounded-full animate-pulse" /> : null}
           </button>
+          <button
+            onMouseEnter={() => uiAudio.playHover()}
+            onClick={() => { uiAudio.playClick(); setActiveModal('community'); }}
+            className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-base font-serif tracking-widest relative"
+            aria-label="打开社区"
+            title="社区"
+          >
+            社
+            <CommunityBadge />
+          </button>
           <div className="w-px h-8 bg-[rgba(212,165,32,0.3)] mx-1" />
           <button onMouseEnter={() => uiAudio.playHover()} onClick={() => { uiAudio.playClick(); setActiveModal('settings'); }} className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm border border-[rgba(212,165,32,0.3)] text-[#d4a520] hover:text-[#f5e6b8] hover:bg-black/60 hover:scale-105 transition-all flex items-center justify-center text-2xl">⚙️</button>
         </div>
@@ -541,7 +600,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
         </div>
         <div className="mb-2 text-center relative">
           <h1 style={{ fontSize: 'clamp(56px, 10vw, 96px)', fontWeight: 900, fontFamily: 'serif', background: 'linear-gradient(180deg, #f5e6b8 0%, #d4a520 40%, #8B5e00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'title-glow 2.5s ease-in-out infinite', letterSpacing: '16px', lineHeight: 1.1 }}>
-            谋天下：问道百家
+            思筹之录
           </h1>
           <div className="flex items-center justify-center gap-3 mt-2">
             <div style={{ height: '1px', width: '60px', background: 'linear-gradient(90deg, transparent, rgba(212,165,32,0.6))' }} />
@@ -549,46 +608,46 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             <div style={{ height: '1px', width: '60px', background: 'linear-gradient(90deg, rgba(212,165,32,0.6), transparent)' }} />
           </div>
         </div>
-        <div className="mb-12" style={{ color: 'rgba(212,197,169,0.55)', fontSize: '14px', letterSpacing: '3px', fontFamily: 'serif' }}>青铜机关城 · 卡牌对战</div>
+        <div className="mb-12" style={{ color: 'rgba(212,197,169,0.55)', fontSize: '14px', letterSpacing: '3px', fontFamily: 'serif' }}>包罗万象，百家永生。</div>
 
-        <div className="flex flex-col gap-2 w-72">
-          <button onClick={() => { uiAudio.playClick(); onStartGame(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('start'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-1 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
-            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'start' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'start' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
+        <div className="flex flex-col gap-3 w-72">
+          <button onClick={() => { uiAudio.playClick(); onStartGame(); }} onMouseEnter={() => uiAudio.playHover()}
+            className="btn-ripple relative transition-all duration-200 flex items-center justify-center outline-none focus:outline-none hover:opacity-90"
+            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-start.png')} alt="开始辩斗" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(135deg, #7a3508 0%, #b8470a 50%, #7a3508 100%)', border: '1px solid rgba(232,93,4,0.6)', borderRadius: '8px', animation: 'border-glow 2s ease-in-out infinite' }}>
-              <span style={{ color: '#fef3c7', fontSize: '22px', fontWeight: 700, fontFamily: 'serif', letterSpacing: '6px' }}>⚔ 开始辩斗</span>
+            <div style={{ display: 'none', width: '100%', padding: '16px 32px', background: 'linear-gradient(180deg, #8B4513 0%, #5D3A1A 100%)', border: '2px solid #D4A520', borderRadius: '8px' }}>
+              <span style={{ color: '#fef3c7', fontSize: '20px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>开始辩斗</span>
             </div>
           </button>
 
-          <button onClick={() => { uiAudio.playClick(); if (onStory) onStory(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('story'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-1 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
-            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'story' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'story' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
+          <button onClick={() => { uiAudio.playClick(); if (onStory) onStory(); }} onMouseEnter={() => uiAudio.playHover()}
+            className="btn-ripple relative transition-all duration-200 flex items-center justify-center outline-none focus:outline-none hover:opacity-90"
+            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-story.png')} alt="争鸣史" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '12px 32px', background: 'linear-gradient(135deg, #2f1f3f 0%, #1f2a4d 100%)', border: '1px solid rgba(138,114,180,0.55)', borderRadius: '8px' }}>
-              <span style={{ color: '#d8c7f3', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>📚 争鸣史</span>
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #2f1f3f 0%, #1f2a4d 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+              <span style={{ color: '#d8c7f3', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>争鸣史</span>
             </div>
           </button>
 
-          <button onClick={() => { uiAudio.playClick(); onCharacters(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('characters'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-1 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
-            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'characters' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'characters' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
+          <button onClick={() => { uiAudio.playClick(); onCharacters(); }} onMouseEnter={() => uiAudio.playHover()}
+            className="btn-ripple relative transition-all duration-200 flex items-center justify-center outline-none focus:outline-none hover:opacity-90"
+            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-characters.png')} alt="问道百家人物志" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '12px 32px', background: 'linear-gradient(135deg, #10192e 0%, #172440 100%)', border: '1px solid rgba(80,120,200,0.5)', borderRadius: '8px' }}>
-              <span style={{ color: '#a0bddc', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>📜 问道百家人物志</span>
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #10192e 0%, #172440 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+              <span style={{ color: '#a0bddc', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>问道百家人物志</span>
             </div>
           </button>
 
-          <button onClick={() => { uiAudio.playClick(); onCollection(); }} onMouseEnter={() => { uiAudio.playHover(); setHoveredBtn('collection'); }} onMouseLeave={() => setHoveredBtn(null)}
-            className="mb-1 relative transition-all duration-300 ease-out flex items-center justify-center outline-none focus:outline-none"
-            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0, transform: hoveredBtn === 'collection' ? 'scale(1.06)' : 'scale(1)', filter: hoveredBtn === 'collection' ? 'drop-shadow(0 0 15px rgba(255, 170, 0, 0.6)) brightness(1.1)' : 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4)) brightness(1)' }}>
+          <button onClick={() => { uiAudio.playClick(); onCollection(); }} onMouseEnter={() => uiAudio.playHover()}
+            className="btn-ripple relative transition-all duration-200 flex items-center justify-center outline-none focus:outline-none hover:opacity-90"
+            style={{ width: '100%', background: 'transparent', border: 'none', padding: 0 }}>
             <img src={asset('assets/btn-collection.png')} alt="卡牌图鉴" style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
               onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block'; }} />
-            <div style={{ display: 'none', width: '100%', padding: '12px 32px', background: 'linear-gradient(135deg, #1a2820 0%, #243530 100%)', border: '1px solid rgba(74,124,111,0.5)', borderRadius: '8px' }}>
-              <span style={{ color: '#a7c5ba', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>📜 卡牌图鉴</span>
+            <div style={{ display: 'none', width: '100%', padding: '14px 32px', background: 'linear-gradient(180deg, #1a2820 0%, #243530 100%)', border: '2px solid #8B7355', borderRadius: '8px' }}>
+              <span style={{ color: '#a7c5ba', fontSize: '18px', fontWeight: 600, fontFamily: 'serif', letterSpacing: '4px' }}>卡牌图鉴</span>
             </div>
           </button>
         </div>
@@ -801,6 +860,12 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             ))}
           </div>
         </SystemModal>
+      )}
+      {activeModal === 'community' && (
+        <CommunityModal
+          isOpen={activeModal === 'community'}
+          onClose={() => setActiveModal(null)}
+        />
       )}
       {activeModal === 'settings' && (
         <SystemModal title="机枢设置" onClose={() => setActiveModal(null)}>

@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260410-190",
+  "goal": "Update the main menu title copy from '谋天下：问道百家' to '思筹之录' and change the visible subtitle line to '包罗万象，百家永生。' without altering other menu content, layout, or behavior.",
+  "constraints": [
+    "Only adjust the requested visible main menu title/subtitle copy.",
+    "Do not modify unrelated UI text, buttons, interactions, or styling structure unless required for the copy replacement.",
+    "Keep the change limited to the main menu presentation layer and directly related task records.",
+    "Avoid touching story, battle, community, or data logic files."
+  ],
+  "deliverables": [
+    "Main menu title displays '思筹之录'.",
+    "Main menu subtitle displays '包罗万象，百家永生。'.",
+    "Project validates with the standard task workflow and a production build."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/MainMenu.tsx",
+    "src/ui/screens/StoryScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-190-title-retitle.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-190-title-retitle.json",
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

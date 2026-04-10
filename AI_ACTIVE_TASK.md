@@ -1,42 +1,43 @@
 # AI Active Task
 
 ## Current active task
-**用户认证系统开发**
+**主菜单标题与副标题改名**
 
-任务文件：`ai/tasks/TASK-20260409-157-backend-user-auth.json`
+任务文件：`ai/tasks/TASK-20260410-190-title-retitle.json`
 
 ## 状态切换记录
 
 | 时间 | 任务 | 状态 |
 |------|------|------|
+| 2026-04-10 | 主菜单标题与副标题改名 | 🔄 进行中 |
+| 2026-04-10 | 社区模块滚动修复 | 🔄 进行中 |
+| 2026-04-10 | 社区模块金红主题换色 | 🔄 进行中 |
 | 2026-04-09 | 前端性能与体验优化 | ✅ 已完成 |
 | 2026-04-09 | 用户认证系统 | ✅ 核心功能已完成 |
 
 ## 当前工作范围
 
-### 已完成文件
-- ✅ `server/utils/password.cjs` - 密码哈希工具
-- ✅ `server/utils/jwt.cjs` - JWT令牌工具
-- ✅ `server/middleware/auth.cjs` - 认证中间件
-- ✅ `server/store/user-store.cjs` - 用户数据存储
-- ✅ `server/routes/auth.cjs` - 认证路由（注册/登录/刷新/登出）
-- ✅ `server/routes/users.cjs` - 用户路由（用户信息管理）
-- ✅ `server/app.cjs` - 集成认证系统
+### 当前工作范围
 
-### API端点
-- `POST /api/v1/auth/register` - 用户注册
-- `POST /api/v1/auth/login` - 用户登录
-- `POST /api/v1/auth/refresh` - 刷新令牌
-- `POST /api/v1/auth/logout` - 登出
-- `POST /api/v1/auth/logout-all` - 登出所有设备
-- `GET /api/v1/users/me` - 获取当前用户信息
-- `PUT /api/v1/users/me` - 更新用户信息
-- `PUT /api/v1/users/me/password` - 更改密码
-- `GET /api/v1/users/:userId` - 获取指定用户公开信息
+#### 目标
+- 将主菜单标题“谋天下：问道百家”改为“思筹之录”
+- 将主菜单副标题改为“包罗万象，百家永生。”
+- 不改其他主菜单文案、结构与交互
 
-### 禁止删除
-- 所有现有的server文件
-- 前端优化新增的文件（见下方清单）
+#### 允许修改文件
+- `src/components/MainMenu.tsx`
+- `AI_ACTIVE_TASK.md`
+- `ai/tasks/TASK-20260410-190-title-retitle.json`
+
+#### 禁止修改
+- 除指定标题与副标题外的其他主菜单文案
+- 非主菜单模块界面
+- 所有现有剧情、战斗、社区、后端逻辑文件
+
+#### 验收目标
+- 主菜单显示新标题“思筹之录”
+- 主菜单显示新副标题“包罗万象，百家永生。”
+- 项目构建通过
 
 ## 当前边界规则
 
