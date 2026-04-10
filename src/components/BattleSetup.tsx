@@ -12,26 +12,27 @@ export function BattleSetup(props: BattleSetupProps) {
   const { selectedArenaId, onSelectArena, onStartBattle, onBackMenu } = props;
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#F2ECD9] text-[#3D2B1F]">
-      {/* 矿物色背景纹理 */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(58,95,65,0.08),transparent_42%),radial-gradient(circle_at_82%_70%,rgba(44,95,120,0.08),transparent_44%)]" />
-      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/handmade-paper.png")' }} />
+    <div className=”relative h-full w-full overflow-hidden bg-gradient-to-b from-[#1a0a0a] to-[#0d0505] text-[#f5e6b8]”>
+      {/* 背景纹理 */}
+      <div className=”pointer-events-none absolute inset-0 opacity-20” style={{
+        background: 'radial-gradient(circle at 30% 30%, rgba(139,69,19,0.3), transparent 50%), radial-gradient(circle at 70% 70%, rgba(139,0,0,0.2), transparent 50%)'
+      }} />
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col px-4 py-8 md:px-8">
-        <header className="mb-8 flex items-center justify-between border-b-2 border-[#D4AF65]/30 pb-4">
+      <div className=”relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col px-6 py-6”>
+        <header className=”mb-6 flex items-center justify-between border-b border-[#d4a520]/30 pb-4”>
           <div>
-            <h2 className="text-3xl font-bold tracking-[0.2em] text-[#5C4033]">择地而论</h2>
-            <p className="mt-2 text-sm text-[#7D5C40]">凡论战者，必占地利。不同场域自有其先贤余韵与特殊规则。</p>
+            <h2 className=”text-2xl font-bold tracking-widest text-[#d4a520]”>选择战场</h2>
+            <p className=”mt-1 text-sm text-[#a7c5ba]”>不同战场有不同规则，选择适合你的战场</p>
           </div>
           <button
             onClick={onBackMenu}
-            className="rounded-md border border-[#8D2F2F]/40 bg-[#F5E6E6] px-4 py-2 text-xs font-bold text-[#8D2F2F] transition hover:bg-[#8D2F2F] hover:text-white"
+            className=”rounded-md border border-[#8B7355]/60 bg-transparent px-4 py-2 text-sm text-[#d4a520] transition hover:bg-[#d4a520]/10”
           >
-            辞别归隐
+            返回
           </button>
         </header>
 
-        <main className="grid flex-1 grid-cols-1 gap-6 overflow-y-auto pb-6 lg:grid-cols-2">
+        <main className=”grid flex-1 grid-cols-1 gap-4 overflow-y-auto pb-4 md:grid-cols-2”>
           {ARENAS.map((arena) => {
             const isSelected = arena.id === selectedArenaId;
             return (
@@ -39,33 +40,33 @@ export function BattleSetup(props: BattleSetupProps) {
                 key={arena.id}
                 onClick={() => onSelectArena(arena.id)}
                 className={[
-                  'group relative rounded-2xl border-2 p-6 text-left transition duration-300 transform',
+                  'group relative rounded-xl border-2 p-5 text-left transition duration-200',
                   isSelected
-                    ? 'scale-[1.02] border-[#D4AF65] bg-[#FFF9EB] shadow-xl'
-                    : 'border-[#B8A48D]/40 bg-white/50 hover:bg-white hover:border-[#B8A48D] hover:shadow-md',
+                    ? 'border-[#d4a520] bg-[#2a1515]'
+                    : 'border-[#8B7355]/30 bg-[#1a0a0a]/50 hover:border-[#d4a520]/50 hover:bg-[#1f0f0f]',
                 ].join(' ')}
               >
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-[#5C4033]">{arena.name}</h3>
-                  {isSelected ? (
-                    <span className="rounded-full border-2 border-[#3A5F41] bg-[#EBF5EE] px-4 py-1 text-xs font-bold text-[#3A5F41]">
-                      已定场
+                <div className=”mb-3 flex items-center justify-between”>
+                  <h3 className=”text-xl font-bold text-[#d4a520]”>{arena.name}</h3>
+                  {isSelected && (
+                    <span className=”rounded-full bg-[#d4a520]/20 px-3 py-1 text-xs font-bold text-[#d4a520]”>
+                      已选
                     </span>
-                  ) : null}
+                  )}
                 </div>
-                <p className="mb-4 text-sm leading-relaxed text-[#7D5C40] italic">“{arena.oneLine}”</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-2">
-                    <span className="font-bold text-[#8B6A4E]">【规则】</span>
-                    <span className="text-[#5C4033]">{arena.passive}</span>
+                <p className=”mb-3 text-sm text-[#a7c5ba]”>{arena.oneLine}</p>
+                <div className=”space-y-2 text-sm”>
+                  <div className=”flex gap-2”>
+                    <span className=”font-bold text-[#d4a520] min-w-[50px]”>开局</span>
+                    <span className=”text-[#f5e6b8]”>{arena.passive}</span>
                   </div>
-                  <div className="flex gap-2">
-                    <span className="font-bold text-[#8B6A4E]">【倾向】</span>
-                    <span className="text-[#5C4033]">{arena.bias}</span>
+                  <div className=”flex gap-2”>
+                    <span className=”font-bold text-[#d4a520] min-w-[50px]”>加成</span>
+                    <span className=”text-[#f5e6b8]”>{arena.bias}</span>
                   </div>
-                  <div className="flex gap-2">
-                    <span className="font-bold text-[#8D2F2F]">【绝变】</span>
-                    <span className="text-[#8D2F2F]/90">{arena.skill}</span>
+                  <div className=”flex gap-2”>
+                    <span className=”font-bold text-[#ff6b35] min-w-[50px]”>绝技</span>
+                    <span className=”text-[#ffb380]”>{arena.skill}</span>
                   </div>
                 </div>
               </button>
@@ -73,13 +74,13 @@ export function BattleSetup(props: BattleSetupProps) {
           })}
         </main>
 
-        <footer className="mt-auto flex items-center justify-end pt-6 border-t-2 border-[#D4AF65]/30">
+        <footer className=”mt-auto flex items-center justify-end pt-4 border-t border-[#d4a520]/30”>
           <button
             onClick={onStartBattle}
-            className="group flex items-center gap-3 rounded-lg border-2 border-[#8D2F2F] bg-[#8D2F2F] px-10 py-3 text-lg font-bold text-white transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+            className=”group flex items-center gap-3 rounded-lg border-2 border-[#d4a520] bg-[#8B4513] px-8 py-3 text-lg font-bold text-[#f5e6b8] transition-all hover:bg-[#A0522D]”
           >
-            挺进稷下
-            <span className="transition-transform group-hover:translate-x-1">→</span>
+            开始战斗
+            <span className=”transition-transform group-hover:translate-x-1”>→</span>
           </button>
         </footer>
       </div>

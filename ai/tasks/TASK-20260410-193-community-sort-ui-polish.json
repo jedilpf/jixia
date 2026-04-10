@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260410-193",
+  "goal": "Polish the community post list sorting control so users can switch between sorting modes through a more intentional gold-red UI that matches the existing community theme.",
+  "constraints": [
+    "Limit UI changes to the sorting area in CommunityPostList and directly related task records.",
+    "Do not change community data flow, sorting semantics, feed contents, or post cards.",
+    "Keep all existing sort modes available: latest, hot, featured, and most_favorited.",
+    "Preserve the current list scrolling behavior while interacting with the sorting area."
+  ],
+  "deliverables": [
+    "Sorting control in CommunityPostList is visually aligned with the community theme.",
+    "Users can clearly switch between all sort modes without the current small native-select look.",
+    "Community list interaction and scrolling continue to work after the UI change."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/community/CommunityPostList.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260410-193-community-sort-ui-polish.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260410-193-community-sort-ui-polish.json"
+  ],
+  "status": "in_progress"
+}

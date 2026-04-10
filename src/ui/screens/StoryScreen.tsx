@@ -6,7 +6,7 @@ const STORY_STYLES = {
   container: {
     width: '100%',
     height: '100dvh',
-    background: '#081423',
+    background: 'linear-gradient(180deg, #1a0a0a 0%, #0d0505 100%)',
     display: 'flex',
     flexDirection: 'column' as const,
     overflow: 'hidden',
@@ -18,16 +18,16 @@ const STORY_STYLES = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottom: '1px solid rgba(96,165,250,0.28)',
-    background: 'rgba(7,17,34,0.95)',
+    borderBottom: '1px solid rgba(212,165,32,0.35)',
+    background: 'rgba(13,5,5,0.95)',
     zIndex: 10,
   },
   chapterBadge: {
     padding: '6px 16px',
-    background: 'rgba(17,34,64,0.92)',
+    background: 'rgba(139,69,19,0.6)',
     borderRadius: '20px',
-    border: '1px solid rgba(96,165,250,0.42)',
-    color: '#bfdbfe',
+    border: '1px solid rgba(212,165,32,0.5)',
+    color: '#f5e6b8',
     fontSize: '14px',
     fontWeight: 600,
   },
@@ -41,12 +41,12 @@ const STORY_STYLES = {
   sceneDescription: {
     fontSize: '16px',
     lineHeight: 1.8,
-    color: '#dbeafe',
+    color: '#f5e6b8',
     marginBottom: '24px',
     padding: '16px 24px',
-    background: 'rgba(15,23,42,0.72)',
+    background: 'rgba(60,30,20,0.5)',
     borderRadius: '8px',
-    borderLeft: '3px solid #60a5fa',
+    borderLeft: '3px solid #d4a520',
     whiteSpace: 'pre-wrap' as const,
   },
   dialogueArea: {
@@ -58,50 +58,50 @@ const STORY_STYLES = {
     width: '160px',
     height: '240px',
     borderRadius: '8px',
-    border: '2px solid #60a5fa',
+    border: '2px solid #d4a520',
     objectFit: 'cover' as const,
-    background: 'rgba(15,23,42,0.85)',
+    background: 'rgba(60,30,20,0.6)',
     flexShrink: 0,
   },
   dialogueBox: {
     flex: 1,
-    background: 'rgba(15,23,42,0.88)',
+    background: 'rgba(40,20,15,0.8)',
     borderRadius: '12px',
-    border: '1px solid rgba(96,165,250,0.35)',
+    border: '1px solid rgba(212,165,32,0.4)',
     padding: '20px 24px',
   },
   speakerName: {
     fontSize: '15px',
     fontWeight: 700,
-    color: '#93c5fd',
+    color: '#d4a520',
     marginBottom: '8px',
   },
   dialogueText: {
     fontSize: '17px',
     lineHeight: 1.7,
-    color: '#e0f2fe',
+    color: '#f5e6b8',
     whiteSpace: 'pre-wrap' as const,
   },
   continueIndicator: {
     textAlign: 'right' as const,
     marginTop: '12px',
-    color: '#60a5fa',
+    color: '#d4a520',
     fontSize: '14px',
     animation: 'pulse 1.5s ease-in-out infinite',
   },
   choicesArea: {
     padding: '24px 48px',
-    background: 'rgba(7,17,34,0.95)',
-    borderTop: '1px solid rgba(96,165,250,0.28)',
+    background: 'rgba(13,5,5,0.95)',
+    borderTop: '1px solid rgba(212,165,32,0.35)',
   },
   choiceButton: {
     width: '100%',
     padding: '16px 24px',
     marginBottom: '12px',
-    background: 'linear-gradient(135deg, #10213f 0%, #081423 100%)',
-    border: '1px solid rgba(96,165,250,0.42)',
+    background: 'linear-gradient(135deg, #3d1f1f 0%, #1a0a0a 100%)',
+    border: '1px solid rgba(212,165,32,0.45)',
     borderRadius: '8px',
-    color: '#e0f2fe',
+    color: '#f5e6b8',
     fontSize: '16px',
     textAlign: 'left' as const,
     cursor: 'pointer',
@@ -111,15 +111,15 @@ const STORY_STYLES = {
     gap: '12px',
   },
   choiceButtonHover: {
-    background: 'linear-gradient(135deg, #17305c 0%, #0d1c36 100%)',
-    borderColor: '#60a5fa',
+    background: 'linear-gradient(135deg, #5c2a2a 0%, #2d1515 100%)',
+    borderColor: '#d4a520',
     transform: 'translateX(8px)',
   },
   relationshipBar: {
     height: '56px',
     padding: '0 24px',
-    background: 'rgba(7,17,34,0.98)',
-    borderTop: '1px solid rgba(96,165,250,0.28)',
+    background: 'rgba(13,5,5,0.98)',
+    borderTop: '1px solid rgba(212,165,32,0.35)',
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
@@ -128,29 +128,29 @@ const STORY_STYLES = {
   factionBadge: {
     minWidth: '72px',
     padding: '6px 10px',
-    background: 'rgba(15,23,42,0.82)',
+    background: 'rgba(40,20,15,0.7)',
     borderRadius: '6px',
-    border: '1px solid rgba(96,165,250,0.28)',
+    border: '1px solid rgba(212,165,32,0.3)',
     textAlign: 'center' as const,
     flexShrink: 0,
   },
   factionName: {
     fontSize: '11px',
-    color: '#cbd5e1',
+    color: '#d4a520',
     marginBottom: '4px',
   },
   reputationBar: {
     height: '3px',
-    background: 'rgba(96,165,250,0.24)',
+    background: 'rgba(212,165,32,0.2)',
     borderRadius: '2px',
     overflow: 'hidden',
   },
   backButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(96,165,250,0.42)',
+    border: '1px solid rgba(212,165,32,0.45)',
     borderRadius: '6px',
-    color: '#dbeafe',
+    color: '#f5e6b8',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -158,9 +158,9 @@ const STORY_STYLES = {
   menuButton: {
     padding: '8px 16px',
     background: 'transparent',
-    border: '1px solid rgba(96,165,250,0.42)',
+    border: '1px solid rgba(212,165,32,0.45)',
     borderRadius: '6px',
-    color: '#dbeafe',
+    color: '#f5e6b8',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -347,12 +347,12 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
             style={STORY_STYLES.backButton}
             onClick={handleBack}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#60a5fa';
-              e.currentTarget.style.color = '#60a5fa';
+              e.currentTarget.style.borderColor = '#d4a520';
+              e.currentTarget.style.color = '#d4a520';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(96,165,250,0.42)';
-              e.currentTarget.style.color = '#dbeafe';
+              e.currentTarget.style.borderColor = 'rgba(212,165,32,0.45)';
+              e.currentTarget.style.color = '#f5e6b8';
             }}
           >
             ← 返回
@@ -360,18 +360,18 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
           <span style={STORY_STYLES.chapterBadge}>{getChapterLabel()}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#dbeafe', fontSize: '14px' }}>
+          <span style={{ color: '#f5e6b8', fontSize: '14px' }}>
             名望: {stats.fame}
           </span>
           <button
             style={STORY_STYLES.menuButton}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#60a5fa';
-              e.currentTarget.style.color = '#60a5fa';
+              e.currentTarget.style.borderColor = '#d4a520';
+              e.currentTarget.style.color = '#d4a520';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(96,165,250,0.42)';
-              e.currentTarget.style.color = '#dbeafe';
+              e.currentTarget.style.borderColor = 'rgba(212,165,32,0.45)';
+              e.currentTarget.style.color = '#f5e6b8';
             }}
           >
             ⚙️ 设置
@@ -402,7 +402,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#60a5fa',
+                color: '#d4a520',
                 fontSize: '14px',
               }}
             >
@@ -459,7 +459,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
                   width: '28px',
                   height: '28px',
                   borderRadius: '50%',
-                  background: 'rgba(96,165,250,0.25)',
+                  background: 'rgba(212,165,32,0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

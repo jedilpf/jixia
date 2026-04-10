@@ -50,8 +50,8 @@ export function CommunityPostList({
           forwardWheelToList(e.deltaY);
         }}
         style={{
-            background: 'rgba(37, 13, 14, 0.72)',
-            borderColor: 'rgba(214, 151, 73, 0.12)',
+          background: 'rgba(37, 13, 14, 0.72)',
+          borderColor: 'rgba(214, 151, 73, 0.12)',
         }}
       >
         <div className="flex flex-col">
@@ -59,38 +59,50 @@ export function CommunityPostList({
           <span className="text-xs text-[#b89372]">按当前筛选与排序显示社区内容</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-[#b89372]">排序</span>
-          <select
-            value={sortMode}
-            onChange={(e) => {
-              onSortChange(e.target.value as CommunitySortMode);
-              e.currentTarget.blur();
-              requestAnimationFrame(() => {
-                scrollContainerRef.current?.focus({ preventScroll: true });
-              });
-            }}
-            onWheel={(e) => {
-              e.preventDefault();
-              e.currentTarget.blur();
-              forwardWheelToList(e.deltaY);
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.blur();
-            }}
-            className="rounded-xl border px-3 py-2 text-xs outline-none"
-            style={{
-                background: 'rgba(34, 12, 13, 0.9)',
-                borderColor: 'rgba(214, 151, 73, 0.22)',
-              color: '#f5e6b8',
-            }}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+        <div
+          className="flex flex-col items-start gap-2 rounded-2xl border px-3 py-2"
+          style={{
+            background: 'linear-gradient(180deg, rgba(57, 20, 19, 0.88), rgba(28, 10, 11, 0.9))',
+            borderColor: 'rgba(214, 151, 73, 0.16)',
+            boxShadow: 'inset 0 1px 0 rgba(255, 221, 164, 0.05)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] uppercase tracking-[0.22em] text-[#b89372]">排序</span>
+            <span className="rounded-full px-2 py-0.5 text-[10px] text-[#d8bb72]" style={{ background: 'rgba(214, 151, 73, 0.1)' }}>
+              当前: {SORT_OPTIONS.find((option) => option.value === sortMode)?.label}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {SORT_OPTIONS.map((option) => {
+              const isActive = option.value === sortMode;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onSortChange(option.value)}
+                  onWheel={(e) => {
+                    e.preventDefault();
+                    forwardWheelToList(e.deltaY);
+                  }}
+                  className="rounded-full px-3 py-1.5 text-xs transition-all"
+                  style={{
+                    background: isActive
+                      ? 'linear-gradient(180deg, rgba(176, 83, 39, 0.4), rgba(214, 151, 73, 0.16))'
+                      : 'rgba(34, 12, 13, 0.76)',
+                    border: `1px solid ${isActive ? 'rgba(214, 151, 73, 0.38)' : 'rgba(214, 151, 73, 0.14)'}`,
+                    color: isActive ? '#f5e6b8' : '#d9c3a0',
+                    boxShadow: isActive ? '0 6px 18px rgba(176, 83, 39, 0.18)' : 'none',
+                  }}
+                >
+                  {isActive ? '◆ ' : ''}
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
