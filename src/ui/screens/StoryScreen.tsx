@@ -224,7 +224,8 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   const { dispatch } = useAppStore();
   const engine = getStoryEngine();
 
-  const [currentNode, setCurrentNode] = useState<StoryNode | undefined>(engine.getCurrentNode());
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [currentNode, setCurrentNode] = useState<StoryNode | undefined>();
   const [dialogueState, setDialogueState] = useState<DialogueState>('typing');
   const [displayedText, setDisplayedText] = useState('');
   const [isHoveredChoice, setIsHoveredChoice] = useState<number | null>(null);
@@ -293,7 +294,9 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
     });
 
     const initialNode = engine.getCurrentNode();
+    setCurrentNode(initialNode);
     startTyping(initialNode?.content || '', Boolean(initialNode?.choices));
+    setIsInitialized(true);
 
     return () => {
       unsubscribe();
@@ -352,6 +355,16 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   };
 
   const visibleFactions = Object.keys(FACTION_NAMES).slice(0, 8);
+
+  if (!isInitialized || !currentNode) {
+    return (
+      <div style={STORY_STYLES.container}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#f1dfbb' }}>
+          正在加载争鸣史...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={STORY_STYLES.container}>

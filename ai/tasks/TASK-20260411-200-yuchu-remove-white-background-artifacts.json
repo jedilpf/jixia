@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260411-200",
+  "goal": "Clean white background artifacts from the updated yuchu stand portrait while preserving the character, held scroll, and on-character white details.",
+  "constraints": [
+    "Do not redraw or replace the character portrait.",
+    "Do not remove intentional white details on the character body, costume, props, or face.",
+    "Limit edits to the task file and assets under public/assets/chars/stand, with yuchu.png as the only intended target for this pass.",
+    "Preserve the existing filename so CharactersView keeps working without code changes."
+  ],
+  "deliverables": [
+    "yuchu.png has its unwanted external white background artifacts removed.",
+    "The portrait remains transparent around the outside and still preserves the core character artwork.",
+    "Task workflow validation and finalize pass."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "public/assets/chars/stand"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-200-yuchu-remove-white-background-artifacts.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-200-yuchu-remove-white-background-artifacts.json"
+  ],
+  "status": "completed"
+}

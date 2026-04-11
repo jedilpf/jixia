@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { uiAudio } from '@/utils/audioManager';
 
 const CHARACTERS = [
@@ -180,9 +180,9 @@ const CHARACTERS = [
     }
 ];
 const SCHOOLS = ['全部', '儒家 / 礼心殿', '法家 / 衡戒廷', '道家 / 归真观', '兵家 / 九阵堂', '墨家 / 玄匠盟', '名家 / 名相府', '占星家 / 司天台', '纵横家 / 游策阁', '农家 / 万农坊', '杂家 / 兼采楼', '公输家 / 天工坊', '阴阳家 / 两仪署', '医家 / 杏林馆', '小说家 / 稗言社', '方技家 / 养真院', '术数家 / 筹天阁'];
-// 立绘文件统一命名为 {id}.png，存放在 publicassets/chars/stand/ 目录
-// luban 暂无立绘，自动降级显示背景图
-const HAS_STAND = new Set(['mozi', 'kongqiu', 'hanfeizi', 'sunwu', 'zouyan', 'xuxing', 'guiguzi', 'huishi', 'zhuangzi']);
+// 立绘文件统一命名为 {id}.png，存放在 public/assets/chars/stand/ 目录
+// All characters now have stands!
+const HAS_STAND = new Set(['mozi', 'kongqiu', 'hanfeizi', 'sunwu', 'zouyan', 'xuxing', 'guiguzi', 'huishi', 'zhuangzi', 'lvbuwei', 'luban', 'gande', 'bianque', 'yuchu', 'qibo', 'jingfang']);
 
 export function CharactersView({ onBack }: { onBack: () => void }) {
     const [activeSchool, setActiveSchool] = useState('全部');

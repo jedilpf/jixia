@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-20260411-198",
+  "goal": "Review the current battle/card system against the 2026-04-08 numeric and three-tier principles, then report the key mismatches without changing gameplay code.",
+  "constraints": [
+    "Do not modify gameplay code, card data, or balance values.",
+    "Do not rewrite story, UI, or community systems as part of this task.",
+    "Limit edits to the task file and any task-generated metadata needed by the workflow.",
+    "Ground findings in the current repository state and cite the relevant files."
+  ],
+  "deliverables": [
+    "A concise review of where the current implementation differs from the 2026-04-08 balance principles.",
+    "Concrete file-level references for the main mismatches.",
+    "A recommendation for which current code should stay and which design rules should still follow 2026-04-08."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-198-review-current-battle-vs-20260408-principles.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-198-review-current-battle-vs-20260408-principles.json"
+  ],
+  "status": "completed"
+}

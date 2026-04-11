@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260411-199",
+  "goal": "Fix the character-encyclopedia stand portraits whose backgrounds are not truly transparent so they display cleanly in CharactersView without changing the character content itself.",
+  "constraints": [
+    "Do not alter the actual character subject, costume, pose, or in-image content beyond background cleanup.",
+    "Do not modify CharactersView layout or unrelated UI code unless needed to consume the corrected assets.",
+    "Prefer non-destructive asset replacement and keep filenames stable where the existing UI already references them.",
+    "Limit edits to the task file, the affected portrait assets, and any minimal supporting notes required by the workflow."
+  ],
+  "deliverables": [
+    "Affected stand portraits in public/assets/chars/stand use transparent backgrounds instead of incorrect solid backgrounds.",
+    "CharactersView continues to load the same filenames without code-path regressions.",
+    "A short verification summary identifies which portraits were corrected."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "public/assets/chars/stand"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-199-character-stand-transparent-backgrounds.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-199-character-stand-transparent-backgrounds.json"
+  ],
+  "status": "in_progress"
+}
