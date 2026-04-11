@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260411-201",
+  "goal": "Restore only the already-started main battle screen UI to the user's previous version after arena entry and faction selection, without changing any other screen, flow, gameplay logic, or assets.",
+  "constraints": [
+    "Do not modify lobby, story mode, character encyclopedia, card codex, community, pre-battle flow, topic selection flow, or faction selection screens unless strictly required by one of the allowed files.",
+    "Do not modify battleV2 gameplay logic, rules, card data, or timing behavior.",
+    "Only revert presentation-layer changes on the main in-battle screen and its immediate chrome.",
+    "Preserve any later non-visual functionality that is already working."
+  ],
+  "deliverables": [
+    "The main battle screen after faction selection matches the user's earlier UI style again.",
+    "Only the battle-in-progress shell/chrome is restored; unrelated pages stay untouched.",
+    "Build or targeted verification passes after the restore."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-201-restore-main-battle-ui-previous-version.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-201-restore-main-battle-ui-previous-version.json",
+    "npx eslint src/components/BattleFrameV2.tsx src/components/battle/layers/TopStatusBar.tsx src/components/battle/layers/BottomControls.tsx src/components/battle/panels/CardLibraryPanel.tsx --ext .tsx"
+  ],
+  "status": "in_progress"
+}

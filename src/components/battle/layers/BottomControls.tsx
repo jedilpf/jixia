@@ -1,6 +1,6 @@
 /**
  * 底部操作区组件
- * 稷下受业：名士案头 (V9 雅化版)
+ * 显示：左侧提示、中间按钮、手牌区
  */
 
 import React from 'react';
@@ -15,14 +15,20 @@ interface BottomControlsProps {
   onCancel: () => void;
 }
 
-const UI_ASSET_PATH = '/assets/v9/battle_ui_controls.png';
-
 const CARD_FRAME_COLORS: Record<string, { border: string; bg: string; glow: string }> = {
-  '立论': { border: '#7d3d23', bg: '#f8e6be', glow: 'rgba(125,61,35,0.2)' },
-  '策术': { border: '#8D2F2F', bg: '#F5E6E6', glow: 'rgba(141,47,47,0.2)' },
-  '反诘': { border: '#f0c36e', bg: '#1b0c0a', glow: 'rgba(240,195,110,0.25)' },
-  '门客': { border: '#d1b185', bg: '#2a0e0a', glow: 'rgba(209,177,133,0.22)' },
-  '玄章': { border: '#2a0e0a', bg: '#F5F5F5', glow: 'rgba(210,150,72,0.16)' },
+  '立论': { border: '#9EAD8A', bg: 'rgba(158,173,138,0.15)', glow: 'rgba(158,173,138,0.4)' },
+  '策术': { border: '#C06F6F', bg: 'rgba(192,111,111,0.15)', glow: 'rgba(192,111,111,0.4)' },
+  '反诘': { border: '#C9A063', bg: 'rgba(201,160,99,0.15)', glow: 'rgba(201,160,99,0.4)' },
+  '门客': { border: '#9C88A8', bg: 'rgba(156,136,168,0.15)', glow: 'rgba(156,136,168,0.4)' },
+  '玄章': { border: '#909BA6', bg: 'rgba(144,155,166,0.15)', glow: 'rgba(144,155,166,0.4)' },
+};
+
+const CARD_FRAME_ASSETS: Record<string, string> = {
+  '立论': 'assets/frames/frame-lilun.png',
+  '策术': 'assets/frames/frame-ceshu.png',
+  '反诘': 'assets/frames/frame-fanje.png',
+  '门客': 'assets/frames/frame-menke.png',
+  '玄章': 'assets/frames/frame-xuanzhang.png',
 };
 
 const HandCard: React.FC<{
@@ -33,87 +39,115 @@ const HandCard: React.FC<{
   total: number;
 }> = ({ card, isSelected, onClick, index, total }) => {
   const colors = CARD_FRAME_COLORS[card.type] || CARD_FRAME_COLORS['立论'];
+  const frameAsset = CARD_FRAME_ASSETS[card.type] || CARD_FRAME_ASSETS['立论'];
   const hasStats = card.power !== undefined && card.hp !== undefined;
 
-  const fanOffset = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 6 : 10) : 0;
-  const rotation = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 1.2 : 2) : 0;
+  const fanOffset = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 5 : 7) : 0;
+  const rotation = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 1.6 : 2.4) : 0;
 
   return (
     <button
       onClick={onClick}
-      className="relative transition-all duration-500 ease-out origin-bottom group"
+      className="relative transition-all duration-300 ease-out origin-bottom"
       style={{
         transform: isSelected
-          ? 'scale(1.2) translateY(-40px)'
+          ? 'scale(1.1) translateY(-12px)'
           : `rotate(${rotation}deg) translateX(${fanOffset}px)`,
-        zIndex: isSelected ? 100 : 10 + index,
+        zIndex: isSelected ? 30 : 10 + index,
       }}
     >
       <div
-        className="relative w-[100px] h-[140px] rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 bg-[#f8e6be] border-2"
+        className="relative w-[82px] h-[114px] rounded-xl overflow-hidden transition-all duration-200 md:w-[88px] md:h-[120px]"
         style={{
-          borderColor: isSelected ? colors.border : `${colors.border}20`,
+          border: `2px solid ${isSelected ? colors.border : `${colors.border}60`}`,
           boxShadow: isSelected
-            ? `0 20px 60px ${colors.glow}, 0 0 0 6px ${colors.border}10`
-            : `0 10px 30px rgba(0,0,0,0.2)`,
+            ? `0 0 30px ${colors.glow}, 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px ${colors.glow}`
+            : `0 4px 15px rgba(0,0,0,0.4)`,
         }}
       >
-        <div className="absolute inset-0 bg-[#1b0c0a]">
-          {card.art ? (
-            <img
-              src={card.art}
-              alt={card.name}
-              className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-opacity duration-700"
-            />
-          ) : (
-            <div className="w-full h-full bg-[#B8A48D]/10" />
-          )}
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1510] via-[#151210] to-[#0d0b08]" />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2a0e0a]/92 via-transparent to-transparent pointer-events-none" />
+        {card.art ? (
+          <img
+            src={card.art}
+            alt={card.name}
+            className="absolute inset-0 w-full h-full object-cover opacity-80"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : null}
 
-        {/* 费用印章 */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+        <img
+          src={frameAsset}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill opacity-95"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+
         <div
-          className="absolute top-2 left-2 z-30 w-8 h-8 rounded-lg flex items-center justify-center text-[15px] font-black shadow-xl rotate-[-5deg]"
+          className="absolute top-1.5 left-1.5 z-30 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold backdrop-blur-sm"
           style={{
-            backgroundColor: '#f8e6be',
-            color: '#1b0c0a',
-            border: `2px solid ${colors.border}`,
+            backgroundColor: colors.bg,
+            color: colors.border,
+            border: `1.5px solid ${colors.border}`,
+            textShadow: '0 1px 2px rgba(0,0,0,0.8)',
           }}
         >
           {card.cost}
         </div>
 
-        {/* 类型标签 */}
         <div
-          className="absolute top-2 right-2 z-30 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter opacity-90 shadow-sm"
+          className="absolute top-1.5 right-1.5 z-30 px-2 py-0.5 rounded text-[10px] font-medium backdrop-blur-sm"
           style={{
-            backgroundColor: isSelected ? colors.border : colors.bg,
-            color: isSelected ? '#f8e6be' : colors.border,
+            backgroundColor: colors.bg,
+            color: colors.border,
+            border: `1px solid ${colors.border}40`,
           }}
         >
           {card.type}
         </div>
 
-        {/* 卡牌名称 */}
-        <div className="absolute bottom-2 left-0 right-0 z-30 p-2">
-          <span className="text-[11px] text-[#f8e6be] font-black block truncate text-center uppercase tracking-tight">
+        <div className="absolute bottom-0 left-0 right-0 z-30 p-2">
+          <span
+            className="text-xs text-white font-medium block truncate text-center drop-shadow-lg"
+            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+          >
             {card.name}
           </span>
         </div>
 
-        {/* 指标数值：砚台质感 */}
         {hasStats && (
-          <div className="absolute bottom-6 right-1.5 z-30 flex flex-col gap-1">
-            <div className="w-5 h-5 rounded-md bg-[#d29648] border border-[#f8e6be]/20 flex items-center justify-center shadow-lg transform rotate-2">
-              <span className="text-[10px] font-black text-[#f8e6be]">{card.power}</span>
+          <div className="absolute bottom-1 right-1 z-30 flex gap-0.5">
+            <div className="w-5 h-5 rounded bg-[#c9952a]/90 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-white">{card.power}</span>
             </div>
-            <div className="w-5 h-5 rounded-md bg-[#7d3d23] border border-[#f8e6be]/20 flex items-center justify-center shadow-lg transform -rotate-2">
-              <span className="text-[10px] font-black text-[#f8e6be]">{card.hp}</span>
+            <div className="w-5 h-5 rounded bg-[#5a8a5a]/90 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-white">{card.hp}</span>
             </div>
           </div>
         )}
+
+        {!isSelected && (
+          <div
+            className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg, transparent 40%, ${colors.glow} 100%)`,
+            }}
+          />
+        )}
       </div>
+
+      {isSelected && (
+        <div
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-14 h-1 rounded-full animate-pulse"
+          style={{ backgroundColor: colors.border }}
+        />
+      )}
     </button>
   );
 };
@@ -130,115 +164,89 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
   const isFinished = phase === 'finished';
   const canAct = phase === 'ming_bian' || phase === 'an_mou';
 
+  const getHintText = (): string => {
+    if (isFinished) return '战斗已结束';
+    if (!canAct) return '等待结算...';
+    if (!selectedCardId) return '请选择一张手牌';
+
+    const card = player.hand.find(c => c.id === selectedCardId);
+    if (!card) return '请选择一张手牌';
+
+    return `已选择: ${card.name}`;
+  };
+
+  const getActionHint = (): string => {
+    if (!canAct) return '';
+    const hints: string[] = [];
+    if (!player.plan.lockedPublic) hints.push('可出明论');
+    if (!player.plan.lockedSecret) hints.push('可出暗策');
+    return hints.join(' / ');
+  };
+
+  const selectedCard = selectedCardId ? player.hand.find(c => c.id === selectedCardId) : null;
+
   return (
-    <div className="h-52 bg-[#2a0e0a] border-t-8 border-[#7d3d23] shadow-[0_-30px_60px_rgba(41,10,8,0.55)] flex shrink-0 relative z-20 overflow-hidden">
-      {/* 装饰层：乌金木案纹理 */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/dark-wood.png')]" />
-      </div>
-
-      {/* 资源显示区：玉瓶与虎符 */}
-      <div className="w-56 xl:w-72 px-8 flex flex-col justify-center gap-6 border-r-2 border-[#d29648]/15 relative z-10 bg-[#2a0e0a]/35">
-        <div className="flex items-center gap-6 transition-all">
-           {/* 灵气玉瓶 */}
-           <div className="relative w-16 h-16 group">
-              <div 
-                className="absolute inset-0 grayscale group-hover:grayscale-0 transition-all opacity-80"
-                style={{ 
-                  backgroundImage: `url('${UI_ASSET_PATH}')`,
-                  backgroundSize: '200% 200%',
-                  backgroundPosition: '0% 0%'
-                }}
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                 <span className="text-[8px] font-black text-[#d1b185]/60 uppercase tracking-widest leading-none">Qi</span>
-                 <span className="text-xl font-black text-[#f8e6be] tracking-widest mt-1 italic">{player.resources.lingShi}</span>
-              </div>
-           </div>
-           
-           {/* 大势虎符 */}
-           <div className="relative w-16 h-16 group">
-              <div 
-                className="absolute inset-0 grayscale group-hover:grayscale-0 transition-all opacity-80"
-                style={{ 
-                  backgroundImage: `url('${UI_ASSET_PATH}')`,
-                  backgroundSize: '200% 200%',
-                  backgroundPosition: '100% 0%'
-                }}
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                 <span className="text-[8px] font-black text-[#d1b185]/60 uppercase tracking-widest leading-none">Dyn</span>
-                 <span className="text-xl font-black text-[#f0c36e] tracking-widest mt-1 italic">{player.resources.daShi}</span>
-              </div>
-           </div>
-        </div>
-
-        <div className="h-px w-full bg-[#d29648]/10" />
-        
-        <div className="flex flex-col gap-1">
-           <span className="text-[10px] font-black text-[#d46b42] uppercase tracking-[0.3em]">Current Doctrine</span>
-           <span className="text-sm font-black text-[#f8e6be]/90 truncate serif italic">
-             {selectedCardId ? player.hand.find(c => c.id === selectedCardId)?.name : '择策而动...'}
-           </span>
-        </div>
-      </div>
-
-      {/* 操作按钮区：朱印与日晷 */}
-      <div className="w-48 xl:w-60 px-8 flex flex-col justify-center items-center gap-4 relative z-10">
-        {selectedCardId ? (
-          <div className="w-full space-y-4">
-             <button
-                onClick={onConfirm}
-                disabled={!canAct}
-                className="group relative w-full h-24 flex items-center justify-center overflow-hidden rounded-2xl transition-all active:scale-95 disabled:grayscale"
-             >
-                <div 
-                  className="absolute inset-0"
-                  style={{ 
-                    backgroundImage: `url('${UI_ASSET_PATH}')`,
-                    backgroundSize: '200% 200%',
-                    backgroundPosition: '0% 100%'
-                  }}
-                />
-                <span className="relative text-2xl font-black text-[#f8e6be] tracking-[1em] pl-[1em] hover:scale-110 transition-transform">布阵</span>
-             </button>
-             <button
-                onClick={onCancel}
-                className="w-full py-2 text-[10px] font-black text-[#f8e6be]/30 uppercase tracking-[0.5em] hover:text-[#f8e6be] transition-all underline underline-offset-8 decoration-[#d29648]/15 decoration-2"
-             >
-               撤回策论
-             </button>
+    <div className="h-[168px] md:h-44 bg-gradient-to-t from-[#0a0908] via-[#0d0b08] to-[#1a1510] border-t border-[#3d3225]/50 flex shrink-0">
+      <div className="w-44 xl:w-52 p-3 md:p-4 flex flex-col justify-center gap-2 border-r border-[#3d3225]/30">
+        <div className="text-sm text-[#c9b896] font-medium leading-relaxed">{getHintText()}</div>
+        {getActionHint() && (
+          <div className="text-xs text-[#8a7a6a]">{getActionHint()}</div>
+        )}
+        <div className="mt-2 pt-2 border-t border-[#3d3225]/30 flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#7ab8c9]/20 border border-[#7ab8c9]/50 flex items-center justify-center">
+              <span className="text-[8px] text-[#7ab8c9]">灵</span>
+            </div>
+            <span className="text-xs text-[#7ab8c9] font-medium">
+              {player.resources.lingShi}/{player.resources.maxLingShi}
+            </span>
           </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#c9952a]/20 border border-[#c9952a]/50 flex items-center justify-center">
+              <span className="text-[8px] text-[#c9952a]">势</span>
+            </div>
+            <span className="text-xs text-[#c9952a] font-medium">{player.resources.daShi}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-40 xl:w-44 p-3 md:p-4 flex flex-col justify-center gap-2 border-r border-[#3d3225]/30">
+        {selectedCardId ? (
+          <>
+            <button
+              onClick={onConfirm}
+              disabled={!canAct}
+              className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#5a8a5a] to-[#4a7a4a] text-white font-medium text-sm hover:from-[#6a9a6a] hover:to-[#5a8a5a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#5a8a5a]/20"
+            >
+              确认出牌
+            </button>
+            <button
+              onClick={onCancel}
+              className="w-full py-2 rounded-lg bg-[#2a2318] border border-[#5c4d3a] text-[#b8a88a] text-sm hover:bg-[#3d3225] hover:border-[#7a6a5a] transition-all"
+            >
+              取消选择
+            </button>
+            {selectedCard && (
+              <div className="text-xs text-[#8a7a6a] text-center mt-1">
+                {selectedCard.description || selectedCard.prologue || ''}
+              </div>
+            )}
+          </>
         ) : (
           <button
             onClick={onEndTurn}
             disabled={!canAct || isFinished}
-            className="group relative w-32 h-32 flex items-center justify-center rounded-full transition-all hover:rotate-90 active:scale-90 disabled:opacity-20"
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-[#c9952a] to-[#b88520] text-white font-medium hover:from-[#d9a53a] hover:to-[#c89530] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#c9952a]/20"
           >
-             <div 
-               className="absolute inset-0 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all duration-700"
-               style={{ 
-                 backgroundImage: `url('${UI_ASSET_PATH}')`,
-                 backgroundSize: '200% 200%',
-                 backgroundPosition: '100% 100%'
-               }}
-             />
-             <div className="relative flex flex-col items-center">
-                <span className="text-lg font-black text-[#f0c36e] tracking-[0.3em] uppercase">结</span>
-                <span className="text-[8px] font-black text-[#d1b185]/60 tracking-widest mt-1">THE END</span>
-             </div>
+            结束回合
           </button>
         )}
       </div>
 
-      {/* 手牌区：乌金木衬托下的华彩 */}
-      <div className="flex-1 px-12 py-6 overflow-x-auto overflow-y-visible scrollbar-hide relative z-10">
-        <div className="flex items-end justify-center h-full min-w-max mx-auto gap-3">
+      <div className="flex-1 px-2 py-3 md:px-4 md:py-4 overflow-x-auto overflow-y-visible">
+        <div className="flex items-end justify-center h-full min-w-max mx-auto gap-1 sm:gap-1.5">
           {player.hand.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 opacity-20">
-               <span className="text-4xl font-black italic serif text-[#f8e6be]">竭</span>
-               <span className="text-[10px] font-black text-[#d1b185]/60 uppercase tracking-[0.5em]">Inventory Depleted</span>
-            </div>
+            <div className="text-[#5c4d3a] text-sm">手牌已空</div>
           ) : (
             player.hand.map((card, index) => (
               <HandCard

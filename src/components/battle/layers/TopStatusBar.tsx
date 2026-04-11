@@ -1,6 +1,6 @@
 /**
  * 顶部状态栏组件
- * 稷下受业：司议云端 (V9 雅化版)
+ * 显示：回合、议题、进度、大势、费用、功能按钮入口
  */
 
 import React from 'react';
@@ -15,30 +15,13 @@ interface TopStatusBarProps {
   onMenu?: () => void;
 }
 
-const PHASE_CONFIG: Record<string, { label: string; color: string; bgColor: string; accent: string }> = {
-  ming_bian: { label: '明辩', color: '#f8e6be', bgColor: '#7d3d23', accent: '#f0c36e' },
-  an_mou: { label: '暗策', color: '#f8e6be', bgColor: '#7d3d23', accent: '#2a0e0a' },
-  reveal: { label: '揭示', color: '#2a0e0a', bgColor: '#f3d3a2', accent: '#d29648' },
-  resolve: { label: '结算', color: '#FFF7EB', bgColor: '#2a0e0a', accent: '#D29648' },
-  finished: { label: '结束', color: '#2a0e0a', bgColor: '#d1b18522', accent: '#d1b185' },
+const PHASE_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
+  ming_bian: { label: '明辩', color: '#7ab8c9', bgColor: 'rgba(122,184,201,0.15)' },
+  an_mou: { label: '暗策', color: '#9C88A8', bgColor: 'rgba(156,136,168,0.15)' },
+  reveal: { label: '揭示', color: '#C9A063', bgColor: 'rgba(201,160,99,0.15)' },
+  resolve: { label: '结算', color: '#c9952a', bgColor: 'rgba(201,149,42,0.15)' },
+  finished: { label: '结束', color: '#8a7a6a', bgColor: 'rgba(138,122,106,0.15)' },
 };
-
-const JadeButton: React.FC<{ icon: string; title: string; onClick: () => void }> = ({ icon, title, onClick }) => (
-  <button
-    onClick={onClick}
-    className="group relative w-12 h-14 flex flex-col items-center justify-center transition-all hover:-translate-y-1 active:scale-90"
-    title={title}
-  >
-    {/* 玉佩形状 */}
-    <div className="absolute inset-0 bg-gradient-to-b from-[#f6e6c3] to-[#d29648] rounded-t-lg rounded-b-2xl border-2 border-[#f8e6be]/25 shadow-[0_5px_15px_rgba(125,61,35,0.2)] group-hover:shadow-[0_8px_25px_rgba(210,150,72,0.35)]" />
-    {/* 挂绳点缀 */}
-    <div className="absolute -top-1 w-1.5 h-3 bg-[#7d3d23] rounded-full shadow-sm" />
-    <svg className="relative w-5 h-5 text-[#f0c36e] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-    </svg>
-    <span className="relative text-[7px] font-black text-[#f0c36e]/60 uppercase tracking-tighter mt-1">{title}</span>
-  </button>
-);
 
 export const TopStatusBar: React.FC<TopStatusBarProps> = ({
   state,
@@ -54,107 +37,137 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
   const isTimerWarning = secondsLeft <= 5 && !isFinished;
 
   return (
-    <div className="h-20 bg-[#1b0c0a] border-b-4 border-[#d29648] shadow-[0_10px_40px_rgba(0,0,0,0.1)] flex items-center px-10 justify-between shrink-0 relative z-30 overflow-hidden">
-      {/* 装饰层：流云背景 */}
-      <div className="absolute inset-0 pointer-events-none opacity-5">
-         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
-         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#f0c36e]/10 to-transparent" />
-         <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-[#7d3d23]/10 to-transparent" />
-      </div>
-
-      <div className="flex items-center gap-6 relative z-10">
+    <div className="h-14 bg-gradient-to-b from-[#1a1510] via-[#151210] to-[#0d0b08] border-b border-[#3d3225]/50 flex items-center px-4 justify-between shrink-0">
+      <div className="flex items-center gap-3">
         {onMenu && (
           <button
             onClick={onMenu}
-            className="w-12 h-12 rounded-2xl bg-[#f8e6be] border-2 border-[#d29648] flex items-center justify-center text-[#7d3d23] hover:bg-[#7d3d23] hover:text-[#f8e6be] hover:rounded-full transition-all shadow-xl active:scale-90"
+            className="w-9 h-9 rounded-lg bg-[#2a2318]/80 border border-[#5c4d3a]/50 flex items-center justify-center text-[#b8a88a] hover:bg-[#3d3225] hover:border-[#7a6a5a] hover:text-[#d4c4a8] transition-all"
+            title="菜单"
           >
-            <span className="text-xl font-bold">⠿</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
         )}
-        <div className="flex flex-col">
-           <span className="text-[10px] font-black text-[#f0c36e] uppercase tracking-[0.4em] leading-none">Jixia Academy</span>
-           <h1 className="text-sm font-black text-[#f8e6be] mt-1 tracking-tighter serif italic">稷下大争鸣</h1>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <div className="w-2 h-2 rounded-full bg-[#c9952a] animate-pulse" />
+          <span className="text-xs text-[#c9b896] font-medium">百家争鸣</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-12 relative z-10">
-        {/* 左侧资源组：大势与计时 */}
-        <div className="flex items-center gap-6">
-           <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#d1b185]/55">Momentum</span>
-              <div className="flex items-center gap-2 mt-0.5">
-                 <span className="text-xl font-black text-[#f0c36e] italic tabular-nums">{player.resources.daShi}</span>
-                 <div className="w-1 h-1 rounded-full bg-[#d29648]/40" />
-                 <span className="text-xl font-black text-[#7d3d23] italic tabular-nums">{enemy.resources.daShi}</span>
-              </div>
-           </div>
-
-           {/* 计时器：日晷意向 */}
-           {!isFinished && (
-             <div className={`relative w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-300 ${isTimerWarning ? 'bg-[#7d3d23] border-[#7d3d23] scale-110 shadow-lg' : 'bg-[#f8e6be] border-[#d29648]/10 shadow-inner'}`}>
-                <div className={`text-lg font-black tabular-nums font-mono ${isTimerWarning ? 'text-[#f8e6be]' : 'text-[#f8e6be]'}`}>
-                   {secondsLeft}s
-                </div>
-                {isTimerWarning && (
-                   <div className="absolute inset-0 rounded-full border-2 border-[#f8e6be] animate-ping opacity-20" />
-                )}
-             </div>
-           )}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <span className="text-[10px] text-[#8a7a6a] uppercase tracking-wider">回合</span>
+          <span className="text-xl font-bold text-[#d4c4a8] tabular-nums">{round}</span>
         </div>
 
-        {/* 核心枢纽：回合与阶段 (Bagua Mirror / Scroll) */}
-        <div className="flex items-center gap-2">
-           <div className="relative h-12 flex items-center group">
-              <div 
-                className="h-full px-10 flex items-center rounded-l-full rounded-r-3xl border-2 border-[#d29648]/14 shadow-2xl transition-all duration-700 overflow-hidden"
-                style={{ backgroundColor: phaseConfig.bgColor }}
-              >
-                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
-                 <span className="relative text-[9px] font-black uppercase tracking-[0.5em] mr-4 mix-blend-multiply opacity-40">Phase</span>
-                 <span className="relative text-xl font-black tracking-[0.5em] pl-[0.5em] serif" style={{ color: phaseConfig.color }}>
-                   {phaseConfig.label}
-                 </span>
-              </div>
-
-              {/* 回合数：视觉圆点 */}
-              <div className="absolute -left-6 w-16 h-16 rounded-full bg-[#7d3d23] border-4 border-[#f0c36e] shadow-2xl flex flex-col items-center justify-center transform group-hover:rotate-12 transition-transform">
-                 <span className="text-[7px] font-black text-[#d1b185]/60 uppercase tracking-widest leading-none">Rnd</span>
-                 <span className="text-2xl font-black text-[#f8e6be] italic leading-none mt-1">{round}</span>
-              </div>
-           </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <span className="text-[10px] text-[#8a7a6a] uppercase tracking-wider">议题</span>
+          <span className="text-sm font-medium text-[#c9b896] max-w-24 truncate">{activeTopic || '待定'}</span>
         </div>
 
-        {/* 议题显示：浮动标签 */}
-        <div className="flex flex-col items-start min-w-32 border-l-2 border-[#d29648]/18 pl-6">
-           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#d1b185]/55">Current Doctrine</span>
-           <div className="flex items-center gap-2 mt-1 py-1 px-3 rounded-md bg-[#2a0e0a]/55 border border-[#d1b185]/20">
-              <span className="text-xs font-bold text-[#f8e6be] italic">{activeTopic || '明辨待定'}</span>
-           </div>
+        <div
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300"
+          style={{
+            backgroundColor: phaseConfig.bgColor,
+            borderColor: `${phaseConfig.color}40`,
+          }}
+        >
+          <span className="text-[10px] text-[#8a7a6a] uppercase tracking-wider">阶段</span>
+          <span
+            className="text-sm font-bold"
+            style={{ color: phaseConfig.color }}
+          >
+            {phaseConfig.label}
+          </span>
+        </div>
+
+        {!isFinished && (
+          <div
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              isTimerWarning
+                ? 'bg-red-500/10 border-red-500/30 animate-pulse'
+                : 'bg-[#1f1a12]/50 border-[#3d3225]/30'
+            }`}
+          >
+            <svg
+              className={`w-4 h-4 ${isTimerWarning ? 'text-red-400' : 'text-[#8a7a6a]'}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span
+              className={`text-sm font-mono font-bold tabular-nums ${
+                isTimerWarning ? 'text-red-400' : 'text-[#b8a88a]'
+              }`}
+            >
+              {secondsLeft}s
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 px-4 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <span className="text-[10px] text-[#8a7a6a] uppercase tracking-wider">大势</span>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold text-[#5a8a5a] tabular-nums">{player.resources.daShi}</span>
+            <div className="w-px h-4 bg-[#3d3225]" />
+            <span className="text-base font-bold text-[#c9725a] tabular-nums">{enemy.resources.daShi}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <div className="w-4 h-4 rounded-full bg-[#7ab8c9]/20 border border-[#7ab8c9]/50 flex items-center justify-center">
+            <span className="text-[8px] text-[#7ab8c9] font-bold">灵</span>
+          </div>
+          <span className="text-sm font-medium text-[#7ab8c9] tabular-nums">
+            {player.resources.lingShi}/{player.resources.maxLingShi}
+          </span>
         </div>
       </div>
 
-      {/* 功能入口组：玉牌按钮 */}
-      <div className="flex items-center gap-3 relative z-10">
-        <JadeButton 
-          title="图鉴" 
-          icon="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" 
-          onClick={onOpenCardLibrary} 
-        />
-        <JadeButton 
-          title="状态" 
-          icon="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
-          onClick={onOpenStatus} 
-        />
-        <JadeButton 
-          title="座次" 
-          icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
-          onClick={onOpenPlayerInfo} 
-        />
-        <JadeButton 
-          title="信笺" 
-          icon="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" 
-          onClick={onOpenChat} 
-        />
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={onOpenCardLibrary}
+          className="group w-9 h-9 rounded-lg bg-[#2a2318]/80 border border-[#5c4d3a]/50 flex items-center justify-center text-[#b8a88a] hover:bg-[#3d3225] hover:border-[#9EAD8A]/50 hover:text-[#9EAD8A] transition-all"
+          title="图鉴"
+        >
+          <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </button>
+
+        <button
+          onClick={onOpenStatus}
+          className="group w-9 h-9 rounded-lg bg-[#2a2318]/80 border border-[#5c4d3a]/50 flex items-center justify-center text-[#b8a88a] hover:bg-[#3d3225] hover:border-[#C9A063]/50 hover:text-[#C9A063] transition-all"
+          title="状态"
+        >
+          <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        <button
+          onClick={onOpenPlayerInfo}
+          className="group w-9 h-9 rounded-lg bg-[#2a2318]/80 border border-[#5c4d3a]/50 flex items-center justify-center text-[#b8a88a] hover:bg-[#3d3225] hover:border-[#9C88A8]/50 hover:text-[#9C88A8] transition-all"
+          title="玩家"
+        >
+          <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </button>
+
+        <button
+          onClick={onOpenChat}
+          className="group w-9 h-9 rounded-lg bg-[#2a2318]/80 border border-[#5c4d3a]/50 flex items-center justify-center text-[#b8a88a] hover:bg-[#3d3225] hover:border-[#7ab8c9]/50 hover:text-[#7ab8c9] transition-all"
+          title="消息"
+        >
+          <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
       </div>
     </div>
   );
