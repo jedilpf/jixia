@@ -15,10 +15,10 @@ interface CommunityPostListProps {
 }
 
 const SORT_OPTIONS: { value: CommunitySortMode; label: string }[] = [
-  { value: 'latest', label: '最新' },
-  { value: 'hot', label: '最热' },
+  { value: 'latest', label: '新撰' },
+  { value: 'hot', label: '热议' },
   { value: 'featured', label: '精华' },
-  { value: 'most_favorited', label: '收藏最多' },
+  { value: 'most_favorited', label: '珍藏' },
 ];
 
 export function CommunityPostList({
@@ -38,78 +38,66 @@ export function CommunityPostList({
   };
 
   if (posts.length === 0) {
-    return <CommunityEmptyState icon="🗂" title="暂无帖子" message="这里还很安静，稍后再来看看，或者成为第一个发言的人。" />;
+    return <CommunityEmptyState icon="卷" title="尚无篇章" message="此处静待文人，稍后再来，或提笔开篇。" />;
   }
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {/* 筛选栏 - 竹简风格 */}
       <div
-        className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3"
+        className="mb-3 flex flex-wrap items-center justify-between gap-3 px-3 py-2"
         onWheel={(e) => {
           e.preventDefault();
           forwardWheelToList(e.deltaY);
         }}
         style={{
-          background: 'rgba(37, 13, 14, 0.72)',
-          borderColor: 'rgba(214, 151, 73, 0.12)',
+          background: 'rgba(28, 12, 10, 0.6)',
+          borderBottom: '1px solid rgba(139, 90, 43, 0.2)',
         }}
       >
-        <div className="flex flex-col">
-          <span className="text-sm tracking-wide text-[#f5e6b8]">共 {posts.length} 篇内容</span>
-          <span className="text-xs text-[#b89372]">按当前筛选与排序显示社区内容</span>
+        <div className="flex items-center gap-2 font-serif">
+          <span className="text-sm text-[#d4a520]">{posts.length}</span>
+          <span className="text-xs text-[#b89372]">篇</span>
         </div>
 
-        <div
-          className="flex flex-col items-start gap-2 rounded-2xl border px-3 py-2"
-          style={{
-            background: 'linear-gradient(180deg, rgba(57, 20, 19, 0.88), rgba(28, 10, 11, 0.9))',
-            borderColor: 'rgba(214, 151, 73, 0.16)',
-            boxShadow: 'inset 0 1px 0 rgba(255, 221, 164, 0.05)',
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] uppercase tracking-[0.22em] text-[#b89372]">排序</span>
-            <span className="rounded-full px-2 py-0.5 text-[10px] text-[#d8bb72]" style={{ background: 'rgba(214, 151, 73, 0.1)' }}>
-              当前: {SORT_OPTIONS.find((option) => option.value === sortMode)?.label}
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-serif text-[#8b5a2b]">按</span>
+          {SORT_OPTIONS.map((option) => {
+            const isActive = option.value === sortMode;
 
-          <div className="flex flex-wrap gap-2">
-            {SORT_OPTIONS.map((option) => {
-              const isActive = option.value === sortMode;
-
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => onSortChange(option.value)}
-                  onWheel={(e) => {
-                    e.preventDefault();
-                    forwardWheelToList(e.deltaY);
-                  }}
-                  className="rounded-full px-3 py-1.5 text-xs transition-all"
-                  style={{
-                    background: isActive
-                      ? 'linear-gradient(180deg, rgba(176, 83, 39, 0.4), rgba(214, 151, 73, 0.16))'
-                      : 'rgba(34, 12, 13, 0.76)',
-                    border: `1px solid ${isActive ? 'rgba(214, 151, 73, 0.38)' : 'rgba(214, 151, 73, 0.14)'}`,
-                    color: isActive ? '#f5e6b8' : '#d9c3a0',
-                    boxShadow: isActive ? '0 6px 18px rgba(176, 83, 39, 0.18)' : 'none',
-                  }}
-                >
-                  {isActive ? '◆ ' : ''}
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onSortChange(option.value)}
+                onWheel={(e) => {
+                  e.preventDefault();
+                  forwardWheelToList(e.deltaY);
+                }}
+                className="px-2 py-1 text-xs font-serif transition-all"
+                style={{
+                  background: isActive
+                    ? 'rgba(139, 90, 43, 0.25)'
+                    : 'rgba(20, 8, 6, 0.5)',
+                  border: isActive
+                    ? '1px solid rgba(212, 165, 32, 0.4)'
+                    : '1px solid rgba(139, 90, 43, 0.15)',
+                  color: isActive ? '#d4a520' : '#b89372',
+                  borderRadius: '2px',
+                }}
+              >
+                {option.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
+      {/* 帖子列表 */}
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="flex-1 min-h-0 space-y-4 overflow-y-auto pr-1 outline-none"
+        className="flex-1 min-h-0 space-y-3 overflow-y-auto pr-1 outline-none"
         style={{ overscrollBehavior: 'contain' }}
       >
         {posts.map((post) => (

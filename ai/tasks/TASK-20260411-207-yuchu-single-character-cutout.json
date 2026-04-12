@@ -1,0 +1,25 @@
+{
+  "task_id": "TASK-20260411-207",
+  "goal": "Refine the Yuchu character stand asset so the encyclopedia shows a clean single-character cutout with the background removed, while preserving the character's white clothing/details.",
+  "constraints": [
+    "Do not change any code or UI components.",
+    "Only edit the Yuchu stand asset and the task file.",
+    "Preserve character body, face, clothing, props, and intentional white highlights on the character.",
+    "Remove only background remnants so the result reads as a single transparent-background figure."
+  ],
+  "deliverables": [
+    "public/assets/chars/stand/yuchu.png is cleaned into a single-character transparent cutout.",
+    "No unrelated character assets are modified.",
+    "Task flow validation/finalization passes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "public/assets/chars/stand/yuchu.png"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-207-yuchu-single-character-cutout.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-207-yuchu-single-character-cutout.json"
+  ],
+  "status": "in_progress"
+}

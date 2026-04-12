@@ -234,19 +234,19 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     }}
                 />
                 {/* 左侧导航遮罩 */}
-                <div className="absolute inset-y-0 left-0 w-[32%] bg-[#1a0a0a]/70" />
+                <div className="absolute inset-y-0 left-0 w-[28%] bg-[#1a0a0a]/70" />
             </div>
 
             {/* ── 左侧：百家名录 ── */}
-            <div className="relative z-20 w-[30%] h-full bg-gradient-to-r from-black/80 via-black/60 to-transparent flex flex-col border-r border-[#d4a520]/20 shadow-[4px_0_24px_rgba(0,0,0,0.6)]">
+            <div className="relative z-20 w-[28%] h-full bg-gradient-to-r from-black/80 via-black/60 to-transparent flex flex-col border-r border-[#d4a520]/20 shadow-[4px_0_24px_rgba(0,0,0,0.6)]">
                 {/* 顶部标题区修饰 */}
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#1a1107]/90 to-transparent pointer-events-none" />
 
-                <div className="pt-24 pb-6 px-8 flex-shrink-0 relative z-10">
+                <div className="pt-16 pb-4 px-6 flex-shrink-0 relative z-10">
                     <div className="flex justify-between items-end mb-6 relative">
                         {/* 标题前缀小印章装饰 */}
                         <div className="absolute -left-4 top-2 w-2 h-8 bg-[#8b2e2e] opacity-80" />
-                        <h2 className="text-[#f5e6b8] text-4xl font-serif tracking-[0.2em] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">诸子百家</h2>
+                        <h2 className="text-[#f5e6b8] text-3xl font-serif tracking-[0.2em] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">诸子百家</h2>
                         <button
                             onClick={() => { uiAudio.playClick(); setSchoolsExpanded(!schoolsExpanded); }}
                             onMouseEnter={() => uiAudio.playHover()}
@@ -261,7 +261,17 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                             return (
                                 <button
                                     key={school}
-                                    onClick={() => { uiAudio.playClick(); setActiveSchool(school); }}
+                                    onClick={() => {
+                                        uiAudio.playClick();
+                                        setActiveSchool(school);
+                                        // 自动切换到该门派的第一个人物
+                                        if (school !== '全部') {
+                                            const firstChar = CHARACTERS.find(c => c.school === school);
+                                            if (firstChar) {
+                                                handleCharSelect(firstChar.id);
+                                            }
+                                        }
+                                    }}
                                     onMouseEnter={() => uiAudio.playHover()}
                                     className={`relative px-4 py-2 text-sm font-serif tracking-widest transition-all duration-300 overflow-hidden group ${isSelected
                                         ? 'text-[#1a1107] font-bold shadow-[0_2px_10px_rgba(212,165,32,0.4)]'
@@ -300,7 +310,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     }} />
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 pb-12 pt-4 custom-scrollbar relative z-10 w-full">
+                <div className="flex-1 overflow-y-auto px-4 pb-8 pt-3 custom-scrollbar relative z-10 w-full">
                     <div className="flex flex-col gap-4 relative">
                         {filteredChars.map(char => {
                             const isActive = char.id === selectedCharId;
@@ -333,7 +343,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                                         }`} />
 
                                     {/* 头像圆圈（玉佩/铜镜感） */}
-                                    <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-2xl mr-4 flex-shrink-0 transition-all duration-500 z-10 ${isActive
+                                    <div className={`relative w-12 h-12 rounded-full flex items-center justify-center text-xl mr-3 flex-shrink-0 transition-all duration-500 z-10 ${isActive
                                         ? 'bg-[#1a1107] border border-[#d4a520] shadow-[0_0_15px_rgba(212,165,32,0.4)]'
                                         : 'bg-black/60 border border-[#d4a520]/20 group-hover:border-[#d4a520]/50'
                                         }`}>
@@ -343,7 +353,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                                     </div>
 
                                     <div className="relative z-10 flex-1">
-                                        <div className={`text-2xl font-serif tracking-[0.15em] mb-1 transition-colors duration-300 ${isActive ? 'text-[#f5e6b8] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#d4a520]/80 group-hover:text-[#f5e6b8]'
+                                        <div className={`text-xl font-serif tracking-[0.15em] mb-1 transition-colors duration-300 ${isActive ? 'text-[#f5e6b8] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#d4a520]/80 group-hover:text-[#f5e6b8]'
                                             }`}>
                                             {char.name}
                                         </div>
@@ -373,9 +383,9 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
             </div>
 
             {/* ── 右侧：展示区 ── */}
-            <div className="relative z-10 flex-1 h-full flex items-center">
+            <div className="relative z-10 flex-1 h-full flex items-center pl-4">
                 {/* 立绘展示框 */}
-                <div className="relative ml-12 flex-shrink-0 flex flex-col items-center" style={{ width: 380 }}>
+                <div className="relative ml-8 flex-shrink-0 flex flex-col items-center" style={{ width: 320 }}>
                     {/* 外层机械边框 */}
                     <div className="relative w-full">
                         {/* 四角装饰 */}
@@ -386,13 +396,19 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                         <div className="absolute -inset-1 border border-[rgba(212,165,32,0.3)] pointer-events-none z-20" />
 
                         {/* 立绘图片 - 固定尺寸容器 */}
-                        <div className="w-full overflow-hidden relative group" style={{ height: 520 }}>
+                        <div className="w-full overflow-hidden relative group" style={{ height: 420 }}>
                             {standImgSrc && !standError ? (
                                 <img
                                     key={`stand-${selectedChar.id}`}
                                     src={standImgSrc}
                                     alt={selectedChar.name}
-                                    className="w-full h-full object-contain object-bottom transition-all duration-700 group-hover:scale-105 block"
+                                    className={`w-full h-full object-contain object-bottom transition-all duration-700 block ${
+                                        ['luban', 'gande', 'bianque', 'yuchu', 'qibo', 'jingfang'].includes(selectedChar.id)
+                                            ? 'origin-bottom scale-[1.35] group-hover:scale-[1.42]'
+                                            : selectedChar.id === 'zouyan'
+                                            ? 'origin-bottom scale-[1.15] group-hover:scale-[1.22]'
+                                            : 'group-hover:scale-105'
+                                    }`}
                                     onError={() => setStandError(true)}
                                 />
                             ) : (
@@ -415,10 +431,10 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                 </div>
 
                 {/* 档案文字区 */}
-                <div className="flex-1 px-12 py-8 flex flex-col justify-center max-w-lg">
+                <div className="flex-1 px-8 py-6 flex flex-col justify-center max-w-md">
                     {/* 姓名与标题 */}
-                    <div className="mb-8 border-b border-[rgba(212,165,32,0.25)] pb-6 relative">
-                        <h1 className="text-[90px] leading-none font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f5e6b8] to-[#d4a520] tracking-widest drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+                    <div className="mb-6 border-b border-[rgba(212,165,32,0.25)] pb-4 relative">
+                        <h1 className="text-[56px] leading-none font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f5e6b8] to-[#d4a520] tracking-widest drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                             {selectedChar.name}
                         </h1>
                         <div className="mt-2 text-sm text-[rgba(167,197,186,0.6)] font-serif tracking-[0.3em]">
@@ -430,7 +446,7 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     {/* 引言 */}
                     <div className="relative mb-8">
                         <div className="absolute -left-8 -top-8 text-[120px] leading-none text-[#d4a520]/10 font-serif select-none pointer-events-none">"</div>
-                        <p className="text-[#f5e6b8] text-2xl font-serif italic tracking-widest leading-relaxed relative z-10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+                        <p className="text-[#f5e6b8] text-xl font-serif italic tracking-widest leading-relaxed relative z-10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
                             {selectedChar.quote}
                         </p>
                     </div>

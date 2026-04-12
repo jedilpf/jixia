@@ -84,44 +84,26 @@ export function CommunityModal({ isOpen, onClose }: CommunityModalProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                uiAudio.playClick();
-                openComposer('create');
-              }}
-              className="rounded-xl px-4 py-2 text-sm transition-all duration-200"
-              style={{
-                background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
-                border: '1px solid rgba(214, 151, 73, 0.34)',
-                color: '#f5e6b8',
-                boxShadow: '0 10px 24px rgba(122,42,28,0.22)',
-              }}
-              onMouseEnter={() => uiAudio.playHover()}
-            >
-              发帖
-            </button>
-            <button
-              onClick={handleClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-xl transition-colors"
-              style={{
-                background: 'rgba(35, 10, 11, 0.34)',
-                border: '1px solid rgba(214, 151, 73, 0.18)',
-                color: '#d9c3a0',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(176, 83, 39, 0.28)';
-                e.currentTarget.style.color = '#f5e6b8';
-                uiAudio.playHover();
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(35, 10, 11, 0.34)';
-                e.currentTarget.style.color = '#d9c3a0';
-              }}
-            >
-              ×
-            </button>
-          </div>
+          <button
+            onClick={handleClose}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-xl transition-colors"
+            style={{
+              background: 'rgba(35, 10, 11, 0.34)',
+              border: '1px solid rgba(214, 151, 73, 0.18)',
+              color: '#d9c3a0',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(176, 83, 39, 0.28)';
+              e.currentTarget.style.color = '#f5e6b8';
+              uiAudio.playHover();
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(35, 10, 11, 0.34)';
+              e.currentTarget.style.color = '#d9c3a0';
+            }}
+          >
+            ×
+          </button>
         </div>
 
         <div className="relative flex-1 overflow-hidden p-4 md:p-6">

@@ -366,8 +366,19 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
     );
   }
 
+  const getBackgroundStyle = (chap: number) => {
+    // Determine image path based on chapter
+    const validChaps = [0, 1, 2, 3, 4, 5, 99];
+    const targetChap = validChaps.includes(chap) ? chap : 0;
+    return {
+      background: `linear-gradient(rgba(42, 14, 10, 0.75), rgba(18, 6, 4, 0.95)), url('assets/story/chapter_${targetChap}_bg.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  };
+
   return (
-    <div style={STORY_STYLES.container}>
+    <div style={{ ...STORY_STYLES.container, ...getBackgroundStyle(chapter) }}>
       <style>{`
         @keyframes pulse {
           0%, 100% { opacity: 0.6; }

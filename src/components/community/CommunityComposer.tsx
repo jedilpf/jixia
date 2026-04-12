@@ -239,10 +239,7 @@ export function CommunityComposer({
             </div>
           </div>
 
-          <div className="rounded-full px-3 py-1 text-xs" style={{ background: 'rgba(212,165,32,0.08)', color: '#d8bb72' }}>
-            图片资源保持现状
           </div>
-        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto pr-1" style={{ overscrollBehavior: 'contain' }}>

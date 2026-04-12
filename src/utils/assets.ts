@@ -137,9 +137,9 @@ const CARD_IMAGE_EXT_OVERRIDES: Record<string, 'png' | 'jpg'> = {
   'yangzhen7': 'png',
   'yangzhen8': 'png',
   'yangzhen9': 'png',
-  'youce10': 'png',
+  'youce10': 'jpg',
   'youce6': 'png',
-  'youce7': 'png',
+  'youce7': 'jpg',
   'youce8': 'png',
   'youce9': 'png',
 };

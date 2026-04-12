@@ -202,83 +202,132 @@ export function CommunityHome() {
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-      <Surface className="p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-[#c89b72]">
-              <span>community board</span>
-              <span className="h-px w-10 bg-[rgba(212,165,32,0.18)]" />
-            </div>
-            <h2 className="mb-2 font-serif text-2xl text-[#f5e6b8]">围绕稷下论场的讨论与沉淀</h2>
-            <p className="text-sm leading-7 text-[#d9c3a0]">
-              这里汇集论道、战报、问答与文苑内容。先浏览已有讨论，或者直接发布你的新帖。
-            </p>
+      {/* 卷轴标题区 + 印章装饰 */}
+      <div
+        className="relative flex items-center justify-between px-5 py-3"
+        style={{
+          background: 'linear-gradient(180deg, rgba(28, 12, 8, 0.92) 0%, rgba(18, 8, 6, 0.95) 100%)',
+          borderBottom: '2px solid rgba(139, 90, 43, 0.35)',
+          borderTop: '1px solid rgba(139, 90, 43, 0.25)',
+        }}
+      >
+        {/* 左侧卷轴装饰 */}
+        <div className="absolute left-0 top-0 bottom-0 w-3" style={{
+          background: 'linear-gradient(90deg, rgba(139, 90, 43, 0.4) 0%, transparent 100%)',
+        }} />
+
+        {/* 印章 */}
+        <div className="flex items-center gap-4">
+          <div
+            className="relative flex h-11 w-11 items-center justify-center rounded-sm"
+            style={{
+              background: 'linear-gradient(135deg, rgba(176, 83, 39, 0.28), rgba(139, 90, 43, 0.18))',
+              border: '2px solid rgba(212, 165, 32, 0.5)',
+              boxShadow: 'inset 0 0 8px rgba(139, 90, 43, 0.3)',
+              transform: 'rotate(-3deg)',
+            }}
+          >
+            <span className="font-serif text-lg text-[#d4a520]" style={{ writingMode: 'vertical-rl' }}>论</span>
+            {/* 印章四角装饰 */}
+            <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-[#d4a520]/60" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 border-t border-r border-[#d4a520]/60" />
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b border-l border-[#d4a520]/60" />
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-[#d4a520]/60" />
           </div>
 
-          <div className="grid min-w-[220px] grid-cols-2 gap-3">
-            <div
-              className="rounded-2xl px-4 py-3"
-              style={{ background: 'rgba(39, 14, 14, 0.72)', border: '1px solid rgba(214, 151, 73, 0.12)' }}
-            >
-              <div className="text-xs uppercase tracking-[0.16em] text-[#a87a5d]">posts</div>
-              <div className="mt-1 text-xl font-serif text-[#f5e6b8]">{visiblePosts.length}</div>
-            </div>
-            <div
-              className="rounded-2xl px-4 py-3"
-              style={{ background: 'rgba(39, 14, 14, 0.72)', border: '1px solid rgba(214, 151, 73, 0.12)' }}
-            >
-              <div className="text-xs uppercase tracking-[0.16em] text-[#a87a5d]">drafts</div>
-              <div className="mt-1 text-xl font-serif text-[#f5e6b8]">{runtime.drafts.length}</div>
-            </div>
+          <div className="flex flex-col">
+            <span className="text-xs tracking-[0.2em] text-[#a87a5d] font-serif">稷下论场</span>
+            <span className="font-serif text-lg text-[#f5e6b8] tracking-wider">百家争鸣 · 思辨之地</span>
           </div>
         </div>
-      </Surface>
 
-      <Surface className="p-4">
-        <div className="flex flex-col gap-4">
+        {/* 右侧统计 */}
+        <div className="flex items-center gap-3 text-xs font-serif">
+          <span className="text-[#b89372]">帖 <span className="text-[#d4a520]">{visiblePosts.length}</span></span>
+          <span className="text-[#8b5a2b]/50">|</span>
+          <span className="text-[#b89372]">稿 <span className="text-[#d4a520]">{runtime.drafts.length}</span></span>
+        </div>
+
+        {/* 右侧卷轴装饰 */}
+        <div className="absolute right-0 top-0 bottom-0 w-3" style={{
+          background: 'linear-gradient(270deg, rgba(139, 90, 43, 0.4) 0%, transparent 100%)',
+        }} />
+      </div>
+
+      {/* 竹简搜索栏 + 签牌按钮 */}
+      <div
+        className="relative mx-2 rounded-sm px-4 py-3"
+        style={{
+          background: 'linear-gradient(180deg, rgba(32, 14, 10, 0.88) 0%, rgba(20, 9, 7, 0.92) 100%)',
+          border: '1px solid rgba(139, 90, 43, 0.28)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15)',
+        }}
+      >
+        {/* 竹简纹理线 */}
+        <div className="absolute left-4 right-4 top-1/2 h-px opacity-30" style={{ background: 'linear-gradient(90deg, transparent, rgba(139, 90, 43, 0.6), transparent)' }} />
+
+        <div className="flex flex-col gap-3">
+          {/* 搜索行 */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex min-w-[220px] flex-1 items-center gap-2">
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
-                placeholder="搜索帖子..."
-                className="flex-1 rounded-2xl border px-4 py-3 text-sm outline-none"
+            {/* 竹简搜索框 */}
+            <div className="flex min-w-[200px] flex-1 items-center gap-2">
+              <div
+                className="relative flex flex-1 items-center"
                 style={{
-                  background: 'rgba(34, 12, 13, 0.8)',
-                  borderColor: 'rgba(214, 151, 73, 0.18)',
-                  color: '#f5e6b8',
-                }}
-              />
-              <button
-                onClick={handleSearch}
-                className="rounded-2xl px-4 py-3 text-sm"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.3), rgba(214, 151, 73, 0.12))',
-                  border: '1px solid rgba(214, 151, 73, 0.3)',
-                  color: '#f5e6b8',
+                  background: 'rgba(24, 10, 8, 0.7)',
+                  border: '1px solid rgba(139, 90, 43, 0.25)',
+                  borderRadius: '2px',
                 }}
               >
-                搜索
+                {/* 搜索图标（放大镜改为古风） */}
+                <span className="px-3 text-[#8b5a2b] font-serif">寻</span>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  placeholder="章句关键词..."
+                  className="flex-1 py-2 pr-3 text-sm outline-none"
+                  style={{
+                    background: 'transparent',
+                    color: '#f5e6b8',
+                  }}
+                />
+              </div>
+
+              <button
+                onClick={handleSearch}
+                className="px-4 py-2 text-sm font-serif"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(139, 90, 43, 0.25), rgba(100, 60, 30, 0.2))',
+                  border: '1px solid rgba(139, 90, 43, 0.35)',
+                  color: '#d4a520',
+                  borderRadius: '2px',
+                }}
+              >
+                查阅
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            {/* 签牌按钮组 */}
+            <div className="flex flex-wrap items-center gap-2">
               {runtime.drafts.length > 0 ? (
                 <button
                   onClick={() => actions.openDrafts()}
-                  className="relative rounded-xl px-3 py-2 text-sm"
+                  className="relative px-3 py-2 text-xs font-serif"
                   style={{
                     background: 'rgba(212, 165, 32, 0.08)',
                     border: '1px solid rgba(212, 165, 32, 0.22)',
                     color: '#e7c484',
+                    borderRadius: '2px',
+                    // 签牌悬挂感
+                    boxShadow: '0 2px 0 rgba(139, 90, 43, 0.3)',
                   }}
                 >
-                  草稿箱
+                  草稿
                   <span
-                    className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px]"
-                    style={{ background: '#d69849', color: '#2a130d' }}
+                    className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-serif"
+                    style={{ background: '#d69849', color: '#2a130d', borderRadius: '2px' }}
                   >
                     {runtime.drafts.length}
                   </span>
@@ -287,46 +336,56 @@ export function CommunityHome() {
 
               <button
                 onClick={() => actions.openMyPosts()}
-                className="rounded-xl px-3 py-2 text-sm"
+                className="px-3 py-2 text-xs font-serif"
                 style={{
-                  background: 'rgba(70, 21, 18, 0.26)',
-                  border: '1px solid rgba(214, 151, 73, 0.16)',
+                  background: 'rgba(70, 21, 18, 0.2)',
+                  border: '1px solid rgba(139, 90, 43, 0.2)',
                   color: '#d9c3a0',
+                  borderRadius: '2px',
+                  boxShadow: '0 2px 0 rgba(139, 90, 43, 0.25)',
                 }}
               >
-                我的帖子
+                我的
               </button>
 
               <button
                 onClick={() => actions.openFavorites()}
-                className="rounded-xl px-3 py-2 text-sm"
+                className="px-3 py-2 text-xs font-serif"
                 style={{
-                  background: 'rgba(70, 21, 18, 0.26)',
-                  border: '1px solid rgba(214, 151, 73, 0.16)',
+                  background: 'rgba(70, 21, 18, 0.2)',
+                  border: '1px solid rgba(139, 90, 43, 0.2)',
                   color: '#d9c3a0',
+                  borderRadius: '2px',
+                  boxShadow: '0 2px 0 rgba(139, 90, 43, 0.25)',
                 }}
               >
-                我的收藏
+                收藏
               </button>
 
+              {/* 发帖签牌 - 主操作 */}
               <button
                 onClick={() => actions.openComposer('create')}
-                className="rounded-xl px-4 py-2 text-sm font-serif"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-serif"
                 style={{
-                  background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
-                  border: '1px solid rgba(214, 151, 73, 0.34)',
+                  background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.35), rgba(139, 90, 43, 0.2))',
+                  border: '2px solid rgba(212, 165, 32, 0.45)',
                   color: '#f5e6b8',
+                  borderRadius: '2px',
+                  boxShadow: '0 3px 0 rgba(139, 90, 43, 0.4), 0 6px 12px rgba(122,42,28,0.25)',
                 }}
               >
-                发帖
+                <span className="text-[#d4a520]">墨</span>
+                <span>提笔</span>
               </button>
             </div>
           </div>
 
+          {/* 分类标签行 */}
           <CommunityCategoryTabs selected={ui.selectedCategory} onSelect={(cat) => actions.setCategory(cat)} />
         </div>
-      </Surface>
+      </div>
 
+      {/* 帖子列表区 */}
       <Surface className="flex-1 min-h-0 overflow-hidden p-4">
         <CommunityPostList
           posts={visiblePosts}

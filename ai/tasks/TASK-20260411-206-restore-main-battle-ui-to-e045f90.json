@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260411-206",
+  "goal": "Restore the already-started main battle screen UI to the older historical version e045f90 for visual comparison, without modifying unrelated screens, battle rules, card data files, or non-battle modules.",
+  "constraints": [
+    "Do not modify lobby, story mode, character encyclopedia, card codex outside the in-battle shell, community, pre-battle flow, topic selection flow outside BattleFrameV2, or faction selection screens.",
+    "Do not modify battleV2 gameplay logic, rules, or source card data files.",
+    "Limit actual code changes to the main in-battle shell file unless compatibility requires one of the already-allowed battle chrome files.",
+    "Preserve all unrelated current code so the user can compare this older shell and later move again if needed."
+  ],
+  "deliverables": [
+    "The main battle screen after faction selection is restored to the e045f90-era shell for comparison.",
+    "Only the battle-in-progress shell is changed; unrelated pages remain untouched.",
+    "Targeted verification passes after the restore."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260411-206-restore-main-battle-ui-to-e045f90.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260411-206-restore-main-battle-ui-to-e045f90.json",
+    "npx eslint --no-ignore src/components/BattleFrameV2.tsx src/components/battle/layers/TopStatusBar.tsx src/components/battle/layers/BottomControls.tsx src/components/battle/panels/CardLibraryPanel.tsx --ext .tsx"
+  ],
+  "status": "in_progress"
+}
