@@ -14,6 +14,18 @@ export default {
         'battle-border-light': 'rgba(184,136,84,0.45)',
         'battle-border-medium': 'rgba(184,136,84,0.5)',
         'battle-gold': '#b88a53',
+        // 稷下青铜机关城主题色
+        'jixia-bg': '#1a0f05',
+        'jixia-bronze': '#5c3a21',
+        'jixia-patina': '#4a5d4e',
+        'jixia-jade': '#4ade80',
+        'jixia-star': '#4dabff',
+        'jixia-orange': '#ff6600',
+        'jixia-red': '#8b0000',
+        'jixia-gold': '#d4a017',
+        'jixia-bamboo': '#e0d5c1',
+        'jixia-black': '#0a0503',
+        'jixia-ink': '#1c1c1c',
         theme: {
           primary: 'var(--color-primary)',
           'primary-light': 'var(--color-primary-light)',

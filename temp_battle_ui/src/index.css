@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+@theme {
+  --color-jixia-bg: #1a0f05;
+  --color-jixia-bronze: #5c3a21;
+  --color-jixia-patina: #4a5d4e;
+  --color-jixia-jade: #4ade80;
+  --color-jixia-star: #4dabff;
+  --color-jixia-orange: #ff6600;
+  --color-jixia-red: #8b0000;
+  --color-jixia-gold: #d4a017;
+  --color-jixia-bamboo: #e0d5c1;
+  --color-jixia-black: #0a0503;
+  --color-jixia-ink: #1c1c1c;
+
+  --animate-gear-rotate: gear-rotate 20s linear infinite;
+  --animate-spin-slow: gear-rotate 10s linear infinite;
+  --animate-ember-float: ember-float 4s ease-in-out infinite;
+
+  @keyframes gear-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes ember-float {
+    0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+    50% { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-jixia-bg text-jixia-bamboo overflow-hidden;
+    font-family: "Noto Serif SC", "Georgia", serif;
+  }
+}
+
+.bronze-border {
+  border: 2px solid var(--color-jixia-bronze);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 5px rgba(212, 160, 23, 0.2);
+  position: relative;
+}
+
+.bronze-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(212, 160, 23, 0.1);
+  pointer-events: none;
+}
+
+.bronze-gradient {
+  background: linear-gradient(135deg, #2c1a0c 0%, #5c3a21 50%, #8b4513 100%);
+}
+
+.furnace-glow {
+  box-shadow: 0 0 25px rgba(255, 102, 0, 0.3), inset 0 0 15px rgba(255, 102, 0, 0.15);
+}
+
+.patina-glow {
+  box-shadow: 0 0 20px rgba(74, 93, 78, 0.4);
+}
+
+.bamboo-slip {
+  background: linear-gradient(90deg, 
+    rgba(224, 213, 193, 0.9) 0%, 
+    rgba(210, 195, 170, 0.9) 50%, 
+    rgba(224, 213, 193, 0.9) 100%
+  );
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.taotie-pattern {
+  background-image: url("https://www.transparenttextures.com/patterns/az-subtle.png");
+  opacity: 0.15;
+}
+
+.royal-silk-button {
+  background: linear-gradient(90deg, #8b0000 0%, #b22222 50%, #8b0000 100%);
+  color: #d4a017;
+  border: 2px solid #d4a017;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212, 160, 23, 0.3);
+  position: relative;
+  overflow: hidden;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  padding: 8px 24px;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+}
+
+.royal-silk-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/silk.png");
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.royal-silk-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.royal-silk-button:hover::after {
+  left: 100%;
+}
+
+.fancy-cloud-border {
+  position: relative;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 0 30px rgba(212, 160, 23, 0.7);
+}
+
+.fancy-cloud-border::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border: 3px solid var(--color-jixia-gold);
+  mask-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 10 10 50 10 Q 90 10 90 50 Q 90 90 50 90 Q 10 90 10 50 Z' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.bottom-flame {
+  position: absolute;
+  bottom: 0;
+  width: 140px;
+  height: 120px;
+  /* Muted, more transparent colors for better blending */
+  background: radial-gradient(circle at bottom, rgba(139, 0, 0, 0.4), rgba(255, 69, 0, 0.3), rgba(255, 140, 0, 0.2), transparent 80%);
+  border-radius: 50% 50% 0 0;
+  filter: blur(25px);
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: soft-light;
+}
+
+/* No pseudo-elements needed for soft smoke */
+.bottom-flame::after, .bottom-flame::before {
+  display: none;
+}
+
+.mural-overlay {
+  background-image: url("https://picsum.photos/seed/ancient-china-debate-mural/1920/1080?grayscale&blur=1");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+  filter: sepia(0.5) contrast(1.1);
+}
+
+.gear-faded {
+  opacity: 0.05 !important;
+  filter: blur(2px);
+}
+
+.seal-style {
+  background-color: #8b0000;
+  color: #e0d5c1;
+  font-family: "Noto Serif SC", serif;
+  font-weight: bold;
+  padding: 4px 8px;
+  border: 2px solid #a52a2a;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.silk-texture {
+  background-image: url("https://www.transparenttextures.com/patterns/silk.png");
+  background-blend-mode: multiply;
+}
+
+.curtain-fold {
+  background: linear-gradient(90deg, 
+    rgba(0,0,0,0.4) 0%, 
+    transparent 15%, 
+    rgba(255,255,255,0.05) 25%, 
+    transparent 35%, 
+    rgba(0,0,0,0.3) 50%, 
+    transparent 65%, 
+    rgba(255,255,255,0.05) 75%, 
+    transparent 85%, 
+    rgba(0,0,0,0.4) 100%
+  );
+  background-size: 40px 100%;
+}
+
+.curtain-shadow {
+  box-shadow: inset -20px 0 30px rgba(0,0,0,0.8), inset 20px 0 30px rgba(0,0,0,0.8);
+}
+
+.gilded-edge {
+  border-image: linear-gradient(to bottom, #d4a017, #8b4513, #d4a017) 1;
+}
