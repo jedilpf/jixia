@@ -205,6 +205,27 @@ const FACTION_NAMES: Record<string, string> = {
   merchant: '商家',
 };
 
+const SPEAKER_TO_IMAGE: Record<string, string> = {
+  '登记官': '/assets/story/chars/registration_official.png',
+  '登记': '/assets/story/chars/registration_official.png',
+  '稷下宫主': '/assets/story/chars/school_master.png',
+  '祭酒': '/assets/story/chars/jijiu.png',
+  '墨家弟子': '/assets/story/chars/mohist_disciple.png',
+  '追兵首领': '/assets/story/chars/pursuer_leader.png',
+  '法家官员': '/assets/story/chars/legalist_official.png',
+  '祖父': '/assets/story/chars/grandfather.png',
+  '执笔史官': '/assets/story/chars/history_official.png',
+  '孟舆': '/assets/story/chars/meng_yu.png',
+  '苏秦': '/assets/story/chars/suqin.png',
+  '禽滑厘': '/assets/story/chars/qinhuali.png',
+  '慎到': '/assets/story/chars/shendao.png',
+  '庄周': '/assets/story/chars/zhuangzhou.png',
+  '无名老者': '/assets/story/chars/nameless_elder.png',
+  '藏书阁老者': '/assets/story/chars/nameless_elder.png',
+  '颜如玉': '/assets/story/chars/yanruyu.png',
+  '公输盘': '/assets/story/chars/gongshupan.png',
+};
+
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
 
 interface StorySettings {
@@ -583,25 +604,33 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
         {/* Dialogue Area */}
         {(currentNode?.type === 'dialogue' || currentNode?.type === 'choice') && (
           <div style={STORY_STYLES.dialogueArea}>
-            {/* Portrait Placeholder */}
-            <div
-              style={{
-                ...STORY_STYLES.portrait,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#f1c56a',
-                fontSize: '14px',
-              }}
-            >
-              {currentNode.speaker ? (
-                <span style={{ writingMode: 'vertical-rl' }}>
-                  {currentNode.speaker}
-                </span>
-              ) : (
-                '旁白'
-              )}
-            </div>
+            {/* Portrait Image/Placeholder */}
+            {currentNode.speaker && SPEAKER_TO_IMAGE[currentNode.speaker] ? (
+              <img 
+                src={SPEAKER_TO_IMAGE[currentNode.speaker]} 
+                alt={currentNode.speaker}
+                style={STORY_STYLES.portrait}
+              />
+            ) : (
+              <div
+                style={{
+                  ...STORY_STYLES.portrait,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#f1c56a',
+                  fontSize: '14px',
+                }}
+              >
+                {currentNode.speaker ? (
+                  <span style={{ writingMode: 'vertical-rl' }}>
+                    {currentNode.speaker}
+                  </span>
+                ) : (
+                  '旁白'
+                )}
+              </div>
+            )}
 
             {/* Dialogue Box */}
             <div style={STORY_STYLES.dialogueBox}>

@@ -50,8 +50,8 @@ export function ResultScreenV2({ state, progress, settlement, onRestart }: Resul
         <div className="h-2 w-full rounded-t-sm" style={{ background: `linear-gradient(90deg, transparent, #b88a53, transparent)` }} />
         
         <div className="relative border-x border-[#b88a5366] bg-[#fdfaf2] px-12 py-16 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          {/* 绢纸纹理叠加 */}
-          <div className="pointer-events-none absolute inset-0 opacity-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
+          {/* 绢纸纹理叠加 - 使用内联SVG避免外链依赖 */}
+          <div className="pointer-events-none absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.5\'/%3E%3C/svg%3E")' }} />
 
           {/* 胜负大印 */}
           <div className="absolute right-12 top-12 flex h-24 w-24 items-center justify-center transform rotate-12 opacity-85 hover:rotate-6 transition-transform">

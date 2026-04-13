@@ -1,4 +1,4 @@
-function buildSequentialImageExtMap(
+export function buildSequentialImageExtMap(
   prefix: string,
   start: number,
   end: number,

@@ -12,7 +12,7 @@ export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryT
       {/* 竹简片分隔装饰 */}
       <div className="h-6 w-px opacity-40" style={{ background: 'rgba(139, 90, 43, 0.5)' }} />
 
-      {COMMUNITY_CATEGORIES.map((cat, index) => {
+      {COMMUNITY_CATEGORIES.map((cat) => {
         const isActive = cat.id === selected;
         return (
           <button

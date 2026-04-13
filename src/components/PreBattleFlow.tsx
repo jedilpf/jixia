@@ -139,7 +139,8 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#2a0e0a] to-[#120604]">
       <div className="absolute inset-0 pointer-events-none opacity-[0.05] z-0">
-         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+         {/* 使用内联SVG生成纸张纹理，避免外链依赖 */}
+         <div className="w-full h-full" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.5\'/%3E%3C/svg%3E")' }} />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col px-6 py-10 md:px-12">

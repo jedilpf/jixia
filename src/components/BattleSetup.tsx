@@ -21,6 +21,7 @@ interface ArenaData {
   skill: string;
   color: string;
   border: string;
+  borderLight: string;
   bg: string;
   glow: string;
 }
@@ -35,6 +36,7 @@ const ARENAS: ArenaData[] = [
     skill: '技能：公议（一次）：第一张反诘费用 -1',
     color: 'text-jixia-gold',
     border: 'border-jixia-gold',
+    borderLight: 'border-jixia-gold/30',
     bg: 'bg-jixia-gold',
     glow: 'rgba(212, 160, 23, 0.5)'
   },
@@ -47,6 +49,7 @@ const ARENAS: ArenaData[] = [
     skill: '技能：焚势（一次）：指定一路本回合不能被护印完全吸收',
     color: 'text-jixia-orange',
     border: 'border-jixia-orange',
+    borderLight: 'border-jixia-orange/30',
     bg: 'bg-jixia-orange',
     glow: 'rgba(255, 102, 0, 0.5)'
   },
@@ -59,6 +62,7 @@ const ARENAS: ArenaData[] = [
     skill: '技能：校书（一次）：立即着书，再抽 1 弃 1',
     color: 'text-jixia-jade',
     border: 'border-jixia-jade',
+    borderLight: 'border-jixia-jade/30',
     bg: 'bg-jixia-jade',
     glow: 'rgba(74, 222, 128, 0.5)'
   },
@@ -71,10 +75,40 @@ const ARENAS: ArenaData[] = [
     skill: '技能：窥衡（一次）：查看对手本回合暗策并强化反诘',
     color: 'text-jixia-star',
     border: 'border-jixia-star',
+    borderLight: 'border-jixia-star/30',
     bg: 'bg-jixia-star',
     glow: 'rgba(77, 171, 255, 0.5)'
   }
 ];
+
+// 显式class映射，防止Tailwind裁剪
+const BORDER_COLOR_MAP: Record<ArenaId, string> = {
+  jixia: 'border-jixia-gold',
+  huode: 'border-jixia-orange',
+  cangshu: 'border-jixia-jade',
+  guanxing: 'border-jixia-star',
+};
+
+const BORDER_LIGHT_MAP: Record<ArenaId, string> = {
+  jixia: 'border-l-jixia-gold/30',
+  huode: 'border-l-jixia-orange/30',
+  cangshu: 'border-l-jixia-jade/30',
+  guanxing: 'border-l-jixia-star/30',
+};
+
+const TEXT_COLOR_MAP: Record<ArenaId, string> = {
+  jixia: 'text-jixia-gold',
+  huode: 'text-jixia-orange',
+  cangshu: 'text-jixia-jade',
+  guanxing: 'text-jixia-star',
+};
+
+const BG_COLOR_MAP: Record<ArenaId, string> = {
+  jixia: 'bg-jixia-gold',
+  huode: 'bg-jixia-orange',
+  cangshu: 'bg-jixia-jade',
+  guanxing: 'bg-jixia-star',
+};
 
 // 齿轮装饰组件
 const GearDecoration = ({ className, size = 100 }: { className?: string, size?: number }) => (
@@ -262,40 +296,43 @@ export function BattleSetup(props: BattleSetupProps) {
 
       {/* 论场选择网格 */}
       <div className="grid grid-cols-2 gap-6 flex-1 max-w-6xl mx-auto w-full relative z-10">
-        {ARENAS.map((arena) => (
-          <motion.div
-            key={arena.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => handleArenaSelect(arena.id)}
-            className={`relative p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
-              selectedArenaId === arena.id 
-              ? `fancy-cloud-border ${arena.border} bg-black/40` 
-              : 'border-jixia-bronze/20 bg-black/20 hover:border-jixia-bronze/40'
-            }`}
-            style={selectedArenaId === arena.id ? { boxShadow: `0 0 30px ${arena.glow}` } : {}}
-          >
-            <div className="absolute inset-0 bamboo-slip opacity-10 pointer-events-none" />
-            <div className="absolute -right-4 -top-4 taotie-pattern w-32 h-32 opacity-20 rotate-12" />
-            
-            <div className="relative z-10">
-              <h2 className={`text-2xl font-bold mb-4 font-serif ${arena.color}`}>{arena.name}</h2>
-              <p className="text-sm text-jixia-bamboo/80 mb-6 font-serif">{arena.description}</p>
+        {ARENAS.map((arena) => {
+          const isSelected = selectedArenaId === arena.id;
+          return (
+            <motion.div
+              key={arena.id}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleArenaSelect(arena.id)}
+              className={`relative p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+                isSelected 
+                ? `fancy-cloud-border ${BORDER_COLOR_MAP[arena.id]} bg-black/40` 
+                : 'border-jixia-bronze/20 bg-black/20 hover:border-jixia-bronze/40'
+              }`}
+              style={isSelected ? { boxShadow: `0 0 30px ${arena.glow}` } : {}}
+            >
+              <div className="absolute inset-0 bamboo-slip opacity-10 pointer-events-none" />
+              <div className="absolute -right-4 -top-4 taotie-pattern w-32 h-32 opacity-20 rotate-12" />
               
-              <div className="space-y-2 text-sm font-serif">
-                <p className={`opacity-70 border-l-2 ${arena.border}/30 pl-3`}>{arena.passive}</p>
-                <p className={`opacity-70 border-l-2 ${arena.border}/30 pl-3`}>{arena.bias}</p>
-                <p className={`opacity-70 border-l-2 ${arena.border}/30 pl-3`}>{arena.skill}</p>
+              <div className="relative z-10">
+                <h2 className={`text-2xl font-bold mb-4 font-serif ${TEXT_COLOR_MAP[arena.id]}`}>{arena.name}</h2>
+                <p className="text-sm text-jixia-bamboo/80 mb-6 font-serif">{arena.description}</p>
+                
+                <div className="space-y-2 text-sm font-serif">
+                  <p className={`opacity-70 border-l-2 pl-3 ${BORDER_LIGHT_MAP[arena.id]}`}>{arena.passive}</p>
+                  <p className={`opacity-70 border-l-2 pl-3 ${BORDER_LIGHT_MAP[arena.id]}`}>{arena.bias}</p>
+                  <p className={`opacity-70 border-l-2 pl-3 ${BORDER_LIGHT_MAP[arena.id]}`}>{arena.skill}</p>
+                </div>
               </div>
-            </div>
 
-            {selectedArenaId === arena.id && (
-              <div className={`absolute top-8 right-8 seal-style text-xs ${arena.bg} text-jixia-ink`}>
-                已选择
-              </div>
-            )}
-          </motion.div>
-        ))}
+              {isSelected && (
+                <div className={`absolute top-8 right-8 seal-style text-xs ${BG_COLOR_MAP[arena.id]} text-jixia-ink`}>
+                  已选择
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* 底部按钮 */}
@@ -304,10 +341,12 @@ export function BattleSetup(props: BattleSetupProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleStart}
-          className={`px-10 py-3 rounded-lg bronze-gradient ${selectedArena?.color} font-bold flex items-center gap-4 furnace-glow border-2 ${selectedArena?.border}/30`}
-          style={{ boxShadow: `0 0 25px ${selectedArena?.glow}` }}
+          className={`px-10 py-3 rounded-lg bronze-gradient font-bold flex items-center gap-4 furnace-glow border-2 ${
+            selectedArenaId ? BORDER_COLOR_MAP[selectedArenaId] : 'border-jixia-gold'
+          }`}
+          style={{ boxShadow: `0 0 25px ${selectedArena?.glow || 'rgba(212, 160, 23, 0.5)'}` }}
         >
-          <div className={`seal-style text-sm ${selectedArena?.bg} text-jixia-ink border-jixia-ink`}>启</div>
+          <div className={`seal-style text-sm ${selectedArenaId ? BG_COLOR_MAP[selectedArenaId] : 'bg-jixia-gold'} text-jixia-ink border-jixia-ink`}>启</div>
           <span className="tracking-widest font-serif">开始对局</span>
           <Play size={20} fill="currentColor" />
         </motion.button>

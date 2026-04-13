@@ -471,6 +471,9 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
         .animate-ember { animation: ember-rise linear infinite; }
         @keyframes forge-pulse { 0%,100% { opacity:0.15; transform: scale(1); } 50% { opacity: 0.35; transform: scale(1.08); } }
         @keyframes title-glow { 0%,100% { text-shadow: 0 0 20px rgba(184,134,11,0.6), 0 0 40px rgba(184,134,11,0.3); } 50% { text-shadow: 0 0 40px rgba(255,180,30,0.9), 0 0 80px rgba(255,140,0,0.5); } }
+        @keyframes title-brush { 0%,100% { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8)) drop-shadow(0 0 15px rgba(212,165,32,0.4)); } 50% { filter: drop-shadow(3px 6px 10px rgba(0,0,0,0.9)) drop-shadow(0 0 25px rgba(255,180,50,0.6)); } }
+        @keyframes ink-spread { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes seal-appear { 0% { opacity: 0; transform: rotate(-15deg) scale(0.5); } 100% { opacity: 1; transform: rotate(-8deg) scale(1); } }
         @keyframes border-glow { 0%,100% { box-shadow: 0 0 10px rgba(255,120,0,0.3); } 50% { box-shadow: 0 0 25px rgba(255,150,0,0.6); } }
         @keyframes particle-glow {
           0%, 100% { opacity: 0.4; transform: scale(1); }
@@ -599,13 +602,106 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
           <div style={{ color: 'rgba(74,124,111,0.8)', fontSize: '13px', letterSpacing: '8px', fontFamily: 'serif' }}>◆ 诸子百家 · 论道争锋 ◆</div>
         </div>
         <div className="mb-2 text-center relative">
-          <h1 style={{ fontSize: 'clamp(56px, 10vw, 96px)', fontWeight: 900, fontFamily: 'serif', background: 'linear-gradient(180deg, #f5e6b8 0%, #d4a520 40%, #8B5e00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'title-glow 2.5s ease-in-out infinite', letterSpacing: '16px', lineHeight: 1.1 }}>
-            思筹之录
+          {/* 印章装饰 */}
+          <div
+            className="absolute -right-8 top-0"
+            style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, rgba(176,83,39,0.85), rgba(139,90,43,0.7))',
+              border: '2px solid rgba(212,165,32,0.8)',
+              borderRadius: '4px',
+              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.4), 0 0 15px rgba(176,83,39,0.5)',
+              animation: 'seal-appear 1s ease-out 0.5s both',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: 'rotate(-8deg)',
+            }}
+          >
+            <span style={{ color: '#d4a520', fontSize: '20px', fontFamily: 'serif', fontWeight: 900, writingMode: 'vertical-rl' }}>筹</span>
+          </div>
+
+          {/* 墨迹底纹 */}
+          <div
+            className="absolute -left-4 -top-6"
+            style={{
+              width: '120px',
+              height: '80px',
+              background: 'radial-gradient(ellipse at 30% 40%, rgba(20,15,10,0.6) 0%, transparent 70%)',
+              animation: 'ink-spread 1.2s ease-out both',
+              filter: 'blur(1px)',
+            }}
+          />
+
+          {/* 主标题 - 图片优先，文字fallback */}
+          <h1 className="relative" style={{ animation: 'title-brush 3s ease-in-out infinite' }}>
+            {/* 标题图片 */}
+            <img
+              src={asset('assets/title-logo.png')}
+              alt="思筹之录"
+              style={{
+                width: 'clamp(320px, 60vw, 520px)',
+                height: 'auto',
+                display: 'block',
+                filter: 'drop-shadow(2px 4px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 20px rgba(212,165,32,0.4))',
+              }}
+              onError={(e) => {
+                // 图片加载失败时显示文字
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'block';
+              }}
+            />
+            {/* 文字fallback */}
+            <span
+              style={{
+                display: 'none',
+                fontSize: 'clamp(64px, 11vw, 108px)',
+                fontWeight: 900,
+                fontFamily: '"STKaiti", "KaiTi", "楷体", serif',
+                background: 'linear-gradient(175deg, #fef3c7 0%, #f5e6b8 15%, #d4a520 35%, #a07020 55%, #5d3a1a 80%, #2a1508 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: 'clamp(8px, 2vw, 20px)',
+                lineHeight: 1.05,
+                textIndent: '0.1em',
+                WebkitTextStroke: '1px rgba(139,90,43,0.3)',
+              }}
+            >
+              思筹之录
+            </span>
           </h1>
-          <div className="flex items-center justify-center gap-3 mt-2">
-            <div style={{ height: '1px', width: '60px', background: 'linear-gradient(90deg, transparent, rgba(212,165,32,0.6))' }} />
-            <div style={{ color: 'rgba(212,197,169,0.7)', fontSize: '13px', letterSpacing: '4px' }}>ASKING THE TAO</div>
-            <div style={{ height: '1px', width: '60px', background: 'linear-gradient(90deg, rgba(212,165,32,0.6), transparent)' }} />
+
+          {/* 笔锋装饰线 */}
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <div
+              style={{
+                height: '2px',
+                width: '80px',
+                background: 'linear-gradient(90deg, transparent, rgba(212,165,32,0.8), rgba(176,83,39,0.6))',
+                boxShadow: '0 1px 3px rgba(212,165,32,0.3)',
+              }}
+            />
+            <div
+              style={{
+                color: 'rgba(212,197,169,0.75)',
+                fontSize: '12px',
+                letterSpacing: '6px',
+                fontFamily: 'serif',
+                fontWeight: 500,
+              }}
+            >
+              ASKING THE TAO
+            </div>
+            <div
+              style={{
+                height: '2px',
+                width: '80px',
+                background: 'linear-gradient(90deg, rgba(176,83,39,0.6), rgba(212,165,32,0.8), transparent)',
+                boxShadow: '0 1px 3px rgba(212,165,32,0.3)',
+              }}
+            />
           </div>
         </div>
         <div className="mb-12" style={{ color: 'rgba(212,197,169,0.55)', fontSize: '18px', letterSpacing: '3px', fontFamily: 'serif' }}>包罗万象，百家永生。</div>

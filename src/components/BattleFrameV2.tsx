@@ -16,7 +16,7 @@
  *   - 消息/表情浮层
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
 import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
 import { getTopicById } from '@/battleV2/topics';
@@ -53,6 +53,7 @@ interface BattleFrameV2Props {
   enemyMainFaction?: string;
   onMenu?: () => void;
   onReselectArena?: () => void;
+  onFinished?: (winnerId: string) => void;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -66,6 +67,7 @@ export default function BattleFrameV2({
   enemyMainFaction,
   onMenu,
   onReselectArena,
+  onFinished,
 }: BattleFrameV2Props) {
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
@@ -79,6 +81,14 @@ export default function BattleFrameV2({
 
   const { phase, player, logs } = state;
   const isFinished = phase === 'finished';
+
+  // 战斗结束时调用 onFinished 回调
+  useEffect(() => {
+    if (isFinished && onFinished && state.winner) {
+      onFinished(state.winner);
+    }
+  }, [isFinished, onFinished, state.winner]);
+
   const isTopicSelectionWindow =
     state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';
   const topicOptions = useMemo(() => {

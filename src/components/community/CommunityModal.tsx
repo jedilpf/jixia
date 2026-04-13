@@ -10,7 +10,7 @@ interface CommunityModalProps {
 
 export function CommunityModal({ isOpen, onClose }: CommunityModalProps) {
   const {
-    actions: { openHome, openComposer, closeCommunity },
+    actions: { openHome, closeCommunity },
   } = useCommunityState();
 
   useEffect(() => {

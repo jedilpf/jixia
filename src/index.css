@@ -1,3 +1,6 @@
+/* Import safelist first (must precede @tailwind directives) */
+@import './tailwind-safelist.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -317,8 +320,9 @@ body {
 }
 
 .taotie-pattern {
-  background-image: url("https://www.transparenttextures.com/patterns/az-subtle.png");
-  opacity: 0.15;
+  /* 使用CSS生成 subtle noise 纹理，避免外链依赖 */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.08;
 }
 
 .royal-silk-button {
@@ -338,8 +342,9 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("https://www.transparenttextures.com/patterns/silk.png");
-  opacity: 0.3;
+  /* 使用CSS生成 silk 纹理，避免外链依赖 */
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='silk' x='0' y='0' width='10' height='10' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 5 Q 2.5 0, 5 5 T 10 5' stroke='%23d4a520' stroke-width='0.3' fill='none' opacity='0.2'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23silk)'/%3E%3C/svg%3E");
+  opacity: 0.4;
   pointer-events: none;
 }
 
@@ -394,7 +399,8 @@ body {
 }
 
 .mural-overlay {
-  background-image: url("https://picsum.photos/seed/ancient-china-debate-mural/1920/1080?grayscale&blur=1");
+  /* 使用本地背景图，避免外链依赖 */
+  background-image: url("/assets/UI/v9/arena_mural.png");
   background-size: cover;
   background-position: center;
   opacity: 0.12;
@@ -420,7 +426,8 @@ body {
 }
 
 .silk-texture {
-  background-image: url("https://www.transparenttextures.com/patterns/silk.png");
+  /* 使用CSS生成 silk 纹理，避免外链依赖 */
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='silkPattern' x='0' y='0' width='8' height='8' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 4 Q 2 0, 4 4 T 8 4' stroke='%23d4a520' stroke-width='0.2' fill='none' opacity='0.15'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23silkPattern)'/%3E%3C/svg%3E");
   background-blend-mode: multiply;
 }
 
