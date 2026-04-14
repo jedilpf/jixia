@@ -1,9 +1,48 @@
-/* Import safelist first (must precede @tailwind directives) */
-@import './tailwind-safelist.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Tailwind Safelist - 确保jixia颜色类不被purge */
+/* jixia主题色 - text */
+.text-jixia-gold { color: #d4a017; }
+.text-jixia-orange { color: #ff6600; }
+.text-jixia-jade { color: #4ade80; }
+.text-jixia-star { color: #4dabff; }
+.text-jixia-bronze { color: #5c3a21; }
+.text-jixia-red { color: #8b0000; }
+.text-jixia-bamboo { color: #e0d5c1; }
+.text-jixia-ink { color: #1c1c1c; }
+
+/* jixia主题色 - border */
+.border-jixia-gold { border-color: #d4a017; }
+.border-jixia-orange { border-color: #ff6600; }
+.border-jixia-jade { border-color: #4ade80; }
+.border-jixia-star { border-color: #4dabff; }
+.border-jixia-bronze { border-color: #5c3a21; }
+.border-jixia-red { border-color: #8b0000; }
+
+/* jixia主题色 - background */
+.bg-jixia-gold { background-color: #d4a017; }
+.bg-jixia-orange { background-color: #ff6600; }
+.bg-jixia-jade { background-color: #4ade80; }
+.bg-jixia-star { background-color: #4dabff; }
+.bg-jixia-bronze { background-color: #5c3a21; }
+.bg-jixia-red { background-color: #8b0000; }
+.bg-jixia-bg { background-color: #1a0f05; }
+.bg-jixia-black { background-color: #0a0503; }
+
+/* 透明度变体 */
+.border-jixia-gold\/30 { border-color: rgba(212, 160, 23, 0.3); }
+.border-jixia-gold\/50 { border-color: rgba(212, 160, 23, 0.5); }
+.border-jixia-orange\/30 { border-color: rgba(255, 102, 0, 0.3); }
+.border-jixia-jade\/30 { border-color: rgba(74, 222, 128, 0.3); }
+.border-jixia-star\/30 { border-color: rgba(77, 171, 255, 0.3); }
+.border-jixia-bronze\/20 { border-color: rgba(92, 58, 33, 0.2); }
+.border-jixia-bronze\/40 { border-color: rgba(92, 58, 33, 0.4); }
+.text-jixia-bamboo\/60 { color: rgba(224, 213, 193, 0.6); }
+.text-jixia-bamboo\/80 { color: rgba(224, 213, 193, 0.8); }
+.bg-jixia-gold\/10 { background-color: rgba(212, 160, 23, 0.1); }
+.bg-jixia-gold\/50 { background-color: rgba(212, 160, 23, 0.5); }
 
 * {
   margin: 0;
@@ -32,248 +71,209 @@ body {
   .theme-surface {
     @apply bg-theme-surface border border-theme-border rounded-lg;
   }
-
+  
   .theme-card {
-    @apply bg-theme-card rounded-lg border border-theme-border shadow-theme-card;
+    @apply bg-theme-card border border-theme-border rounded-lg shadow-theme-card;
   }
-
+  
   .theme-button {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
-    @apply bg-theme-surface border border-theme-border;
-    @apply hover:border-theme-border-light hover:shadow-theme-primary;
-    @apply active:scale-95;
+    @apply bg-theme-primary text-white px-4 py-2 rounded-lg font-medium
+           transition-all duration-200 hover:brightness-110 active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
-
-  .theme-button-primary {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
-    @apply bg-theme-primary text-theme-background;
-    @apply hover:shadow-theme-glow active:scale-95;
+  
+  .theme-button-secondary {
+    @apply bg-theme-secondary text-white px-4 py-2 rounded-lg font-medium
+           transition-all duration-200 hover:brightness-110 active:scale-95;
   }
-
+  
   .theme-input {
-    @apply w-full px-3 py-2 rounded-lg;
-    @apply bg-theme-background border border-theme-border;
-    @apply text-theme-text placeholder:text-theme-text-muted;
-    @apply focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary;
-    @apply transition-all duration-200;
-  }
-
-  .theme-modal {
-    @apply fixed inset-0 z-[9999] flex items-center justify-center p-8;
-    @apply bg-black/70 backdrop-blur-md;
-    animation: modal-fade-in 0.2s ease-out;
-  }
-
-  .theme-modal-content {
-    @apply bg-theme-surface border-2 border-theme-border rounded-xl;
-    @apply shadow-theme-elevated flex flex-col overflow-hidden;
-    animation: modal-scale-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .theme-modal-header {
-    @apply h-14 bg-gradient-to-r from-theme-surface-dark via-theme-surface-light to-theme-surface-dark;
-    @apply border-b border-theme-border flex items-center justify-between px-6;
-  }
-
-  .theme-glow-text {
-    text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
-  }
-
-  .theme-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s linear infinite;
+    @apply bg-theme-background border border-theme-border rounded-lg px-4 py-2
+           text-theme-text placeholder-theme-text-muted
+           focus:outline-none focus:border-theme-primary transition-colors;
   }
 }
 
-@layer utilities {
-  .text-shadow-glow {
-    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-  }
-
-  .border-glow {
-    box-shadow: 0 0 10px var(--color-primary), inset 0 0 10px rgba(var(--color-primary), 0.1);
-  }
-
-  .card-hover {
-    @apply transition-all duration-300;
-    @apply hover:scale-105 hover:shadow-theme-glow;
-  }
-
-  .btn-hover {
-    @apply transition-all duration-200;
-    @apply hover:brightness-110 hover:shadow-theme-primary active:scale-95;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@keyframes debateFadeUp {
-  0% {
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animation utilities */
+.animate-in {
+  animation: animate-in 0.3s ease-out;
+}
+
+.animate-out {
+  animation: animate-out 0.2s ease-in;
+}
+
+@keyframes animate-in {
+  from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes modal-scale-up {
-  from { 
-    transform: scale(0.95) translateY(-10px); 
-    opacity: 0; 
+@keyframes animate-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
   }
-  to { 
-    transform: scale(1) translateY(0); 
-    opacity: 1; 
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Card glow effect */
+.card-glow {
+  box-shadow: 0 0 20px rgba(201, 149, 42, 0.3);
 }
 
-@keyframes pulse-glow {
+.card-glow-strong {
+  box-shadow: 0 0 30px rgba(201, 149, 42, 0.5);
+}
+
+/* Damage flash effect */
+.damage-flash {
+  animation: damage-flash 0.2s ease-in-out;
+}
+
+@keyframes damage-flash {
   0%, 100% {
-    box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary);
-    opacity: 1;
-  }
-  50% {
-    box-shadow: 0 0 15px var(--color-primary), 0 0 25px var(--color-primary);
-    opacity: 0.9;
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.debate-fade-up {
-  animation: debateFadeUp 380ms ease-out both;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
-}
-
-* {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-*::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
-}
-
-::selection {
-  background: var(--color-primary, #d4a520);
-  color: var(--color-background, #0f0f1a);
-}
-
-/* ─── 结算动画关键帧 ───────────────────────────────────────────────────────── */
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
-  20%, 40%, 60%, 80% { transform: translateX(3px); }
-}
-
-@keyframes flash {
-  0%, 100% { 
-    opacity: 1;
     filter: brightness(1);
   }
-  50% { 
-    opacity: 0.7;
-    filter: brightness(1.5);
+  50% {
+    filter: brightness(1.5) saturate(1.2);
   }
 }
 
-@keyframes damage-float {
+/* Heal pulse effect */
+.heal-pulse {
+  animation: heal-pulse 0.5s ease-in-out;
+}
+
+@keyframes heal-pulse {
   0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.8);
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(90, 201, 114, 0.4);
   }
-  20% {
-    opacity: 1;
-    transform: translateY(-5px) scale(1.1);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(-25px) scale(1);
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 5px rgba(90, 201, 114, 0.2);
   }
   100% {
-    opacity: 0;
-    transform: translateY(-35px) scale(0.9);
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(90, 201, 114, 0);
   }
 }
 
-@keyframes card-attack {
+/* Phase transition animation */
+.phase-transition {
+  animation: phase-transition 0.5s ease-in-out;
+}
+
+@keyframes phase-transition {
   0% {
-    transform: translateY(0) scale(1);
-  }
-  30% {
-    transform: translateY(-15px) scale(1.05);
-  }
-  60% {
-    transform: translateY(5px) scale(1.1);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes penetrate-flash {
-  0%, 100% {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.5);
   }
   50% {
     opacity: 1;
     transform: scale(1.1);
   }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.animate-shake {
-  animation: shake 0.4s ease-in-out;
+/* Minion card glow animation */
+@keyframes minion-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(201, 149, 42, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(201, 149, 42, 0.6);
+  }
 }
 
-.animate-flash {
-  animation: flash 0.3s ease-in-out 2;
+.minion-card-glow {
+  animation: minion-glow 2s ease-in-out infinite;
 }
 
-.animate-damage-float {
-  animation: damage-float 1.2s ease-out forwards;
+/* Attack animation */
+@keyframes attack-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
-.animate-card-attack {
-  animation: card-attack 0.4s ease-out;
+.attack-shake {
+  animation: attack-shake 0.3s ease-in-out;
+}
+
+/* Card play animation */
+@keyframes card-play {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.1) translateY(-30px); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-60px); }
+}
+
+.card-play {
+  animation: card-play 0.3s ease-out forwards;
+}
+
+/* Card draw animation */
+@keyframes card-draw {
+  0% { 
+    opacity: 0; 
+    transform: translateY(100px) rotateY(180deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) rotateY(0); 
+  }
+}
+
+.card-draw {
+  animation: card-draw 0.5s ease-out;
+}
+
+/* Penetrate flash effect */
+@keyframes penetrate-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
 }
 
 .animate-penetrate-flash {
@@ -283,7 +283,7 @@ body {
 /* ─── 稷下青铜机关城 - 论场选择界面样式 ───────────────────────────────────────── */
 
 .bronze-border {
-  border: 2px solid var(--color-jixia-bronze);
+  border: 2px solid #5c3a21;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 5px rgba(212, 160, 23, 0.2);
   position: relative;
 }
@@ -374,7 +374,7 @@ body {
   content: "";
   position: absolute;
   inset: -12px;
-  border: 3px solid var(--color-jixia-gold);
+  border: 3px solid #d4a017;
   mask-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 10 10 50 10 Q 90 10 90 50 Q 90 90 50 90 Q 10 90 10 50 Z' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
   mask-size: 100% 100%;
   pointer-events: none;

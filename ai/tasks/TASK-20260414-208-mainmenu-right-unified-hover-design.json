@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260414-208",
+  "goal": "Design an interaction optimization plan that consolidates profile, community, settings, and related quick-entry modules into a single right-side trigger button with hover-to-expand behavior, improving visual clarity of the main menu.",
+  "constraints": [
+    "Design-first output only in this round; do not implement business code changes.",
+    "Keep existing navigation model and modal opening logic semantics unchanged at plan level.",
+    "Preserve all currently available menu functions; no functional regression is allowed in the proposed design.",
+    "Include desktop hover interaction details and non-hover fallback behavior for touch devices.",
+    "If plan assumptions are uncertain, mark UNKNOWN and list them in open_questions.md."
+  ],
+  "deliverables": [
+    "Current-state module inventory for right-side consolidation scope.",
+    "Interaction design spec: states, trigger zones, timing, collapse rules, and conflict handling.",
+    "Information architecture proposal for panel item grouping and ordering.",
+    "Implementation-ready acceptance checklist for later coding phase."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/project",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260414-208-mainmenu-right-unified-hover-design.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260414-208-mainmenu-right-unified-hover-design.json"
+  ],
+  "status": "in_progress"
+}
