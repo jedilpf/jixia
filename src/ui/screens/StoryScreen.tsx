@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getStoryEngine, type StoryNode, type StoryChoice } from '@/game/story';
+import { getStoryEngine, type StoryNode, type StoryChoice, type SaveSlotType } from '@/game/story';
 import { useAppStore } from '@/app/store';
+import { asset } from '@/utils/assets';
+import { SaveLoadModal } from '@/ui/components/SaveLoadModal';
+import { uiAudio } from '@/utils/audioManager';
 
 const STORY_STYLES = {
   container: {
@@ -206,24 +209,28 @@ const FACTION_NAMES: Record<string, string> = {
 };
 
 const SPEAKER_TO_IMAGE: Record<string, string> = {
-  '登记官': '/assets/story/chars/registration_official.png',
-  '登记': '/assets/story/chars/registration_official.png',
-  '稷下宫主': '/assets/story/chars/school_master.png',
-  '祭酒': '/assets/story/chars/jijiu.png',
-  '墨家弟子': '/assets/story/chars/mohist_disciple.png',
-  '追兵首领': '/assets/story/chars/pursuer_leader.png',
-  '法家官员': '/assets/story/chars/legalist_official.png',
-  '祖父': '/assets/story/chars/grandfather.png',
-  '执笔史官': '/assets/story/chars/history_official.png',
-  '孟舆': '/assets/story/chars/meng_yu.png',
-  '苏秦': '/assets/story/chars/suqin.png',
-  '禽滑厘': '/assets/story/chars/qinhuali.png',
-  '慎到': '/assets/story/chars/shendao.png',
-  '庄周': '/assets/story/chars/zhuangzhou.png',
-  '无名老者': '/assets/story/chars/nameless_elder.png',
-  '藏书阁老者': '/assets/story/chars/nameless_elder.png',
-  '颜如玉': '/assets/story/chars/yanruyu.png',
-  '公输盘': '/assets/story/chars/gongshupan.png',
+  '登记官': 'assets/story/chars/registration_official.png',
+  '登记': 'assets/story/chars/registration_official.png',
+  '稷下宫主': 'assets/story/chars/school_master.png',
+  '祭酒': 'assets/story/chars/jijiu.png',
+  '墨家弟子': 'assets/story/chars/mohist_disciple.png',
+  '追兵首领': 'assets/story/chars/pursuer_leader.png',
+  '法家官员': 'assets/story/chars/legalist_official.png',
+  '祖父': 'assets/story/chars/grandfather.png',
+  '执笔史官': 'assets/story/chars/history_official.png',
+  '孟舆': 'assets/story/chars/meng_yu.png',
+  '汝': 'assets/story/chars/meng_yu.png',
+  '苏秦': 'assets/story/chars/suqin.png',
+  '禽滑厘': 'assets/story/chars/qinhuali.png',
+  '慎到': 'assets/story/chars/shendao.png',
+  '庄周': 'assets/story/chars/zhuangzhou.png',
+  '无名老者': 'assets/story/chars/nameless_elder.png',
+  '藏书阁老者': 'assets/story/chars/nameless_elder.png',
+  '颜如玉': 'assets/story/chars/yanruyu.png',
+  '公输盘': 'assets/story/chars/gongshupan.png',
+  '执教长史': 'assets/story/chars/instructor_official.png',
+  '儒家讲席': 'assets/story/chars/yanruyu.png',
+  '学宫评议席': 'assets/story/chars/jijiu.png',
 };
 
 type DialogueState = 'typing' | 'complete' | 'choice' | 'transition';
@@ -255,6 +262,12 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
   const [relationships, setRelationships] = useState(engine.getRelationships());
   const [stats, setStats] = useState(engine.getPlayerStats());
   const [showSettings, setShowSettings] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveFeedback, setSaveFeedback] = useState<{
+    show: boolean;
+    success: boolean;
+    message: string;
+  }>({ show: false, success: false, message: '' });
   const [settings, setSettings] = useState<StorySettings>({
     textSpeed: 'normal',
     autoPlay: false,
@@ -360,6 +373,49 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
     }
   }, [dispatch, onBack]);
 
+  // 存档处理
+  const handleSave = useCallback((slot: SaveSlotType) => {
+    uiAudio.playClick();
+    const success = engine.forceSave(slot);
+    setSaveFeedback({
+      show: true,
+      success,
+      message: success ? '存档成功！' : '存档失败，请重试',
+    });
+    setShowSaveModal(false);
+
+    // 2秒后自动隐藏 Toast
+    setTimeout(() => {
+      setSaveFeedback({ show: false, success: false, message: '' });
+    }, 2000);
+  }, [engine]);
+
+  const handleLoad = useCallback((slot: SaveSlotType) => {
+    uiAudio.playClick();
+    const success = engine.loadSlot(slot);
+    if (success) {
+      setSaveFeedback({
+        show: true,
+        success: true,
+        message: '读档成功！',
+      });
+      setShowSaveModal(false);
+
+      setTimeout(() => {
+        setSaveFeedback({ show: false, success: false, message: '' });
+      }, 2000);
+    } else {
+      setSaveFeedback({
+        show: true,
+        success: false,
+        message: '读档失败，存档可能已损坏',
+      });
+      setTimeout(() => {
+        setSaveFeedback({ show: false, success: false, message: '' });
+      }, 2000);
+    }
+  }, [engine]);
+
   const getChapterLabel = () => {
     if (chapter === 0) return '序章·入学';
     if (chapter === 1) return '第一章·百家入门';
@@ -438,6 +494,23 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
           <span style={{ color: '#fff3de', fontSize: '14px' }}>
             名望: {stats.fame}
           </span>
+          <button
+            style={{
+              ...STORY_STYLES.menuButton,
+              background: 'rgba(88,35,16,0.76)',
+            }}
+            onClick={() => setShowSaveModal(true)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#f1c56a';
+              e.currentTarget.style.color = '#f1c56a';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(236,185,87,0.42)';
+              e.currentTarget.style.color = '#fff3de';
+            }}
+          >
+            📁 存档
+          </button>
           <button
             style={STORY_STYLES.menuButton}
             onClick={() => setShowSettings(!showSettings)}
@@ -607,7 +680,7 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
             {/* Portrait Image/Placeholder */}
             {currentNode.speaker && SPEAKER_TO_IMAGE[currentNode.speaker] ? (
               <img 
-                src={SPEAKER_TO_IMAGE[currentNode.speaker]} 
+                src={asset(SPEAKER_TO_IMAGE[currentNode.speaker])} 
                 alt={currentNode.speaker}
                 style={STORY_STYLES.portrait}
               />
@@ -714,6 +787,50 @@ export function StoryScreen({ onBack }: { onBack?: () => void } = {}) {
           </div>
         ))}
       </div>
+
+      {/* 存档/读档弹窗 */}
+      <SaveLoadModal
+        mode="save"
+        open={showSaveModal}
+        slots={engine.getSaveSlots()}
+        onSave={handleSave}
+        onLoad={handleLoad}
+        onClose={() => setShowSaveModal(false)}
+      />
+
+      {/* 存档反馈 Toast */}
+      {saveFeedback.show && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '100px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            background: saveFeedback.success
+              ? 'rgba(90,201,114,0.9)'
+              : 'rgba(180,60,60,0.9)',
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 600,
+            zIndex: 1000,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            animation: 'fadeInUp 0.3s ease',
+          }}
+        >
+          {saveFeedback.success ? '✓ ' : '✗ '}
+          {saveFeedback.message}
+        </div>
+      )}
+
+      {/* Toast 动画 */}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -130,11 +130,29 @@ export class StoryEngine {
     if (node) {
       if (node.type === 'ending') {
         this.handleChapterEnding(node.id);
+        // 仅章节结束时强制存档
+        this.forceSave('autosave');
       }
     }
 
     this.emit({ type: 'node_changed', nodeId });
-    this.persist();
+    // 移除自动存档 - 存档由用户手动触发或章节结束时执行
+  }
+
+  /**
+   * 强制存档（绕过防抖）
+   * 用于章节结束、用户手动存档等场景
+   */
+  public forceSave(slot: SaveSlotType = 'autosave'): boolean {
+    try {
+      const saveData = this.save();
+      localStorage.setItem(STORAGE_KEYS[slot], JSON.stringify(saveData));
+      console.log(`[StoryEngine] 强制存档成功: ${slot} @ ${this.currentNodeId}`);
+      return true;
+    } catch (e) {
+      console.error(`[StoryEngine] 强制存档失败:`, e);
+      return false;
+    }
   }
 
   public goToNext() {
