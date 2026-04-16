@@ -200,9 +200,8 @@ export function EnhancedCardBattleView({ battle, endTurn, restart, onExit }: any
 
         {/* divider line -> 32px height to match Pixi offset (16px spacing top/bottom) */}
         <div className="h-8 w-[304px] flex justify-between items-center px-6 font-bold text-[#8c7b65] border-y border-[#b5a68b] my-4 shadow-sm relative bg-[#dcd0bf]/30">
-          <span className="text-sm">先声席</span>
-          <span className="text-sm">主辩席</span>
-          <span className="text-sm">余论席</span>
+          <span className="text-sm">主议</span>
+          <span className="text-sm">旁议</span>
         </div>
 
         {/* Player Board Hitboxes */}

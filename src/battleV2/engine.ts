@@ -44,9 +44,8 @@ const TOPIC_SELECTION_ROUND = 2;
 const TOPIC_SELECTION_SECONDS = 12;
 
 export const SEAT_LABEL: Record<SeatId, string> = {
-  xian_sheng: '先声席',
-  zhu_bian: '主辩席',
-  yu_lun: '余论席',
+  zhu_yi: '主议',
+  pang_yi: '旁议',
 };
 
 export const SLOT_CARD_RULES: Record<PlanSlot, CardTypeV2[]> = {
@@ -75,7 +74,7 @@ export interface CreateBattleStateOptions {
   deckSize?: number;
 }
 
-const ALL_SEATS: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
+const ALL_SEATS: SeatId[] = ['zhu_yi', 'pang_yi'];
 const MAX_ROUNDS = 40;            // 兜底回合上限：超限后进入裁决收束
 const HERO_MAX_XIN_ZHENG = 20;    // 主辩者初始心证
 const AI_TUNING = {
@@ -114,9 +113,8 @@ function makeLog(round: number, text: string): BattleLog {
 
 function cloneSeatState(): Record<SeatId, SeatState> {
   return {
-    xian_sheng: { front: null, back: null },
-    zhu_bian: { front: null, back: null },
-    yu_lun: { front: null, back: null },
+    zhu_yi: { front: null, back: null },
+    pang_yi: { front: null, back: null },
   };
 }
 
@@ -211,8 +209,8 @@ function createPlayer(
       responseCardId: null,
       secretCardId: null,
       writingCardId: null,
-      mainTargetSeat: 'zhu_bian',
-      secretTargetSeat: 'zhu_bian',
+      mainTargetSeat: 'zhu_yi',
+      secretTargetSeat: 'zhu_yi',
       usedLingShi: 0,
       lockedPublic: false,
       lockedSecret: false,
@@ -603,7 +601,7 @@ function resolveCardEffect(ctx: ResolveContext): void {
   const { owner, rival, card, round, logs, feed, layerLabel, targetSeat, damageModifier = 0, arenaId, topicId } = ctx;
   if (!card) return;
 
-  const seat = targetSeat ?? 'zhu_bian';
+  const seat = targetSeat ?? 'zhu_yi';
   const seatLabel = SEAT_LABEL[seat];
   const effectMultiplier = topicId ? getTopicEffectMultiplier(topicId, card) : 1;
   const weightedEffectValue = scaleEffectValue(card.effectValue, effectMultiplier);
@@ -771,18 +769,18 @@ function resetPlanForNewRound(player: BattlePlayer): void {
 }
 
 function beginNewRound(state: DebateBattleState): void {
-  // 应用左路奖励（下回合开始时）
+  // 将着书累积的文脉在新回合转化为灵势
   if (state.player.resources.wenMai > 0) {
     const bonus = state.player.resources.wenMai;
     state.player.resources.wenMai = 0;
     state.player.resources.lingShi = Math.min(state.player.resources.maxLingShi, state.player.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：我方获得 ${bonus} 灵势`));
+    state.logs.push(makeLog(state.round, `文脉转化：我方获得 ${bonus} 灵势`));
   }
   if (state.enemy.resources.wenMai > 0) {
     const bonus = state.enemy.resources.wenMai;
     state.enemy.resources.wenMai = 0;
     state.enemy.resources.lingShi = Math.min(state.enemy.resources.maxLingShi, state.enemy.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `左路立势：敌方获得 ${bonus} 灵势`));
+    state.logs.push(makeLog(state.round, `文脉转化：敌方获得 ${bonus} 灵势`));
   }
   
   state.player.resources.lingShi = state.player.resources.maxLingShi;
@@ -938,7 +936,7 @@ function resolveRound(state: DebateBattleState): void {
   discardPlannedCard(state.enemy, state.enemy.plan.responseCardId);
   discardPlannedCard(state.enemy, state.enemy.plan.secretCardId);
 
-  feed.push('【层 6】三路奖励');
+  feed.push('【层 6】议区奖励');
   const laneControls = calculateAllLaneControls(state);
   const { playerRewards, enemyRewards } = applyLaneRewards(state, laneControls);
   
@@ -965,10 +963,10 @@ function resolveRound(state: DebateBattleState): void {
   state.logs.push(...logs);
   state.resolveFeed = feed;
   audit.push(
-    `[R${round}] player-res xin=${state.player.resources.xinZheng} ling=${state.player.resources.lingShi} hu=${state.player.resources.huYin} zhengli=${state.player.resources.zhengLi} shixu=${state.player.resources.shiXu} wenmai=${state.player.resources.wenMai} jibian=${state.player.resources.jiBian}`
+    `[R${round}] player-res xin=${state.player.resources.xinZheng} ling=${state.player.resources.lingShi} hu=${state.player.resources.huYin} zhengli=${state.player.resources.zhengLi} shixu=${state.player.resources.shiXu} wenmai=${state.player.resources.wenMai} jibian=${state.player.resources.jiBian} dashi=${state.player.resources.daShi} chou=${state.player.resources.chou}`
   );
   audit.push(
-    `[R${round}] enemy-res xin=${state.enemy.resources.xinZheng} ling=${state.enemy.resources.lingShi} hu=${state.enemy.resources.huYin} zhengli=${state.enemy.resources.zhengLi} shixu=${state.enemy.resources.shiXu} wenmai=${state.enemy.resources.wenMai} jibian=${state.enemy.resources.jiBian}`
+    `[R${round}] enemy-res xin=${state.enemy.resources.xinZheng} ling=${state.enemy.resources.lingShi} hu=${state.enemy.resources.huYin} zhengli=${state.enemy.resources.zhengLi} shixu=${state.enemy.resources.shiXu} wenmai=${state.enemy.resources.wenMai} jibian=${state.enemy.resources.jiBian} dashi=${state.enemy.resources.daShi} chou=${state.enemy.resources.chou}`
   );
   audit.push(`[R${round}] resolve-end`);
   state.internalAudit.push(...audit);

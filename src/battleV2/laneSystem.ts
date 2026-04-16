@@ -1,46 +1,44 @@
-﻿/**
- * 轻异构三路系统实现
- * 
- * 三路规则：
- * - 左路【立势】：控制左路，下回合开始时 +1 心证
- * - 中路【争衡】：控制中路，获得 2 点议势（胜利条件：10 点议势）
- * - 右路【机辩】：控制右路，获得 1 点机变（用于下一张术牌/反诘 -1 费）
+/**
+ * 轻异构议区系统实现
+ *
+ * 议区规则（根据文档v1.2）：
+ * - 主议【大势】：控制主议，获得大势（胜利条件：8点大势）
+ * - 旁议【筹】：控制旁议，获得1个筹（可用于出牌减费）
  */
 
 import { SeatId, BattlePlayer, DebateBattleState } from './types';
 
-// 三路定义
-export type LaneId = 'left' | 'center' | 'right';
-export type LaneName = '立势' | '争衡' | '机辩';
+// 议区定义
+export type LaneId = 'zhu_yi' | 'pang_yi';
+export type LaneName = '主议' | '旁议';
 
 export const LANE_MAPPING: Record<SeatId, LaneId> = {
-  'xian_sheng': 'left',      // 先声席 = 左路
-  'zhu_bian': 'center',      // 主辩席 = 中路
-  'yu_lun': 'right',         // 余论席 = 右路
+  'zhu_yi': 'zhu_yi',      // 主议 = 主议
+  'pang_yi': 'pang_yi',    // 旁议 = 旁议
 };
 
 export const LANE_NAMES: Record<LaneId, LaneName> = {
-  left: '立势',
-  center: '争衡',
-  right: '机辩',
+  zhu_yi: '主议',
+  pang_yi: '旁议',
 };
 
 export const LANE_DESCRIPTIONS: Record<LaneId, string> = {
-  left: '控制左路：下回合开始时 +1 心证',
-  center: '控制中路：获得 2 点议势（10 点议势获胜）',
-  right: '控制右路：获得 1 点机变（下一张术牌/反诘 -1 费）',
+  zhu_yi: '控制主议：获得大势（8点大势获胜），主议胜额外+1大势',
+  pang_yi: '控制旁议：获得1个筹（可用于出牌减费）',
 };
 
-// 扩展资源接口
+// 资源快照（含兼容旧字段）
 export interface ExtendedResources {
   xinZheng: number;        // 心证
   lingShi: number;         // 灵势
   maxLingShi: number;      // 最大灵势
   huYin: number;           // 护印
-  zhengLi: number;         // 议势（胜利条件）
+  zhengLi: number;         // 证立（本回合加成）
   shiXu: number;           // 失序
-  wenMai: number;          // 文脉
-  jiBian: number;          // 机变（新增）
+  wenMai: number;          // 文脉（着书累积）
+  jiBian: number;          // 机变（兼容旧字段）
+  daShi: number;           // 大势（主议胜利推进）
+  chou: number;            // 筹（旁议奖励）
 }
 
 // 控制权状态
@@ -85,27 +83,23 @@ export function calculateLaneControl(
 }
 
 /**
- * 计算三路控制权
+ * 计算议区控制权
  */
 export function calculateAllLaneControls(state: DebateBattleState): Record<LaneId, LaneControl> {
   return {
-    left: calculateLaneControl(
-      state.player.seats.xian_sheng,
-      state.enemy.seats.xian_sheng
+    zhu_yi: calculateLaneControl(
+      state.player.seats.zhu_yi,
+      state.enemy.seats.zhu_yi
     ),
-    center: calculateLaneControl(
-      state.player.seats.zhu_bian,
-      state.enemy.seats.zhu_bian
-    ),
-    right: calculateLaneControl(
-      state.player.seats.yu_lun,
-      state.enemy.seats.yu_lun
+    pang_yi: calculateLaneControl(
+      state.player.seats.pang_yi,
+      state.enemy.seats.pang_yi
     ),
   };
 }
 
 /**
- * 应用三路回合结束奖励
+ * 应用议区回合结束奖励
  */
 export function applyLaneRewards(
   state: DebateBattleState,
@@ -113,99 +107,81 @@ export function applyLaneRewards(
 ): { playerRewards: string[]; enemyRewards: string[] } {
   const playerRewards: string[] = [];
   const enemyRewards: string[] = [];
-  
-  // 左路奖励：控制左路，下回合开始时 +1 心证
-  // 这里先标记，在回合开始时实际增加
-  if (laneControls.left.controlledBy === 'player') {
-    state.player.resources.wenMai += 1;  // 使用文脉作为临时存储，在回合开始时转为心证
-    playerRewards.push('左路立势：下回合 +1 心证');
-  }
-  if (laneControls.left.controlledBy === 'enemy') {
-    state.enemy.resources.wenMai += 1;
-    enemyRewards.push('左路立势：下回合 +1 心证');
-  }
-  
-  // 中路奖励：控制中路，获得 2 点议势
-  if (laneControls.center.controlledBy === 'player') {
-    state.player.resources.zhengLi += 2;
-    playerRewards.push('中路争衡：+2 议势');
-    
+
+  // 主议奖励：控制主议，获得大势（胜利条件：8点大势）
+  // 主议胜额外 +1 大势
+  if (laneControls.zhu_yi.controlledBy === 'player') {
+    state.player.resources.daShi += 1;  // 基础获得1点大势
+    playerRewards.push('主议胜：+1 大势');
+
     // 检查胜利条件
-    if (state.player.resources.zhengLi >= 10) {
+    if (state.player.resources.daShi >= 8) {
       state.phase = 'finished';
-      playerRewards.push('🏆 议势达到 10 点，获得胜利！');
+      playerRewards.push('🏆 大势达到 8 点，获得胜利！');
     }
   }
-  if (laneControls.center.controlledBy === 'enemy') {
-    state.enemy.resources.zhengLi += 2;
-    enemyRewards.push('中路争衡：+2 议势');
-    
+  if (laneControls.zhu_yi.controlledBy === 'enemy') {
+    state.enemy.resources.daShi += 1;
+    enemyRewards.push('主议胜：+1 大势');
+
     // 检查胜利条件
-    if (state.enemy.resources.zhengLi >= 10) {
+    if (state.enemy.resources.daShi >= 8) {
       state.phase = 'finished';
-      enemyRewards.push('🏆 议势达到 10 点，获得胜利！');
+      enemyRewards.push('🏆 大势达到 8 点，获得胜利！');
     }
   }
-  
-  // 右路奖励：控制右路，获得 1 点机变
-  if (laneControls.right.controlledBy === 'player') {
-    state.player.resources.jiBian += 1;
-    playerRewards.push('右路机辩：+1 机变');
+
+  // 旁议奖励：控制旁议，获得1个筹（可用于出牌减费）
+  if (laneControls.pang_yi.controlledBy === 'player') {
+    if (state.player.resources.chou < 1) {
+      state.player.resources.chou += 1;
+      playerRewards.push('旁议胜：获得1筹');
+    } else {
+      playerRewards.push('旁议胜：筹已达上限');
+    }
   }
-  if (laneControls.right.controlledBy === 'enemy') {
-    state.enemy.resources.jiBian += 1;
-    enemyRewards.push('右路机辩：+1 机变');
+  if (laneControls.pang_yi.controlledBy === 'enemy') {
+    if (state.enemy.resources.chou < 1) {
+      state.enemy.resources.chou += 1;
+      enemyRewards.push('旁议胜：获得1筹');
+    } else {
+      enemyRewards.push('旁议胜：筹已达上限');
+    }
   }
-  
+
   return { playerRewards, enemyRewards };
 }
 
 /**
- * 检查是否可以使用机变减费
+ * 检查是否可以使用筹减费
  */
-export function canUseJiBianDiscount(player: BattlePlayer, cardCost: number): boolean {
-  return player.resources.jiBian >= 1 && cardCost > 1;
+export function canUseChouDiscount(player: BattlePlayer, cardCost: number): boolean {
+  return player.resources.chou >= 1 && cardCost > 1;
 }
 
 /**
- * 使用机变减费
- * 消耗 1 机变，下一张术牌/反诘费用 -1
+ * 使用筹减费
+ * 消耗 1 筹，出牌费用 -1
  */
-export function useJiBianDiscount(player: BattlePlayer): boolean {
-  if (player.resources.jiBian >= 1) {
-    player.resources.jiBian -= 1;
-    // 这里可以设置一个标记，表示下一张牌减费
-    // 在实际出牌时检查这个标记
+export function useChouDiscount(player: BattlePlayer): boolean {
+  if (player.resources.chou >= 1) {
+    player.resources.chou -= 1;
     return true;
   }
   return false;
 }
 
 /**
- * 应用左路奖励（回合开始时）
- */
-export function applyLeftLaneBonus(player: BattlePlayer): boolean {
-  if (player.resources.wenMai > 0) {
-    // 将文脉转换为心证
-    const bonus = player.resources.wenMai;
-    player.resources.wenMai = 0;
-    player.resources.lingShi = Math.min(player.resources.maxLingShi, player.resources.lingShi + bonus);
-    return true;
-  }
-  return false;
-}
-
-/**
- * 获取三路控制状态描述
+ * 获取议区控制状态描述
  */
 export function getLaneControlSummary(state: DebateBattleState): string {
   const controls = calculateAllLaneControls(state);
   const parts: string[] = [];
-  
-  (['left', 'center', 'right'] as LaneId[]).forEach(laneId => {
+
+  (['zhu_yi', 'pang_yi'] as LaneId[]).forEach(laneId => {
     const control = controls[laneId];
     const laneName = LANE_NAMES[laneId];
-    
+
     if (control.controlledBy === 'player') {
       parts.push(`我方控制${laneName}`);
     } else if (control.controlledBy === 'enemy') {
@@ -214,6 +190,6 @@ export function getLaneControlSummary(state: DebateBattleState): string {
       parts.push(`${laneName}未控制`);
     }
   });
-  
+
   return parts.join(' | ');
 }

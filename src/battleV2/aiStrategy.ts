@@ -21,11 +21,10 @@ const CARD_VALUE_WEIGHTS: Record<EffectKind, number> = {
   summon_back: 0.9,  // 召唤后排
 };
 
-// 座位优先级（攻击目标选择）
+// 议区优先级（攻击目标选择）
 const SEAT_PRIORITY: Record<SeatId, number> = {
-  xian_sheng: 3,  // 先生最重要
-  zhu_bian: 2,    // 主编次之
-  yu_lun: 1,      // 舆论最低
+  zhu_yi: 2,    // 主议最重要（决定大势）
+  pang_yi: 1,   // 旁议次之（获得筹）
 };
 
 /**
@@ -67,7 +66,7 @@ export function evaluateCardValue(card: DebateCard, state: DebateBattleState, si
   if (card.effectKind === 'shield') {
     const mySeats = side === 'player' ? state.player.seats : state.enemy.seats;
     let totalHp = 0;
-    for (const seatId of ['xian_sheng', 'zhu_bian', 'yu_lun'] as const) {
+    for (const seatId of ['zhu_yi', 'pang_yi'] as const) {
       const seat = mySeats[seatId];
       totalHp += (seat.front?.hp || 0) + (seat.back?.hp || 0);
     }
@@ -86,10 +85,10 @@ export function chooseBestTarget(
 ): SeatId {
   const seats = player.seats;
 
-  // 评估每个座位的价值
+  // 评估每个议区的价值
   const seatScores: Array<{ seat: SeatId; score: number }> = [];
 
-  for (const seatId of ['xian_sheng', 'zhu_bian', 'yu_lun'] as const) {
+  for (const seatId of ['zhu_yi', 'pang_yi'] as const) {
     const seat = seats[seatId];
     let score = SEAT_PRIORITY[seatId];
 
@@ -107,7 +106,7 @@ export function chooseBestTarget(
     seatScores.push({ seat: seatId, score });
   }
 
-  // 返回得分最高的座位
+  // 返回得分最高的议区
   seatScores.sort((a, b) => b.score - a.score);
   return seatScores[0].seat;
 }
@@ -165,7 +164,7 @@ export function aiPlanMingBianStrategy(state: DebateBattleState): {
   // 选择目标
   const targetSeat = mainCandidate.card.effectKind === 'damage'
     ? chooseBestTarget(state.player, mainCandidate.card)
-    : 'zhu_bian'; // 非伤害牌默认打主编位
+    : 'zhu_yi'; // 非伤害牌默认打主议位
 
   return {
     mainCard: mainCandidate.card,
@@ -203,7 +202,7 @@ export function aiPlanAnMouStrategy(state: DebateBattleState): {
   const secretCard = secretCandidates[0].card;
   const targetSeat = secretCard.effectKind === 'damage'
     ? chooseBestTarget(state.player, secretCard)
-    : 'zhu_bian';
+    : 'zhu_yi';
 
   return { secretCard, targetSeat };
 }

@@ -12,9 +12,8 @@ interface BattleArenaProps {
 }
 
 const SEAT_CONFIG: Record<SeatId, { name: string; color: string; icon: string; title: string }> = {
-  xian_sheng: { name: '先声席', color: '#3A5F41', icon: '声', title: 'First Voice' },
-  zhu_bian: { name: '主辩席', color: '#D4AF65', icon: '辩', title: 'Grand Debate' },
-  yu_lun: { name: '余论席', color: '#8D2F2F', icon: '论', title: 'Remaining Logic' },
+  zhu_yi: { name: '主议', color: '#D4AF65', icon: '议', title: 'Grand Debate' },
+  pang_yi: { name: '旁议', color: '#8D2F2F', icon: '旁', title: 'Side Debate' },
 };
 
 const UnitPip: React.FC<{
@@ -169,7 +168,7 @@ export const BattleArena: React.FC<BattleArenaProps> = ({
     return p.hand.find(c => c.id === cardId) || null;
   };
 
-  const seats: SeatId[] = ['xian_sheng', 'zhu_bian', 'yu_lun'];
+  const seats: SeatId[] = ['zhu_yi', 'pang_yi'];
 
   return (
     <div className="flex-1 flex flex-col min-h-0 relative bg-[#FDFBF7] overflow-hidden">

@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260414-210",
+  "goal": "Unify battle system to the confirmed two-zone model (zhu_yi/pang_yi) and remove runtime inconsistencies between staged and working states.",
+  "constraints": [
+    "Treat two-zone model as the single source of truth: zhu_yi and pang_yi.",
+    "Do not introduce new gameplay systems; only consistency and naming alignment fixes.",
+    "Keep changes within battle runtime/UI and task workflow files.",
+    "If any mapping cannot be proven, keep behavior and only update inconsistent wording/comments."
+  ],
+  "deliverables": [
+    "Aligned SeatId/lane usage across staged and working changes.",
+    "Removed or corrected stale three-lane wording in active battle runtime/UI files.",
+    "Typecheck and gate checks passing after alignment."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets/story/chars",
+    "src/battleV2",
+    "src/components/battle"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260414-210-two-zone-unification.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260414-210-two-zone-unification.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260414-210-two-zone-unification.json"
+  ],
+  "status": "in_progress"
+}

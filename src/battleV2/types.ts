@@ -31,7 +31,7 @@ export interface DebateCard {
   art?: string;
   prologue?: string;
   description?: string;
-  lanePreference?: 'left' | 'center' | 'right';  // 三路偏好
+  lanePreference?: 'left' | 'center' | 'right';  // 路线偏好（兼容旧卡库）
   faction?: string;
   factionCore?: boolean;
   guestEligible?: boolean;
@@ -40,7 +40,7 @@ export interface DebateCard {
   tags?: string[];
 }
 
-export type SeatId = 'xian_sheng' | 'zhu_bian' | 'yu_lun';
+export type SeatId = 'zhu_yi' | 'pang_yi';
 export type LayerId = 'front' | 'back';
 
 export interface SeatUnit {
@@ -64,7 +64,7 @@ export interface Resources {
   zhengLi: number;
   shiXu: number;
   wenMai: number;
-  jiBian: number;      // 机变（右路奖励）
+  jiBian: number;      // 机变（兼容旧字段）
   daShi: number;       // 大势（胜利条件：先到8获胜）
   chou: number;        // 筹（旁议获胜获得，可用于减费）
 }

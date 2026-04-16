@@ -549,9 +549,9 @@ export function useEnhancedCardBattle() {
       }
     }
 
-    // 战场碰撞(3个栏位独立结算)
-    const laneNames = ['先声席', '主辩席', '余论席'];
-    for (let col = 0; col < 3; col++) {
+    // 战场碰撞(2个议区独立结算)
+    const laneNames = ['主议', '旁议'];
+    for (let col = 0; col < 2; col++) {
       let pDmg = 0;
       let eDmg = 0;
 
