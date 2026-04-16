@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-20260416-211",
+  "goal": "检查并补齐 docs/card/card-pool-160.md：若缺失则创建 160 张卡牌完整卡池模板；若存在则校验结构完整性并修复。",
+  "constraints": [
+    "严格遵循 canon/ 与 scope/ 约束，不得越界写入。",
+    "仅处理 docs/card/card-pool-160.md 与任务流程所需 ai/tasks、ai/out 元数据。",
+    "模板使用中文字段与表头，保持可后续人工补全。",
+    "如遇信息不足，写 UNKNOWN 并记录到 open_questions.md。"
+  ],
+  "deliverables": [
+    "docs/card/card-pool-160.md 存在且包含完整模板结构。",
+    "标题、首发目标、当前进度、通用卡牌区与门派专属卡牌区（含礼心殿、名相府）齐备。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/card",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260416-211-card-pool-160-template.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260416-211-card-pool-160-template.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260416-211-card-pool-160-template.json"
+  ],
+  "status": "in_progress"
+}
