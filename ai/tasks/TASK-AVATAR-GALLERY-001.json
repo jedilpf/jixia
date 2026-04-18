@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-AVATAR-GALLERY-001",
+  "goal": "Implement a centralized Avatar Data Registry (数据图库) for managing character avatars and persistence, as a backend-focused data layer.",
+  "constraints": [
+    "Manage avatar assets, unlock states, and selection persistence.",
+    "Integrated into existing profile/stats components (PlayerStatsPanelV2).",
+    "Clean data-driven API (AvatarBackend) for cross-component usage."
+  ],
+  "deliverables": [
+    "src/data/game/avatarRegistry.ts (New data layer)",
+    "src/ui/components/PlayerStatsPanelV2.tsx (Integration)",
+    "docs/PROJECT_MEMORY.md (Updated completion records)"
+  ],
+  "allowed_write_paths": [
+    "src/data/game/avatarRegistry.ts",
+    "src/ui/components/PlayerStatsPanelV2.tsx",
+    "src/App.tsx",
+    "src/battleV2",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/MainMenu.tsx",
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run build"
+  ],
+  "status": "draft"
+}

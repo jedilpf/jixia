@@ -26,9 +26,9 @@ type LegacyScreen =
   | 'battle_setup'
   | 'pre_battle'
   | 'battle'
+  | 'characters'
   | 'story'
-  | 'collection'
-  | 'characters';
+  | 'collection';
 
 const DEFAULT_SETTINGS: AppSettings = {
   masterVolume: 0.8,
@@ -250,10 +250,10 @@ function AppMainContent({
           settings={settings}
           onSettingsChange={onSettingsChange}
           onStartGame={handleStartGame}
-          onStory={() => setScreen('story')}
-          onCollection={() => setScreen('collection')}
-          onCharacters={() => setScreen('characters')}
-        />
+           onStory={() => setScreen('story')}
+           onCollection={() => setScreen('collection')}
+           onCharacters={() => setScreen('characters')}
+         />
       ) : null}
 
       {screen === 'transition' ? (

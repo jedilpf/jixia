@@ -1,7 +1,7 @@
 ﻿# 文档索引（主线版）
 ## 《思筹之录》当前可执行文档入口
 
-> 最后更新：2026-03-26
+> 最后更新：2026-04-18
 > 说明：本索引优先服务“当前可运行主线 + 持续开发”，不再把历史方案与临时草稿混为同级入口。
 
 ---
@@ -9,7 +9,7 @@
 ## 1. 主线必读（先看这些）
 
 - [AI主线协作规则](AI-mainline-policy.md)
-- [战斗核心规则](battle/battle-design-核心规则-v1.2.md)
+- [战斗核心规则](battle/battle-design-核心规则-v2.0.md)
 - [战斗实现说明](battle/dev/battle-dev-明谋暗辩实现-v2.md)
 - [战斗系统索引](battle/battle-design-索引.md)
 - [卡牌平衡总览](card/card-balance-总览.md)
@@ -24,7 +24,7 @@
 - [本周文档收口清单](weekly-docs-curation-20260326.md)
 - [多版本文档梳理报告（仓库内事实版）](多版本设计文档梳理报告.md)
 - [项目整理方案（主仓执行版）](项目整理方案_v1.md)
-- [思筹之录PPT构思稿](project/ppt-outline-sichouzhi-lu-20260410.md)
+- [思筹之录PPT文档入口（主线）](project/presentation/README.md)
 - [文档变更记录](文档变更记录.md)
 
 说明：以上文档已经过“主仓范围、非破坏执行、可落地流程”校正。

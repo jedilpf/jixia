@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-20260417-216",
+  "goal": "补充 RemoteProfileService 骨架：提供登录、远端拉取与回写接口定义，并与现有 ProfileService 体系衔接，便于后续对接后端账号系统。",
+  "constraints": [
+    "严格遵循 canon/ 与 scope/ 约束，不得越界写入。",
+    "保持现有本地流程可用，不改变现有调用方行为。",
+    "本次仅提供可编译骨架，不实现真实后端协议细节。",
+    "如遇信息不足，写 UNKNOWN 并记录到 open_questions.md。"
+  ],
+  "deliverables": [
+    "新增 RemoteProfileService 类与远端传输接口定义。",
+    "支持登录态缓存、远端拉取、远端回写的调用入口。",
+    "在 src/profile/index.ts 暴露远端骨架导出。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/profile",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260417-216-remote-profile-service-skeleton.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260417-216-remote-profile-service-skeleton.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260417-216-remote-profile-service-skeleton.json"
+  ],
+  "status": "in_progress"
+}

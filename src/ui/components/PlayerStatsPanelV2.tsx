@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { AvatarBackend } from '@/data/game/avatarRegistry';
 
 interface PlayerStats {
   level: number;
@@ -53,7 +54,22 @@ export const PlayerStatsPanelV2: React.FC<PlayerStatsPanelV2Props> = ({
           <div className="flex items-center gap-4">
              {/* 极简水墨感头像占位 */}
              <div className="w-14 h-14 bg-[#1a1a1a] rounded-sm relative overflow-hidden flex items-center justify-center">
-                <span className="text-[#fdfaf2] text-2xl font-serif">{playerName.charAt(0)}</span>
+                {AvatarBackend.getSelectedInfo() ? (
+                  <img 
+                    src={AvatarBackend.getSelectedInfo().assetPath} 
+                    alt="avatar" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <span className="text-[#fdfaf2] text-2xl font-serif">{playerName.charAt(0)}</span>
+                )}
+                {/* 如果图片加载失败显示文字 */}
+                <span className="absolute text-[#fdfaf2] text-2xl font-serif pointer-events-none mix-blend-difference opacity-20">
+                  {playerName.charAt(0)}
+                </span>
                 <div className="absolute inset-0 border-2 border-[#b88a5344] m-1" />
              </div>
              <div>

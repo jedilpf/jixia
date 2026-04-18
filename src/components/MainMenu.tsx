@@ -1,7 +1,57 @@
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { uiAudio } from '@/utils/audioManager';
 import { CommunityBadge } from '@/components/community/CommunityBadge';
-import { CommunityModal } from '@/components/community/CommunityModal';
+import { CommunityScreen } from '@/components/community/CommunityScreen';
+import { AvatarBackend } from '@/data/game/avatarRegistry';
+
+// ─── 统一 UI 辅助组件 ─────────────────────────────────────────────────────────
+
+function GoldenCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-lg border border-[rgba(212,165,32,0.2)] bg-black/30 p-4 transition-all hover:border-[rgba(212,165,32,0.4)] ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function GoldenTab({ label, active, onClick, badge }: { label: string; active: boolean; onClick: () => void; badge?: boolean }) {
+  return (
+    <button
+      onClick={() => { uiAudio.playClick(); onClick(); }}
+      className={`relative px-6 py-2 text-sm font-serif tracking-widest transition-all border-b-2 ${
+        active 
+          ? 'text-[#d4a520] border-[#d4a520] bg-[#d4a520]/5' 
+          : 'text-[#a7c5ba] border-transparent hover:text-[#f5e6b8] hover:bg-white/5'
+      }`}
+    >
+      {label}
+      {badge && <span className="absolute top-1 right-2 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
+    </button>
+  );
+}
+
+function ShopItem({ icon, name, price, amount, onBuy, type = 'coin' }: { 
+  icon: string; name: string; price: string | number; amount: string; onBuy: () => void; type?: 'coin' | 'jade' 
+}) {
+  const isCoin = type === 'coin';
+  return (
+    <div className="group relative flex flex-col items-center bg-[#1a2840] border border-[rgba(212,165,32,0.3)] rounded-lg p-4 transition-all hover:border-[rgba(212,165,32,0.6)] hover:brightness-110">
+      <div className="text-4xl mb-3 filter drop-shadow-[0_0_8px_rgba(212,165,32,0.4)] group-hover:scale-110 transition-transform">{icon}</div>
+      <div className="text-[#f5e6b8] text-sm font-serif mb-1">{name}</div>
+      <div className="text-[#a7c5ba] text-xs mb-4">{amount}</div>
+      <button 
+        onClick={(e) => { e.stopPropagation(); onBuy(); }}
+        className={`w-full py-1.5 rounded border text-xs transition-all ${
+          isCoin 
+            ? 'border-[rgba(212,165,32,0.4)] text-[#d4a520] hover:bg-[#d4a520] hover:text-black' 
+            : 'border-[rgba(74,124,111,0.4)] text-[#a7c5ba] hover:bg-[#4a6b99] hover:text-white'
+        }`}
+      >
+        {typeof price === 'number' ? `💠 ${price}` : price}
+      </button>
+    </div>
+  );
+}
 
 // ─── 设置状态接口 ────────────────────────────────────────────────────────────
 export interface AppSettings {
@@ -384,11 +434,13 @@ function loadMainMenuState(): MainMenuPersistedState {
 export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onCollection, onCharacters }: MainMenuProps) {
   const initialState = useMemo(() => loadMainMenuState(), []);
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [profileTab, setProfileTab] = useState<ProfileTab>('overview');
+  // TODO: profileTab 用于未来个人面板标签切换
+  const [_profileTab, _setProfileTab] = useState<ProfileTab>('overview');
   const [coinBalance, setCoinBalance] = useState(initialState.coinBalance);
   const [jadeBalance, setJadeBalance] = useState(initialState.jadeBalance);
   const [events, setEvents] = useState<EventItem[]>(initialState.events);
   const [quests, setQuests] = useState<QuestItem[]>(initialState.quests);
+  const [questTab, setQuestTab] = useState<'daily' | 'weekly' | 'achieve'>('daily');
   const [mails, setMails] = useState<MailItem[]>(initialState.mails);
   const embers = Array.from({ length: 18 }, (_, i) => i);
   const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
@@ -412,17 +464,18 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
     claimRewards(0, pack.amount);
   };
 
-  const handleJoinEvent = (id: string) => {
+  // TODO: handleJoinEvent 和 handleClaimEvent 用于未来活动功能，暂时保留
+  void function _handleJoinEvent(_id: string) {
     uiAudio.playClick();
-    setEvents((prev) => prev.map((item) => (item.id === id ? { ...item, joined: true } : item)));
+    setEvents((prev) => prev.map((item) => (item.id === _id ? { ...item, joined: true } : item)));
   };
 
-  const handleClaimEvent = (id: string) => {
-    const item = events.find((event) => event.id === id);
+  void function _handleClaimEvent(_id: string) {
+    const item = events.find((event) => event.id === _id);
     if (!item || item.claimed) return;
     uiAudio.playClick();
     claimRewards(item.rewardCoin, item.rewardJade);
-    setEvents((prev) => prev.map((event) => (event.id === id ? { ...event, claimed: true } : event)));
+    setEvents((prev) => prev.map((event) => (event.id === _id ? { ...event, claimed: true } : event)));
   };
 
   const handleClaimQuest = (id: string) => {
@@ -761,208 +814,308 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
       {/* ★ 弹窗渲染区 */}
       {activeModal === 'profile' && (
         <SystemModal title="玩家档案" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-xl">
-            <div className="mb-5 flex gap-2">
-              {[
-                { id: 'overview', label: '总览' },
-                { id: 'records', label: '战绩' },
-                { id: 'collection', label: '收藏' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    uiAudio.playClick();
-                    setProfileTab(tab.id as ProfileTab);
-                  }}
-                  className="rounded-md border px-3 py-1.5 text-sm transition"
-                  style={{
-                    borderColor: profileTab === tab.id ? '#d4a520' : 'rgba(212,165,32,0.25)',
-                    color: profileTab === tab.id ? '#f5e6b8' : '#c6b792',
-                    background: profileTab === tab.id ? 'rgba(212,165,32,0.14)' : 'rgba(10,10,18,0.35)',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          <div className="w-full space-y-6">
+            {/* Header Info */}
+            <div className="flex items-center gap-6">
+              <div className="relative group">
+                <div className="w-24 h-24 rounded-lg border-2 border-[#d4a520] overflow-hidden shadow-[0_0_20px_rgba(212,165,32,0.3)] bg-black/40">
+                  <img 
+                    src={AvatarBackend.getSelectedInfo()?.assetPath} 
+                    alt="头像" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                </div>
+                <div className="absolute -bottom-2 -right-2 bg-[#d4a520] text-black text-[10px] px-2 py-0.5 rounded font-bold shadow-lg">
+                  LV.12
+                </div>
+              </div>
+              
+              <div className="flex flex-col">
+                <h2 className="text-[#f5e6b8] text-2xl font-serif tracking-widest mb-1">机枢学徒</h2>
+                <div className="flex items-center gap-3 text-sm">
+                  <span className="text-[#a7c5ba]">墨家门徒</span>
+                  <div className="w-1 h-1 rounded-full bg-[#d4a520]/40" />
+                  <span className="text-[#d4a520]">段位：青铜 Ⅲ</span>
+                </div>
+              </div>
             </div>
-            {profileTab === 'overview' ? (
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                  <div className="text-[#bda77f]">当前身份</div>
-                  <div className="mt-1 text-[#f5e6b8]">机枢学徒 · Lv.12</div>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                  <div className="text-[#bda77f]">主修门派</div>
-                  <div className="mt-1 text-[#f5e6b8]">墨家 / 儒家</div>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                  <div className="text-[#bda77f]">铜钱</div>
-                  <div className="mt-1 text-[#f5e6b8]">{coinBalance.toLocaleString()}</div>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                  <div className="text-[#bda77f]">机关玉</div>
-                  <div className="mt-1 text-[#f5e6b8]">{jadeBalance.toLocaleString()}</div>
+
+            {/* Currency Bar */}
+            <div className="w-full py-3 border-y border-[rgba(212,165,32,0.15)] flex justify-around text-base">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🪙</span>
+                <span className="text-[#a7c5ba]">铜钱：</span>
+                <span className="text-[#f5e6b8] font-mono">{coinBalance.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">💠</span>
+                <span className="text-[#a7c5ba]">机关玉：</span>
+                <span className="text-[#f5e6b8] font-mono">{jadeBalance.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
+                  <span>◆</span> 战斗记录
+                </h3>
+                <div className="bg-black/20 rounded-lg p-3 border border-white/5 space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#a7c5ba]">总场次</span>
+                    <span className="text-[#f5e6b8]">42</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#a7c5ba]">胜率</span>
+                    <span className="text-[#f5e6b8]">64%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#a7c5ba]">最高连胜</span>
+                    <span className="text-[#f5e6b8]">5</span>
+                  </div>
                 </div>
               </div>
-            ) : null}
-            {profileTab === 'records' ? (
-              <div className="space-y-3 text-sm">
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3 flex justify-between">
-                  <span className="text-[#bda77f]">最近论场胜率</span><span className="text-[#f5e6b8]">58%</span>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3 flex justify-between">
-                  <span className="text-[#bda77f]">连胜记录</span><span className="text-[#f5e6b8]">4 场</span>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3 flex justify-between">
-                  <span className="text-[#bda77f]">剧情完成度</span><span className="text-[#f5e6b8]">序章 + 第一章上半</span>
+
+              <div className="space-y-3">
+                <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
+                  <span>◆</span> 最爱门派
+                </h3>
+                <div className="bg-black/20 rounded-lg p-3 border border-white/5 flex items-center gap-2">
+                  <div className="flex-1">
+                    <div className="flex justify-between text-[10px] text-[#a7c5ba] mb-1">
+                      <span>墨家 (32场)</span>
+                      <span>76%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#d4a520] w-[76%]" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            ) : null}
-            {profileTab === 'collection' ? (
-              <div className="space-y-3 text-sm">
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3 flex justify-between">
-                  <span className="text-[#bda77f]">已收录卡牌</span><span className="text-[#f5e6b8]">52 / 160</span>
-                </div>
-                <div className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3 flex justify-between">
-                  <span className="text-[#bda77f]">本周新增</span><span className="text-[#f5e6b8]">+5</span>
-                </div>
-                <div className="text-xs text-[#97adbd]">提示：更多卡牌可在“卡牌图鉴”和活动奖励中解锁。</div>
+            </div>
+
+            {/* Achievements */}
+            <div className="space-y-3">
+              <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
+                <span>◆</span> 近期成就
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { title: '首次论道', done: true },
+                  { title: '连胜3场', done: true },
+                  { title: '收集10张卡', done: false },
+                ].map((ach, idx) => (
+                  <div key={idx} className={`flex items-center justify-center p-2 rounded border text-[10px] gap-1.5 transition-colors ${
+                    ach.done ? 'bg-[#d4a520]/10 border-[#d4a520]/30 text-[#f5e6b8]' : 'bg-black/20 border-white/5 text-[#a7c5ba]'
+                  }`}>
+                    <span>{ach.done ? '🏆' : '⬜'}</span>
+                    {ach.title}
+                  </div>
+                ))}
               </div>
-            ) : null}
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'store_coin' && (
-        <SystemModal title="获取铜钱" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-md space-y-3">
-            {COIN_PACKS.map((pack) => (
-              <button
-                key={pack.id}
-                className="w-full rounded-lg border border-[rgba(212,165,32,0.35)] bg-black/30 px-4 py-3 text-left transition hover:bg-[#d4a520]/10"
-                onClick={() => handleBuyCoinPack(pack)}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[#f5e6b8]">{pack.name}</span>
-                  <span className="text-[#d4a520]">{pack.priceLabel}</span>
-                </div>
-                <div className="mt-1 text-xs text-[#bda77f]">获得 {pack.amount.toLocaleString()} 铜钱</div>
-              </button>
-            ))}
+        <SystemModal title="铜钱商店" onClose={() => setActiveModal(null)}>
+          <div className="w-full flex flex-col gap-6">
+            <div className="grid grid-cols-3 gap-4">
+              <ShopItem icon="🃏" name="随机卡牌" price="500 铜钱" amount="包含 1 张随机卡牌" onBuy={() => handleBuyCoinPack(COIN_PACKS[0])} />
+              <ShopItem icon="🏯" name="门派礼包" price="1000 铜钱" amount="墨/儒门派基础卡" onBuy={() => handleBuyCoinPack(COIN_PACKS[1])} />
+              <ShopItem icon="💎" name="每日特惠" price="300 铜钱" amount="限时 7 折优惠" onBuy={() => handleBuyCoinPack(COIN_PACKS[2])} />
+            </div>
+            <div className="text-center py-2 border-t border-white/5">
+              <span className="text-xs text-[#a7c5ba]">当前拥有：</span>
+              <span className="text-sm text-[#f5e6b8] font-mono">🪙 {coinBalance.toLocaleString()}</span>
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'store_jade' && (
-        <SystemModal title="获取机关玉" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-md space-y-3">
-            {JADE_PACKS.map((pack) => (
-              <button
-                key={pack.id}
-                className="w-full rounded-lg border border-[rgba(94,127,170,0.45)] bg-black/30 px-4 py-3 text-left transition hover:bg-[#4a6b99]/12"
-                onClick={() => handleBuyJadePack(pack)}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[#d7e8ff]">{pack.name}</span>
-                  <span className="text-[#88b6ff]">{pack.priceLabel}</span>
-                </div>
-                <div className="mt-1 text-xs text-[#9eb9dd]">获得 {pack.amount.toLocaleString()} 机关玉</div>
-              </button>
-            ))}
+        <SystemModal title="机关玉兑换" onClose={() => setActiveModal(null)}>
+          <div className="w-full flex flex-col gap-6">
+            <div className="grid grid-cols-3 gap-4">
+              <ShopItem type="jade" icon="✨" name="限定卡牌" price="200" amount="本季限定传说卡" onBuy={() => handleBuyJadePack(JADE_PACKS[0])} />
+              <ShopItem type="jade" icon="🎭" name="皮肤碎片" price="50" amount="用于兑换名士外观" onBuy={() => handleBuyJadePack(JADE_PACKS[1])} />
+              <ShopItem type="jade" icon="🖼️" name="头像框" price="100" amount="稷下学宫特殊框" onBuy={() => handleBuyJadePack(JADE_PACKS[2])} />
+            </div>
+            <div className="text-center py-2 border-t border-white/5">
+              <span className="text-xs text-[#a7c5ba]">当前拥有：</span>
+              <span className="text-sm text-[#9eb9dd] font-mono">💠 {jadeBalance.toLocaleString()}</span>
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'events' && (
         <SystemModal title="活动中心" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-lg space-y-3">
-            {events.map((item) => (
-              <div key={item.id} className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[#f5e6b8]">{item.title}</h3>
-                  <span className="text-xs text-[#bda77f]">奖励 {item.rewardCoin}铜钱 / {item.rewardJade}玉</span>
-                </div>
-                <p className="mt-1 text-sm text-[#b4c9d8]">{item.summary}</p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    disabled={item.joined}
-                    onClick={() => handleJoinEvent(item.id)}
-                    className="rounded-md border border-[rgba(212,165,32,0.35)] px-3 py-1 text-xs text-[#f5e6b8] disabled:opacity-50"
-                  >
-                    {item.joined ? '已参与' : '参加活动'}
-                  </button>
-                  <button
-                    disabled={!item.joined || item.claimed}
-                    onClick={() => handleClaimEvent(item.id)}
-                    className="rounded-md border border-[rgba(80,180,120,0.45)] px-3 py-1 text-xs text-[#bfeccf] disabled:opacity-50"
-                  >
-                    {item.claimed ? '已领取' : '领取奖励'}
+          <div className="w-full space-y-4">
+            {/* Banner Item */}
+            <div className="relative rounded-lg overflow-hidden border border-[#d4a520]/40 group">
+              <div className="h-28 bg-[#1a2840] flex flex-col justify-center px-6 relative z-10">
+                <div className="text-[#f5e6b8] text-lg font-serif mb-1 group-hover:text-white transition-colors">🔥 限时活动：稷下开学季</div>
+                <div className="text-[#a7c5ba] text-xs">完成 5 场论道即可获得限定卡牌</div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex-1 max-w-[200px]">
+                    <div className="flex justify-between text-[10px] text-[#a7c5ba] mb-1">
+                      <span>活动进度</span>
+                      <span>60%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-black/40 rounded-full">
+                      <div className="h-full bg-[#d4a520] w-[60%]" />
+                    </div>
+                  </div>
+                  <button onClick={() => uiAudio.playClick()} className="bg-[#d4a520] text-black text-[10px] px-4 py-1.5 rounded font-bold hover:brightness-110 active:scale-95 transition-all">
+                    立即参与
                   </button>
                 </div>
               </div>
-            ))}
+              <div className="absolute top-2 right-4 text-[10px] text-[#d4a520]/60 italic font-mono">剩余：3天12小时</div>
+            </div>
+
+            {/* Daily/Other events */}
+            <div className="grid grid-cols-1 gap-3">
+              <GoldenCard className="flex items-center justify-between">
+                <div>
+                  <div className="text-[#f5e6b8] text-sm font-serif">📅 日常活动</div>
+                  <div className="text-[#a7c5ba] text-xs">每日首胜额外奖励 +200 铜钱</div>
+                </div>
+                <button className="text-[#d4a520] text-xs border border-[#d4a520]/30 px-3 py-1 rounded hover:bg-[#d4a520]/10 transition-colors">查看详情</button>
+              </GoldenCard>
+
+              <GoldenCard className="flex items-center justify-between opacity-80">
+                <div>
+                  <div className="text-[#f5e6b8] text-sm font-serif">🎁 新手福利</div>
+                  <div className="text-[#a7c5ba] text-xs">完成新手引导即可获得 1000 铜钱</div>
+                </div>
+                <div className="text-[#50b478] text-xs font-serif flex items-center gap-1">
+                  <span>✅</span> 已完成
+                </div>
+              </GoldenCard>
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'quests' && (
         <SystemModal title="修行任务" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-lg space-y-3">
-            {quests.map((item) => {
-              const done = item.progress >= item.target;
-              return (
-                <div key={item.id} className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#f5e6b8]">{item.title}</span>
-                    <span className="text-xs text-[#bda77f]">{item.progress}/{item.target}</span>
-                  </div>
-                  <div className="mt-2 h-2 rounded-full bg-black/40">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#8b5e00] to-[#d4a520]"
-                      style={{ width: `${Math.min(100, (item.progress / item.target) * 100)}%` }}
-                    />
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-[#9fbad4]">奖励 {item.rewardCoin}铜钱 / {item.rewardJade}玉</span>
-                    <button
-                      disabled={!done || item.claimed}
-                      onClick={() => handleClaimQuest(item.id)}
-                      className="rounded-md border border-[rgba(80,180,120,0.45)] px-3 py-1 text-xs text-[#bfeccf] disabled:opacity-50"
-                    >
-                      {item.claimed ? '已领取' : done ? '领取' : '未完成'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="w-full flex flex-col">
+            {/* Tabs */}
+            <div className="flex border-b border-white/10 mb-6">
+              <GoldenTab label="日常" active={questTab === 'daily'} onClick={() => setQuestTab('daily')} />
+              <GoldenTab label="周常" active={questTab === 'weekly'} onClick={() => setQuestTab('weekly')} />
+              <GoldenTab label="成就" active={questTab === 'achieve'} onClick={() => setQuestTab('achieve')} />
+            </div>
+
+            {/* List */}
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="text-[10px] text-[#a7c5ba] uppercase tracking-widest mb-2 px-1">◆ {questTab === 'daily' ? '日常任务 (每日刷新)' : questTab === 'weekly' ? '本周任务' : '历史成就'}</div>
+              
+              {quests.map((item) => {
+                const done = item.progress >= item.target;
+                return (
+                  <GoldenCard key={item.id} className="group">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{item.title.includes('胜利') ? '🏆' : item.title.includes('战') ? '⚔️' : '📚'}</span>
+                        <span className="text-[#f5e6b8] text-sm font-serif">{item.title}</span>
+                      </div>
+                      <span className="text-xs text-[#d4a520] font-mono">{item.progress}/{item.target}</span>
+                    </div>
+
+                    <div className="h-1.5 w-full bg-black/40 rounded-full mb-4">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#8b5e00] to-[#d4a520] transition-all duration-500"
+                        style={{ width: `${Math.min(100, (item.progress / item.target) * 100)}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-3">
+                        {item.rewardCoin > 0 && <span className="text-[10px] text-[#bda77f] flex items-center gap-1">🪙 {item.rewardCoin}</span>}
+                        {item.rewardJade > 0 && <span className="text-[10px] text-[#9eb9dd] flex items-center gap-1">💠 {item.rewardJade}</span>}
+                      </div>
+                      <button
+                        disabled={!done || item.claimed}
+                        onClick={() => handleClaimQuest(item.id)}
+                        className={`text-[10px] px-4 py-1 rounded transition-all ${
+                          item.claimed 
+                            ? 'bg-white/5 text-white/20 border border-white/5 cursor-default' 
+                            : done 
+                              ? 'bg-[#d4a520] text-black font-bold animate-pulse' 
+                              : 'border border-[rgba(212,165,32,0.3)] text-[#a7c5ba] hover:border-[rgba(212,165,32,0.6)]'
+                        }`}
+                      >
+                        {item.claimed ? '已领取' : done ? '领取奖励' : '未完成'}
+                      </button>
+                    </div>
+                  </GoldenCard>
+                );
+              })}
+              
+              <div className="text-center pt-4 opacity-40 text-[10px] text-[#a7c5ba]">
+                下次刷新：18小时32分钟
+              </div>
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'mail' && (
         <SystemModal title="百灵鸟传书" onClose={() => setActiveModal(null)}>
-          <div className="w-full max-w-lg space-y-3">
-            {mails.map((item) => (
-              <div key={item.id} className="rounded-lg border border-[rgba(212,165,32,0.25)] bg-black/30 p-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[#f5e6b8]">{item.title}</h3>
-                  <span className="text-xs text-[#bda77f]">{item.read ? '已读' : '未读'}</span>
-                </div>
-                <p className="mt-1 text-sm text-[#b4c9d8]">{item.content}</p>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs text-[#9fbad4]">
-                    {item.rewardCoin || item.rewardJade ? `附件：${item.rewardCoin}铜钱 / ${item.rewardJade}玉` : '无附件'}
-                  </span>
-                  <button
-                    disabled={item.claimed || (item.rewardCoin === 0 && item.rewardJade === 0)}
-                    onClick={() => handleClaimMail(item.id)}
-                    className="rounded-md border border-[rgba(80,180,120,0.45)] px-3 py-1 text-xs text-[#bfeccf] disabled:opacity-50"
-                  >
-                    {item.claimed ? '已领取' : '领取附件'}
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="w-full flex flex-col">
+            <div className="flex justify-end mb-4">
+              <button 
+                onClick={() => setMails(prev => prev.map(m => ({ ...m, read: true })))}
+                className="text-[10px] text-[#d4a520] border border-[#d4a520]/30 px-3 py-1 rounded hover:bg-[#d4a520]/10"
+              >
+                全部已读
+              </button>
+            </div>
+            
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              {mails.map((item) => (
+                <GoldenCard key={item.id} className={`${item.read ? 'opacity-70' : ''}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{item.rewardCoin || item.rewardJade ? '🎁' : '📢'}</span>
+                      <h3 className="text-[#f5e6b8] text-sm font-serif">{item.title}</h3>
+                      {!item.read && <span className="w-1.5 h-1.5 bg-red-500 rounded-full" title="未读" />}
+                    </div>
+                    <span className="text-[10px] text-[#a7c5ba] font-mono">2026-04-15</span>
+                  </div>
+                  
+                  <p className="text-xs text-[#a7c5ba] mb-4 line-clamp-2">{item.content}</p>
+                  
+                  <div className="flex items-center justify-between border-t border-white/5 pt-3">
+                    <div className="flex gap-2">
+                      {item.rewardCoin > 0 && <span className="text-[10px] text-[#d4a520]">🪙 {item.rewardCoin}</span>}
+                      {item.rewardJade > 0 && <span className="text-[10px] text-[#9eb9dd]">💠 {item.rewardJade}</span>}
+                    </div>
+                    <div className="flex gap-2">
+                      {(item.rewardCoin > 0 || item.rewardJade > 0) && (
+                        <button
+                          disabled={item.claimed}
+                          onClick={() => handleClaimMail(item.id)}
+                          className={`text-[10px] px-3 py-1 rounded transition-all ${
+                            item.claimed 
+                              ? 'text-white/20' 
+                              : 'bg-[#d4a520]/20 text-[#d4a520] hover:bg-[#d4a520] hover:text-black'
+                          }`}
+                        >
+                          {item.claimed ? '已领取' : '领取附件'}
+                        </button>
+                      )}
+                      <button className="text-[10px] text-[#a7c5ba] hover:text-white transition-colors px-2">删除</button>
+                    </div>
+                  </div>
+                </GoldenCard>
+              ))}
+            </div>
           </div>
         </SystemModal>
       )}
       {activeModal === 'community' && (
-        <CommunityModal
+        <CommunityScreen
           isOpen={activeModal === 'community'}
           onClose={() => setActiveModal(null)}
         />

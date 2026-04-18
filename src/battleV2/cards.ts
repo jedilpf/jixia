@@ -1,81 +1,68 @@
 /**
- * cards.ts — battleV2 战斗副牌
+ * 测试卡牌数据 - 简化版（20张）
  *
- * 规则：
- *  - 使用 cardsSource 统一数据源（content/cards -> generated/cardsRuntime）。
- *  - 卡图路径统一走 shared asset helper，兼容迁移后的 BS01/LEG-SC id。
- *  - 首发 Starter 牌库：从"礼心殿"和"名相府"两个门派各取5张（共10种），
- *    每张复制2份凑成 20 张完整牌库。
+ * 只有两种类型：立论（单位）、施策（法术）
  */
 
 import { DebateCard, Side } from './types';
-import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, FRAMEWORK_FACTION_NAMES, pickSceneBiasFromRoutePreference, resolveFactionForCards, toFrameworkFactionName } from './factions';
-import { ACTIVE_CARDS, type CardData } from '@/data/cardsSource';
-import { getCardImageUrl } from '@/utils/assets';
-import {
-  DEFAULT_CARD_POOL_CONFIG,
-  DEFAULT_DECK_BUILD_DEFAULTS,
-  normalizeEnabledFactions,
-} from './meta';
-import {
-  enforceDeckTierQuota,
-  getCardUnlockLevel,
-  getDeckTierQuotaForLevel,
-  isCardUnlockedForLevel,
-  resolveStarTierByRarity,
-} from './tierSystem';
 
-export function artPathForId(id: string, cardName?: string): string {
-  return getCardImageUrl(id, cardName);
-}
-
-// ── 从 ACTIVE_CARDS 按 id 查找对应的设定 ─────────────────────────────
-const SHOWCASE_MAP: Record<string, CardData> = Object.fromEntries(ACTIVE_CARDS.map((c) => [c.id, c]));
-const CARDS_BY_FACTION: Record<string, CardData[]> = ACTIVE_CARDS.reduce((acc, card) => {
-  if (!acc[card.faction]) acc[card.faction] = [];
-  acc[card.faction].push(card);
-  return acc;
-}, {} as Record<string, CardData[]>);
-
-// ── 首发 Starter 牌库卡池（10种，各2份=20张）─────────────────────────
-//   礼心殿：wenyan / zhuduchao / jiangxi / sishi / libian
-//   名相府：baima  / mingshi  / tongyi  / cifeng / guibian
-const STARTER_IDS: string[] = [
-  'wenyan', 'zhuduchao', 'jiangxi', 'sishi', 'libian',
-  'baima',  'mingshi',  'tongyi',  'cifeng', 'guibian',
-];
-const STARTER_FALLBACK_NAMES: string[] = [
-  '温言立论', '竹牍抄录', '讲席清规', '司史执笔', '礼辩同归',
-  '兼守同盟', '连弩匣', '机关木鸢', '城防尺牍', '千机壁垒',
+// === 立论牌（单位） ===
+const LILUN_CARDS: DebateCard[] = [
+  { id: 'l001', name: '行旅学子', type: '立论', cost: 1, power: 1, hp: 2 },
+  { id: 'l002', name: '乡议书吏', type: '立论', cost: 2, power: 2, hp: 2 },
+  { id: 'l003', name: '公议守席', type: '立论', cost: 2, power: 2, hp: 3 },
+  { id: 'l004', name: '案前执简', type: '立论', cost: 3, power: 3, hp: 2 },
+  { id: 'l005', name: '守成之议', type: '立论', cost: 3, power: 2, hp: 4 },
+  { id: 'l006', name: '学堂弟子', type: '立论', cost: 1, power: 1, hp: 3 },
+  { id: 'l007', name: '经史研者', type: '立论', cost: 2, power: 3, hp: 2 },
+  { id: 'l008', name: '大儒之论', type: '立论', cost: 4, power: 4, hp: 3 },
+  { id: 'l009', name: '百家宗师', type: '立论', cost: 5, power: 5, hp: 5 },
+  { id: 'l010', name: '墨家匠人', type: '立论', cost: 2, power: 2, hp: 2 },
 ];
 
-const DEFAULT_GUEST_COUNT = Math.max(
-  0,
-  Math.floor(
-    (DEFAULT_DECK_BUILD_DEFAULTS.deckSize
-      - DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount
-      - DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount)
-    / Math.max(1, DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount)
-  )
-);
+// === 施策牌（法术） ===
+const SHICE_CARDS: DebateCard[] = [
+  { id: 's001', name: '两端衡量', type: '施策', cost: 1, power: 0, hp: 0, effectKind: 'draw', effectValue: 1 },
+  { id: 's002', name: '驳杂去芜', type: '施策', cost: 2, power: 0, hp: 0, effectKind: 'damage', effectValue: 3 },
+  { id: 's003', name: '收束成文', type: '施策', cost: 2, power: 0, hp: 0, effectKind: 'draw', effectValue: 2 },
+  { id: 's004', name: '旁征博引', type: '施策', cost: 3, power: 0, hp: 0, effectKind: 'heal', effectValue: 2 },
+  { id: 's005', name: '公论成势', type: '施策', cost: 4, power: 0, hp: 0, effectKind: 'damage', effectValue: 5 },
+  { id: 's006', name: '急辩先声', type: '施策', cost: 1, power: 0, hp: 0, effectKind: 'damage', effectValue: 2 },
+  { id: 's007', name: '稳守阵地', type: '施策', cost: 2, power: 0, hp: 0, effectKind: 'heal', effectValue: 3 },
+  { id: 's008', name: '连珠发问', type: '施策', cost: 3, power: 0, hp: 0, effectKind: 'damage', effectValue: 4 },
+  { id: 's009', name: '深思缓行', type: '施策', cost: 1, power: 0, hp: 0, effectKind: 'draw', effectValue: 2 },
+  { id: 's010', name: '一语定论', type: '施策', cost: 5, power: 0, hp: 0, effectKind: 'damage', effectValue: 8 },
+];
 
+// === 全部测试卡牌 ===
+export const TEST_CARDS: DebateCard[] = [...LILUN_CARDS, ...SHICE_CARDS];
+
+// === 创建基础卡组 ===
 export interface CreateStarterDeckOptions {
-  // 兼容老逻辑：不传时仍使用 20 张固定 Starter
-  useFactionFramework?: boolean;
-  // 新默认：直接使用全量活跃卡池（170）参与演算
-  useFullCardPool?: boolean;
-  // 新逻辑：16 门派兼容框架
   mainFaction?: string;
   guestFactions?: string[];
+  useFactionFramework?: boolean;
+  useFullCardPool?: boolean;
+  playerLevel?: number;
   enabledFactions?: string[];
   genericCardIds?: string[];
-  guestCount?: number;
   mainFactionCardCount?: number;
   guestFactionCardCount?: number;
   includeCommons?: number;
   deckSize?: number;
-  forceClassicStarter?: boolean;
-  playerLevel?: number;
+}
+
+export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions): DebateCard[] {
+  const useFullCardPool = options?.useFullCardPool ?? true;
+  // TODO: useFullCardPool 用于控制是否使用完整卡池，目前暂未实现
+  // 简化版：每个玩家复制一份测试卡牌
+  const deck: DebateCard[] = TEST_CARDS.map(card => ({
+    ...card,
+    id: `${side}-${card.id}`,
+  }));
+
+  // 洗牌
+  return shuffleArray(deck);
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -86,355 +73,14 @@ function shuffleArray<T>(arr: T[]): T[] {
   return arr;
 }
 
-function dedupePreserveOrder<T>(arr: T[]): T[] {
-  const seen = new Set<T>();
-  const result: T[] = [];
-  for (const item of arr) {
-    if (seen.has(item)) continue;
-    seen.add(item);
-    result.push(item);
-  }
-  return result;
-}
-
-function getStableFactionCards(faction: string): CardData[] {
-  const cards = CARDS_BY_FACTION[faction] ?? [];
-  return [...cards].sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
-}
-
-function buildEnabledShowcaseFactionSet(enabledFactions: string[]): Set<string> {
-  return new Set(
-    normalizeEnabledFactions(enabledFactions).map((faction) => resolveFactionForCards(faction))
-  );
-}
-
-function buildSignatureSlotMap(): Map<string, number> {
-  const slotMap = new Map<string, number>();
-  for (const faction of Object.keys(CARDS_BY_FACTION)) {
-    const cards = getStableFactionCards(faction);
-    cards.forEach((card, idx) => slotMap.set(card.id, idx + 1));
-  }
-  return slotMap;
-}
-
-const SIGNATURE_SLOT_BY_ID = buildSignatureSlotMap();
-const CORE_FACTION_SET = new Set(CORE_FACTION_NAMES);
-
-function showcaseToDebateCardFromSource(src: CardData): Omit<DebateCard, 'id'> {
-  // 兼容新旧两套卡牌类型词表，统一归一到 DebateCard 的五类语义。
-  type EffectKind = DebateCard['effectKind'];
-  const canonicalTypeMap: Record<string, DebateCard['type']> = {
-    '技能': '立论',
-    '事件': '立论',
-    '场地': '玄章',
-    '装备': '策术',
-    '角色': '门客',
-    '反制': '反诘',
-    '立论': '立论',
-    '策术': '策术',
-    '玄章': '玄章',
-    '门客': '门客',
-    '反诘': '反诘',
-  };
-  const effectKindMap: Record<string, EffectKind> = {
-    '技能': 'draw',
-    '事件': 'damage',
-    '场地': 'shield',
-    '装备': 'shield',
-    '角色': 'summon_front',
-    '反制': 'shixu',
-    '立论': 'damage',
-    '策术': 'draw',
-    '玄章': 'shield',
-    '门客': 'summon_front',
-    '反诘': 'shixu',
-  };
-  const normalizedType = canonicalTypeMap[src.type] ?? '立论';
-
-  const frameworkFaction = toFrameworkFactionName(src.faction);
-  const blueprint = FRAMEWORK_FACTION_BY_NAME[frameworkFaction];
-  const sceneBias = blueprint ? pickSceneBiasFromRoutePreference(blueprint.routePreference) : 'all';
-  const starTier = resolveStarTierByRarity(src.rarity);
-  const unlockLevel = getCardUnlockLevel({ starTier, rarity: src.rarity });
-
-  return {
-    name: src.name,
-    type: normalizedType,
-    rarity: src.rarity,
-    starTier,
-    unlockLevel,
-    cost: Math.max(1, src.cost <= 3 ? src.cost : Math.round(src.cost / 2)),
-    effectKind: effectKindMap[src.type] ?? effectKindMap[normalizedType] ?? 'draw',
-    effectValue: src.attack ?? src.shield ?? (src.hp ? Math.ceil(src.hp / 2) : 1),
-    art: artPathForId(src.id, src.name),
-    prologue: src.background,
-    description: src.skill,
-    faction: frameworkFaction,
-    factionCore: CORE_FACTION_SET.has(frameworkFaction),
-    guestEligible: true,
-    signatureSlot: SIGNATURE_SLOT_BY_ID.get(src.id),
-    sceneBias,
-    lanePreference: sceneBias === 'all' ? undefined : sceneBias,
-  };
-}
-
-function showcaseToDebateCard(id: string): Omit<DebateCard, 'id'> | null {
-  const src = SHOWCASE_MAP[id];
-  if (!src) return null;
-  return showcaseToDebateCardFromSource(src);
-}
-
-function buildCardId(side: Side, copy: number, id: string): string {
-  return `${side}-c${copy}-${id}`;
-}
-
-function resolveClassicStarterIds(): string[] {
-  const presetIds = STARTER_IDS.filter((id) => Boolean(SHOWCASE_MAP[id]));
-  if (presetIds.length >= 6) return presetIds.slice(0, 10);
-
-  const nameBasedIds = STARTER_FALLBACK_NAMES
-    .map((name) => ACTIVE_CARDS.find((card) => card.name === name)?.id)
-    .filter((id): id is string => Boolean(id));
-
-  const factionFallbackIds = ACTIVE_CARDS
-    .filter((card) => card.faction === '礼心殿' || card.faction === '玄匠盟')
-    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
-    .map((card) => card.id);
-
-  const universalFallbackIds = [...ACTIVE_CARDS]
-    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
-    .map((card) => card.id);
-
-  return dedupePreserveOrder([
-    ...presetIds,
-    ...nameBasedIds,
-    ...factionFallbackIds,
-    ...universalFallbackIds,
-  ]).slice(0, 10);
-}
-
-function createClassicStarterDeck(side: Side): DebateCard[] {
-  const deck: DebateCard[] = [];
-  const starterIds = resolveClassicStarterIds();
-  if (starterIds.length === 0) return deck;
-  const copies = Math.max(2, Math.ceil(20 / starterIds.length));
-
-  for (let copy = 0; copy < copies; copy += 1) {
-    for (const id of starterIds) {
-      const base = showcaseToDebateCard(id);
-      if (!base) continue;
-      deck.push({ ...base, id: buildCardId(side, copy, id) });
-    }
-  }
-
-  return deck.slice(0, 20);
-}
-
-function applyTierUnlockFilter(deck: DebateCard[], playerLevel?: number): DebateCard[] {
-  if (typeof playerLevel !== 'number' || !Number.isFinite(playerLevel)) return deck;
-  const safeLevel = Math.max(1, Math.floor(playerLevel));
-  return deck.filter((card) => isCardUnlockedForLevel(card, safeLevel));
-}
-
-function applyTierRules(deck: DebateCard[], playerLevel?: number): DebateCard[] {
-  if (typeof playerLevel !== 'number' || !Number.isFinite(playerLevel)) return deck;
-  const safeLevel = Math.max(1, Math.floor(playerLevel));
-  const unlockedDeck = applyTierUnlockFilter(deck, safeLevel);
-  const enforced = enforceDeckTierQuota(unlockedDeck, safeLevel);
-  return enforced.deck;
-}
-
-function getTierFallbackDeck(side: Side, playerLevel?: number): DebateCard[] {
-  const safeLevel = typeof playerLevel === 'number' && Number.isFinite(playerLevel)
-    ? Math.max(1, Math.floor(playerLevel))
-    : 1;
-  const quota = getDeckTierQuotaForLevel(safeLevel);
-  const byTier = {
-    one: [] as CardData[],
-    two: [] as CardData[],
-    three: [] as CardData[],
-  };
-
-  for (const src of ACTIVE_CARDS) {
-    const tier = resolveStarTierByRarity(src.rarity);
-    if (tier === 3) byTier.three.push(src);
-    else if (tier === 2) byTier.two.push(src);
-    else byTier.one.push(src);
-  }
-
-  const deckSource = [
-    ...byTier.one,
-    ...byTier.two.slice(0, quota.maxTwoStar),
-    ...byTier.three.slice(0, quota.maxThreeStar),
-  ];
-
-  return deckSource.map((src, idx) => ({
-    ...showcaseToDebateCardFromSource(src),
-    id: `${side}-tier-fallback-${idx}-${src.id}`,
-  }));
-}
-
 export function getActiveCardPoolSize(): number {
-  return ACTIVE_CARDS.length;
+  return TEST_CARDS.length;
+}
+
+export function rollGuestFactions(_main: string, _count: number): string[] {
+  return [];
 }
 
 export function listAllDebateCardsForLibrary(): DebateCard[] {
-  return ACTIVE_CARDS
-    .map((src, idx) => ({
-      ...showcaseToDebateCardFromSource(src),
-      id: `library-${idx}-${src.id}`,
-    }))
-    .sort((a, b) => (a.cost - b.cost) || a.name.localeCompare(b.name, 'zh-Hans-CN'));
-}
-
-function createFullCardPoolDeck(side: Side, enabledFactions: string[], playerLevel?: number): DebateCard[] {
-  const enabledShowcaseFactions = buildEnabledShowcaseFactionSet(enabledFactions);
-  const isFactionEnabled = (faction: string): boolean =>
-    enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
-
-  const selected = ACTIVE_CARDS.filter((card) => isFactionEnabled(card.faction));
-  if (selected.length === 0) return [];
-
-  const shuffled = shuffleArray([...selected]);
-  const fullDeck = shuffled.map((src, idx) => ({
-    ...showcaseToDebateCardFromSource(src),
-    id: `${side}-p${idx}-${src.id}`,
-  }));
-  return applyTierRules(fullDeck, playerLevel);
-}
-
-function getDeckIdsForFactionFramework(
-  mainFaction: string,
-  guestFactions: string[],
-  mainFactionCardCount: number,
-  guestFactionCardCount: number,
-  commonCount: number,
-  deckSize: number,
-  genericCardIds: string[],
-  enabledFactions: string[]
-): string[] {
-  const mainShowcaseFaction = resolveFactionForCards(mainFaction);
-  const enabledShowcaseFactions = buildEnabledShowcaseFactionSet(enabledFactions);
-  const isFactionEnabled = (faction: string): boolean =>
-    enabledShowcaseFactions.size === 0 || enabledShowcaseFactions.has(faction);
-
-  const mainIds = getStableFactionCards(mainShowcaseFaction)
-    .filter((card) => isFactionEnabled(card.faction))
-    .slice(0, Math.max(0, mainFactionCardCount))
-    .map((c) => c.id);
-
-  const guestShowcaseFactions = dedupePreserveOrder(
-    guestFactions.map((f) => resolveFactionForCards(f)).filter((f) => f && f !== mainShowcaseFaction)
-  ).filter((f) => (CARDS_BY_FACTION[f]?.length ?? 0) > 0 && isFactionEnabled(f));
-
-  // 每个客派按配置贡献若干张代表牌
-  const guestIds = guestShowcaseFactions.flatMap((faction) =>
-    getStableFactionCards(faction)
-      .slice(0, Math.max(0, guestFactionCardCount))
-      .map((card) => card.id)
-  );
-
-  const selectedIds = dedupePreserveOrder([...mainIds, ...guestIds]);
-
-  const configuredCommonPool = dedupePreserveOrder(genericCardIds)
-    .map((id) => SHOWCASE_MAP[id]?.id)
-    .filter((id): id is string => Boolean(id))
-    .filter((id) => !selectedIds.includes(id))
-    .filter((id) => {
-      const card = SHOWCASE_MAP[id];
-      return card ? isFactionEnabled(card.faction) : false;
-    });
-  const fallbackCommonPool = ACTIVE_CARDS
-    .filter((card) => !selectedIds.includes(card.id))
-    .filter((card) => isFactionEnabled(card.faction))
-    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
-    .map((card) => card.id);
-  const commonsPool = configuredCommonPool.length > 0
-    ? configuredCommonPool
-    : fallbackCommonPool;
-  const commonIds = commonsPool.slice(0, Math.max(0, commonCount));
-
-  const baseIds = dedupePreserveOrder([...selectedIds, ...commonIds]);
-  if (baseIds.length === 0) return [];
-
-  const result: string[] = [];
-  for (let i = 0; i < deckSize; i += 1) {
-    result.push(baseIds[i % baseIds.length]);
-  }
-  return result;
-}
-
-export function listShowcaseFactions(): string[] {
-  return Object.keys(CARDS_BY_FACTION).sort((a, b) => a.localeCompare(b));
-}
-
-export function rollGuestFactions(mainFaction: string, count = DEFAULT_GUEST_COUNT): string[] {
-  const normalizedMain = toFrameworkFactionName(mainFaction);
-  const candidates = FRAMEWORK_FACTION_NAMES.filter((f) => f !== normalizedMain);
-  return shuffleArray([...candidates]).slice(0, Math.max(0, count));
-}
-
-export function createStarterDeck(side: Side, options?: CreateStarterDeckOptions): DebateCard[] {
-  if (options?.forceClassicStarter) {
-    const forceClassicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
-    return forceClassicDeck.length > 0 ? forceClassicDeck : getTierFallbackDeck(side, options?.playerLevel);
-  }
-
-  const enabledFactions = normalizeEnabledFactions(options?.enabledFactions ?? DEFAULT_CARD_POOL_CONFIG.enabledFactions);
-  const useFullCardPool = options?.useFullCardPool ?? true;
-  if (useFullCardPool) {
-    const fullPoolDeck = createFullCardPoolDeck(side, enabledFactions, options?.playerLevel);
-    if (fullPoolDeck.length > 0) return fullPoolDeck;
-    return getTierFallbackDeck(side, options?.playerLevel);
-  }
-
-  const useFramework = Boolean(
-    options?.useFactionFramework ||
-    options?.mainFaction ||
-    (options?.guestFactions && options.guestFactions.length > 0)
-  );
-  if (!useFramework) {
-    const classicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
-    return classicDeck.length > 0 ? classicDeck : getTierFallbackDeck(side, options?.playerLevel);
-  }
-
-  const mainFaction = toFrameworkFactionName(options?.mainFaction ?? CORE_FACTION_NAMES[0]);
-  const genericCardIds = options?.genericCardIds ?? DEFAULT_CARD_POOL_CONFIG.genericCardIds;
-  const mainFactionCardCount = options?.mainFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount;
-  const guestFactionCardCount = options?.guestFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount;
-  const commonCount = options?.includeCommons ?? DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount;
-  const deckSize = options?.deckSize ?? DEFAULT_DECK_BUILD_DEFAULTS.deckSize;
-  const computedGuestCount = Math.max(
-    0,
-    Math.floor((deckSize - mainFactionCardCount - commonCount) / Math.max(1, guestFactionCardCount))
-  );
-  const guestFactions = options?.guestFactions?.length
-    ? options.guestFactions.map((f) => toFrameworkFactionName(f))
-    : rollGuestFactions(mainFaction, options?.guestCount ?? computedGuestCount);
-
-  const ids = getDeckIdsForFactionFramework(
-    mainFaction,
-    guestFactions,
-    mainFactionCardCount,
-    guestFactionCardCount,
-    commonCount,
-    deckSize,
-    genericCardIds,
-    enabledFactions
-  );
-  const deck: DebateCard[] = [];
-  ids.forEach((id, idx) => {
-    const src = SHOWCASE_MAP[id];
-    if (!src) return;
-    const base = showcaseToDebateCardFromSource(src);
-    deck.push({ ...base, id: `${side}-f${idx}-${id}` });
-  });
-
-  if (deck.length === 0) {
-    const classicDeck = applyTierRules(createClassicStarterDeck(side), options?.playerLevel);
-    return classicDeck.length > 0 ? classicDeck : getTierFallbackDeck(side, options?.playerLevel);
-  }
-  const tierAppliedDeck = applyTierRules(deck, options?.playerLevel);
-  if (tierAppliedDeck.length > 0) return tierAppliedDeck;
-  return getTierFallbackDeck(side, options?.playerLevel);
+  return TEST_CARDS;
 }

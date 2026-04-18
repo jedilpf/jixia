@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-UI-MODAL-OPTIMIZE-001",
+  "goal": "Unify the visual style of auxiliary modals in the main menu (Settings, Profile, Events, Quests, Mail, Store) based on the V9 Yahua design system.",
+  "constraints": [
+    "Use SystemModal as the standard container.",
+    "Align colors and typography with the Settings modal baseline.",
+    "Implement rich content for Profile, Events, Quests, Mail, and Stores.",
+    "Do not touch core battle or character view UI."
+  ],
+  "deliverables": [
+    "src/components/MainMenu.tsx (UI refactoring)",
+    "public/assets/chars/avatars/ (New assets)",
+    "src/data/game/avatarRegistry.ts (Data update)"
+  ],
+  "allowed_write_paths": [
+    "src/components",
+    "src/data/game",
+    "public/assets/chars/avatars",
+    "src/App.tsx",
+    "src/ui/components/PlayerStatsPanelV2.tsx",
+    "src/battleV2/cards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/profile",
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

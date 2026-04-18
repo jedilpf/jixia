@@ -18,12 +18,13 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
-import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
 import { getTopicById } from '@/battleV2/topics';
 import {
   ArenaId,
   SeatId,
 } from '@/battleV2/types';
+import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
+import { CARDS, CardData } from '@/data/showcaseCards';
 
 // 三层架构组件
 import {
@@ -39,8 +40,6 @@ import {
   ExitConfirmModal,
 } from './battle';
 
-// 所有可用卡牌（用于图鉴）
-import { TEST_CARDS_V01 } from '@/battleV2/testCards';
 
 // ═══════════════════════════════════════════════════════════════
 // Props
@@ -222,7 +221,7 @@ export default function BattleFrameV2({
   // 图鉴数据
   // ═══════════════════════════════════════════════════════════
   const allCards = useMemo(() => {
-    return listAllDebateCardsForLibrary() || TEST_CARDS_V01;
+    return listAllDebateCardsForLibrary();
   }, []);
 
   // ═══════════════════════════════════════════════════════════
