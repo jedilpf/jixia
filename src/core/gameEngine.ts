@@ -1,3 +1,20 @@
+/**
+ * ⚠️ LEGACY MODULE — DO NOT USE FOR NEW DEVELOPMENT
+ *
+ * This module contains two categories of code:
+ *
+ * 1. PRE-BATTLE NAVIGATION (still in use by appReducer):
+ *    createInitialGameState, startMatchFlow, openTopicPreview,
+ *    openFactionPick, lockFaction, autoLockFaction, enterLoading, startBattle
+ *
+ * 2. BATTLE LOGIC (DEPRECATED — superseded by src/battleV2/engine.ts):
+ *    advanceBattlePhase, playCardToZone, passAction, resolveRound,
+ *    resolveBattle, and all related helpers
+ *
+ * CURRENT SHOWCASE: Battle V2 engine at src/battleV2/engine.ts
+ * This file is retained for historical reference only.
+ */
+
 import { formatYahuaLog } from '@/utils/yahuaLogs';
 import { resolveBattle } from '@/core/battleResolver';
 import { getNextBattlePhase } from '@/core/phaseMachine';

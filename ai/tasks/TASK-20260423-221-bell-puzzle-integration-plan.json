@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260423-221-bell-puzzle-integration-plan",
+  "goal": "Produce a concrete integration plan to merge the PDF-defined bianzhong music puzzle into the current game architecture, with explicit implementation milestones and risk/difficulty analysis.",
+  "constraints": [
+    "Do not modify gameplay runtime code in this task; this is planning and arbitration only.",
+    "Respect current confirmed direction: battle active card taxonomy remains two types (立论/策术) and no hidden-card semantics.",
+    "Default UX language remains Chinese; multilingual should be surfaced via initial settings entry and not mixed by default.",
+    "If source conflicts exist between current implementation and PDF proposal, record arbitration before finalizing plan.",
+    "Keep recommendations grounded in existing files and architecture of StoryEngine/StoryScreen/MainMenu/LanguageContext."
+  ],
+  "deliverables": [
+    "Conflict arbitration record for faction-route mismatch between current prolog and PDF bell design",
+    "Integration planning document with scope, architecture, flow, data contract, milestones, and acceptance criteria",
+    "Difficulty/risk section with mitigation and sequencing suggestions"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/standards",
+    "docs/story"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260423-221-bell-puzzle-integration-plan.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260423-221-bell-puzzle-integration-plan.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260423-221-bell-puzzle-integration-plan.json"
+  ],
+  "status": "in_progress"
+}

@@ -11,10 +11,12 @@
     searchCards,
     sortCards,
 } from '@/types';
-import { CARDS } from './showcaseCards';
+import { CARDS, normalizeRuleText } from './showcaseCards';
 import type { CardData } from './showcaseCards';
 
 const TYPE_MAP: Record<string, CardType> = {
+    '立论': 'character',
+    '策术': 'event',
     '技能': 'skill',
     '事件': 'event',
     '场地': 'field',
@@ -30,8 +32,18 @@ const RARITY_MAP: Record<string, RarityZh> = {
     '传说': '传说',
 };
 
-export function mapType(zhType: string): CardType {
-    return TYPE_MAP[zhType] ?? 'skill';
+function inferCardTypeFromStats(data?: Pick<CardData, 'attack' | 'hp'>): CardType {
+    if (!data) return 'event';
+    return data.attack !== undefined || data.hp !== undefined ? 'character' : 'event';
+}
+
+function inferCharacterStat(primary: number | undefined, fallback: number): number {
+    if (typeof primary === 'number' && primary > 0) return Math.round(primary);
+    return Math.max(1, Math.round(fallback));
+}
+
+export function mapType(zhType: string, data?: Pick<CardData, 'attack' | 'hp'>): CardType {
+    return TYPE_MAP[zhType] ?? inferCardTypeFromStats(data);
 }
 
 export function mapRarity(zhRarity: string): RarityZh {
@@ -39,7 +51,8 @@ export function mapRarity(zhRarity: string): RarityZh {
 }
 
 export function mapShowcaseToBattleCard(data: CardData): Card {
-    const type = mapType(data.type);
+    const type = mapType(data.type, data);
+    const normalizedRuleText = data.ruleText || normalizeRuleText(data.skill);
     
     const baseCard = {
         id: data.id,
@@ -49,7 +62,7 @@ export function mapShowcaseToBattleCard(data: CardData): Card {
         faction: data.faction,
         rarity: mapRarity(data.rarity),
         background: data.background,
-        skillDesc: data.skill,
+        skillDesc: normalizedRuleText,
     };
 
     switch (type) {
@@ -57,8 +70,8 @@ export function mapShowcaseToBattleCard(data: CardData): Card {
             return {
                 ...baseCard,
                 type: 'character',
-                atk: data.attack ?? 0,
-                hp: data.hp ?? 1,
+                atk: inferCharacterStat(data.attack, Math.min(6, data.cost)),
+                hp: inferCharacterStat(data.hp, Math.min(8, data.cost + 1)),
             } as CharacterCard;
 
         case 'gear':

@@ -1,0 +1,32 @@
+{
+  "task_id": "TASK-20260419-219",
+  "goal": "Unify card codex and shared catalog output to two active card types only (立论/策术) so users no longer see five-type taxonomy in gameplay-facing card views.",
+  "constraints": [
+    "Follow the latest user-confirmed battle/card taxonomy direction: active card typing must be two types only.",
+    "Do not rewrite the full 170-card corpus manually; prefer deterministic normalization at data boundary.",
+    "Keep scope limited to card data typing/output and required conflict arbitration record.",
+    "Do not modify unrelated story, community, or main-menu systems in this task."
+  ],
+  "deliverables": [
+    "Conflict arbitration record documenting replacement of prior five-type codex taxonomy with two-type output.",
+    "showcaseCards exports only two active card types for downstream catalog/card showcase consumers.",
+    "Type color map and card typing stay consistent with two-type output.",
+    "Verification notes from typecheck/build command(s)."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/standards",
+    "src/data/showcaseCards.ts",
+    "src/components/battle/HandCard.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "src/components/showcase/CardDetail.tsx",
+    "src/ui/screens/StoryScreen.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260419-219-card-codex-two-type-unification.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260419-219-card-codex-two-type-unification.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260419-219-card-codex-two-type-unification.json"
+  ],
+  "status": "in_progress"
+}

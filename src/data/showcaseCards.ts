@@ -6,40 +6,244 @@ export const rarityColor: Record<string, string> = {
     '传说': '#f59e0b',
 };
 
-export type CanonicalCardType = '立论' | '策术' | '玄章' | '门客' | '反诘';
-export type LegacyCardType = '技能' | '事件' | '场地' | '角色' | '装备' | '反制';
-export type ShowcaseCardType = CanonicalCardType | LegacyCardType;
+export type ActiveCardType = '\u7acb\u8bba' | '\u7b56\u672f';
+export type LegacyCardType = '\u6280\u80fd' | '\u4e8b\u4ef6' | '\u573a\u5730' | '\u89d2\u8272' | '\u88c5\u5907' | '\u53cd\u5236';
+export type RetiredCanonicalCardType = '\u7384\u7ae0' | '\u95e8\u5ba2' | '\u53cd\u8bd8';
+export type RawShowcaseCardType = ActiveCardType | RetiredCanonicalCardType | LegacyCardType;
+export type ShowcaseCardType = ActiveCardType;
 
-// 卡牌类型背景颜色（新旧类型兼容）
+const RAW_TYPE_TO_ACTIVE: Record<RawShowcaseCardType, ActiveCardType> = {
+    '\u7acb\u8bba': '\u7acb\u8bba',
+    '\u7b56\u672f': '\u7b56\u672f',
+    '\u7384\u7ae0': '\u7b56\u672f',
+    '\u95e8\u5ba2': '\u7acb\u8bba',
+    '\u53cd\u8bd8': '\u7b56\u672f',
+    '\u6280\u80fd': '\u7acb\u8bba',
+    '\u4e8b\u4ef6': '\u7b56\u672f',
+    '\u573a\u5730': '\u7b56\u672f',
+    '\u89d2\u8272': '\u7acb\u8bba',
+    '\u88c5\u5907': '\u7b56\u672f',
+    '\u53cd\u5236': '\u7b56\u672f',
+};
+
+const RAW_TYPE_COLOR: Record<RawShowcaseCardType, string> = {
+    '\u6280\u80fd': '#064e3b',
+    '\u4e8b\u4ef6': '#7c3aed',
+    '\u573a\u5730': '#1e3a5f',
+    '\u88c5\u5907': '#78350f',
+    '\u89d2\u8272': '#831843',
+    '\u53cd\u5236': '#4c1d95',
+    '\u7acb\u8bba': '#064e3b',
+    '\u7b56\u672f': '#7c3aed',
+    '\u7384\u7ae0': '#1e3a5f',
+    '\u95e8\u5ba2': '#831843',
+    '\u53cd\u8bd8': '#4c1d95',
+};
+
+// Expose two visible card types only.
 export const typeColor: Record<ShowcaseCardType, string> = {
-    '技能': '#064e3b',
-    '事件': '#7c3aed',
-    '场地': '#1e3a5f',
-    '装备': '#78350f',
-    '角色': '#831843',
-    '反制': '#4c1d95',
-    '立论': '#064e3b',
-    '策术': '#7c3aed',
-    '玄章': '#1e3a5f',
-    '门客': '#831843',
-    '反诘': '#4c1d95',
+    '\u7acb\u8bba': RAW_TYPE_COLOR['\u7acb\u8bba'],
+    '\u7b56\u672f': RAW_TYPE_COLOR['\u7b56\u672f'],
 };
 
 export interface CardData {
     id: string;
     name: string;
     faction: string;
-    type: ShowcaseCardType;
+    type: ActiveCardType;
     rarity: string;
     background: string;
     skill: string;
+    ruleText: string;
+    rule: CardRule;
     cost: number;
     attack?: number;
     hp?: number;
     shield?: number;
 }
 
-export const CARDS: CardData[] = [
+export type RuleOpCode = 'summon' | 'damage' | 'draw' | 'heal' | 'discard' | 'shield' | 'counter' | 'silence' | 'cost' | 'unknown';
+export type RuleTarget = 'self' | 'enemy' | 'both' | 'any' | 'none';
+
+export interface CardRuleOp {
+    code: RuleOpCode;
+    target: RuleTarget;
+    value: number;
+    attack?: number;
+    hp?: number;
+}
+
+export interface CardRule {
+    version: 'v1';
+    ops: CardRuleOp[];
+    source: 'normalized';
+}
+
+interface RawCardData extends Omit<CardData, 'type' | 'ruleText' | 'rule'> {
+    type: RawShowcaseCardType;
+}
+
+const CN_DIGITS: Record<string, number> = {
+    '零': 0, '〇': 0,
+    '一': 1, '壹': 1,
+    '二': 2, '贰': 2, '两': 2, '俩': 2,
+    '三': 3, '叁': 3,
+    '四': 4, '肆': 4,
+    '五': 5, '伍': 5,
+    '六': 6, '陆': 6,
+    '七': 7, '柒': 7,
+    '八': 8, '捌': 8,
+    '九': 9, '玖': 9,
+};
+
+const CN_UNITS: Record<string, number> = {
+    '十': 10, '拾': 10,
+    '百': 100, '佰': 100,
+    '千': 1000, '仟': 1000,
+};
+
+const NUMBER_TOKEN_RE = /[零〇一二两俩三四五六七八九十百千壹贰叁肆伍陆柒捌玖拾佰仟\d.]+/g;
+
+function parseNumberToken(rawToken: string): number {
+    const token = rawToken.trim();
+    if (!token) return 0;
+
+    if (/^\d+(\.\d+)?$/.test(token)) {
+        return Math.max(0, Math.round(Number(token)));
+    }
+
+    let total = 0;
+    let current = 0;
+    let hasKnownChar = false;
+
+    for (const ch of token) {
+        if (ch in CN_DIGITS) {
+            current = CN_DIGITS[ch];
+            hasKnownChar = true;
+            continue;
+        }
+        if (ch in CN_UNITS) {
+            const unit = CN_UNITS[ch];
+            hasKnownChar = true;
+            if (current === 0) {
+                current = 1;
+            }
+            total += current * unit;
+            current = 0;
+            continue;
+        }
+        if (/\d/.test(ch)) {
+            current = current * 10 + Number(ch);
+            hasKnownChar = true;
+        }
+    }
+
+    if (!hasKnownChar) return 0;
+    return Math.max(0, total + current);
+}
+
+export function normalizeRuleText(raw: string): string {
+    const normalizedNumbers = raw.replace(NUMBER_TOKEN_RE, (token) => String(parseNumberToken(token)));
+    const cleaned = normalizedNumbers
+        .replace(/[【】]/g, '')
+        .replace(/[①②③④⑤⑥⑦⑧⑨]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const clauses = cleaned
+        .split(/[；。]/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+    const effectiveClauses = clauses.filter((clause) =>
+        /(抽|弃|造成|回复|获得|护持|沉默|反制|费用|本回合|下回合|结算)/.test(clause),
+    );
+
+    const selected = (effectiveClauses.length > 0 ? effectiveClauses : clauses).slice(0, 3);
+    return selected.join('；');
+}
+
+function appendOp(ops: CardRuleOp[], op: CardRuleOp): void {
+    if (!Number.isFinite(op.value) || op.value <= 0) return;
+    ops.push(op);
+}
+
+function inferStatValue(value: number | undefined, fallback: number): number {
+    if (typeof value === 'number' && value > 0) return Math.round(value);
+    return Math.max(1, Math.round(fallback));
+}
+
+function buildStructuredRule(rawCard: RawCardData, activeType: ActiveCardType): { ruleText: string; rule: CardRule } {
+    const normalized = normalizeRuleText(rawCard.skill);
+    const ops: CardRuleOp[] = [];
+
+    if (activeType === '立论') {
+        const attack = inferStatValue(rawCard.attack, Math.min(6, rawCard.cost));
+        const hp = inferStatValue(rawCard.hp, Math.min(8, rawCard.cost + 1));
+        appendOp(ops, {
+            code: 'summon',
+            target: 'self',
+            value: 1,
+            attack,
+            hp,
+        });
+    }
+
+    const hasEnemyHint = /(敌方|对手|敌军|其操作者)/.test(normalized);
+    const drawMatches = normalized.match(/抽(\d+)/g) ?? [];
+    const healMatches = normalized.match(/回复(\d+)/g) ?? [];
+    const damageMatches = normalized.match(/造成(\d+)点伤害/g) ?? [];
+    const discardMatches = normalized.match(/弃(\d+)张牌/g) ?? [];
+    const shieldMatches = normalized.match(/护持(\d+)/g) ?? [];
+    const costMatches = normalized.match(/费用[^\d-+]*([+-]?\d+)/g) ?? [];
+
+    for (const entry of drawMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'draw', target: 'self', value });
+    }
+    for (const entry of healMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'heal', target: 'self', value });
+    }
+    for (const entry of damageMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'damage', target: hasEnemyHint ? 'enemy' : 'any', value });
+    }
+    for (const entry of discardMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'discard', target: hasEnemyHint ? 'enemy' : 'self', value });
+    }
+    for (const entry of shieldMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'shield', target: 'self', value });
+    }
+    for (const entry of costMatches) {
+        const value = parseNumberToken(entry.replace(/[^\d.]/g, ''));
+        appendOp(ops, { code: 'cost', target: hasEnemyHint ? 'enemy' : 'self', value });
+    }
+
+    if (/(反制)/.test(normalized)) {
+        appendOp(ops, { code: 'counter', target: 'enemy', value: 1 });
+    }
+    if (/(沉默)/.test(normalized)) {
+        appendOp(ops, { code: 'silence', target: hasEnemyHint ? 'enemy' : 'any', value: 1 });
+    }
+
+    const fallbackRuleText = activeType === '立论'
+        ? `入场：辩锋${inferStatValue(rawCard.attack, Math.min(6, rawCard.cost))}，根基${inferStatValue(rawCard.hp, Math.min(8, rawCard.cost + 1))}`
+        : (rawCard.shield ? `获得护持${Math.round(rawCard.shield)}` : `本回合按费用${rawCard.cost}结算`);
+
+    return {
+        ruleText: normalized || fallbackRuleText,
+        rule: {
+            version: 'v1',
+            ops: ops.length > 0 ? ops : [{ code: 'unknown', target: 'none', value: 1 }],
+            source: 'normalized',
+        },
+    };
+}
+
+const RAW_CARDS: RawCardData[] = [
     // ====== 礼心殿 ======
     { id: 'wenyan', name: '温言立论', faction: '礼心殿', type: '立论', rarity: '常见', cost: 1, background: '言不急则理自明，笑里藏锋亦不伤人。青灯一盏，足压满堂躁气。', skill: '抽壹；若你本回合已使用过本门派牌，改为抽贰。' },
     { id: 'zhuduchao', name: '竹牍抄录', faction: '礼心殿', type: '策术', rarity: '常见', cost: 2, background: '抄一段旧文，便得一线新路。字落竹纹，心亦随之安定。', skill: '从牌库检索壹张【立论】牌加入手牌；然后弃壹张牌。' },
@@ -145,7 +349,7 @@ export const CARDS: CardData[] = [
     { id: 'lixindian7', name: '明堂议事', faction: '礼心殿', type: '门客', rarity: '稀有', cost: 3, attack: 1, hp: 4, background: '明堂一开，诸事皆归礼序。中和之气，至刚至柔。', skill: '登场：你每回合首次使用【技能】牌时，抽壹；双方造成的伤害各-1（每回合）。' },
     { id: 'lixindian8', name: '六礼备至', faction: '礼心殿', type: '策术', rarity: '常见', cost: 2, background: '冠婚丧祭乡相见，六礼周全则天下安。', skill: '获得【护持叁】；你本回合第壹次受到伤害时，额外抽壹。' },
     { id: 'lixindian9', name: '仪队总规', faction: '礼心殿', type: '策术', rarity: '稀有', cost: 2, shield: 2, background: '仪仗列队，气象庄严；规矩既立，百事顺遂。', skill: '装备：你每打出一张【技能】牌后，获得【护持壹】。' },
-    { id: 'lixindian10', name: '礼义廉耻', faction: '礼心殿', type: '反诘', rarity: '史诗', cost: 3, background: '四维不张，国乃灭亡。一言驳斥，胜过刀兵。', skill: '反制正在结算的壹张牌；成功后净化你全部负面状态，并令对手获得【怀疑加贰（贰回合）】。' },
+    { id: 'lixindian10', name: '礼义廉耻', faction: '礼心殿', type: '反诘', rarity: '传说', cost: 3, background: '四维不张，国乃灭亡。一言驳斥，胜过刀兵。', skill: '反制正在结算的壹张牌；成功后净化你全部负面状态，并令对手获得【怀疑加贰（贰回合）】。' },
 
     // ====== 衡戒廷（二期）======
     { id: 'hengjieting6', name: '规典立则', faction: '衡戒廷', type: '立论', rarity: '常见', cost: 1, background: '法典一立，天下皆知规矩。无规矩则不成方圆。', skill: '抽壹；若你本回合已反制过牌，改为抽贰且获得【护持贰】。' },
@@ -159,7 +363,7 @@ export const CARDS: CardData[] = [
     { id: 'guizhen7', name: '炼气储真', faction: '归真观', type: '门客', rarity: '稀有', cost: 4, attack: 3, hp: 5, background: '真气充盈，百病不侵；内力深厚，外物难损。', skill: '被动：你每回合结束时若未受伤，回复1底蕴并获得【清明加壹】；清明达到5时，清除所有负面状态。' },
     { id: 'guizhen8', name: '虚空契道', faction: '归真观', type: '策术', rarity: '稀有', cost: 3, background: '虚室生白，吉祥止止。空处生明，无为而成。', skill: '净化全部负面状态；回复肆点底蕴；若你本回合未使用过牌，改为回复柒点。' },
     { id: 'guizhen9', name: '炉鼎炼气', faction: '归真观', type: '策术', rarity: '常见', cost: 2, shield: 2, background: '鼎炉相配，水火既济；炼气自成，进退皆宜。', skill: '装备：你每打出【技能】牌后回复壹点底蕴；若该技能净化过负面，额外回复壹点。' },
-    { id: 'guizhen10', name: '归一守中', faction: '归真观', type: '玄章', rarity: '史诗', cost: 4, background: '天下万物归于一，一归于无；守中不偏，道自在。', skill: '场地：你每回合结束若未造成过伤害，获得【护持肆】；你每回合第壹次回复底蕴，额外回复+1。' },
+    { id: 'guizhen10', name: '归一守中', faction: '归真观', type: '玄章', rarity: '传说', cost: 4, background: '天下万物归于一，一归于无；守中不偏，道自在。', skill: '场地：你每回合结束若未造成过伤害，获得【护持肆】；你每回合第壹次回复底蕴，额外回复+1。' },
 
     // ====== 玄匠盟（二期）======
     { id: 'xuanjang6', name: '奇械造化', faction: '玄匠盟', type: '立论', rarity: '常见', cost: 1, background: '妙手偶得，奇机自出。工匠之道，在于化腐朽为神奇。', skill: '从牌库检索壹张【装备】牌加入手牌；若手牌中有装备，抽壹。' },
@@ -180,7 +384,7 @@ export const CARDS: CardData[] = [
     { id: 'mingxiang7', name: '名家辩手', faction: '名相府', type: '门客', rarity: '稀有', cost: 3, attack: 2, hp: 3, background: '言语如剑，辞锋所指，天下皆知其锐。', skill: '被动：你每使用壹张【反制】，造成壹点伤害；回合末若你使用过贰张反制，额外抽壹。' },
     { id: 'mingxiang8', name: '名实相悖', faction: '名相府', type: '反诘', rarity: '稀有', cost: 2, background: '言之悖论，自陷于囹；一语戳破，万言皆空。', skill: '反制正在结算的壹张牌；成功后令对手本回合费用加贰（使用牌更贵）。' },
     { id: 'mingxiang9', name: '名实洞穿', faction: '名相府', type: '策术', rarity: '史诗', cost: 4, background: '一言穿透千层幕，概念既清，论争自息。', skill: '令对手手牌随机弃壹张；若其被弃牌为【角色】，额外对敌方主将造成叁点伤害。' },
-    { id: 'mingxiang10', name: '名相倒推', faction: '名相府', type: '玄章', rarity: '史诗', cost: 4, background: '正推得名，倒推得实；名相倒立，天下皆知其妙。', skill: '场地：每当你使用【反制】成功，抽壹；你每回合第壹次使用技能或反制，费用减壹。' },
+    { id: 'mingxiang10', name: '名相倒推', faction: '名相府', type: '玄章', rarity: '传说', cost: 4, background: '正推得名，倒推得实；名相倒立，天下皆知其妙。', skill: '场地：每当你使用【反制】成功，抽壹；你每回合第壹次使用技能或反制，费用减壹。' },
 
     // ====== 司天台（二期）======
     { id: 'sitian6', name: '观天象变', faction: '司天台', type: '立论', rarity: '常见', cost: 1, background: '仰观俯察，顺势而为；天象既变，人事随变。', skill: '进行壹次判定：阳→抽贰；阴→获得【护持叁】。' },
@@ -201,7 +405,7 @@ export const CARDS: CardData[] = [
     { id: 'wannong7', name: '田间老农', faction: '万农坊', type: '门客', rarity: '稀有', cost: 3, attack: 0, hp: 7, background: '老农一生，勤勉持重；不言胜利，只知耕作。', skill: '被动：你每回合结束若底蕴未满，回复贰点；若底蕴为最大值，抽壹。' },
     { id: 'wannong8', name: '仓廪丰实', faction: '万农坊', type: '策术', rarity: '史诗', cost: 4, background: '仓廪实则知礼节，衣食足则知荣辱。粮草充足，则战心坚固。', skill: '回复捌点底蕴；若你本回合未造成过伤害，额外获得【护持伍】。' },
     { id: 'wannong9', name: '农具改良', faction: '万农坊', type: '策术', rarity: '常见', cost: 2, shield: 1, background: '铁犁胜木耒，改良之功，往往胜过增兵。', skill: '装备：回合开始你回复壹点底蕴；你每回合第壹次回复底蕴，额外回复+1。' },
-    { id: 'wannong10', name: '五亩之宅', faction: '万农坊', type: '玄章', rarity: '史诗', cost: 4, background: '五亩之宅，树之以桑；鸡豚狗彘，无失其时——民足则国强。', skill: '场地：你每回合结束获得【护持贰】；若你本回合底蕴回复过，改为【护持4】。' },
+    { id: 'wannong10', name: '五亩之宅', faction: '万农坊', type: '玄章', rarity: '传说', cost: 4, background: '五亩之宅，树之以桑；鸡豚狗彘，无失其时——民足则国强。', skill: '场地：你每回合结束获得【护持贰】；若你本回合底蕴回复过，改为【护持4】。' },
 
     // ====== 兼采楼（补全+二期）======
     { id: 'jianai2', name: '百家争鸣', faction: '兼采楼', type: '玄章', rarity: '传说', cost: 5, background: '百家并立，各鸣其是；争鸣之中，真理得见。', skill: '场地：你每打出壹张其他门派的牌，获得该门派的1个随机效果（小型版）。' },
@@ -266,3 +470,14 @@ export const CARDS: CardData[] = [
     { id: 'shouchengzhiyi', name: '守成之议', faction: '通用', type: '门客', rarity: '常见', cost: 3, attack: 2, hp: 3, background: '守成之议，贵在稳心稳局，不求一时锋芒。', skill: '进场时，若置于主议，+1 根基。' },
     { id: 'jiantingzeming', name: '兼听则明', faction: '通用', type: '策术', rarity: '稀有', cost: 4, background: '兼听可明，偏听则暗；先广闻，后定断。', skill: '抽贰张牌；然后一张己方立论 +1 根基。' },
 ];
+
+export const CARDS: CardData[] = RAW_CARDS.map((card) => {
+    const activeType = RAW_TYPE_TO_ACTIVE[card.type];
+    const normalized = buildStructuredRule(card, activeType);
+    return {
+        ...card,
+        type: activeType,
+        ruleText: normalized.ruleText,
+        rule: normalized.rule,
+    };
+});

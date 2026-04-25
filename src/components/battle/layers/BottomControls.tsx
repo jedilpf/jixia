@@ -18,17 +18,11 @@ interface BottomControlsProps {
 const CARD_FRAME_COLORS: Record<string, { border: string; bg: string; glow: string }> = {
   '立论': { border: '#9EAD8A', bg: 'rgba(158,173,138,0.15)', glow: 'rgba(158,173,138,0.4)' },
   '策术': { border: '#C06F6F', bg: 'rgba(192,111,111,0.15)', glow: 'rgba(192,111,111,0.4)' },
-  '反诘': { border: '#C9A063', bg: 'rgba(201,160,99,0.15)', glow: 'rgba(201,160,99,0.4)' },
-  '门客': { border: '#9C88A8', bg: 'rgba(156,136,168,0.15)', glow: 'rgba(156,136,168,0.4)' },
-  '玄章': { border: '#909BA6', bg: 'rgba(144,155,166,0.15)', glow: 'rgba(144,155,166,0.4)' },
 };
 
 const CARD_FRAME_ASSETS: Record<string, string> = {
   '立论': 'assets/frames/frame-lilun.png',
   '策术': 'assets/frames/frame-ceshu.png',
-  '反诘': 'assets/frames/frame-fanje.png',
-  '门客': 'assets/frames/frame-menke.png',
-  '玄章': 'assets/frames/frame-xuanzhang.png',
 };
 
 const HandCard: React.FC<{
@@ -162,7 +156,7 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
 }) => {
   const { phase, player } = state;
   const isFinished = phase === 'finished';
-  const canAct = phase === 'ming_bian' || phase === 'an_mou';
+  const canAct = phase === 'play_1' || phase === 'play_2';
 
   const getHintText = (): string => {
     if (isFinished) return '战斗已结束';
@@ -178,8 +172,8 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
   const getActionHint = (): string => {
     if (!canAct) return '';
     const hints: string[] = [];
-    if (!player.plan.lockedPublic) hints.push('可出明论');
-    if (!player.plan.lockedSecret) hints.push('可出暗策');
+    if (!player.plan.lockedLayer1) hints.push('可出第一手');
+    if (!player.plan.lockedLayer2) hints.push('可出第二手');
     return hints.join(' / ');
   };
 
@@ -195,17 +189,23 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
         <div className="mt-2 pt-2 border-t border-[#3d3225]/30 flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-4 rounded-full bg-[#7ab8c9]/20 border border-[#7ab8c9]/50 flex items-center justify-center">
-              <span className="text-[8px] text-[#7ab8c9]">灵</span>
+              <span className="text-[8px] text-[#7ab8c9] font-bold">费</span>
             </div>
-            <span className="text-xs text-[#7ab8c9] font-medium">
-              {player.resources.lingShi}/{player.resources.maxLingShi}
+            <span className="text-xs text-[#7ab8c9] font-medium tabular-nums">
+              {player.resources.cost}/{player.resources.maxCost}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-4 rounded-full bg-[#c9952a]/20 border border-[#c9952a]/50 flex items-center justify-center">
-              <span className="text-[8px] text-[#c9952a]">势</span>
+              <span className="text-[8px] text-[#c9952a] font-bold">势</span>
             </div>
-            <span className="text-xs text-[#c9952a] font-medium">{player.resources.daShi}</span>
+            <span className="text-xs text-[#c9952a] font-medium tabular-nums">{player.resources.dashi}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#5a8a5a]/20 border border-[#5a8a5a]/50 flex items-center justify-center">
+              <span className="text-[8px] text-[#5a8a5a] font-bold">筹</span>
+            </div>
+            <span className="text-xs text-[#5a8a5a] font-medium tabular-nums">{player.resources.chou}</span>
           </div>
         </div>
       </div>
@@ -226,9 +226,9 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
             >
               取消选择
             </button>
-            {selectedCard && (
+            {(selectedCard?.ruleText || selectedCard?.description) && (
               <div className="text-xs text-[#8a7a6a] text-center mt-1">
-                {selectedCard.description || selectedCard.prologue || ''}
+                {selectedCard?.ruleText ?? selectedCard?.description}
               </div>
             )}
           </>

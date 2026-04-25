@@ -1,47 +1,48 @@
-import { ARENA_BY_ID } from './arena';
-import { CreateStarterDeckOptions, createStarterDeck, getActiveCardPoolSize, rollGuestFactions } from './cards';
-import { CORE_FACTION_NAMES, FRAMEWORK_FACTION_BY_NAME, pickSceneBiasFromRoutePreference, toFrameworkFactionName } from './factions';
+﻿/**
+ * 战斗引擎 - v2.0 两层结算版
+ *
+ * 规则对齐：
+ * - 卡牌类型仅保留：立论 / 策术
+ * - 回合阶段：play_1 -> resolve_1 -> play_2 -> resolve_2
+ * - 核心胜利条件：先到 8 大势
+ */
+
 import {
   ArenaId,
   BattleAction,
-  BattleLog,
   BattlePlayer,
   CardTypeV2,
+  DASHI_TARGET,
   DebateBattleState,
   DebateCard,
   DebatePhase,
   PlanSlot,
   PublicPlanInfo,
   PublicSubmitInfo,
-  RevealInfo,
   RevealData,
-  Resources,
+  RuleOp,
   SeatId,
-  SeatState,
   SeatUnit,
   Side,
   TargetableSlot,
-  WIN_DASHI,
-  Zone,
 } from './types';
-import {
-  calculateAllLaneControls,
-  applyLaneRewards,
-  LANE_NAMES,
-} from './laneSystem';
-import { DEFAULT_DECK_BUILD_DEFAULTS } from './meta';
-import { getTopicById, getTopicConfig, getTopicEffectMultiplier } from './topics';
-import { validateDeckTierQuota } from './tierSystem';
+import { ARENA_BY_ID } from './arena';
+import { createStarterDeck } from './cards';
+import { resolveCombat } from './laneSystem';
 
 export const PHASE_DURATION: Record<Exclude<DebatePhase, 'finished'>, number> = {
-  ming_bian: 25,
-  an_mou: 25,
-  reveal: 3,
-  resolve: 6,
+  play_1: 40,
+  resolve_1: 3,
+  play_2: 40,
+  resolve_2: 3,
 };
 
+const MAX_ROUNDS = 40;
 const TOPIC_SELECTION_ROUND = 2;
-const TOPIC_SELECTION_SECONDS = 12;
+const AI_SCORE_JITTER = 0.25;
+const HAND_REFILL_TO = 5;
+
+let unitSeq = 0;
 
 export const SEAT_LABEL: Record<SeatId, string> = {
   zhu_yi: '主议',
@@ -49,9 +50,9 @@ export const SEAT_LABEL: Record<SeatId, string> = {
 };
 
 export const SLOT_CARD_RULES: Record<PlanSlot, CardTypeV2[]> = {
-  main: ['立论', '策术', '门客', '玄章'],
-  response: ['反诘', '策术'],
-  secret: ['立论', '策术', '反诘'],
+  layer1: ['立论', '策术'],
+  layer2: ['立论', '策术'],
+  writing: ['立论', '策术'],
 };
 
 export interface CreateBattleStateOptions {
@@ -59,62 +60,59 @@ export interface CreateBattleStateOptions {
   forcedTopicId?: string;
   playerLevel?: number;
   enemyLevel?: number;
-  useFactionFramework?: boolean;
-  useFullCardPool?: boolean;
   playerMainFaction?: string;
   enemyMainFaction?: string;
-  playerGuestFactions?: string[];
-  enemyGuestFactions?: string[];
-  enabledFactions?: string[];
-  genericCardIds?: string[];
-  guestFactionCount?: number;
-  mainFactionCardCount?: number;
-  guestFactionCardCount?: number;
-  includeCommons?: number;
-  deckSize?: number;
 }
 
-const ALL_SEATS: SeatId[] = ['zhu_yi', 'pang_yi'];
-const MAX_ROUNDS = 40;            // 兜底回合上限：超限后进入裁决收束
-const HERO_MAX_XIN_ZHENG = 20;    // 主辩者初始心证
-const AI_TUNING = {
-  playMainChance: 0.74,
-  playResponseChance: 0.52,
-  playSecretChance: 0.62,
-  writeChance: 0.42,
-  passChance: 0.22,
-  useTokenChance: 0.38,
-  targetWeakSeatChance: 0.72,
-  preferTopCostChance: 0.75,
-  candidateWindow: 3,
-} as const;
+type AIEvalPhase = 'play_1' | 'play_2';
 
-let logSeq = 0;
-let unitSeq = 0;
-
-interface ResolveContext {
-  owner: BattlePlayer;
-  rival: BattlePlayer;
-  card: DebateCard | null;
-  round: number;
-  logs: BattleLog[];
-  feed: string[];
-  layerLabel: string;
-  targetSeat?: SeatId;
-  damageModifier?: number;
-  arenaId: ArenaId;
-  topicId: string | null;
-}
-
-function makeLog(round: number, text: string): BattleLog {
-  logSeq += 1;
-  return { id: `log-${logSeq}`, round, text };
-}
-
-function cloneSeatState(): Record<SeatId, SeatState> {
+function makeLog(round: number, text: string) {
   return {
-    zhu_yi: { front: null, back: null },
-    pang_yi: { front: null, back: null },
+    id: `log-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    round,
+    text,
+    timestamp: Date.now(),
+  };
+}
+
+function clonePlayer(player: BattlePlayer): BattlePlayer {
+  return {
+    ...player,
+    resources: { ...player.resources },
+    deck: [...player.deck],
+    hand: [...player.hand],
+    discard: [...player.discard],
+    writings: [...player.writings],
+    seats: {
+      zhu_yi: {
+        maxUnits: 3,
+        units: player.seats.zhu_yi.units.map((unit) => ({ ...unit })),
+      },
+      pang_yi: {
+        maxUnits: 3,
+        units: player.seats.pang_yi.units.map((unit) => ({ ...unit })),
+      },
+    },
+    plan: { ...player.plan },
+    submitAction: player.submitAction ? { ...player.submitAction } : null,
+    loadout: player.loadout
+      ? {
+          ...player.loadout,
+          guestFactions: [...player.loadout.guestFactions],
+        }
+      : undefined,
+  };
+}
+
+function cloneState(state: DebateBattleState): DebateBattleState {
+  return {
+    ...state,
+    topicOptions: [...state.topicOptions],
+    player: clonePlayer(state.player),
+    enemy: clonePlayer(state.enemy),
+    logs: [...state.logs],
+    resolveFeed: [...state.resolveFeed],
+    internalAudit: [...state.internalAudit],
   };
 }
 
@@ -126,299 +124,28 @@ function shuffleArray<T>(arr: T[]): T[] {
   return arr;
 }
 
-function randomPick<T>(list: T[], count: number): T[] {
-  if (count <= 0) return [];
-  const pool = [...list];
-  for (let i = pool.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, Math.min(count, pool.length));
+function createInitialSeats(): BattlePlayer['seats'] {
+  return {
+    zhu_yi: { units: [], maxUnits: 3 },
+    pang_yi: { units: [], maxUnits: 3 },
+  };
 }
 
-function randomPickWithRepeat<T>(list: T[], count: number): T[] {
-  if (count <= 0 || list.length === 0) return [];
-  const pool: T[] = [];
-  while (pool.length < count) {
-    pool.push(...list);
-  }
-  return randomPick(pool, count);
+export function getMaxCost(round: number): number {
+  if (round <= 1) return 2;
+  if (round === 2) return 3;
+  if (round === 3) return 4;
+  return 5;
 }
 
 function drawCards(player: BattlePlayer, count: number): void {
   for (let i = 0; i < count; i += 1) {
-    // If deck is empty, shuffle discard back in
     if (player.deck.length === 0 && player.discard.length > 0) {
       player.deck = shuffleArray(player.discard.splice(0));
     }
     const card = player.deck.shift();
-    if (!card) {
-      // Both deck and discard are exhausted — minor penalty
-      player.resources.shiXu += 1;
-      continue;
-    }
-    player.hand.push(card);
+    if (card) player.hand.push(card);
   }
-}
-
-function buildInitialResources(initialHuYin: number): Resources {
-  return {
-    xinZheng: HERO_MAX_XIN_ZHENG,
-    lingShi: 3,
-    maxLingShi: 3,
-    huYin: initialHuYin,
-    zhengLi: 0,
-    shiXu: 0,
-    wenMai: 0,
-    jiBian: 0,
-    daShi: 0,
-    chou: 0,
-  };
-}
-
-function createPlayer(
-  side: Side,
-  name: string,
-  initialHuYin: number,
-  deckOptions?: CreateStarterDeckOptions
-): BattlePlayer {
-  const deck = createStarterDeck(side, deckOptions);
-  const mainFaction = deckOptions?.mainFaction ? toFrameworkFactionName(deckOptions.mainFaction) : null;
-  const guestFactions = (deckOptions?.guestFactions ?? []).map((f) => toFrameworkFactionName(f));
-  const routePreference = mainFaction ? FRAMEWORK_FACTION_BY_NAME[mainFaction]?.routePreference : '';
-  const sceneBias = pickSceneBiasFromRoutePreference(routePreference ?? '');
-
-  const player: BattlePlayer = {
-    side,
-    name,
-    resources: buildInitialResources(initialHuYin),
-    deck,
-    hand: [],
-    discard: [],
-    writings: [],
-    seats: cloneSeatState(),
-    loadout: mainFaction
-      ? {
-          mainFaction,
-          guestFactions,
-          sceneBias,
-        }
-      : undefined,
-    plan: {
-      mainCardId: null,
-      responseCardId: null,
-      secretCardId: null,
-      writingCardId: null,
-      mainTargetSeat: 'zhu_yi',
-      secretTargetSeat: 'zhu_yi',
-      usedLingShi: 0,
-      lockedPublic: false,
-      lockedSecret: false,
-    },
-    gold: 0,
-    submitAction: null,
-  };
-  drawCards(player, 5);
-  return player;
-}
-
-function pickTopicOptions(count: number, forcedTopicId?: string): string[] {
-  const allTopicIds = getTopicConfig().topics.map((topic) => topic.id);
-  const shuffled = randomPickWithRepeat(allTopicIds, Math.max(count, allTopicIds.length));
-  const options = shuffled.slice(0, Math.max(1, Math.min(count, shuffled.length)));
-
-  if (forcedTopicId && !options.includes(forcedTopicId)) {
-    options[0] = forcedTopicId;
-  }
-
-  return options;
-}
-
-function isTopicSelectionWindow(state: DebateBattleState): boolean {
-  return state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';
-}
-
-function applyTopicSelection(
-  state: DebateBattleState,
-  topicId: string,
-  reason: 'player' | 'timeout',
-): boolean {
-  if (!state.topicSelectionPending) return false;
-  if (!state.topicOptions.includes(topicId)) return false;
-
-  const topic = getTopicById(topicId);
-  if (!topic) return false;
-
-  state.activeTopicId = topic.id;
-  state.activeTopic = topic.title;
-  state.topicSelectionPending = false;
-  state.topicSelectionSecondsLeft = null;
-  state.logs.push(
-    makeLog(
-      state.round,
-      reason === 'player'
-        ? `当前议题已锁定：${topic.title}`
-        : `议题选择超时，系统自动锁定：${topic.title}`,
-    ),
-  );
-  return true;
-}
-
-function applyAutoTopicSelection(state: DebateBattleState): boolean {
-  const fallback = randomPick(state.topicOptions, 1)[0];
-  if (!fallback) return false;
-  return applyTopicSelection(state, fallback, 'timeout');
-}
-
-export function createInitialBattleState(options?: CreateBattleStateOptions): DebateBattleState {
-  const arenaId = options?.arenaId ?? 'jixia';
-  const arena = ARENA_BY_ID[arenaId];
-  const initialHuYin = arenaId === 'jixia' ? 1 : 0;
-  const useFactionFramework = options?.useFactionFramework ?? true;
-  const useFullCardPool = options?.useFullCardPool ?? true;
-  const mainFactionCardCount = options?.mainFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.mainFactionCardCount;
-  const guestFactionCardCount = options?.guestFactionCardCount ?? DEFAULT_DECK_BUILD_DEFAULTS.guestFactionCardCount;
-  const includeCommons = options?.includeCommons ?? DEFAULT_DECK_BUILD_DEFAULTS.commonCardCount;
-  const deckSize = options?.deckSize ?? getActiveCardPoolSize();
-  const defaultGuestFactionCount = Math.max(
-    0,
-    Math.floor((deckSize - mainFactionCardCount - includeCommons) / Math.max(1, guestFactionCardCount))
-  );
-
-  const playerMainFaction = toFrameworkFactionName(options?.playerMainFaction ?? CORE_FACTION_NAMES[0]);
-  const enemyMainFaction = toFrameworkFactionName(options?.enemyMainFaction ?? CORE_FACTION_NAMES[2] ?? CORE_FACTION_NAMES[0]);
-  const playerGuestFactions = options?.playerGuestFactions?.map((f) => toFrameworkFactionName(f))
-    ?? rollGuestFactions(playerMainFaction, options?.guestFactionCount ?? defaultGuestFactionCount);
-  const enemyGuestFactions = options?.enemyGuestFactions?.map((f) => toFrameworkFactionName(f))
-    ?? rollGuestFactions(enemyMainFaction, options?.guestFactionCount ?? defaultGuestFactionCount);
-
-  const playerDeckOptions: CreateStarterDeckOptions | undefined = useFactionFramework
-    ? {
-        useFactionFramework: true,
-        useFullCardPool,
-        playerLevel: options?.playerLevel,
-        mainFaction: playerMainFaction,
-        guestFactions: playerGuestFactions,
-        enabledFactions: options?.enabledFactions,
-        genericCardIds: options?.genericCardIds,
-        mainFactionCardCount,
-        guestFactionCardCount,
-        includeCommons,
-        deckSize,
-      }
-    : undefined;
-  const enemyDeckOptions: CreateStarterDeckOptions | undefined = useFactionFramework
-    ? {
-        useFactionFramework: true,
-        useFullCardPool,
-        playerLevel: options?.enemyLevel ?? options?.playerLevel,
-        mainFaction: enemyMainFaction,
-        guestFactions: enemyGuestFactions,
-        enabledFactions: options?.enabledFactions,
-        genericCardIds: options?.genericCardIds,
-        mainFactionCardCount,
-        guestFactionCardCount,
-        includeCommons,
-        deckSize,
-      }
-    : undefined;
-
-  const startLog = useFactionFramework
-    ? `对局开始：进入${arena.name}｜我方主盟${playerMainFaction}｜敌方主盟${enemyMainFaction}`
-    : `对局开始：进入${arena.name}`;
-
-  const auditLine = useFactionFramework
-    ? `[R1] faction-setup player=${playerMainFaction} guest=[${playerGuestFactions.join(',')}] enemy=${enemyMainFaction} guest=[${enemyGuestFactions.join(',')}]`
-    : `[R1] classic-setup arena=${arenaId}`;
-  const forcedTopic = options?.forcedTopicId ? getTopicById(options.forcedTopicId) : undefined;
-  const topic = forcedTopic ?? null;
-  const topicOptions = pickTopicOptions(3, forcedTopic?.id);
-  const topicSelectionPending = topic === null;
-  const safePlayerLevel = Math.max(1, Math.floor(options?.playerLevel ?? 1));
-  const safeEnemyLevel = Math.max(1, Math.floor(options?.enemyLevel ?? safePlayerLevel));
-  const player = createPlayer('player', '我方', initialHuYin, playerDeckOptions);
-  const enemy = createPlayer('enemy', '敌方', initialHuYin, enemyDeckOptions);
-  const playerTierValidation = validateDeckTierQuota(player.deck, safePlayerLevel);
-  const enemyTierValidation = validateDeckTierQuota(enemy.deck, safeEnemyLevel);
-
-  const tierValidationErrors: string[] = [];
-  if (!playerTierValidation.ok) {
-    tierValidationErrors.push(`我方牌组配额不合法：${playerTierValidation.errors.join('；')}`);
-  }
-  if (!enemyTierValidation.ok) {
-    tierValidationErrors.push(`敌方牌组配额不合法：${enemyTierValidation.errors.join('；')}`);
-  }
-
-  if (tierValidationErrors.length > 0) {
-    return {
-      round: 1,
-      maxRounds: MAX_ROUNDS,
-      phase: 'finished',
-      secondsLeft: 0,
-      activeTopicId: topic?.id ?? null,
-      activeTopic: topic?.title ?? '',
-      topicSelectionPending,
-      topicSelectionRound: TOPIC_SELECTION_ROUND,
-      topicSelectionSecondsLeft: null,
-      topicOptions,
-      arenaId,
-      arenaName: arena.name,
-      player,
-      enemy,
-      logs: [
-        makeLog(1, startLog),
-        ...tierValidationErrors.map((line) => makeLog(1, `[配额拦截] ${line}`)),
-        makeLog(1, '对局未开始：星级配额校验未通过，请调整牌组后重试'),
-      ],
-      resolveFeed: [],
-      internalAudit: [auditLine, '[R1] tier-quota-blocked'],
-      winner: 'draw',
-    };
-  }
-
-  return {
-    round: 1,
-    maxRounds: MAX_ROUNDS,
-    phase: 'ming_bian',
-    secondsLeft: PHASE_DURATION.ming_bian,
-    activeTopicId: topic?.id ?? null,
-    activeTopic: topic?.title ?? '',
-    topicSelectionPending,
-    topicSelectionRound: TOPIC_SELECTION_ROUND,
-    topicSelectionSecondsLeft: null,
-    topicOptions,
-    arenaId,
-    arenaName: arena.name,
-    player,
-    enemy,
-    logs: [
-      makeLog(1, startLog),
-      ...(topicSelectionPending
-        ? [makeLog(1, `议题将在第 ${TOPIC_SELECTION_ROUND} 回合开始前由玩家选择`)]
-        : []),
-    ],
-    resolveFeed: [],
-    internalAudit: [auditLine],
-    winner: null,
-  };
-}
-
-export function isCardAllowedForSlot(slot: PlanSlot, cardType: CardTypeV2): boolean {
-  return SLOT_CARD_RULES[slot].includes(cardType);
-}
-
-function getPhaseSeconds(phase: DebatePhase): number {
-  if (phase === 'finished') return 0;
-  return PHASE_DURATION[phase];
-}
-
-function getPlanCardIds(player: BattlePlayer): string[] {
-  return [
-    player.plan.mainCardId,
-    player.plan.responseCardId,
-    player.plan.secretCardId,
-    player.plan.writingCardId,
-  ].filter((id): id is string => Boolean(id));
 }
 
 function getCardFromHand(player: BattlePlayer, cardId: string | null): DebateCard | null {
@@ -426,1084 +153,743 @@ function getCardFromHand(player: BattlePlayer, cardId: string | null): DebateCar
   return player.hand.find((card) => card.id === cardId) ?? null;
 }
 
-function getCardByPlanSlot(player: BattlePlayer, slot: PlanSlot): DebateCard | null {
-  const id = slot === 'main' ? player.plan.mainCardId : slot === 'response' ? player.plan.responseCardId : player.plan.secretCardId;
-  if (!id) return null;
-  return getCardFromHand(player, id);
-}
-
-function recalcUsedLingShi(player: BattlePlayer): number {
-  const ids = [player.plan.mainCardId, player.plan.responseCardId, player.plan.secretCardId].filter(
-    (id): id is string => Boolean(id)
-  );
-  return ids.reduce((sum, id) => {
-    const card = getCardFromHand(player, id);
-    return sum + (card?.cost ?? 0);
-  }, 0);
-}
-
-function projectedUsedLingShi(player: BattlePlayer, slot: PlanSlot, card: DebateCard): number {
-  const map: Record<PlanSlot, string | null> = {
-    main: player.plan.mainCardId,
-    response: player.plan.responseCardId,
-    secret: player.plan.secretCardId,
-  };
-  map[slot] = card.id;
-
-  const ids = Object.values(map).filter((id): id is string => Boolean(id));
-  return ids.reduce((sum, id) => {
-    const plannedCard = getCardFromHand(player, id);
-    return sum + (plannedCard?.cost ?? 0);
-  }, 0);
-}
-
-export function getPlanAssignError(player: BattlePlayer, slot: PlanSlot, cardId: string | null): string | null {
+function getCardFromKnownZones(player: BattlePlayer, cardId: string | null): DebateCard | null {
   if (!cardId) return null;
-  const card = getCardFromHand(player, cardId);
-  if (!card) return '该牌不在手牌中';
-  if (!isCardAllowedForSlot(slot, card.type)) return `${card.type} 不能放入该槽位`;
+  return (
+    player.hand.find((card) => card.id === cardId)
+    ?? player.discard.find((card) => card.id === cardId)
+    ?? player.writings.find((card) => card.id === cardId)
+    ?? null
+  );
+}
 
-  const occupied = getPlanCardIds(player);
-  if (occupied.includes(cardId)) {
-    const sameSlotCard = getCardByPlanSlot(player, slot);
-    if (!sameSlotCard || sameSlotCard.id !== cardId) {
-      return '该牌已放入其他槽位';
-    }
+function getPlanRawCost(player: BattlePlayer, layer1CardId: string | null, layer2CardId: string | null): number {
+  const layer1 = getCardFromKnownZones(player, layer1CardId);
+  const layer2 = getCardFromKnownZones(player, layer2CardId);
+  return (layer1?.cost ?? 0) + (layer2?.cost ?? 0);
+}
+
+function evaluatePlanCost(
+  player: BattlePlayer,
+  layer1CardId: string | null,
+  layer2CardId: string | null,
+): { valid: boolean; rawCost: number; usedCost: number } {
+  const card1 = layer1CardId ? getCardFromHand(player, layer1CardId) : null;
+  const card2 = layer2CardId ? getCardFromHand(player, layer2CardId) : null;
+
+  const rawCost = (card1?.cost ?? 0) + (card2?.cost ?? 0);
+  if (rawCost <= player.resources.cost) {
+    return { valid: true, rawCost, usedCost: rawCost };
   }
 
-  const costAfterAssign = projectedUsedLingShi(player, slot, card);
-  if (costAfterAssign > player.resources.lingShi) {
-    return `灵势不足：需要 ${costAfterAssign}，当前 ${player.resources.lingShi}`;
+  const canUseChou = player.resources.chou > 0 && rawCost - 1 <= player.resources.cost;
+  if (canUseChou) {
+    return { valid: true, rawCost, usedCost: rawCost - 1 };
   }
-  return null;
+
+  return { valid: false, rawCost, usedCost: rawCost };
 }
 
-export function getPublicPlanInfo(player: BattlePlayer): PublicPlanInfo {
-  return {
-    hasMainCard: player.plan.mainCardId !== null,
-    hasResponseCard: player.plan.responseCardId !== null,
-    hasSecretCard: player.plan.secretCardId !== null,
-    mainTargetSeat: player.plan.mainTargetSeat,
-    secretTargetSeat: player.plan.secretTargetSeat,
-    lockedPublic: player.plan.lockedPublic,
-    lockedSecret: player.plan.lockedSecret,
-    handCount: player.hand.length,
-    writingCount: player.writings.length,
-  };
-}
-
-export function getRevealInfo(state: DebateBattleState): RevealInfo {
-  const playerMainCard = getCardFromHand(state.player, state.player.plan.mainCardId);
-  const playerResponseCard = getCardFromHand(state.player, state.player.plan.responseCardId);
-  const playerSecretCard = getCardFromHand(state.player, state.player.plan.secretCardId);
-  const playerWritingCard = getCardFromHand(state.player, state.player.plan.writingCardId);
-
-  const enemyMainCard = getCardFromHand(state.enemy, state.enemy.plan.mainCardId);
-  const enemyResponseCard = getCardFromHand(state.enemy, state.enemy.plan.responseCardId);
-  const enemySecretCard = getCardFromHand(state.enemy, state.enemy.plan.secretCardId);
-  const enemyWritingCard = getCardFromHand(state.enemy, state.enemy.plan.writingCardId);
-
-  return {
-    player: {
-      mainCard: playerMainCard,
-      responseCard: playerResponseCard,
-      secretCard: playerSecretCard,
-      writingCard: playerWritingCard,
-    },
-    enemy: {
-      mainCard: enemyMainCard,
-      responseCard: enemyResponseCard,
-      secretCard: enemySecretCard,
-      writingCard: enemyWritingCard,
-    },
-  };
-}
-
-export function checkDaShiVictory(state: DebateBattleState): Side | null {
-  if (state.player.resources.daShi >= WIN_DASHI) return 'player';
-  if (state.enemy.resources.daShi >= WIN_DASHI) return 'enemy';
-  return null;
-}
-
-function applyHeroDamage(resources: Resources, damage: number): number {
-  let remain = damage;
-  if (resources.huYin > 0) {
-    const absorbed = Math.min(resources.huYin, remain);
-    resources.huYin -= absorbed;
-    remain -= absorbed;
+function consumeChouIfNeeded(player: BattlePlayer): void {
+  const rawCost = getPlanRawCost(player, player.plan.layer1CardId, player.plan.layer2CardId);
+  if (rawCost > player.plan.usedCost && player.resources.chou > 0) {
+    player.resources.chou -= 1;
   }
-  if (remain > 0) {
-    resources.xinZheng = Math.max(0, resources.xinZheng - remain);
-  }
-  return remain;
 }
 
-function applyDamageToLane(target: SeatState, targetResources: Resources, damage: number): number {
-  let remain = damage;
-  if (target.front && remain > 0) {
-    target.front.hp -= remain;
-    if (target.front.hp <= 0) {
-      remain = Math.abs(target.front.hp);
-      target.front = null;
+function consumePlannedCard(player: BattlePlayer, cardId: string | null): DebateCard | null {
+  if (!cardId) return null;
+
+  const index = player.hand.findIndex((card) => card.id === cardId);
+  if (index < 0) return null;
+
+  const [card] = player.hand.splice(index, 1);
+  player.discard.push(card);
+  return card;
+}
+
+function chooseAIOffensiveSeat(target: BattlePlayer): SeatId {
+  const zhuScore = target.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.hp + unit.power, 0);
+  const pangScore = target.seats.pang_yi.units.reduce((sum, unit) => sum + unit.hp + unit.power, 0);
+  return zhuScore <= pangScore ? 'zhu_yi' : 'pang_yi';
+}
+
+function getCardRuleOps(card: DebateCard): RuleOp[] {
+  if (card.rule?.ops?.length) {
+    return card.rule.ops.filter((op) => Number.isFinite(op.value) && op.value > 0);
+  }
+
+  if (!card.effectKind || !card.effectValue || card.effectValue <= 0) {
+    return [];
+  }
+
+  if (card.effectKind === 'damage') {
+    return [{ op: 'damage', target: 'enemy', value: card.effectValue }];
+  }
+  if (card.effectKind === 'draw') {
+    return [{ op: 'draw', target: 'self', value: card.effectValue }];
+  }
+  if (card.effectKind === 'heal') {
+    return [{ op: 'shield', target: 'self', value: card.effectValue }];
+  }
+
+  return [];
+}
+
+function estimateCardThreat(card: DebateCard | null): number {
+  if (!card) return 0;
+  if (card.type === '立论') return card.power * 1.4 + card.hp;
+
+  const ops = getCardRuleOps(card);
+  let score = 0;
+  for (const op of ops) {
+    if (op.op === 'damage') score += op.value * 1.7;
+    if (op.op === 'draw') score += op.value * 1.1;
+    if (op.op === 'heal' || op.op === 'shield') score += op.value * 1.3;
+    if (op.op === 'discard') score += op.value * 1.2;
+  }
+  if (score > 0) return score;
+
+  return card.cost;
+}
+
+function evaluateAICard(card: DebateCard, state: DebateBattleState, phase: AIEvalPhase): number {
+  const enemy = state.enemy;
+  const player = state.player;
+
+  const myBoardPower =
+    enemy.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
+    + enemy.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
+  const oppBoardPower =
+    player.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
+    + player.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
+
+  let score = 0;
+
+  if (card.type === '立论') {
+    score = card.power * 2 + card.hp * 1.15;
+    if (myBoardPower <= oppBoardPower) score += 1.4;
+    if (card.cost <= 2) score += 0.4;
+  } else {
+    const ops = getCardRuleOps(card);
+    if (ops.length === 0) {
+      score = card.cost;
     } else {
-      remain = 0;
+      for (const op of ops) {
+        if (op.op === 'damage') {
+          score += op.value * 2.2 + estimateCardThreat(getCardFromHand(player, player.plan.layer1CardId)) * 0.1;
+          if (player.resources.dashi >= 6) score += 1.6;
+        } else if (op.op === 'draw') {
+          score += op.value * 1.5 + Math.max(0, 4 - enemy.hand.length) * 0.8;
+        } else if (op.op === 'heal' || op.op === 'shield') {
+          score += op.value * 1.6 + (enemy.resources.guyin <= 1 ? 0.9 : 0);
+        } else if (op.op === 'discard') {
+          score += op.value * 1.7;
+        } else {
+          score += card.cost * 0.5;
+        }
+      }
     }
   }
-  if (target.back && remain > 0) {
-    target.back.hp -= remain;
-    if (target.back.hp <= 0) {
-      remain = Math.abs(target.back.hp);
-      target.back = null;
-    } else {
-      remain = 0;
-    }
-  }
-  if (remain > 0) {
-    applyHeroDamage(targetResources, remain);
-  }
-  return remain;
+
+  if (phase === 'play_2') score += 0.25;
+  score -= card.cost * 0.2;
+  score += Math.random() * AI_SCORE_JITTER;
+
+  return score;
 }
 
-function summonUnit(player: BattlePlayer, card: DebateCard, seat: SeatId, layer: 'front' | 'back'): boolean {
-  const slot = player.seats[seat];
-  if (slot[layer]) return false;
-  unitSeq += 1;
-  const power = Math.max(1, card.effectValue);
+function pickBestPlayableCard(playable: DebateCard[], state: DebateBattleState, phase: AIEvalPhase): DebateCard | null {
+  if (playable.length === 0) return null;
+
+  let best: DebateCard | null = null;
+  let bestScore = -Infinity;
+
+  for (const card of playable) {
+    const score = evaluateAICard(card, state, phase);
+    if (score > bestScore) {
+      bestScore = score;
+      best = card;
+    }
+  }
+
+  return best;
+}
+
+function summonUnit(player: BattlePlayer, card: DebateCard, seatId: SeatId): boolean {
+  const seat = player.seats[seatId];
+  if (seat.units.length >= seat.maxUnits) return false;
+
   const unit: SeatUnit = {
-    id: `unit-${player.side}-${unitSeq}`,
+    id: `unit-${unitSeq++}`,
+    cardId: card.id,
     name: card.name,
-    power,
-    hp: power + 1,
-    maxHp: power + 1,
+    power: Math.max(1, card.power),
+    hp: Math.max(1, card.hp),
+    maxHp: Math.max(1, card.hp),
   };
-  slot[layer] = unit;
+
+  seat.units.push(unit);
   return true;
 }
 
-function firstAvailableSeat(player: BattlePlayer, layer: 'front' | 'back'): SeatId | null {
-  for (const seat of ALL_SEATS) {
-    if (!player.seats[seat][layer]) return seat;
+function applyDamageToSeat(
+  target: BattlePlayer,
+  seatId: SeatId,
+  amount: number,
+): { unitDamage: number; absorbedByGuyin: number; dashiPressure: number } {
+  const seat = target.seats[seatId];
+  let remain = Math.max(0, amount);
+  let unitDamage = 0;
+
+  while (remain > 0 && seat.units.length > 0) {
+    const front = seat.units[0];
+    const dealt = Math.min(front.hp, remain);
+    front.hp -= dealt;
+    unitDamage += dealt;
+    remain -= dealt;
+    if (front.hp <= 0) seat.units.shift();
   }
-  return null;
+
+  const absorbedByGuyin = Math.min(target.resources.guyin, remain);
+  target.resources.guyin -= absorbedByGuyin;
+  remain -= absorbedByGuyin;
+
+  const dashiPressure = remain > 0 ? Math.ceil(remain / 2) : 0;
+  if (dashiPressure > 0) {
+    target.resources.dashi = Math.max(0, target.resources.dashi - dashiPressure);
+  }
+
+  return {
+    unitDamage,
+    absorbedByGuyin,
+    dashiPressure,
+  };
 }
 
-function pushResolveFeed(feed: string[], line: string): void {
-  feed.push(line);
-}
+function applySpellEffect(
+  caster: BattlePlayer,
+  target: BattlePlayer,
+  card: DebateCard,
+  targetSeat: SeatId,
+  feed: string[],
+  ownerLabel: string,
+): void {
+  const ops = getCardRuleOps(card);
+  if (ops.length === 0) return;
 
-function scaleEffectValue(baseValue: number, multiplier: number): number {
-  const scaled = Math.round(baseValue * multiplier);
-  if (baseValue <= 0) return scaled;
-  return Math.max(1, scaled);
-}
+  for (const op of ops) {
+    if (op.op === 'damage') {
+      const dealt = applyDamageToSeat(target, targetSeat, op.value);
+      const chunks: string[] = [];
+      if (dealt.unitDamage > 0) chunks.push(`席位伤害 ${dealt.unitDamage}`);
+      if (dealt.absorbedByGuyin > 0) chunks.push(`护印吸收 ${dealt.absorbedByGuyin}`);
+      if (dealt.dashiPressure > 0) chunks.push(`大势压制 ${dealt.dashiPressure}`);
+      if (chunks.length === 0) chunks.push('未造成有效影响');
+      feed.push(`${ownerLabel}【${card.name}】：${chunks.join('，')}`);
+      continue;
+    }
 
-function resolveCardEffect(ctx: ResolveContext): void {
-  const { owner, rival, card, round, logs, feed, layerLabel, targetSeat, damageModifier = 0, arenaId, topicId } = ctx;
-  if (!card) return;
+    if (op.op === 'draw') {
+      drawCards(caster, op.value);
+      feed.push(`${ownerLabel}【${card.name}】：抽 ${op.value} 张牌`);
+      continue;
+    }
 
-  const seat = targetSeat ?? 'zhu_yi';
-  const seatLabel = SEAT_LABEL[seat];
-  const effectMultiplier = topicId ? getTopicEffectMultiplier(topicId, card) : 1;
-  const weightedEffectValue = scaleEffectValue(card.effectValue, effectMultiplier);
+    if (op.op === 'heal' || op.op === 'shield') {
+      caster.resources.guyin += op.value;
+      feed.push(`${ownerLabel}【${card.name}】：护印 +${op.value}`);
+      continue;
+    }
 
-  switch (card.effectKind) {
-    case 'damage': {
-      const amount = Math.max(0, weightedEffectValue + owner.resources.zhengLi + damageModifier);
-      if (amount <= 0) {
-        logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》被完全化解`));
-        pushResolveFeed(feed, `${owner.name}${layerLabel} ${card.name} 被化解`);
-        break;
+    if (op.op === 'discard') {
+      const discardCount = Math.min(op.value, target.hand.length);
+      if (discardCount <= 0) {
+        feed.push(`${ownerLabel}【${card.name}】：对方无可弃手牌`);
+        continue;
       }
-
-      const targetLane = rival.seats[seat];
-      const frontHpBefore = targetLane.front?.hp ?? 0;
-      applyDamageToLane(targetLane, rival.resources, amount);
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》对${seatLabel}造成 ${amount} 压力`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} ${card.name} -> ${seatLabel} ${amount}`);
-
-      if (arenaId === 'huode' && frontHpBefore > 0 && amount > frontHpBefore) {
-        applyHeroDamage(rival.resources, 1);
-        logs.push(makeLog(round, `火德论坛·穿席余烬触发：${rival.name}额外承受 1 心证伤害`));
-        pushResolveFeed(feed, `火德论坛：穿席余烬 +1 心证`);
+      for (let i = 0; i < discardCount; i += 1) {
+        const dropped = target.hand.shift();
+        if (dropped) target.discard.push(dropped);
       }
-      break;
+      feed.push(`${ownerLabel}【${card.name}】：令对方弃 ${discardCount} 张牌`);
     }
-    case 'shield': {
-      owner.resources.huYin += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 护印`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 护印 +${weightedEffectValue}`);
-      break;
-    }
-    case 'draw': {
-      drawCards(owner, weightedEffectValue);
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》抽牌 ${weightedEffectValue}`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 抽牌 +${weightedEffectValue}`);
-      break;
-    }
-    case 'zhengli': {
-      owner.resources.zhengLi += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》获得 ${weightedEffectValue} 证立`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 证立 +${weightedEffectValue}`);
-      break;
-    }
-    case 'shixu': {
-      rival.resources.shiXu += weightedEffectValue;
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》使对手失序 +${weightedEffectValue}`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 对手失序 +${weightedEffectValue}`);
-      break;
-    }
-    case 'summon_front': {
-      const summonCard = weightedEffectValue === card.effectValue ? card : { ...card, effectValue: weightedEffectValue };
-      const target = summonUnit(owner, summonCard, seat, 'front') ? seat : firstAvailableSeat(owner, 'front');
-      if (!target) break;
-      if (target !== seat) {
-        summonUnit(owner, summonCard, target, 'front');
-      }
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}前席登场`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 前席登场 -> ${SEAT_LABEL[target]}`);
-      break;
-    }
-    case 'summon_back': {
-      const summonCard = weightedEffectValue === card.effectValue ? card : { ...card, effectValue: weightedEffectValue };
-      const target = summonUnit(owner, summonCard, seat, 'back') ? seat : firstAvailableSeat(owner, 'back');
-      if (!target) break;
-      if (target !== seat) {
-        summonUnit(owner, summonCard, target, 'back');
-      }
-      logs.push(makeLog(round, `${owner.name}${layerLabel}《${card.name}》在${SEAT_LABEL[target]}后席登场`));
-      pushResolveFeed(feed, `${owner.name}${layerLabel} 后席登场 -> ${SEAT_LABEL[target]}`);
-      break;
-    }
-    default:
-      break;
   }
 }
 
-function pickPlannedCard(player: BattlePlayer, cardId: string | null): DebateCard | null {
-  if (!cardId) return null;
-  return getCardFromHand(player, cardId);
-}
-
-function applyWriting(player: BattlePlayer, logs: BattleLog[], feed: string[], round: number, arenaId: ArenaId): void {
-  const writingId = player.plan.writingCardId;
-  if (!writingId) return;
-  const idx = player.hand.findIndex((card) => card.id === writingId);
-  if (idx < 0) return;
-
-  const wasFirstWriting = player.writings.length === 0;
-  const hadAtLeastOneWriting = player.writings.length >= 1;
-
-  const [card] = player.hand.splice(idx, 1);
-  player.writings.push(card);
-  player.resources.wenMai += 1;
-  player.resources.maxLingShi = Math.min(10, player.resources.maxLingShi + 1);
-
-  logs.push(makeLog(round, `${player.name}执行着书《${card.name}》，文脉 +1`));
-  pushResolveFeed(feed, `${player.name} 着书 ${card.name}，文脉 +1`);
-
-  if (arenaId === 'cangshu' && wasFirstWriting) {
-    player.resources.huYin += 1;
-    logs.push(makeLog(round, `藏书秘阁触发：${player.name}首次着书额外获得 1 护印`));
-    pushResolveFeed(feed, '藏书秘阁：首次着书 护印 +1');
+function resolveSingleCard(
+  caster: BattlePlayer,
+  target: BattlePlayer,
+  card: DebateCard | null,
+  targetSeat: SeatId,
+  feed: string[],
+  ownerLabel: string,
+): void {
+  if (!card) {
+    feed.push(`${ownerLabel}：空过`);
+    return;
   }
 
-  if (arenaId === 'cangshu' && hadAtLeastOneWriting) {
-    player.resources.xinZheng = Math.min(HERO_MAX_XIN_ZHENG, player.resources.xinZheng + 1);
-    logs.push(makeLog(round, `藏书秘阁触发：${player.name}着书回复 1 心证`));
-    pushResolveFeed(feed, '藏书秘阁：着书后回复 1 心证');
+  if (card.type === '立论') {
+    const success = summonUnit(caster, card, targetSeat);
+    feed.push(
+      success
+        ? `${ownerLabel}【${card.name}】入驻${SEAT_LABEL[targetSeat]}`
+        : `${ownerLabel}【${card.name}】入驻失败（${SEAT_LABEL[targetSeat]}已满）`,
+    );
+    return;
   }
+
+  applySpellEffect(caster, target, card, targetSeat, feed, ownerLabel);
 }
 
-function discardPlannedCard(player: BattlePlayer, cardId: string | null): void {
-  if (!cardId) return;
-  const idx = player.hand.findIndex((card) => card.id === cardId);
-  if (idx < 0) return;
-  const [card] = player.hand.splice(idx, 1);
-  player.discard.push(card);
-}
-
-function resolveSeatBattle(
+function resolveLayer(
   player: BattlePlayer,
   enemy: BattlePlayer,
-  logs: BattleLog[],
+  playerCardId: string | null,
+  enemyCardId: string | null,
+  playerSeat: SeatId,
+  enemySeat: SeatId,
   feed: string[],
-  round: number,
-  arenaId: ArenaId
+  layerLabel: string,
 ): void {
-  ALL_SEATS.forEach((seat) => {
-    const pSeat = player.seats[seat];
-    const eSeat = enemy.seats[seat];
-    const playerFrontBonus = arenaId === 'huode' && pSeat.front ? 1 : 0;
-    const enemyFrontBonus = arenaId === 'huode' && eSeat.front ? 1 : 0;
-    const pPower = (pSeat.front?.power ?? pSeat.back?.power ?? 0) + playerFrontBonus;
-    const ePower = (eSeat.front?.power ?? eSeat.back?.power ?? 0) + enemyFrontBonus;
+  const playerCard = getCardFromHand(player, playerCardId);
+  const enemyCard = getCardFromHand(enemy, enemyCardId);
 
-    if (pPower > 0) {
-      applyDamageToLane(eSeat, enemy.resources, pPower);
-      logs.push(makeLog(round, `我方${SEAT_LABEL[seat]}争鸣造成 ${pPower} 压力`));
-      pushResolveFeed(feed, `我方${SEAT_LABEL[seat]}争鸣 ${pPower}`);
-    }
+  resolveSingleCard(player, enemy, playerCard, playerSeat, feed, `我方${layerLabel}`);
+  resolveSingleCard(enemy, player, enemyCard, enemySeat, feed, `敌方${layerLabel}`);
 
-    if (ePower > 0) {
-      applyDamageToLane(pSeat, player.resources, ePower);
-      logs.push(makeLog(round, `敌方${SEAT_LABEL[seat]}争鸣造成 ${ePower} 压力`));
-      pushResolveFeed(feed, `敌方${SEAT_LABEL[seat]}争鸣 ${ePower}`);
-    }
-  });
+  consumePlannedCard(player, playerCardId);
+  consumePlannedCard(enemy, enemyCardId);
 }
 
-function resetPlanForNewRound(player: BattlePlayer): void {
-  player.plan = {
-    mainCardId: null,
-    responseCardId: null,
-    secretCardId: null,
-    writingCardId: null,
-    mainTargetSeat: player.plan.mainTargetSeat,
-    secretTargetSeat: player.plan.secretTargetSeat,
-    usedLingShi: 0,
-    lockedPublic: false,
-    lockedSecret: false,
-  };
-  player.resources.zhengLi = 0;
-  player.submitAction = null;
-}
+function checkVictory(state: DebateBattleState): Side | 'draw' | null {
+  if (state.player.resources.dashi >= DASHI_TARGET) return 'player';
+  if (state.enemy.resources.dashi >= DASHI_TARGET) return 'enemy';
 
-function beginNewRound(state: DebateBattleState): void {
-  // 将着书累积的文脉在新回合转化为灵势
-  if (state.player.resources.wenMai > 0) {
-    const bonus = state.player.resources.wenMai;
-    state.player.resources.wenMai = 0;
-    state.player.resources.lingShi = Math.min(state.player.resources.maxLingShi, state.player.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `文脉转化：我方获得 ${bonus} 灵势`));
+  if (state.round >= MAX_ROUNDS) {
+    if (state.player.resources.dashi > state.enemy.resources.dashi) return 'player';
+    if (state.enemy.resources.dashi > state.player.resources.dashi) return 'enemy';
+    return 'draw';
   }
-  if (state.enemy.resources.wenMai > 0) {
-    const bonus = state.enemy.resources.wenMai;
-    state.enemy.resources.wenMai = 0;
-    state.enemy.resources.lingShi = Math.min(state.enemy.resources.maxLingShi, state.enemy.resources.lingShi + bonus);
-    state.logs.push(makeLog(state.round, `文脉转化：敌方获得 ${bonus} 灵势`));
-  }
-  
-  state.player.resources.lingShi = state.player.resources.maxLingShi;
-  state.enemy.resources.lingShi = state.enemy.resources.maxLingShi;
-  drawCards(state.player, 1);
-  drawCards(state.enemy, 1);
+
+  return null;
 }
 
-function resolveRound(state: DebateBattleState): void {
-  const logs: BattleLog[] = [];
+function resolveLayerByKey(state: DebateBattleState, layer: 'layer1' | 'layer2'): DebateBattleState {
+  const next = cloneState(state);
   const feed: string[] = [];
-  const audit: string[] = [];
-  const round = state.round;
 
-  audit.push(`[R${round}] resolve-start arena=${state.arenaId}`);
-  audit.push(
-    `[R${round}] player-plan main=${state.player.plan.mainCardId ?? '-'} resp=${state.player.plan.responseCardId ?? '-'} secret=${state.player.plan.secretCardId ?? '-'} writing=${state.player.plan.writingCardId ?? '-'}`
-  );
-  audit.push(
-    `[R${round}] enemy-plan main=${state.enemy.plan.mainCardId ?? '-'} resp=${state.enemy.plan.responseCardId ?? '-'} secret=${state.enemy.plan.secretCardId ?? '-'} writing=${state.enemy.plan.writingCardId ?? '-'}`
-  );
-
-  feed.push('【层1】应对结算');
-  const pResponse = pickPlannedCard(state.player, state.player.plan.responseCardId);
-  const eResponse = pickPlannedCard(state.enemy, state.enemy.plan.responseCardId);
-  resolveCardEffect({
-    owner: state.player,
-    rival: state.enemy,
-    card: pResponse,
-    round,
-    logs,
-    feed,
-    layerLabel: '应对',
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-  resolveCardEffect({
-    owner: state.enemy,
-    rival: state.player,
-    card: eResponse,
-    round,
-    logs,
-    feed,
-    layerLabel: '应对',
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-
-  let playerMainDamageModifier = 0;
-  let enemyMainDamageModifier = 0;
-  if (eResponse?.type === '反诘') {
-    playerMainDamageModifier -= 1;
-    feed.push('敌方反诘：我方主论伤害 -1');
-  }
-  if (pResponse?.type === '反诘') {
-    enemyMainDamageModifier -= 1;
-    feed.push('我方反诘：敌方主论伤害 -1');
-  }
-
-  feed.push('【层2】主论结算');
-  const pMain = pickPlannedCard(state.player, state.player.plan.mainCardId);
-  const eMain = pickPlannedCard(state.enemy, state.enemy.plan.mainCardId);
-
-  if (state.arenaId === 'jixia' && pMain && !state.player.plan.writingCardId) {
-    state.player.resources.zhengLi += 1;
-    logs.push(makeLog(round, '稷下学宫触发：我方首次立论且未着书，证立 +1'));
-    feed.push('稷下学宫：我方证立 +1');
-  }
-  if (state.arenaId === 'jixia' && eMain && !state.enemy.plan.writingCardId) {
-    state.enemy.resources.zhengLi += 1;
-    logs.push(makeLog(round, '稷下学宫触发：敌方首次立论且未着书，证立 +1'));
-    feed.push('稷下学宫：敌方证立 +1');
-  }
-
-  resolveCardEffect({
-    owner: state.player,
-    rival: state.enemy,
-    card: pMain,
-    round,
-    logs,
-    feed,
-    layerLabel: '主论',
-    targetSeat: state.player.plan.mainTargetSeat,
-    damageModifier: playerMainDamageModifier,
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-  resolveCardEffect({
-    owner: state.enemy,
-    rival: state.player,
-    card: eMain,
-    round,
-    logs,
-    feed,
-    layerLabel: '主论',
-    targetSeat: state.enemy.plan.mainTargetSeat,
-    damageModifier: enemyMainDamageModifier,
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-
-  feed.push('【层3】三席争鸣');
-  resolveSeatBattle(state.player, state.enemy, logs, feed, round, state.arenaId);
-
-  feed.push('【层4】暗策结算');
-  const pSecret = pickPlannedCard(state.player, state.player.plan.secretCardId);
-  const eSecret = pickPlannedCard(state.enemy, state.enemy.plan.secretCardId);
-
-  if (state.arenaId === 'guanxing' && pSecret) {
-    state.player.resources.huYin += 1;
-    logs.push(makeLog(round, '玄机观星台触发：我方首次暗策，护印 +1'));
-    feed.push('玄机观星台：我方暗策 护印 +1');
-  }
-  if (state.arenaId === 'guanxing' && eSecret) {
-    state.enemy.resources.huYin += 1;
-    logs.push(makeLog(round, '玄机观星台触发：敌方首次暗策，护印 +1'));
-    feed.push('玄机观星台：敌方暗策 护印 +1');
-  }
-
-  resolveCardEffect({
-    owner: state.player,
-    rival: state.enemy,
-    card: pSecret,
-    round,
-    logs,
-    feed,
-    layerLabel: '暗策',
-    targetSeat: state.player.plan.secretTargetSeat,
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-  resolveCardEffect({
-    owner: state.enemy,
-    rival: state.player,
-    card: eSecret,
-    round,
-    logs,
-    feed,
-    layerLabel: '暗策',
-    targetSeat: state.enemy.plan.secretTargetSeat,
-    arenaId: state.arenaId,
-    topicId: state.activeTopicId,
-  });
-
-  feed.push('【层 5】回合收束');
-  applyWriting(state.player, logs, feed, round, state.arenaId);
-  applyWriting(state.enemy, logs, feed, round, state.arenaId);
-
-  discardPlannedCard(state.player, state.player.plan.mainCardId);
-  discardPlannedCard(state.player, state.player.plan.responseCardId);
-  discardPlannedCard(state.player, state.player.plan.secretCardId);
-  discardPlannedCard(state.enemy, state.enemy.plan.mainCardId);
-  discardPlannedCard(state.enemy, state.enemy.plan.responseCardId);
-  discardPlannedCard(state.enemy, state.enemy.plan.secretCardId);
-
-  feed.push('【层 6】议区奖励');
-  const laneControls = calculateAllLaneControls(state);
-  const { playerRewards, enemyRewards } = applyLaneRewards(state, laneControls);
-  
-  (Object.keys(laneControls) as Array<keyof typeof laneControls>).forEach(laneId => {
-    const control = laneControls[laneId];
-    const laneName = LANE_NAMES[laneId];
-    if (control.controlledBy) {
-      const controller = control.controlledBy === 'player' ? '我方' : '敌方';
-      logs.push(makeLog(round, `${controller}控制${laneName}（战力 ${control.playerPower}:${control.enemyPower}）`));
-      feed.push(`${laneName}: ${controller}控制 (${control.playerPower}:${control.enemyPower})`);
-    } else {
-      logs.push(makeLog(round, `${laneName}未控制（战力 ${control.playerPower}:${control.enemyPower}）`));
-      feed.push(`${laneName}: 未控制 (${control.playerPower}:${control.enemyPower})`);
-    }
-  });
-  
-  playerRewards.forEach(reward => {
-    logs.push(makeLog(round, `我方：${reward}`));
-  });
-  enemyRewards.forEach(reward => {
-    logs.push(makeLog(round, `敌方：${reward}`));
-  });
-
-  state.logs.push(...logs);
-  state.resolveFeed = feed;
-  audit.push(
-    `[R${round}] player-res xin=${state.player.resources.xinZheng} ling=${state.player.resources.lingShi} hu=${state.player.resources.huYin} zhengli=${state.player.resources.zhengLi} shixu=${state.player.resources.shiXu} wenmai=${state.player.resources.wenMai} jibian=${state.player.resources.jiBian} dashi=${state.player.resources.daShi} chou=${state.player.resources.chou}`
-  );
-  audit.push(
-    `[R${round}] enemy-res xin=${state.enemy.resources.xinZheng} ling=${state.enemy.resources.lingShi} hu=${state.enemy.resources.huYin} zhengli=${state.enemy.resources.zhengLi} shixu=${state.enemy.resources.shiXu} wenmai=${state.enemy.resources.wenMai} jibian=${state.enemy.resources.jiBian} dashi=${state.enemy.resources.daShi} chou=${state.enemy.resources.chou}`
-  );
-  audit.push(`[R${round}] resolve-end`);
-  state.internalAudit.push(...audit);
-  if (state.internalAudit.length > 240) {
-    state.internalAudit = state.internalAudit.slice(-240);
-  }
-}
-
-function canMoveToAnMou(state: DebateBattleState): boolean {
-  return state.player.plan.lockedPublic && state.enemy.plan.lockedPublic;
-}
-
-function canMoveToReveal(state: DebateBattleState): boolean {
-  return state.player.plan.lockedSecret && state.enemy.plan.lockedSecret;
-}
-
-function setPhase(state: DebateBattleState, phase: DebatePhase): void {
-  state.phase = phase;
-  state.secondsLeft = getPhaseSeconds(phase);
-}
-
-function advancePhase(state: DebateBattleState): void {
-  if (state.phase === 'ming_bian') {
-    setPhase(state, 'an_mou');
-    state.logs.push(makeLog(state.round, '明辩结束，进入暗策'));
-    return;
-  }
-
-  if (state.phase === 'an_mou') {
-    setPhase(state, 'reveal');
-    state.logs.push(makeLog(state.round, '暗策结束，进入揭示'));
-    return;
-  }
-
-  if (state.phase === 'reveal') {
-    setPhase(state, 'resolve');
-    resolveRound(state);
-    state.logs.push(makeLog(state.round, '进入结算层'));
-    return;
-  }
-
-  if (state.phase === 'resolve') {
-    resetPlanForNewRound(state.player);
-    resetPlanForNewRound(state.enemy);
-
-    const daShiWinner = checkDaShiVictory(state);
-    if (daShiWinner) {
-      setPhase(state, 'finished');
-      state.winner = daShiWinner;
-      const result = daShiWinner === 'player' 
-        ? `对局结束：我方大势达到${WIN_DASHI}，获胜！` 
-        : `对局结束：敌方大势达到${WIN_DASHI}，获胜！`;
-      state.logs.push(makeLog(state.round, result));
-      if (daShiWinner === 'player') state.player.gold += 100;
-      else state.enemy.gold += 100;
-      return;
-    }
-
-    const playerDead = state.player.resources.xinZheng <= 0;
-    const enemyDead  = state.enemy.resources.xinZheng  <= 0;
-    if (playerDead || enemyDead) {
-      setPhase(state, 'finished');
-      let result = '';
-      if (playerDead && enemyDead) {
-        state.winner = 'draw';
-        result = '对局结束：双方同时心证归零，平局';
-      } else if (playerDead) {
-        state.winner = 'enemy';
-        result = '对局结束：我方心证归零，敌方胜';
-        state.enemy.gold += 100;
-      } else {
-        state.winner = 'player';
-        result = '对局结束：敌方心证归零，我方胜';
-        state.player.gold += 100;
-      }
-      state.logs.push(makeLog(state.round, result));
-      return;
-    }
-
-    if (state.round >= state.maxRounds) {
-      setPhase(state, 'finished');
-      const roundLimitResult = resolveRoundLimitWinner(state);
-      state.winner = roundLimitResult.winner;
-      state.logs.push(makeLog(state.round, roundLimitResult.resultText));
-      if (roundLimitResult.winner === 'player') state.player.gold += 100;
-      else if (roundLimitResult.winner === 'enemy') state.enemy.gold += 100;
-      return;
-    }
-
-    state.round += 1;
-    beginNewRound(state);
-    setPhase(state, 'ming_bian');
-    state.logs.push(makeLog(state.round, `第 ${state.round} 回合开始`));
-  }
-}
-
-function updatePlanCard(player: BattlePlayer, slot: PlanSlot, cardId: string | null): boolean {
-  if (!cardId) {
-    if (slot === 'main') player.plan.mainCardId = null;
-    if (slot === 'response') player.plan.responseCardId = null;
-    if (slot === 'secret') player.plan.secretCardId = null;
-    player.plan.usedLingShi = recalcUsedLingShi(player);
-    return true;
-  }
-
-  const error = getPlanAssignError(player, slot, cardId);
-  if (error) return false;
-
-  if (slot === 'main') player.plan.mainCardId = cardId;
-  if (slot === 'response') player.plan.responseCardId = cardId;
-  if (slot === 'secret') player.plan.secretCardId = cardId;
-  player.plan.usedLingShi = recalcUsedLingShi(player);
-  return true;
-}
-
-function updateWriting(player: BattlePlayer, cardId: string | null): boolean {
-  if (!cardId) {
-    player.plan.writingCardId = null;
-    return true;
-  }
-  if (!getCardFromHand(player, cardId)) return false;
-  if (getPlanCardIds(player).includes(cardId)) return false;
-  player.plan.writingCardId = cardId;
-  return true;
-}
-
-function findAffordableByType(player: BattlePlayer, slot: PlanSlot, costBudget: number): DebateCard[] {
-  return player.hand
-    .filter((card) => isCardAllowedForSlot(slot, card.type))
-    .filter((card) => !getPlanCardIds(player).includes(card.id))
-    .filter((card) => card.cost <= costBudget)
-    .sort((a, b) => b.cost - a.cost);
-}
-
-function chooseTargetSeat(defender: BattlePlayer): SeatId {
-  const seatScores = ALL_SEATS.map((seat) => {
-    const lane = defender.seats[seat];
-    const frontHp = lane.front?.hp ?? 0;
-    const backHp = lane.back?.hp ?? 0;
-    return {
-      seat,
-      score: frontHp + backHp,
-    };
-  });
-  seatScores.sort((a, b) => a.score - b.score);
-  if (seatScores.length === 1) return seatScores[0].seat;
-  if (Math.random() < AI_TUNING.targetWeakSeatChance) return seatScores[0].seat;
-  const alternatives = seatScores.slice(1);
-  return alternatives[Math.floor(Math.random() * alternatives.length)].seat;
-}
-
-function pickAiCandidate(candidates: DebateCard[]): DebateCard | null {
-  if (candidates.length === 0) return null;
-  if (candidates.length === 1) return candidates[0];
-  const window = candidates.slice(0, Math.min(AI_TUNING.candidateWindow, candidates.length));
-  if (Math.random() < AI_TUNING.preferTopCostChance) return window[0];
-  return window[Math.floor(Math.random() * window.length)];
-}
-
-function getSeatTotalHp(player: BattlePlayer): number {
-  return ALL_SEATS.reduce((total, seat) => {
-    const lane = player.seats[seat];
-    return total + (lane.front?.hp ?? 0) + (lane.back?.hp ?? 0);
-  }, 0);
-}
-
-function resolveRoundLimitWinner(state: DebateBattleState): { winner: Side | 'draw'; resultText: string } {
-  const playerDaShi = state.player.resources.daShi;
-  const enemyDaShi = state.enemy.resources.daShi;
-  if (playerDaShi !== enemyDaShi) {
-    const winner = playerDaShi > enemyDaShi ? 'player' : 'enemy';
-    const resultText =
-      winner === 'player'
-        ? `对局结束：达到 ${state.maxRounds} 回合上限，按大势裁决，我方胜`
-        : `对局结束：达到 ${state.maxRounds} 回合上限，按大势裁决，敌方胜`;
-    return { winner, resultText };
-  }
-
-  const playerXin = state.player.resources.xinZheng;
-  const enemyXin = state.enemy.resources.xinZheng;
-  if (playerXin !== enemyXin) {
-    const winner = playerXin > enemyXin ? 'player' : 'enemy';
-    const resultText =
-      winner === 'player'
-        ? `对局结束：达到 ${state.maxRounds} 回合上限，大势持平，按心证裁决，我方胜`
-        : `对局结束：达到 ${state.maxRounds} 回合上限，大势持平，按心证裁决，敌方胜`;
-    return { winner, resultText };
-  }
-
-  const playerSeatHp = getSeatTotalHp(state.player);
-  const enemySeatHp = getSeatTotalHp(state.enemy);
-  if (playerSeatHp !== enemySeatHp) {
-    const winner = playerSeatHp > enemySeatHp ? 'player' : 'enemy';
-    const resultText =
-      winner === 'player'
-        ? `对局结束：达到 ${state.maxRounds} 回合上限，大势与心证持平，按席位总血量裁决，我方胜`
-        : `对局结束：达到 ${state.maxRounds} 回合上限，大势与心证持平，按席位总血量裁决，敌方胜`;
-    return { winner, resultText };
-  }
-
-  return {
-    winner: 'draw',
-    resultText: `对局结束：达到 ${state.maxRounds} 回合上限，核心指标持平，平局`,
-  };
-}
-
-function aiPlanForMingBian(state: DebateBattleState): void {
-  const enemy = state.enemy;
-  let budget = enemy.resources.lingShi;
-
-  const mainCandidates = findAffordableByType(enemy, 'main', budget);
-  const responseCandidates = findAffordableByType(enemy, 'response', budget);
-
-  const playMain = Math.random() < AI_TUNING.playMainChance;
-  const playResponse = Math.random() < AI_TUNING.playResponseChance;
-
-  if (playMain && mainCandidates.length > 0) {
-    const main = pickAiCandidate(mainCandidates);
-    if (main) {
-      updatePlanCard(enemy, 'main', main.id);
-      enemy.plan.mainTargetSeat = chooseTargetSeat(state.player);
-      budget -= main.cost;
-    }
-  }
-
-  if (playResponse && responseCandidates.length > 0 && budget > 0) {
-    const affordableResponses = responseCandidates.filter((card) => card.cost <= budget);
-    const response = pickAiCandidate(affordableResponses);
-    if (response) {
-      updatePlanCard(enemy, 'response', response.id);
-      budget -= response.cost;
-    }
-  }
-
-  const canWrite = enemy.resources.maxLingShi < 8 && Math.random() < AI_TUNING.writeChance;
-  if (canWrite) {
-    const writingCandidates = enemy.hand.filter((card) => !getPlanCardIds(enemy).includes(card.id));
-    if (writingCandidates.length > 0) {
-      const writingCandidate = writingCandidates[Math.floor(Math.random() * writingCandidates.length)];
-      updateWriting(enemy, writingCandidate.id);
-    }
-  }
-
-  enemy.plan.lockedPublic = true;
-}
-
-function aiPlanForAnMou(state: DebateBattleState): void {
-  const enemy = state.enemy;
-  const budget = Math.max(0, enemy.resources.lingShi - enemy.plan.usedLingShi);
-  const secretCandidates = findAffordableByType(enemy, 'secret', budget);
-
-  if (Math.random() < AI_TUNING.playSecretChance && secretCandidates.length > 0) {
-    const secret = pickAiCandidate(secretCandidates);
-    if (secret) {
-      updatePlanCard(enemy, 'secret', secret.id);
-      enemy.plan.secretTargetSeat = chooseTargetSeat(state.player);
-    }
-  }
-  enemy.plan.lockedSecret = true;
-}
-
-function aiAutoSubmit(state: DebateBattleState): void {
-  const enemy = state.enemy;
-  const budget = enemy.resources.lingShi;
-  
-  const playableCards = enemy.hand.filter(card => card.cost <= budget);
-  
-  if (playableCards.length === 0 || Math.random() < AI_TUNING.passChance) {
-    enemy.submitAction = {
-      type: 'pass',
-      cardId: null,
-      zone: null,
-      useToken: false,
-    };
-    state.logs.push(makeLog(state.round, '敌方选择空过'));
+  if (layer === 'layer1') {
+    resolveLayer(
+      next.player,
+      next.enemy,
+      next.player.plan.layer1CardId,
+      next.enemy.plan.layer1CardId,
+      next.player.plan.layer1TargetSeat,
+      next.enemy.plan.layer1TargetSeat,
+      feed,
+      '第一手',
+    );
   } else {
-    const card = playableCards[Math.floor(Math.random() * playableCards.length)];
-    const zones: Zone[] = ['main', 'side', 'prep'];
-    const zone = zones[Math.floor(Math.random() * zones.length)];
-    
-    enemy.submitAction = {
-      type: 'play_card',
-      cardId: card.id,
-      zone,
-      useToken: enemy.resources.chou > 0 && Math.random() < AI_TUNING.useTokenChance,
-    };
-    
-    if (enemy.submitAction.useToken && enemy.resources.chou > 0) {
-      enemy.resources.chou -= 1;
-    }
-    
-    state.logs.push(makeLog(state.round, `敌方已提交到${zone === 'main' ? '主议' : zone === 'side' ? '旁议' : '预备区'}`));
+    resolveLayer(
+      next.player,
+      next.enemy,
+      next.player.plan.layer2CardId,
+      next.enemy.plan.layer2CardId,
+      next.player.plan.layer2TargetSeat,
+      next.enemy.plan.layer2TargetSeat,
+      feed,
+      '第二手',
+    );
   }
-  
-  if (state.phase === 'ming_bian') {
-    enemy.plan.lockedPublic = true;
-  } else {
-    enemy.plan.lockedSecret = true;
-  }
+
+  next.resolveFeed = feed;
+  next.logs.push(...feed.map((text) => makeLog(next.round, text)));
+  return next;
 }
 
-export function getPublicSubmitInfo(player: BattlePlayer): PublicSubmitInfo {
-  if (!player.submitAction) {
+function finalizeRound(state: DebateBattleState): DebateBattleState {
+  const next = cloneState(state);
+
+  consumeChouIfNeeded(next.player);
+  consumeChouIfNeeded(next.enemy);
+
+  const laneResult = resolveCombat(next);
+  laneResult.summary.forEach((line) => {
+    next.logs.push(makeLog(next.round, line));
+  });
+
+  const winner = checkVictory(next);
+  if (winner) {
+    next.phase = 'finished';
+    next.winner = winner;
+    next.secondsLeft = 0;
+    return next;
+  }
+
+  const nextRound = next.round + 1;
+  const nextMaxCost = getMaxCost(nextRound);
+
+  next.round = nextRound;
+  next.phase = 'play_1';
+  next.secondsLeft = PHASE_DURATION.play_1;
+  next.resolveFeed = [];
+
+  next.player.resources.maxCost = nextMaxCost;
+  next.player.resources.cost = nextMaxCost;
+  next.enemy.resources.maxCost = nextMaxCost;
+  next.enemy.resources.cost = nextMaxCost;
+
+  next.player.plan = {
+    layer1CardId: null,
+    layer2CardId: null,
+    writingCardId: null,
+    layer1TargetSeat: 'zhu_yi',
+    layer2TargetSeat: 'pang_yi',
+    usedCost: 0,
+    lockedLayer1: false,
+    lockedLayer2: false,
+  };
+
+  next.enemy.plan = {
+    layer1CardId: null,
+    layer2CardId: null,
+    writingCardId: null,
+    layer1TargetSeat: 'zhu_yi',
+    layer2TargetSeat: 'pang_yi',
+    usedCost: 0,
+    lockedLayer1: false,
+    lockedLayer2: false,
+  };
+
+  drawCards(next.player, Math.max(0, HAND_REFILL_TO - next.player.hand.length));
+  drawCards(next.enemy, Math.max(0, HAND_REFILL_TO - next.enemy.hand.length));
+
+  return next;
+}
+
+function lockLayerIfNeeded(state: DebateBattleState): DebateBattleState {
+  const next = cloneState(state);
+
+  if (next.phase === 'play_1') {
+    next.player.plan.lockedLayer1 = true;
+    next.enemy.plan.lockedLayer1 = true;
+    return next;
+  }
+
+  if (next.phase === 'play_2') {
+    next.player.plan.lockedLayer2 = true;
+    next.enemy.plan.lockedLayer2 = true;
+    return next;
+  }
+
+  return next;
+}
+
+function advancePhase(state: DebateBattleState): DebateBattleState {
+  if (state.phase === 'finished') return state;
+
+  if (state.phase === 'play_1') {
+    const locked = lockLayerIfNeeded(state);
+    const resolved = resolveLayerByKey(locked, 'layer1');
+    resolved.phase = 'resolve_1';
+    resolved.secondsLeft = PHASE_DURATION.resolve_1;
+    return resolved;
+  }
+
+  if (state.phase === 'resolve_1') {
     return {
-      submitted: false,
-      zone: null,
-      hasUsedToken: false,
+      ...state,
+      phase: 'play_2',
+      secondsLeft: PHASE_DURATION.play_2,
+      resolveFeed: [],
     };
   }
+
+  if (state.phase === 'play_2') {
+    const locked = lockLayerIfNeeded(state);
+    const resolved = resolveLayerByKey(locked, 'layer2');
+    resolved.phase = 'resolve_2';
+    resolved.secondsLeft = PHASE_DURATION.resolve_2;
+    return resolved;
+  }
+
+  if (state.phase === 'resolve_2') {
+    return finalizeRound(state);
+  }
+
+  return state;
+}
+
+function aiAutoPlan(state: DebateBattleState): DebateBattleState {
+  const next = cloneState(state);
+  const enemy = next.enemy;
+
+  if (next.phase === 'play_1' && !enemy.plan.lockedLayer1) {
+    const playable = enemy.hand.filter((card) => card.cost <= enemy.resources.cost);
+    const picked = pickBestPlayableCard(playable, next, 'play_1');
+
+    if (picked) {
+      enemy.plan.layer1CardId = picked.id;
+      enemy.plan.layer1TargetSeat = chooseAIOffensiveSeat(next.player);
+      const costEval = evaluatePlanCost(enemy, enemy.plan.layer1CardId, enemy.plan.layer2CardId);
+      enemy.plan.usedCost = costEval.usedCost;
+    }
+
+    enemy.plan.lockedLayer1 = true;
+    return next;
+  }
+
+  if (next.phase === 'play_2' && !enemy.plan.lockedLayer2) {
+    const playable = enemy.hand.filter((card) => {
+      if (card.id === enemy.plan.layer1CardId) return false;
+      const costEval = evaluatePlanCost(enemy, enemy.plan.layer1CardId, card.id);
+      return costEval.valid;
+    });
+
+    const picked = pickBestPlayableCard(playable, next, 'play_2');
+
+    if (picked) {
+      enemy.plan.layer2CardId = picked.id;
+      enemy.plan.layer2TargetSeat = chooseAIOffensiveSeat(next.player);
+      const costEval = evaluatePlanCost(enemy, enemy.plan.layer1CardId, enemy.plan.layer2CardId);
+      enemy.plan.usedCost = costEval.usedCost;
+    }
+
+    enemy.plan.lockedLayer2 = true;
+    return next;
+  }
+
+  return next;
+}
+
+function canAdvanceFromCurrentPlayPhase(state: DebateBattleState): boolean {
+  if (state.phase === 'play_1') {
+    return state.player.plan.lockedLayer1 && state.enemy.plan.lockedLayer1;
+  }
+  if (state.phase === 'play_2') {
+    return state.player.plan.lockedLayer2 && state.enemy.plan.lockedLayer2;
+  }
+  return false;
+}
+
+function createPlayer(side: Side, name: string): BattlePlayer {
+  const deck = createStarterDeck(side, { useFullCardPool: true });
+  const initialCost = getMaxCost(1);
+
   return {
-    submitted: true,
-    zone: player.submitAction.zone,
-    hasUsedToken: player.submitAction.useToken,
+    side,
+    name,
+    resources: {
+      cost: initialCost,
+      maxCost: initialCost,
+      dashi: 0,
+      chou: 0,
+      guyin: 0,
+    },
+    deck: shuffleArray(deck),
+    hand: [],
+    discard: [],
+    writings: [],
+    seats: createInitialSeats(),
+    plan: {
+      layer1CardId: null,
+      layer2CardId: null,
+      writingCardId: null,
+      layer1TargetSeat: 'zhu_yi',
+      layer2TargetSeat: 'pang_yi',
+      usedCost: 0,
+      lockedLayer1: false,
+      lockedLayer2: false,
+    },
+    gold: 0,
+    submitAction: null,
   };
 }
 
-export function getRevealData(state: DebateBattleState): RevealData | null {
-  if (state.phase !== 'reveal' && state.phase !== 'resolve') return null;
-  
+export function createInitialBattleState(options?: CreateBattleStateOptions): DebateBattleState {
+  const arenaId = options?.arenaId ?? 'jixia';
+  const arena = ARENA_BY_ID[arenaId];
+
+  const player = createPlayer('player', '我方');
+  const enemy = createPlayer('enemy', '敌方');
+
+  drawCards(player, HAND_REFILL_TO);
+  drawCards(enemy, HAND_REFILL_TO);
+
   return {
-    player: state.player.submitAction?.type === 'play_card' 
-      ? { cardId: state.player.submitAction.cardId!, zone: state.player.submitAction.zone! }
-      : null,
-    enemy: state.enemy.submitAction?.type === 'play_card'
-      ? { cardId: state.enemy.submitAction.cardId!, zone: state.enemy.submitAction.zone! }
-      : null,
+    round: 1,
+    maxRounds: MAX_ROUNDS,
+    phase: 'play_1',
+    secondsLeft: PHASE_DURATION.play_1,
+    activeTopicId: options?.forcedTopicId ?? null,
+    activeTopic: '',
+    topicSelectionPending: false,
+    topicSelectionRound: TOPIC_SELECTION_ROUND,
+    topicSelectionSecondsLeft: null,
+    topicOptions: [],
+    arenaId,
+    arenaName: arena?.name ?? '稷下学宫',
+    player,
+    enemy,
+    logs: [makeLog(1, '战斗开始：进入第一手出牌')],
+    resolveFeed: [],
+    internalAudit: [],
+    winner: null,
   };
 }
 
-function setTargetSeat(player: BattlePlayer, slot: TargetableSlot, seatId: SeatId): void {
-  if (slot === 'main') player.plan.mainTargetSeat = seatId;
-  if (slot === 'secret') player.plan.secretTargetSeat = seatId;
+function handlePlanCard(state: DebateBattleState, slot: PlanSlot, cardId: string | null): DebateBattleState {
+  if (slot !== 'layer1' && slot !== 'layer2') return state;
+
+  const next = cloneState(state);
+  const player = next.player;
+
+  if (slot === 'layer1' && next.phase !== 'play_1') return state;
+  if (slot === 'layer2' && next.phase !== 'play_2') return state;
+  if (slot === 'layer1' && player.plan.lockedLayer1) return state;
+  if (slot === 'layer2' && player.plan.lockedLayer2) return state;
+
+  if (cardId && !player.hand.some((card) => card.id === cardId)) return state;
+  if (cardId && slot === 'layer1' && player.plan.layer2CardId === cardId) return state;
+  if (cardId && slot === 'layer2' && player.plan.layer1CardId === cardId) return state;
+
+  if (slot === 'layer1') player.plan.layer1CardId = cardId;
+  if (slot === 'layer2') player.plan.layer2CardId = cardId;
+
+  const costEval = evaluatePlanCost(player, player.plan.layer1CardId, player.plan.layer2CardId);
+  if (!costEval.valid) return state;
+
+  player.plan.usedCost = costEval.usedCost;
+  return next;
+}
+
+function handleSetTargetSeat(state: DebateBattleState, slot: TargetableSlot, seatId: SeatId): DebateBattleState {
+  const next = cloneState(state);
+
+  if (slot === 'layer1') {
+    next.player.plan.layer1TargetSeat = seatId;
+  } else {
+    next.player.plan.layer2TargetSeat = seatId;
+  }
+
+  return next;
 }
 
 export function battleReducer(state: DebateBattleState, action: BattleAction): DebateBattleState {
-  const next = structuredClone(state) as DebateBattleState;
-
   switch (action.type) {
     case 'TICK': {
-      if (next.phase === 'finished') return next;
-      if (isTopicSelectionWindow(next)) {
-        if (next.topicSelectionSecondsLeft === null) {
-          next.topicSelectionSecondsLeft = TOPIC_SELECTION_SECONDS;
-          next.logs.push(makeLog(next.round, '本回合先确定议题后再进入明辩出牌'));
-          return next;
-        }
-
-        if (next.topicSelectionSecondsLeft > 0) {
-          next.topicSelectionSecondsLeft -= 1;
-        }
-
-        if (next.topicSelectionSecondsLeft <= 0) {
-          applyAutoTopicSelection(next);
-        }
-        return next;
-      }
-      next.secondsLeft -= 1;
-      if (next.secondsLeft === 5 && (next.phase === 'ming_bian' || next.phase === 'an_mou')) {
-        const phaseName = next.phase === 'ming_bian' ? '明辩' : '暗策';
-        next.logs.push(makeLog(next.round, `倒计时 5 秒：${phaseName}阶段即将自动结束`));
-      }
-      if (next.phase === 'ming_bian' && canMoveToAnMou(next)) {
-        advancePhase(next);
-        return next;
-      }
-      if (next.phase === 'an_mou' && canMoveToReveal(next)) {
-        advancePhase(next);
-        return next;
-      }
-      if (next.secondsLeft <= 0) {
-        advancePhase(next);
-      }
-      return next;
+      if (state.phase === 'finished') return state;
+      if (state.secondsLeft <= 1) return advancePhase(state);
+      return {
+        ...state,
+        secondsLeft: state.secondsLeft - 1,
+      };
     }
 
     case 'SELECT_TOPIC': {
-      if (!isTopicSelectionWindow(next)) return next;
-      applyTopicSelection(next, action.topicId, 'player');
-      return next;
+      return {
+        ...state,
+        activeTopicId: action.topicId,
+        activeTopic: action.topicId,
+        topicSelectionPending: false,
+        topicSelectionSecondsLeft: null,
+      };
     }
 
-    case 'PLAN_CARD': {
-      if (next.phase === 'finished') return next;
-      if (isTopicSelectionWindow(next)) return next;
-      if (action.slot === 'secret' && next.phase !== 'an_mou') return next;
-      if (action.slot !== 'secret' && next.phase !== 'ming_bian') return next;
-      if (action.slot === 'secret' && next.player.plan.lockedSecret) return next;
-      if (action.slot !== 'secret' && next.player.plan.lockedPublic) return next;
-      updatePlanCard(next.player, action.slot, action.cardId);
-      return next;
-    }
+    case 'PLAN_CARD':
+      return handlePlanCard(state, action.slot, action.cardId);
 
     case 'PLAN_WRITING': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase !== 'ming_bian' || next.player.plan.lockedPublic) return next;
-      updateWriting(next.player, action.cardId);
-      return next;
-    }
-
-    case 'SET_TARGET_SEAT': {
-      if (next.phase === 'finished') return next;
-      if (isTopicSelectionWindow(next)) return next;
-      if (action.slot === 'main' && (next.phase !== 'ming_bian' || next.player.plan.lockedPublic)) return next;
-      if (action.slot === 'secret' && (next.phase !== 'an_mou' || next.player.plan.lockedSecret)) return next;
-      setTargetSeat(next.player, action.slot, action.seatId);
-      return next;
-    }
-
-    case 'LOCK_PUBLIC': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase !== 'ming_bian') return next;
-      next.player.plan.lockedPublic = true;
-      next.logs.push(makeLog(next.round, '我方已提前结束明辩'));
-      if (!next.enemy.plan.lockedPublic) {
-        aiPlanForMingBian(next);
+      const next = cloneState(state);
+      if (action.cardId && !next.player.hand.some((card) => card.id === action.cardId)) {
+        return state;
       }
-      if (canMoveToAnMou(next)) {
-        advancePhase(next);
+      next.player.plan.writingCardId = action.cardId;
+      return next;
+    }
+
+    case 'SET_TARGET_SEAT':
+      return handleSetTargetSeat(state, action.slot, action.seatId);
+
+    case 'LOCK_LAYER1': {
+      if (state.phase !== 'play_1') return state;
+      const next = cloneState(state);
+      next.player.plan.lockedLayer1 = true;
+      if (canAdvanceFromCurrentPlayPhase(next)) {
+        return advancePhase(next);
       }
       return next;
     }
 
-    case 'LOCK_SECRET': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase !== 'an_mou') return next;
-      next.player.plan.lockedSecret = true;
-      next.logs.push(makeLog(next.round, '我方已提前结束暗策'));
-      if (!next.enemy.plan.lockedSecret) {
-        aiPlanForAnMou(next);
-      }
-      if (canMoveToReveal(next)) {
-        advancePhase(next);
+    case 'LOCK_LAYER2': {
+      if (state.phase !== 'play_2') return state;
+      const next = cloneState(state);
+      next.player.plan.lockedLayer2 = true;
+      if (canAdvanceFromCurrentPlayPhase(next)) {
+        return advancePhase(next);
       }
       return next;
     }
 
     case 'AI_AUTO_PLAN': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase === 'ming_bian' && !next.enemy.plan.lockedPublic) {
-        aiPlanForMingBian(next);
-        if (canMoveToAnMou(next)) {
-          advancePhase(next);
-        }
-      } else if (next.phase === 'an_mou' && !next.enemy.plan.lockedSecret) {
-        aiPlanForAnMou(next);
-        if (canMoveToReveal(next)) {
-          advancePhase(next);
-        }
+      const next = aiAutoPlan(state);
+      if (canAdvanceFromCurrentPlayPhase(next)) {
+        return advancePhase(next);
       }
       return next;
     }
 
-    case 'SUBMIT_CARD': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase !== 'ming_bian' && next.phase !== 'an_mou') return next;
-      const card = next.player.hand.find(c => c.id === action.cardId);
-      if (!card) return next;
-      let cost = card.cost;
-      if (action.useToken && next.player.resources.chou > 0) {
-        cost = Math.max(0, cost - 1);
-      }
-      if (cost > next.player.resources.lingShi) return next;
-      next.player.submitAction = {
-        type: 'play_card',
-        cardId: action.cardId,
-        zone: action.zone,
-        useToken: action.useToken,
-      };
-      if (action.useToken && next.player.resources.chou > 0) {
-        next.player.resources.chou -= 1;
-      }
-      next.logs.push(makeLog(next.round, `我方已提交到${action.zone === 'main' ? '主议' : action.zone === 'side' ? '旁议' : '预备区'}`));
-      return next;
-    }
+    case 'ADVANCE_PHASE':
+      return advancePhase(state);
 
-    case 'PASS': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase !== 'ming_bian' && next.phase !== 'an_mou') return next;
-      next.player.submitAction = {
-        type: 'pass',
-        cardId: null,
-        zone: null,
-        useToken: false,
-      };
-      next.logs.push(makeLog(next.round, '我方选择空过'));
-      return next;
-    }
-
-    case 'CONFIRM_SUBMIT': {
-      if (isTopicSelectionWindow(next)) return next;
-      if (next.phase === 'ming_bian') {
-        next.player.plan.lockedPublic = true;
-        if (!next.enemy.plan.lockedPublic) {
-          aiAutoSubmit(next);
-        }
-        if (canMoveToAnMou(next)) {
-          advancePhase(next);
-        }
-      } else if (next.phase === 'an_mou') {
-        next.player.plan.lockedSecret = true;
-        if (!next.enemy.plan.lockedSecret) {
-          aiAutoSubmit(next);
-        }
-        if (canMoveToReveal(next)) {
-          advancePhase(next);
-        }
-      }
-      return next;
-    }
-
-    case 'AI_AUTO_SUBMIT': {
-      if (isTopicSelectionWindow(next)) return next;
-      const enemyLocked =
-        next.phase === 'ming_bian'
-          ? next.enemy.plan.lockedPublic
-          : next.phase === 'an_mou'
-            ? next.enemy.plan.lockedSecret
-            : true;
-
-      if ((next.phase === 'ming_bian' || next.phase === 'an_mou') && !enemyLocked) {
-        aiAutoSubmit(next);
-        if (next.phase === 'ming_bian' && canMoveToAnMou(next)) {
-          advancePhase(next);
-        } else if (next.phase === 'an_mou' && canMoveToReveal(next)) {
-          advancePhase(next);
-        }
-      }
-      return next;
-    }
-
-    case 'ADVANCE_PHASE': {
-      if (isTopicSelectionWindow(next)) return next;
-      advancePhase(next);
-      return next;
-    }
+    case 'SUBMIT_CARD':
+    case 'PASS':
+    case 'CONFIRM_SUBMIT':
+    case 'AI_AUTO_SUBMIT':
+      return state;
 
     default:
-      return next;
+      return state;
   }
+}
+
+export function getPublicSubmitInfo(player: BattlePlayer): PublicSubmitInfo {
+  return {
+    submitted: player.plan.lockedLayer1 || player.plan.lockedLayer2,
+    zone: null,
+    hasUsedToken: false,
+  };
+}
+
+export function getRevealData(_state: DebateBattleState): RevealData | null {
+  return null;
+}
+
+export function getPublicPlanInfo(player: BattlePlayer): PublicPlanInfo {
+  return {
+    hasLayer1Card: Boolean(player.plan.layer1CardId),
+    hasLayer2Card: Boolean(player.plan.layer2CardId),
+    hasWritingCard: Boolean(player.plan.writingCardId),
+    layer1TargetSeat: player.plan.layer1TargetSeat,
+    layer2TargetSeat: player.plan.layer2TargetSeat,
+    lockedLayer1: player.plan.lockedLayer1,
+    lockedLayer2: player.plan.lockedLayer2,
+    handCount: player.hand.length,
+    writingCount: player.writings.length,
+  };
+}
+
+export function getPlayerPlannedCardIds(player: BattlePlayer): { layer1: string | null; layer2: string | null } {
+  return {
+    layer1: player.plan.layer1CardId,
+    layer2: player.plan.layer2CardId,
+  };
+}
+
+export function getCurrentPhaseActionHint(phase: DebatePhase): { canPlan: boolean; slot: PlanSlot | null } {
+  if (phase === 'play_1') return { canPlan: true, slot: 'layer1' };
+  if (phase === 'play_2') return { canPlan: true, slot: 'layer2' };
+  return { canPlan: false, slot: null };
 }

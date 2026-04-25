@@ -1,0 +1,39 @@
+{
+  "task_id": "TASK-20260422-220",
+  "goal": "Rebuild card description pipeline into a machine-usable numeric rule system with two active card categories only (立论/策术), while preserving separate flavor text for display.",
+  "constraints": [
+    "Battle/card active taxonomy must stay at two categories only: 立论 and 策术.",
+    "Do not manually rewrite the full 170-card corpus one-by-one; use deterministic normalization at data boundary.",
+    "Keep flavor text and executable rule text separated.",
+    "Use integer-only values in normalized rule payloads and text.",
+    "Keep changes scoped to card data mapping, battle card model/runtime usage, and directly related card UI text rendering."
+  ],
+  "deliverables": [
+    "Conflict arbitration record for replacing narrative-only card descriptions with structured numeric rules.",
+    "Card data model includes structured rule payload + normalized rule text for backend parsing.",
+    "showcase/catalog card views display normalized规则 text and keep风味文本独立展示.",
+    "battleV2 card model/runtime can consume structured rule payload while remaining compatible with existing effect fields.",
+    "Verification notes from typecheck and task finalize commands."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "docs/standards",
+    "src/data/showcaseCards.ts",
+    "src/data/cards.ts",
+    "src/battleV2/types.ts",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/components/battle/HandCard.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/panels/CardLibraryPanel.tsx",
+    "src/components/showcase/CardDetail.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260422-220-card-rule-normalization.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260422-220-card-rule-normalization.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260422-220-card-rule-normalization.json"
+  ],
+  "status": "in_progress"
+}

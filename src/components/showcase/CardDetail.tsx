@@ -30,9 +30,11 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
   const card = CARDS[currentIndex];
   const rarityBadgeColor = rarityColor[card.rarity] || '#9ca3af';
   const typeBadgeColor = typeColor[card.type] || '#374151';
-  const isCharacter = card.type === '角色' || card.type === '门客';
+  const isCharacter = card.attack !== undefined || card.hp !== undefined;
   const cardImageUrl = getCardImageUrl(card.id, card.name);
   const tierLabel = getCardTierLabel(card);
+  const ruleText = (card as any).ruleText ?? card.skill ?? '';
+  const flavorText = card.background ?? (card as any).flavorText ?? '';
 
   const playBellSound = () => {
     try {
@@ -263,16 +265,20 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
               </div>
             )}
 
-            <p className="text-[12px] text-stone-800 leading-relaxed italic pl-3 border-l-2 border-stone-800/40">
-              "{card.background}"
-            </p>
+            {ruleText && (
+              <div className="text-[13px] text-stone-900 leading-7 font-medium">
+                <span className="font-bold text-white bg-[#8a3324]/90 px-1 py-0.5 rounded shadow-sm mr-1 border border-[#8a3324] text-[11px]">
+                  规则：
+                </span>
+                {ruleText}
+              </div>
+            )}
 
-            <div className="text-[13px] text-stone-900 leading-7 font-medium">
-              <span className="font-bold text-white bg-[#8a3324]/90 px-1 py-0.5 rounded shadow-sm mr-1 border border-[#8a3324] text-[11px]">
-                {card.type}效果：
-              </span>
-              {card.skill}
-            </div>
+            {flavorText && (
+              <p className="text-[12px] text-stone-800 leading-relaxed italic pl-3 border-l-2 border-stone-800/40">
+                "{flavorText}"
+              </p>
+            )}
 
             <div className="mt-auto pt-2 flex justify-start text-[11px] text-stone-700 border-t border-stone-800/20">
               <span>
@@ -357,18 +363,28 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
           transform-origin: top center;
         }
         .custom-scrollbar::-webkit-scrollbar {
-          width: 3px;
+          width: 4px;
           height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(212, 165, 32, 0.3);
-          border-radius: 3px;
+          background: rgba(212, 165, 32, 0.4);
+          border-radius: 2px;
+          border: none;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(212, 165, 32, 0.6);
+          background: rgba(212, 165, 32, 0.7);
+        }
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+        /* Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(212, 165, 32, 0.4) rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>
