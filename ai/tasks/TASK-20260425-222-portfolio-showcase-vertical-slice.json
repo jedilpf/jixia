@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260425-222-portfolio-showcase-vertical-slice",
+  "goal": "Create a dedicated portfolio directory and English showcase entry for KMD review, and define a strict vertical-slice demo scope for external presentation.",
+  "constraints": [
+    "Keep all runtime gameplay code untouched; this task is documentation and portfolio packaging only.",
+    "Do not change existing canon or scope constraints, and do not modify files outside allowed_write_paths.",
+    "GitHub root README remains a developer entry; add a separate English showcase entrance for KMD/portfolio review.",
+    "Demo definition must be narrowed to a single vertical slice: 2 schools, 1 topic, 1 battleground, 12-20 cards, 3 full rounds.",
+    "If required information is unknown (for example external video URL), write UNKNOWN and register it in open_questions.md."
+  ],
+  "deliverables": [
+    "New portfolio directory skeleton with README_EN.md, demo_script_en.md, research_proposal_en.md, video_link.md, screenshots/, and Jixia_Portfolio.pdf placeholder.",
+    "English portfolio page focused on project value rather than implementation detail overload.",
+    "Root README section titled 'For KMD / Portfolio Review: Start Here' linking to the English portfolio entry.",
+    "Open question record(s) for any UNKNOWN items required by the new portfolio package."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "README.md",
+    "portfolio",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260425-222-portfolio-showcase-vertical-slice.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260425-222-portfolio-showcase-vertical-slice.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260425-222-portfolio-showcase-vertical-slice.json"
+  ],
+  "status": "in_progress"
+}

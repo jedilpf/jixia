@@ -1,3 +1,10 @@
+import { 
+  IconTalk, 
+  IconCrossSwords, 
+  IconSeek, 
+  IconChronicle, 
+  IconWait 
+} from '@/components/common/JixiaIcons';
 import { useMemo, useState } from 'react';
 import type { CommunityCategory, CommunityComposerMode, CommunityDraft, CommunityPost } from '../../community/types';
 import { CATEGORY_TAG_MAP, COMMUNITY_CATEGORIES } from '../../community/types';
@@ -6,14 +13,38 @@ import { validatePostInput } from '../../community/moderation';
 const MAX_TAGS = 5;
 const MAX_TAG_LENGTH = 20;
 
+// 格式化剩余时间（毫秒 → 分:秒）
+function formatRemainingTime(ms: number): string {
+  if (ms <= 0) return '';
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes > 0) {
+    return `${minutes}分${remainingSeconds}秒`;
+  }
+  return `${remainingSeconds}秒`;
+}
+
 function normalizeTag(tag: string) {
   return tag.trim().replace(/^#+/, '').trim();
+}
+
+function CategoryIcon({ id, color }: { id: string; color: string }) {
+    switch(id) {
+        case 'discussion': return <IconTalk size={14} color={color} />;
+        case 'battle_report': return <IconCrossSwords size={14} color={color} />;
+        case 'qa': return <IconSeek size={14} color={color} />;
+        case 'culture': return <IconChronicle size={14} color={color} />;
+        default: return null;
+    }
 }
 
 interface CommunityComposerProps {
   mode: CommunityComposerMode;
   initialDraft?: CommunityDraft | null;
   initialPost?: CommunityPost | null;
+  canPost?: boolean; // 是否可以发布新帖
+  nextPostTimeRemaining?: number; // 距离下次可发布的剩余时间（毫秒）
   onSubmit: (input: {
     title: string;
     content: string;
@@ -47,6 +78,8 @@ export function CommunityComposer({
   mode,
   initialDraft,
   initialPost,
+  canPost = true,
+  nextPostTimeRemaining = 0,
   onSubmit,
   onSaveDraft,
   onUpdateDraft,
@@ -268,7 +301,7 @@ export function CommunityComposer({
                       color: isActive ? '#f5e6b8' : '#d9c3a0',
                     }}
                   >
-                    <span>{cat.icon}</span>
+                    <CategoryIcon id={cat.id} color={isActive ? '#f5e6b8' : '#d9c3a0'} />
                     <span>{cat.label}</span>
                   </button>
                 );
@@ -473,7 +506,7 @@ export function CommunityComposer({
           borderColor: 'rgba(214, 151, 73, 0.12)',
         }}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {mode === 'create' ? (
             <button
               onClick={handleSaveDraft}
@@ -486,6 +519,21 @@ export function CommunityComposer({
             >
               保存草稿
             </button>
+          ) : null}
+
+          {/* 发布频率限制提示 */}
+          {mode === 'create' && !canPost ? (
+            <div
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
+              style={{
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.18)',
+                color: '#fca5a5',
+              }}
+            >
+              <IconWait size={12} color="#fca5a5" />
+              <span>需等待 {formatRemainingTime(nextPostTimeRemaining)} 后可再次发布</span>
+            </div>
           ) : null}
 
           {mode === 'edit_draft' ? (
@@ -521,14 +569,17 @@ export function CommunityComposer({
         {mode === 'create' ? (
           <button
             onClick={handleSubmit}
-            className="rounded-xl px-6 py-2.5 text-sm font-serif transition-colors"
+            disabled={!canPost}
+            className="rounded-xl px-6 py-2.5 text-sm font-serif transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
+              background: canPost
+                ? 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))'
+                : 'rgba(70, 21, 18, 0.26)',
               border: '1px solid rgba(214, 151, 73, 0.34)',
               color: '#f5e6b8',
             }}
           >
-            发布
+            {canPost ? '发布' : `等待 ${formatRemainingTime(nextPostTimeRemaining)}`}
           </button>
         ) : null}
 

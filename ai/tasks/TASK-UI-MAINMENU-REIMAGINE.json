@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-UI-MAINMENU-REIMAGINE",
+  "goal": "Redesign the main menu navigation buttons using the horizontal 'Bamboo Slip' style (Option A).",
+  "constraints": [
+    "Follow V9 Mineral Aesthetic (Ivory, Gold, Cinnabar, Ink Black).",
+    "Replace old vertical button images with a code-driven horizontal 'Slip' button design.",
+    "Include clear calligraphy-style text (Serif/Kaiti) for each action.",
+    "Use JixiaIcons for each button (Start, Story, Characters, Collection).",
+    "Maintain the layout balance with the new V9 cover background."
+  ],
+  "deliverables": [
+    "Updated MainMenu.tsx with SlotButton component and new layout.",
+    "CSS/Tailwind styles for the 'Bamboo Slip' effect (mineral noise, gold border).",
+    "Updated docs/PROJECT_MEMORY.md."
+  ],
+  "allowed_write_paths": [
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks/TASK-UI-MAINMENU-REIMAGINE.json",
+    "src/components/MainMenu.tsx",
+    "src/index.css"
+  ],
+  "acceptance_commands": [
+    "npm run gate:daily"
+  ],
+  "status": "completed"
+}

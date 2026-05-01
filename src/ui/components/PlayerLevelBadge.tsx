@@ -48,24 +48,30 @@ export function PlayerLevelBadge({ level, exp, playerStats, compact = false }: P
     return (
       <button
         onClick={handleToggle}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/80 border transition-all duration-200 hover:bg-[#2a2318] cursor-pointer"
-        style={{ borderColor: `${color}50` }}
+        className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-br from-[#1a1510] to-[#2a2318] border-2 transition-all duration-300 hover:scale-105 cursor-pointer shadow-[0_8px_20px_rgba(0,0,0,0.4)] group relative overflow-hidden"
+        style={{ borderColor: `${color}80` }}
         title="查看等级详情"
       >
-        <span className="text-base">{icon}</span>
+        {/* 极光/绸缎光泽效果 */}
+        <div className="absolute inset-0 opacity-20 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+        
+        <span className="text-xl filter drop-shadow-md">{icon}</span>
         <div className="flex flex-col items-start">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold" style={{ color }}>
+          <div className="flex items-center gap-2">
+            <span 
+              className="text-xs font-black tracking-wider filter brightness-125" 
+              style={{ color, textShadow: `0 0 8px ${color}40` }}
+            >
               Lv.{level}
             </span>
-            <span className="text-xs text-[#c9b896]">{title}</span>
+            <span className="text-xs text-[#F5E6B8] font-bold tracking-tight">{title}</span>
           </div>
-          <div className="text-[10px] truncate max-w-[80px]" style={{ color: `${color}99` }}>
+          <div className="text-[9px] font-medium tracking-widest text-[#F5E6B8]/70 uppercase">
             {rank.subtitle}
           </div>
         </div>
         <svg
-          className={`w-3 h-3 text-[#8a7a6a] transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+          className={`w-3.5 h-3.5 text-[#F5E6B8]/40 transition-transform duration-300 group-hover:text-[#F5E6B8] ${expanded ? 'rotate-90' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import type { CommunityPost, CommunitySortMode } from '../../community/types';
 import { CommunityPostCard } from './CommunityPostCard';
 import { CommunityEmptyState } from './CommunityEmptyState';
+import { IconBambooSlips } from '@/components/common/JixiaIcons';
 
 interface CommunityPostListProps {
   posts: CommunityPost[];
@@ -15,6 +16,7 @@ interface CommunityPostListProps {
 }
 
 const SORT_OPTIONS: { value: CommunitySortMode; label: string }[] = [
+  { value: 'recommended', label: '推荐' },
   { value: 'latest', label: '新撰' },
   { value: 'hot', label: '热议' },
   { value: 'featured', label: '精华' },
@@ -38,7 +40,7 @@ export function CommunityPostList({
   };
 
   if (posts.length === 0) {
-    return <CommunityEmptyState icon="卷" title="尚无篇章" message="此处静待文人，稍后再来，或提笔开篇。" />;
+    return <CommunityEmptyState icon={<IconBambooSlips size={32} color="#d4a520" />} title="尚无篇章" message="此处静待文人，稍后再来，或提笔开篇。" />;
   }
 
   return (

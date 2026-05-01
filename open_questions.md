@@ -10,3 +10,5 @@
 |---|---|---|---|---|---|---|---|
 | OQ-000 | 示例: 墨家反制窗口是否允许跨阶段触发 | mechanics | P2 | 规则负责人 | 2026-03-29 | open | MEC-CORE-COUNTER |
 | OQ-001 | 礼心殿->儒家、玄匠盟->墨家的映射是否最终确认 | canon | P2 | 设定负责人 | 2026-03-29 | open | ANC-FACTION-001/002 |
+| OQ-002 | KMD 申请展示用公开 Demo 视频链接尚未提供（当前为 UNKNOWN） | portfolio | P1 | 项目负责人 | 2026-04-30 | open | portfolio/video_link.md |
+| OQ-003 | `portfolio/Jixia_Portfolio.pdf` 当前为占位文件，最终导出版本来源与交付时间待确认（UNKNOWN） | portfolio | P1 | 项目负责人 | 2026-04-30 | open | portfolio/Jixia_Portfolio.pdf |

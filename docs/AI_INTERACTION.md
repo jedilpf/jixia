@@ -38,7 +38,7 @@ function aiMakeDecision(state: GameState): AIDecision | null {
   const hand = state.players.enemy.hand;
   const mana = state.players.enemy.mana;
 
-  // 3. 筛选可出的牌（费用<=当前用度）
+  // 3. 筛选可出的牌（费用<=当前势）
   const playableCards = hand.filter(card => card.cost <= mana);
 
   // 4. 评估每张牌的价值
@@ -186,7 +186,7 @@ function selectStrategy(state: GameState): 'aggressive' | 'defensive' | 'balance
 ```typescript
 // 阶段提示文案
 const PHASE_HINTS = {
-  round_start: '新回合开始，获得用度并抽牌',
+  round_start: '新回合开始，获得势并抽牌',
   hidden_submit: '暗辩阶段：选择卡牌放入议区',
   submission_lock: '已锁定，等待揭示',
   reveal: '明辩揭示：展示双方出牌',
@@ -255,7 +255,7 @@ const ANIMATION_CONFIG = {
 
 | 场景 | 处理 |
 |------|------|
-| 用度不足 | 提示"用度不足"，按钮置灰 |
+| 势不足 | 提示"势不足"，按钮置灰 |
 | 议区已满 | 提示"该议区已满"，禁止放入 |
 | 非出牌阶段 | 提示"当前阶段无法出牌" |
 | 无可用牌 | 自动跳过，进入结算 |

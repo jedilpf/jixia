@@ -1,4 +1,4 @@
-﻿export function asset(path: string): string {
+export function asset(path: string): string {
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 }
 
@@ -12,7 +12,7 @@ export const PRE_BATTLE_COLORS = {
   buttonHover: '#9a4126',
 };
 
-export const PRE_BATTLE_BACKGROUND = asset('/assets/bg-main1.png');
+export const PRE_BATTLE_BACKGROUND = asset('/assets/v9/cover_v9.png');
 
 export const FACTION_PORTRAIT_MAP: Record<string, string> = {
   confucian: asset('/assets/chars/stand/kongqiu.png'),

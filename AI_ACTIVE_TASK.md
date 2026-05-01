@@ -1,14 +1,17 @@
 # AI Active Task
 
 ## Current active task
-**卡牌规则文本数值化与双类型一致化**
+**Presentation Portfolio 口径对齐（KMD 评审版）**
 
-任务文件：`ai/tasks/TASK-20260422-220-card-rule-normalization.json`
+任务文件：`ai/tasks/TASK-20260426-224-portfolio-presentation-alignment.json`
 
 ## 状态切换记录
 
 | 时间 | 任务 | 状态 |
 |------|------|------|
+| 2026-04-26 | Presentation Portfolio 口径对齐（KMD 评审版） | 🔄 进行中 |
+| 2026-04-25 | Portfolio 媒体设计叙事重构（五段式） | 🔄 进行中 |
+| 2026-04-25 | 申请展示目录搭建 + 英文 Portfolio 入口 + Demo 竖切收束 | 🔄 进行中 |
 | 2026-04-22 | 卡牌规则文本数值化与双类型一致化 | 🔄 进行中 |
 | 2026-04-10 | 社区排序小界面美化 | 🔄 进行中 |
 | 2026-04-10 | 社区发帖自定义标签 | 🔄 进行中 |
@@ -24,24 +27,29 @@
 ### 当前工作范围
 
 #### 目标
-- 美化社区列表顶部的排序选择小界面
-- 保留全部排序项并让切换更直观
-- 不改社区数据、列表内容与帖子卡片逻辑
+- 解决 `docs/project/presentation/PORTFOLIO.md` 与 `portfolio/README_EN.md` 的叙事冲突
+- 将 Presentation 目录的 KMD 文档统一到“媒体设计项目”评审口径
+- 保持竖切边界不变（2 学派、1 议题、1 论场、12-20 张卡、3 回合）
 
 #### 允许修改文件
-- `src/components/community/CommunityPostList.tsx`
+- `portfolio/*`
+- `README.md`
+- `open_questions.md`
+- `docs/PROJECT_MEMORY.md`
+- `docs/project/presentation/*`
+- `docs/standards/*`
 - `AI_ACTIVE_TASK.md`
-- `ai/tasks/TASK-20260410-193-community-sort-ui-polish.json`
+- `ai/tasks/TASK-20260426-224-portfolio-presentation-alignment.json`
 
 #### 禁止修改
-- 社区排序语义、帖子数据与帖子卡片逻辑
-- 非社区列表顶部排序区域
-- 所有现有战斗、争鸣史、后端逻辑文件
+- 所有运行时代码（`src/`、`server/`、`electron/`）
+- 现有战斗/剧情/社区逻辑与数值
+- `canon/` 与 `scope/` 约束文件
 
 #### 验收目标
-- 社区排序区域视觉更完整、更符合当前主题
-- 最新、最热、精华、收藏最多都可直接切换
-- 与排序区域交互时列表滚动体验保持正常
+- `docs/project/presentation/PORTFOLIO.md` 与 `portfolio/README_EN.md` 口径一致
+- 形成冲突仲裁记录并保留可追溯决策依据
+- 最终输出包含“修改前 vs 修改后”与影响说明
 
 ## 当前边界规则
 

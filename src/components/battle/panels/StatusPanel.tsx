@@ -13,10 +13,10 @@ interface StatusPanelProps {
 }
 
 const PHASE_CONFIG: Record<string, { name: string; color: string; icon: string; bg: string; subtitle: string }> = {
-  ming_bian: { name: '众目·明辩', color: '#3A5F41', icon: '明', bg: '#EBF5EE', subtitle: 'Public Discourse' },
-  an_mou: { name: '幽径·暗策', color: '#1A1A1A', icon: '暗', bg: '#F5F5F5', subtitle: 'Secret Strategy' },
-  reveal: { name: '风起·揭示', color: '#8D2F2F', icon: '揭', bg: '#F5E6E6', subtitle: 'Moment of Truth' },
-  resolve: { name: '尘定·结算', color: '#D4AF65', icon: '结', bg: '#FDFBF7', subtitle: 'Logic Resolution' },
+  play_1: { name: '第一手·出牌', color: '#3A5F41', icon: '一', bg: '#EBF5EE', subtitle: 'First Play' },
+  resolve_1: { name: '风起·结算一', color: '#C9A063', icon: '结', bg: '#FDFBF7', subtitle: 'First Resolution' },
+  play_2: { name: '第二手·出牌', color: '#9C88A8', icon: '二', bg: '#F5F5F5', subtitle: 'Second Play' },
+  resolve_2: { name: '尘定·结算二', color: '#D4AF65', icon: '终', bg: '#FDFBF7', subtitle: 'Final Resolution' },
   finished: { name: '曲终·论罢', color: '#5C4033', icon: '终', bg: '#F2ECD9', subtitle: 'Battle Concluded' },
 };
 
@@ -118,18 +118,17 @@ const StatusPanel: React.FC<StatusPanelProps> = ({ isOpen, onClose, state }) => 
             />
           </div>
 
-          {/* 百家共鸣：文画印章 */}
+          {/* 场域状态 */}
           <div className="p-10 rounded-[2.5rem] bg-white border-2 border-[#1A1A1A]/5 shadow-sm relative">
-            <div className="flex items-center gap-4 mb-10">
+            <div className="flex items-center gap-4 mb-6">
                <div className="h-px flex-1 bg-[#1A1A1A]/5" />
-               <h3 className="text-[11px] font-black text-[#5C4033]/40 uppercase tracking-[0.4em] whitespace-nowrap">场域共鸣 · Resonances</h3>
+               <h3 className="text-[11px] font-black text-[#5C4033]/40 uppercase tracking-[0.4em] whitespace-nowrap">核心资源 · Core Resources</h3>
                <div className="h-px flex-1 bg-[#1A1A1A]/5" />
             </div>
-            <div className="grid grid-cols-2 gap-6">
-              <EffectItem name="文脉" value={player.resources.wenMai} icon="文" color="#3A5F41" desc="灵感涌现，生生不息" />
-              <EffectItem name="机变" value={player.resources.jiBian} icon="机" color="#1A1A1A" desc="瞬息万变，谋定后动" />
-              <EffectItem name="证立" value={player.resources.zhengLi} icon="证" color="#D4AF65" desc="立言得体，威望渐厚" />
-              <EffectItem name="失序" value={player.resources.shiXu} icon="失" color="#8D2F2F" desc="论证纰漏，气数大减" />
+            <div className="grid grid-cols-3 gap-6">
+              <EffectItem name="大势" value={player.resources.dashi} icon="势" color="#5a8a5a" desc="积分，先到8获胜" />
+              <EffectItem name="费用" value={player.resources.cost} icon="费" color="#7ab8c9" desc="本回合可用费用" />
+              <EffectItem name="手牌" value={player.hand.length} icon="牌" color="#c9952a" desc="当前持有手牌数" />
             </div>
           </div>
         </div>
@@ -170,22 +169,17 @@ const ResourcePanel: React.FC<{
       </div>
       
       <div className="space-y-8 relative z-10">
-        <ResourceBar label="心证" value={resources.xinZheng} max={20} color="#8D2F2F" icon="心" />
-        <ResourceBar label="灵势" value={resources.lingShi} max={resources.maxLingShi} color="#3A5F41" icon="灵" />
-        <ResourceBar label="大势" value={resources.daShi} max={8} color="#D4AF65" icon="势" />
+        <ResourceBar label="大势" value={resources.dashi} max={8} color="#5a8a5a" icon="势" />
+        <ResourceBar label="费用" value={resources.cost} max={resources.maxCost} color="#7ab8c9" icon="费" />
 
-        <div className="pt-8 border-t-2 border-[#1A1A1A]/5 grid grid-cols-3 gap-4">
-          <div className="text-center p-4 rounded-2xl bg-[#FDFBF7] shadow-inner group/stat">
-            <div className="text-lg font-black text-[#1A1A1A] tabular-nums italic group-hover/stat:scale-110 transition-transform">{resources.huYin}</div>
-            <div className="text-[9px] font-black text-[#5C4033]/40 uppercase tracking-tighter">符印</div>
-          </div>
-          <div className="text-center p-4 rounded-2xl bg-[#FDFBF7] shadow-inner group/stat">
-            <div className="text-lg font-black text-[#1A1A1A] tabular-nums italic group-hover/stat:scale-110 transition-transform">{resources.chou}</div>
-            <div className="text-[9px] font-black text-[#5C4033]/40 uppercase tracking-tighter">算筹</div>
-          </div>
+        <div className="pt-8 border-t-2 border-[#1A1A1A]/5 grid grid-cols-2 gap-4">
           <div className="text-center p-4 rounded-2xl bg-[#FDFBF7] shadow-inner group/stat">
             <div className="text-lg font-black text-[#1A1A1A] tabular-nums italic group-hover/stat:scale-110 transition-transform">{handCount}</div>
-            <div className="text-[9px] font-black text-[#5C4033]/40 uppercase tracking-tighter">卷帙</div>
+            <div className="text-[9px] font-black text-[#5C4033]/40 uppercase tracking-tighter">手牌</div>
+          </div>
+          <div className="text-center p-4 rounded-2xl bg-[#FDFBF7] shadow-inner group/stat">
+            <div className="text-lg font-black text-[#1A1A1A] tabular-nums italic group-hover/stat:scale-110 transition-transform">{resources.dashi}/8</div>
+            <div className="text-[9px] font-black text-[#5C4033]/40 uppercase tracking-tighter">大势</div>
           </div>
         </div>
       </div>

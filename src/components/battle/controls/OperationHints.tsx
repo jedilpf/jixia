@@ -12,29 +12,29 @@ interface OperationHintsProps {
 }
 
 const PHASE_INFO: Record<string, { title: string; desc: string; color: string; icon: string }> = {
-  ming_bian: {
-    title: '明辩阶段',
-    desc: '公开出牌，正面交锋',
+  play_1: {
+    title: '第一手出牌',
+    desc: '选择本回合第一张牌',
     color: '#7ab8c9',
-    icon: '明',
+    icon: '一',
   },
-  an_mou: {
-    title: '暗策阶段',
-    desc: '秘密布局，暗中筹谋',
-    color: '#9C88A8',
-    icon: '暗',
-  },
-  reveal: {
-    title: '揭示阶段',
-    desc: '展示暗策，真相大白',
+  resolve_1: {
+    title: '第一手结算',
+    desc: '立即结算第一手的出牌结果',
     color: '#C9A063',
-    icon: '揭',
-  },
-  resolve: {
-    title: '结算阶段',
-    desc: '计算结果，决定胜负',
-    color: '#c9952a',
     icon: '结',
+  },
+  play_2: {
+    title: '第二手出牌',
+    desc: '继续打出第二张牌',
+    color: '#9C88A8',
+    icon: '二',
+  },
+  resolve_2: {
+    title: '结算阶段',
+    desc: '完成第二手与席位对抗结算',
+    color: '#c9952a',
+    icon: '终',
   },
   finished: {
     title: '战斗结束',
@@ -50,7 +50,7 @@ const OperationHints: React.FC<OperationHintsProps> = ({
 }) => {
   const { phase, player } = state;
   const isFinished = phase === 'finished';
-  const canAct = phase === 'ming_bian' || phase === 'an_mou';
+  const canAct = phase === 'play_1' || phase === 'play_2';
   const phaseInfo = PHASE_INFO[phase] || PHASE_INFO['finished'];
 
   const getStepHints = (): { text: string; active: boolean; done: boolean }[] => {
@@ -82,14 +82,14 @@ const OperationHints: React.FC<OperationHintsProps> = ({
 
     const hints: { text: string; type: 'info' | 'warning' | 'success' }[] = [];
 
-    if (phase === 'ming_bian' && !player.plan.lockedPublic) {
-      hints.push({ text: '可出明论卡', type: 'success' });
+    if (phase === 'play_1' && !player.plan.lockedLayer1) {
+      hints.push({ text: '可出第一手', type: 'success' });
     }
-    if (phase === 'an_mou' && !player.plan.lockedSecret) {
-      hints.push({ text: '可出暗策卡', type: 'success' });
+    if (phase === 'play_2' && !player.plan.lockedLayer2) {
+      hints.push({ text: '可出第二手', type: 'success' });
     }
 
-    if (player.resources.lingShi <= 1) {
+    if (player.resources.cost <= 1) {
       hints.push({ text: '费用紧张', type: 'warning' });
     }
 

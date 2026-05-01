@@ -1,0 +1,24 @@
+{
+  "task_id": "TASK-POSTER-GEN-001",
+  "goal": "Generate a high-end Collector's Edition narrative poster following V9 Mineral Aesthetic standards.",
+  "constraints": [
+    "Follow V9 Mineral Aesthetic (Ivory background, Ancient Gold, Cinnabar, Malachite, Ink Black).",
+    "Use Silhouette contour composition with internal narrative fill.",
+    "No messy collage or cheap fantasy assets.",
+    "Ensure 40% white space and refined mineral noise."
+  ],
+  "deliverables": [
+    "Optimized AI Prompt for the poster",
+    "Generated poster asset in brain/ directory",
+    "Poster design report in artifacts"
+  ],
+  "allowed_write_paths": [
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks/TASK-POSTER-GEN-001.json",
+    "C:/Users/21389/.gemini/antigravity/brain/0dfad900-cae6-4595-8471-adc1dc56d59f/poster_design_report.md"
+  ],
+  "acceptance_commands": [
+    "npm run gate:daily"
+  ],
+  "status": "completed"
+}

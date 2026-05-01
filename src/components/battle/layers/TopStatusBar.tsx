@@ -16,10 +16,10 @@ interface TopStatusBarProps {
 }
 
 const PHASE_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
-  ming_bian: { label: '明辩', color: '#7ab8c9', bgColor: 'rgba(122,184,201,0.15)' },
-  an_mou: { label: '暗策', color: '#9C88A8', bgColor: 'rgba(156,136,168,0.15)' },
-  reveal: { label: '揭示', color: '#C9A063', bgColor: 'rgba(201,160,99,0.15)' },
-  resolve: { label: '结算', color: '#c9952a', bgColor: 'rgba(201,149,42,0.15)' },
+  play_1: { label: '第一手', color: '#7ab8c9', bgColor: 'rgba(122,184,201,0.15)' },
+  resolve_1: { label: '第一手结算', color: '#C9A063', bgColor: 'rgba(201,160,99,0.15)' },
+  play_2: { label: '第二手', color: '#9C88A8', bgColor: 'rgba(156,136,168,0.15)' },
+  resolve_2: { label: '回合结算', color: '#c9952a', bgColor: 'rgba(201,149,42,0.15)' },
   finished: { label: '结束', color: '#8a7a6a', bgColor: 'rgba(138,122,106,0.15)' },
 };
 
@@ -112,18 +112,27 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
         <div className="flex items-center gap-3 px-4 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
           <span className="text-[10px] text-[#8a7a6a] uppercase tracking-wider">大势</span>
           <div className="flex items-center gap-2">
-            <span className="text-base font-bold text-[#5a8a5a] tabular-nums">{player.resources.daShi}</span>
+            <span className="text-base font-bold text-[#5a8a5a] tabular-nums">{player.resources.dashi}</span>
             <div className="w-px h-4 bg-[#3d3225]" />
-            <span className="text-base font-bold text-[#c9725a] tabular-nums">{enemy.resources.daShi}</span>
+            <span className="text-base font-bold text-[#c9725a] tabular-nums">{enemy.resources.dashi}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
           <div className="w-4 h-4 rounded-full bg-[#7ab8c9]/20 border border-[#7ab8c9]/50 flex items-center justify-center">
-            <span className="text-[8px] text-[#7ab8c9] font-bold">灵</span>
+            <span className="text-[8px] text-[#7ab8c9] font-bold">费</span>
           </div>
           <span className="text-sm font-medium text-[#7ab8c9] tabular-nums">
-            {player.resources.lingShi}/{player.resources.maxLingShi}
+            {player.resources.cost}/{player.resources.maxCost}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
+          <div className="w-4 h-4 rounded-full bg-[#5a8a5a]/20 border border-[#5a8a5a]/50 flex items-center justify-center">
+            <span className="text-[8px] text-[#5a8a5a] font-bold">筹</span>
+          </div>
+          <span className="text-sm font-medium text-[#5a8a5a] tabular-nums">
+            {player.resources.chou}
           </span>
         </div>
       </div>

@@ -36,20 +36,19 @@ interface AIIntent {
 
 // AI意图推断（基于敌方手牌和局势）
 function inferAIIntent(state: DebateBattleState): AIIntent {
-  const { enemy, player, phase } = state;
+  const { enemy, phase } = state;
   const enemyHand = enemy.hand;
-  const playerDaShi = player.resources.daShi;
-  const enemyDaShi = enemy.resources.daShi;
+  const enemyDashi = enemy.resources.dashi;
 
   // 分析敌方手牌构成
   const attackCards = enemyHand.filter(c => c.effectKind === 'damage');
-  const defenseCards = enemyHand.filter(c => c.effectKind === 'shield');
+  const healCards = enemyHand.filter(c => c.effectKind === 'heal');
   const drawCards = enemyHand.filter(c => c.effectKind === 'draw');
 
   // 判断意图
-  if (phase === 'ming_bian') {
-    // 明辩阶段：优先高费牌或攻击牌
-    if (attackCards.length >= 2 && enemy.resources.lingShi >= 3) {
+  if (phase === 'play_1') {
+    // 第一手：优先高价值进攻或资源牌
+    if (attackCards.length >= 2 && enemy.resources.cost >= 3) {
       return {
         type: 'planning_attack',
         confidence: 0.75,
@@ -57,12 +56,12 @@ function inferAIIntent(state: DebateBattleState): AIIntent {
         suggestedCards: attackCards.slice(0, 2).map(c => c.name),
       };
     }
-    if (defenseCards.length > 0 && playerDaShi > enemyDaShi) {
+    if (healCards.length > 0 && enemyDashi <= 2) {
       return {
         type: 'planning_defense',
         confidence: 0.6,
         description: '敌方可能采取防守策略',
-        suggestedCards: defenseCards.slice(0, 1).map(c => c.name),
+        suggestedCards: healCards.slice(0, 1).map(c => c.name),
       };
     }
     if (drawCards.length > 0 && enemyHand.length <= 4) {
@@ -75,16 +74,16 @@ function inferAIIntent(state: DebateBattleState): AIIntent {
     }
   }
 
-  if (phase === 'an_mou') {
-    // 暗谋阶段：更隐蔽
-    if (enemy.plan.lockedPublic) {
-      const mainCard = enemy.hand.find(c => c.id === enemy.plan.mainCardId);
-      if (mainCard && mainCard.effectKind === 'damage') {
+  if (phase === 'play_2') {
+    // 第二手：倾向与第一手形成组合
+    if (enemy.plan.lockedLayer1) {
+      const layer1Card = enemy.hand.find(c => c.id === enemy.plan.layer1CardId);
+      if (layer1Card && layer1Card.effectKind === 'damage') {
         return {
           type: 'planning_combo',
           confidence: 0.65,
           description: '敌方可能在策划连续攻击',
-          suggestedCards: [mainCard.name],
+          suggestedCards: [layer1Card.name],
         };
       }
     }
@@ -278,8 +277,8 @@ export function AIActionPreview({
 
   // 是否正在思考
   const isThinking =
-    (state.phase === 'ming_bian' && !state.enemy.plan.lockedPublic) ||
-    (state.phase === 'an_mou' && !state.enemy.plan.lockedSecret);
+    (state.phase === 'play_1' && !state.enemy.plan.lockedLayer1) ||
+    (state.phase === 'play_2' && !state.enemy.plan.lockedLayer2);
 
   // 延迟显示意图（模拟AI思考时间）
   useEffect(() => {

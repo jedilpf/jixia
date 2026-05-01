@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260426-224-portfolio-presentation-alignment",
+  "goal": "Resolve narrative conflict between the legacy presentation portfolio doc and the new media-design-focused portfolio entry, and align the KMD-facing presentation document to a clear value-first format.",
+  "constraints": [
+    "Documentation-only task; do not modify runtime code.",
+    "Create a mandatory conflict arbitration record before implementing the content rewrite.",
+    "KMD-facing portfolio content must prioritize clarity, aesthetics, research question, prototype evidence, and future potential.",
+    "Maintain the locked vertical slice scope: 2 schools, 1 topic, 1 battleground, 12-20 cards, 3 rounds."
+  ],
+  "deliverables": [
+    "Conflict arbitration record for portfolio narrative mismatch.",
+    "Updated docs/project/presentation/PORTFOLIO.md aligned to media design review expectations.",
+    "Presentation index wording adjusted to reduce future narrative drift."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "README.md",
+    "docs/PROJECT_MEMORY.md",
+    "open_questions.md",
+    "portfolio",
+    "docs/project/presentation",
+    "docs/standards"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260426-224-portfolio-presentation-alignment.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260426-224-portfolio-presentation-alignment.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260426-224-portfolio-presentation-alignment.json"
+  ],
+  "status": "in_progress"
+}

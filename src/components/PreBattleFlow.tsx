@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FRAMEWORK_FACTIONS, FactionBlueprint } from '@/battleV2/factions';
 import { ArenaId } from '@/battleV2/types';
+import { uiAudio } from '@/utils/audioManager';
+import { motion } from 'framer-motion';
+import { Shield, Zap, ChevronRight, Scale, BookOpen } from 'lucide-react';
 
-type FlowStep = 'matching' | 'sect_draft';
+// FlowStep type reserved for future multi-step flow extension
+// type FlowStep = 'sect_draft';
 
 export interface PreBattleResult {
   topicId?: string;
@@ -39,73 +43,51 @@ function factionDifficultyText(faction: FactionBlueprint): 'easy' | 'mid' | 'har
   return 'mid';
 }
 
-function stepIndex(step: FlowStep): number {
-  if (step === 'matching') return 0;
-  return 1;
-}
-
-const FLOW_LABELS = ['寻访', '受命'];
+const getFactionIcon = (name: string, className?: string) => {
+  const sizeClass = className || 'w-6 h-6';
+  if (name.includes('墨') || name.includes('公输')) return <Zap className={sizeClass} />;
+  if (name.includes('儒') || name.includes('名')) return <BookOpen className={sizeClass} />;
+  if (name.includes('兵') || name.includes('法')) return <Shield className={sizeClass} />;
+  if (name.includes('道') || name.includes('阴阳') || name.includes('方技')) return <Scale className={sizeClass} />;
+  return <ChevronRight className={sizeClass} />;
+};
 
 export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowProps) {
   const sectCandidates = useMemo(() => sampleUnique(FRAMEWORK_FACTIONS, 4), []);
 
-  const [step, setStep] = useState<FlowStep>('matching');
-  const [sectSecondsLeft, setSectSecondsLeft] = useState(20);
-
+  const [sectSecondsLeft, setSectSecondsLeft] = useState(30);
   const [selectedSectName, setSelectedSectName] = useState<string | null>(null);
   const [playerSectName, setPlayerSectName] = useState<string | null>(null);
   const [enemySectName, setEnemySectName] = useState<string | null>(null);
 
   const completedRef = useRef(false);
 
-  const sectForPanel = useMemo(() => {
-    const name = selectedSectName ?? playerSectName ?? sectCandidates[0]?.name;
-    if (!name) return null;
-    return sectCandidates.find((faction) => faction.name === name) ?? null;
-  }, [selectedSectName, playerSectName, sectCandidates]);
-
   useEffect(() => {
-    if (step !== 'matching') return undefined;
-    const timer = window.setTimeout(() => {
-      setStep('sect_draft');
-      setSectSecondsLeft(20);
-    }, 2400);
-    return () => window.clearTimeout(timer);
-  }, [step]);
-
-  useEffect(() => {
-    if (step !== 'sect_draft') return undefined;
     const timer = window.setInterval(() => {
       setSectSecondsLeft((seconds) => Math.max(0, seconds - 1));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [step]);
+  }, []);
 
   useEffect(() => {
-    if (step !== 'sect_draft' || enemySectName) return undefined;
+    if (enemySectName) return undefined;
     const timer = window.setTimeout(() => {
       const pick = pickRandom(sectCandidates);
       if (pick) setEnemySectName(pick.name);
-    }, 2500 + Math.floor(Math.random() * 2000));
+    }, 3000 + Math.floor(Math.random() * 2000));
     return () => window.clearTimeout(timer);
-  }, [step, enemySectName, sectCandidates]);
+  }, [enemySectName, sectCandidates]);
 
   useEffect(() => {
-    if (step !== 'sect_draft') return;
     if (sectSecondsLeft > 0) return;
     if (!playerSectName) {
       const pick = pickRandom(sectCandidates);
       const finalPick = selectedSectName ?? pick?.name ?? null;
       if (finalPick) setPlayerSectName(finalPick);
     }
-    if (!enemySectName) {
-      const pick = pickRandom(sectCandidates);
-      if (pick) setEnemySectName(pick.name);
-    }
-  }, [step, sectSecondsLeft, playerSectName, enemySectName, selectedSectName, sectCandidates]);
+  }, [sectSecondsLeft, playerSectName, selectedSectName, sectCandidates]);
 
   useEffect(() => {
-    if (step !== 'sect_draft') return undefined;
     if (!playerSectName || !enemySectName) return undefined;
     if (completedRef.current) return undefined;
 
@@ -117,13 +99,19 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
       });
     }, 320);
     return () => window.clearTimeout(timer);
-  }, [step, playerSectName, enemySectName, onComplete]);
+  }, [playerSectName, enemySectName, onComplete]);
 
   const lockSectChoice = () => {
     if (playerSectName) return;
-    const pick = pickRandom(sectCandidates);
-    const finalPick = selectedSectName ?? pick?.name ?? null;
-    if (finalPick) setPlayerSectName(finalPick);
+    uiAudio.playClick();
+    const finalPick = selectedSectName ?? pickRandom(sectCandidates)?.name ?? null;
+    if (finalPick) {
+      setPlayerSectName(finalPick);
+      if (!enemySectName) {
+        const enemyPick = pickRandom(sectCandidates.filter(s => s.name !== finalPick));
+        setEnemySectName(enemyPick?.name ?? sectCandidates[0].name);
+      }
+    }
   };
 
   const arenaLabel = useMemo(() => {
@@ -133,193 +121,160 @@ export function PreBattleFlow({ arenaId, onCancel, onComplete }: PreBattleFlowPr
     return '玄机观星台';
   }, [arenaId]);
 
-  const currentStep = stepIndex(step);
-  const missingCoreData = sectCandidates.length === 0;
-
   return (
-    <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#2a0e0a] to-[#120604]">
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05] z-0">
-         {/* 使用内联SVG生成纸张纹理，避免外链依赖 */}
-         <div className="w-full h-full" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.5\'/%3E%3C/svg%3E")' }} />
+    <div className="relative h-screen w-screen overflow-hidden bg-[#3a0d0a] select-none font-serif flex flex-col">
+      {/* 锦绣红底色与金纹 */}
+      <div className="absolute inset-0 z-0 bg-[#5c1913]">
+        <div 
+          className="absolute inset-0 opacity-[0.08]" 
+          style={{ 
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }} 
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(212,165,32,0.1),transparent_60%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col px-6 py-10 md:px-12">
-        <header className="mb-12 flex items-end justify-between">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col px-12 py-6 justify-between">
+        
+        {/* 顶部栏 - 紧凑型 */}
+        <header className="flex items-center justify-between shrink-0">
           <div className="flex items-center gap-8">
-            <div className="w-20 h-20 rounded-full border-4 border-[#d29648] flex items-center justify-center shadow-2xl">
-               <span className="text-3xl font-black italic serif">J</span>
-            </div>
-            <div>
-              <h2 className="text-5xl font-black tracking-tighter text-[#f8e6be] uppercase leading-none">百家受业</h2>
-              <div className="flex items-center gap-4 mt-3">
-                 <span className="text-[10px] font-black bg-[#7d3d23] text-[#f8e6be] px-3 py-1 rounded-full tracking-widest uppercase">{arenaLabel}</span>
-                 <span className="text-[10px] font-black text-[#d1b185]/45 tracking-[0.3em] uppercase italic">The Scholarly Way</span>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-4">
+                <h2 className="text-4xl font-black tracking-[0.6em] text-[#f5e6b8] drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">百家授业</h2>
+                <div className="h-0.5 w-24 bg-gradient-to-r from-[#d4a520] to-transparent" />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs font-bold text-[#d4a520] tracking-widest">{arenaLabel}</span>
+                <span className="text-[10px] text-[#f5e6b8]/20 uppercase tracking-[0.2em]">/ Imperial Selection</span>
               </div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="group flex items-center gap-3 px-8 py-4 rounded-2xl border-2 border-[#d29648]/10 text-[10px] font-black text-[#f8e6be]/30 tracking-[0.3em] uppercase hover:border-[#d46b42] hover:text-[#d46b42] transition-all"
-          >
-            <span>辞别归隐</span>
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
-          </button>
+
+          <div className="flex items-center gap-8">
+            <div className="flex flex-col items-end gap-1">
+               <span className="text-[10px] text-[#d4a520]/40 font-bold uppercase tracking-widest">Decision Time</span>
+               <div className="flex items-baseline gap-2">
+                  <span className={`text-3xl font-mono ${sectSecondsLeft <= 10 ? 'text-[#ff4d4d]' : 'text-[#d4a520]'}`}>{sectSecondsLeft}</span>
+                  <span className="text-[10px] text-[#d4a520]/60">SEC</span>
+               </div>
+            </div>
+            <button
+              onClick={() => { uiAudio.playClick(); onCancel(); }}
+              className="px-6 py-2 border border-[#d4a520]/30 text-[#d4a520] text-xs font-bold hover:bg-[#d4a520] hover:text-[#5c1913] transition-all"
+            >
+              辞别归隐
+            </button>
+          </div>
         </header>
 
-        <div className="mb-12 flex items-center gap-4">
-          {FLOW_LABELS.map((label, index) => (
-            <div
-              key={label}
-              className={`
-                flex-1 px-8 py-4 rounded-2xl border-2 transition-all flex items-center justify-between
-                ${currentStep === index ? 'bg-[#7d3d23] border-[#d29648] text-[#f8e6be] shadow-2xl scale-105 z-10' : 'bg-[#1b0c0a] border-[#d29648]/5 text-[#d1b185]/45 opacity-60'}
-              `}
-            >
-               <span className="text-[10px] font-black tracking-[0.4em] uppercase">{label}</span>
-               <span className="text-xl font-black italic opacity-20">0{index + 1}</span>
-            </div>
-          ))}
-        </div>
-
-        {missingCoreData ? (
-          <section className="flex-1 flex flex-col items-center justify-center p-20 bg-[#1b0c0a] border-8 border-[#d29648]/20 rounded-[3rem] shadow-2xl">
-             <div className="w-24 h-24 rounded-full bg-[#d46b42]/10 flex items-center justify-center mb-8">
-                <span className="text-4xl font-black text-[#d46b42]">!</span>
+        {/* 核心内容区 - 使用横向 1x4 布局确保不滚动 */}
+        <main className="flex-1 flex flex-col justify-center min-h-0 py-4">
+           {/* 过渡引导文字 */}
+           <div className="mb-6 text-center">
+             <div className="inline-block relative">
+               <span className="text-xl text-[#f5e6b8] tracking-[0.4em] font-bold">请 择 本 心</span>
+               <div className="absolute -left-12 top-1/2 w-8 h-px bg-gradient-to-l from-[#d4a520] to-transparent" />
+               <div className="absolute -right-12 top-1/2 w-8 h-px bg-gradient-to-r from-[#d4a520] to-transparent" />
              </div>
-             <h3 className="text-2xl font-black text-[#f8e6be] mb-4 uppercase tracking-tight">论战准备数据异常</h3>
-             <p className="text-sm font-bold text-[#f8e6be]/40 uppercase tracking-widest leading-relaxed mb-10 text-center max-w-md">The academy's scrolls are scattered. Please return to the menu and seek guidance.</p>
-             <button onClick={onCancel} className="px-12 py-5 rounded-3xl bg-[#7d3d23] text-[#f8e6be] text-[10px] font-black tracking-[0.4em] uppercase hover:scale-105 active:scale-95 transition-all">REVISIT ARCHIVES</button>
-          </section>
-        ) : null}
+           </div>
 
-        {!missingCoreData && step === 'matching' ? (
-          <section className="flex-1 flex flex-col items-center justify-center gap-10">
-            <div className="relative">
-               <div className="w-40 h-40 rounded-full border-2 border-[#d29648]/5 border-t-[#7d3d23] animate-spin" />
-               <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                  <div className="text-6xl font-black italic serif">寻</div>
-               </div>
-            </div>
-            <div className="text-center">
-              <h3 className="text-3xl font-black tracking-tight text-[#f8e6be] uppercase">寻方定位中...</h3>
-              <p className="mt-4 text-[10px] font-black text-[#d1b185]/45 tracking-[0.4em] uppercase italic animate-pulse">Navigating the Scholarly Compass</p>
-            </div>
-          </section>
-        ) : null}
-
-        {!missingCoreData && step === 'sect_draft' ? (
-          <section className="grid min-h-0 flex-1 grid-cols-1 gap-12 lg:grid-cols-[1.6fr_1fr] animate-in fade-in slide-in-from-bottom duration-1000 cubic-bezier(0.23, 1, 0.32, 1)">
-            <div className="flex flex-col">
-              <div className="mb-8 flex items-center justify-between px-2">
-                <h3 className="text-2xl font-black tracking-tight text-[#f8e6be] uppercase">百家分馆</h3>
-                <div className="flex items-center gap-4">
-                   <span className="text-[10px] font-black text-[#d1b185]/45 tracking-widest uppercase italic">Remaining Time</span>
-                   <div className="px-6 py-2 rounded-full border-2 border-[#d29648] text-xl font-black tabular-nums bg-[#1b0c0a]">
-                     {sectSecondsLeft}S
-                   </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto scrollbar-hide pb-10">
-                {sectCandidates.map((faction) => {
-                  const isSelected = selectedSectName === faction.name;
-                  const isLocked = playerSectName === faction.name;
-                  const difficulty = factionDifficultyText(faction);
-                  const diffColor = difficulty === 'easy' ? '#7d3d23' : difficulty === 'hard' ? '#d46b42' : '#f0c36e';
-                  
-                  return (
-                    <button
-                      key={faction.name}
-                      type="button"
-                      disabled={Boolean(playerSectName)}
-                      onClick={() => setSelectedSectName(faction.name)}
-                      className={`
-                        group relative rounded-[2.5rem] border-4 p-8 text-left transition-all duration-500
-                        ${isLocked ? 'bg-[#1b0c0a] border-[#7d3d23] shadow-2xl scale-105 z-20' : isSelected ? 'bg-[#1b0c0a] border-[#d29648] shadow-xl scale-[1.02] z-10' : 'bg-[#1b0c0a]/40 border-[#d29648]/5 hover:border-[#d29648]/20'}
-                      `}
-                    >
-                      <div className="mb-4 flex items-center justify-between">
-                        <span className="text-2xl font-black text-[#f8e6be] uppercase tracking-tighter">{faction.name}</span>
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[8px] font-black" style={{ color: diffColor, borderColor: `${diffColor}20`, borderWidth: '2px' }}>
-                           {difficulty === 'easy' ? '初' : difficulty === 'hard' ? '极' : '常'}
-                        </div>
-                      </div>
-                      <p className="mb-6 text-[10px] font-black text-[#f8e6be]/30 uppercase tracking-[0.2em] italic serif group-hover:text-[#f8e6be]/60"> {faction.persona} </p>
-                      <div className="space-y-2">
-                         <div className="flex items-center gap-3">
-                            <span className="w-1 h-1 rounded-full bg-[#7d3d23]/10" />
-                            <span className="text-[9px] font-black text-[#f8e6be]/40 uppercase tracking-widest">{faction.routePreference}</span>
-                         </div>
-                         <div className="flex items-center gap-3">
-                            <span className="w-1 h-1 rounded-full bg-[#7d3d23]" />
-                            <span className="text-[9px] font-black text-[#7d3d23] uppercase tracking-widest">{faction.winPath}</span>
-                         </div>
-                      </div>
-                      
-                      {isLocked && (
-                        <div className="absolute top-4 right-4 animate-in fade-in zoom-in">
-                           <div className="bg-[#7d3d23] text-[#f8e6be] text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest leading-none shadow-lg">LOCKED IN</div>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-auto px-10 py-8 rounded-[3rem] bg-[#1b0c0a] border-4 border-[#d29648] shadow-[0_40px_80px_rgba(0,0,0,0.2)] flex items-center justify-between">
-                <div>
-                   <div className="text-[10px] font-black text-[#d1b185]/45 uppercase tracking-[0.4em] mb-1">State of Governance</div>
-                   <div className="text-xl font-black text-[#f8e6be] uppercase tracking-tight">
-                     {playerSectName ? `受命：${playerSectName}` : '待定论点'} · {enemySectName ? `敌手：${enemySectName}` : '寻访对手…'}
-                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={lockSectChoice}
-                  disabled={Boolean(playerSectName)}
-                  className="px-12 py-5 rounded-[2rem] bg-[#7d3d23] text-[#f8e6be] text-[10px] font-black tracking-[0.3em] uppercase hover:scale-105 active:scale-95 transition-all shadow-2xl disabled:opacity-20"
-                >
-                  {playerSectName ? '定轴入局' : '受命入局 (VOW)'}
-                </button>
-              </div>
-            </div>
-
-            <aside className="rounded-[3rem] bg-[#1b0c0a] border-8 border-[#d29648]/20 shadow-2xl p-10 flex flex-col relative overflow-hidden">
-               <div className="absolute inset-0 pointer-events-none opacity-[0.02] z-0">
-                  <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
-               </div>
+           {/* 1x4 横向网格 */}
+           <div className="grid grid-cols-4 gap-6 h-[50vh] xl:h-[55vh] max-w-[1500px] mx-auto w-full">
+             {sectCandidates.map((faction) => {
+               const isSelected = selectedSectName === faction.name;
+               const isLocked = playerSectName === faction.name;
+               const difficulty = factionDifficultyText(faction);
                
-               <div className="relative z-10 flex-1 flex flex-col">
-                  <div className="flex items-center justify-between mb-8">
-                     <span className="text-[10px] font-black text-[#d1b185]/45 uppercase tracking-[0.4em]">门派钤印 · ARCHIVE</span>
-                     <div className="w-10 h-10 rounded-full bg-[#7d3d23] text-[#f8e6be] flex items-center justify-center text-xs font-black shadow-lg">印</div>
-                  </div>
-                  
-                  <div className="text-5xl font-black text-[#f8e6be] uppercase tracking-tighter mb-6">{sectForPanel?.name ?? '请择百家'}</div>
-                  <p className="text-base font-bold text-[#f8e6be]/70 leading-relaxed italic serif mb-10 border-l-4 border-[#d29648]/10 pl-8">
-                    “{sectForPanel?.persona ?? '在此明证该派本心。'}”
-                  </p>
+               return (
+                 <motion.button
+                   key={faction.name}
+                   onClick={() => !playerSectName && (uiAudio.playClick(), setSelectedSectName(faction.name))}
+                   className={`
+                     group relative h-full flex flex-col p-6 rounded-xs border-2 transition-all duration-300 text-left
+                     ${isLocked 
+                       ? 'border-[#f5e6b8] bg-[#8b2e2e] shadow-[0_0_40px_rgba(212,165,32,0.4)]' 
+                       : isSelected 
+                         ? 'border-[#d4a520] bg-[#5c1913] scale-105 z-10 shadow-[0_0_30px_rgba(212,165,32,0.2)]' 
+                         : 'border-[#d4a520]/10 bg-[#3a0d0a]/60 hover:border-[#d4a520]/40'}
+                   `}
+                 >
+                   {/* 派系图标与名称 */}
+                   <div className="flex flex-col items-center gap-4 mb-6 border-b border-[#d4a520]/10 pb-4">
+                      <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all ${isSelected || isLocked ? 'border-[#f5e6b8] bg-[#f5e6b8]/10 text-[#f5e6b8]' : 'border-[#d4a520]/20 text-[#d4a520]/30'}`}>
+                         {getFactionIcon(faction.name, 'w-8 h-8')}
+                      </div>
+                      <h4 className={`text-2xl font-bold tracking-[0.2em] ${isSelected || isLocked ? 'text-[#f5e6b8]' : 'text-[#f5e6b8]/40'}`}>
+                        {faction.name}
+                      </h4>
+                      <div className={`text-[8px] px-2 py-0.5 border ${difficulty === 'hard' ? 'border-[#ff4d4d]/40 text-[#ff4d4d]' : 'border-[#d4a520]/20 text-[#d4a520]/40'}`}>
+                        {difficulty === 'hard' ? '极 诣' : difficulty === 'easy' ? '平 易' : '常 通'}
+                      </div>
+                   </div>
 
-                  <div className="space-y-6 mt-auto">
-                    <DetailItem label="枢机偏好 · STRATEGY" content={sectForPanel?.routePreference} color="#d1b185" />
-                    <DetailItem label="取胜之径 · VICTORY" content={sectForPanel?.winPath} color="#7d3d23" />
-                    <DetailItem label="其术之弊 · WEAKNESS" content={sectForPanel?.weakness} color="#d46b42" />
-                  </div>
-               </div>
-            </aside>
-          </section>
-        ) : null}
+                   {/* 描述文案 - 紧凑型 */}
+                   <div className="flex-1 overflow-hidden">
+                      <p className={`text-xs leading-relaxed font-light transition-colors ${isSelected || isLocked ? 'text-[#f5e6b8]/90' : 'text-[#f5e6b8]/20'}`}>
+                         {faction.persona}
+                      </p>
+                   </div>
+
+                   {/* 固定底部信息 */}
+                   <div className="mt-4 pt-4 border-t border-[#d4a520]/10 space-y-2">
+                       <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] text-[#d4a520]/40 font-bold tracking-widest uppercase">Key Strength</span>
+                          <span className={`text-[10px] line-clamp-1 ${isSelected || isLocked ? 'text-[#d4a520]' : 'text-[#d4a520]/20'}`}>{faction.winPath}</span>
+                       </div>
+                   </div>
+
+                   {/* 绝学标签 */}
+                   <div className={`absolute top-2 right-2 px-2 py-0.5 text-[8px] bg-black/40 rounded-full transition-opacity ${isSelected || isLocked ? 'opacity-100' : 'opacity-0'}`}>
+                      <span className="text-[#f5e6b8]/60">道统归一</span>
+                   </div>
+                 </motion.button>
+               );
+             })}
+           </div>
+        </main>
+
+        {/* 底部功能区 - 固定吸底 */}
+        <footer className="flex items-center justify-between py-6 border-t border-white/5 shrink-0">
+          <div className="flex items-center gap-12">
+             <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-[#d4a520]/40 font-bold tracking-widest uppercase">Current Faction</span>
+                <span className="text-2xl font-bold text-[#f5e6b8] tracking-[0.2em]">
+                   {playerSectName || selectedSectName || '请 选 择 ...'}
+                </span>
+             </div>
+             
+             <div className="h-10 w-px bg-white/5" />
+
+             <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-[#d4a520]/40 font-bold tracking-widest uppercase">Opponent Match</span>
+                <span className="text-sm font-bold text-[#f5e6b8]/40 italic">
+                   {enemySectName ? `已匹配：${enemySectName}` : '寻访对手中...'}
+                </span>
+             </div>
+          </div>
+
+          <motion.button
+            whileHover={!playerSectName && selectedSectName ? { scale: 1.05 } : {}}
+            whileTap={!playerSectName && selectedSectName ? { scale: 0.95 } : {}}
+            onClick={lockSectChoice}
+            disabled={Boolean(playerSectName) || !selectedSectName}
+            className={`
+              relative px-20 py-4 font-bold transition-all duration-300
+              ${!playerSectName && selectedSectName 
+                ? 'bg-gradient-to-br from-[#d4a520] to-[#b05327] text-[#3a0d0a] shadow-[0_0_30px_rgba(212,165,32,0.5)]' 
+                : 'bg-white/5 text-white/10 grayscale'}
+            `}
+          >
+            <span className="text-xl tracking-[1em]">{playerSectName ? '已守持' : '定约授命'}</span>
+          </motion.button>
+        </footer>
+
       </div>
     </div>
   );
 }
-
-const DetailItem: React.FC<{ label: string; content?: string; color: string }> = ({ label, content, color }) => (
-  <div className="group">
-     <span className="text-[9px] font-black tracking-[0.3em] uppercase mb-2 block opacitiy-40" style={{ color }}>{label}</span>
-     <div className="p-6 rounded-[2rem] bg-gradient-to-b from-[#2a0e0a] to-[#120604] border-2 border-[#d29648]/5 group-hover:border-[#d29648]/20 transition-all shadow-inner">
-       <span className="text-sm font-black text-[#f8e6be] uppercase leading-snug">{content ?? '-'}</span>
-     </div>
-  </div>
-);

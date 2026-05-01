@@ -1,0 +1,31 @@
+{
+  "task_id": "TASK-20260501-REDACT-SECONDARY-UI",
+  "goal": "Apply the V9 Mineral Aesthetic (Black Jade & Gold Silk, Aged Ivory, Lapis Lazuli, Malachite, Cinnabar) to all secondary screens and panels (StoryScreen, BattleArena, Modals, ResultScreen, CharactersView) to ensure visual consistency and premium feel.",
+  "constraints": [
+    "Use V9 Mineral Palette: Aged Ivory (#f6e4c3), Lapis Lazuli (#1e3a5f), Malachite (#064e3b), Cinnabar (#831843), Polished Jade (#e7e1f0).",
+    "Replace hardcoded red/gold with the new mineral palette.",
+    "Implement ink-wash textures and gold-leaf filigree borders (Silk-woven borders).",
+    "Ensure all buttons use the V9 Command Library terminology (宣篇, 定谳, 辍笔, 承运).",
+    "Do not modify the initial interface background/layout of MainMenu, only the interactive sub-elements."
+  ],
+  "deliverables": [
+    "Updated src/ui/screens/StoryScreen.tsx",
+    "Updated src/components/battle/layers/BattleArena.tsx",
+    "Updated src/components/battle/panels/LogDrawer.tsx",
+    "Updated src/components/MainMenu.tsx",
+    "Updated src/components/CharactersView.tsx",
+    "Updated src/ui/screens/ResultScreenV2.tsx",
+    "Updated src/ui/screens/TopicScreenV2.tsx"
+  ],
+  "allowed_write_paths": [
+    "src/ui/screens",
+    "src/components",
+    "src/components/battle/layers",
+    "src/components/battle/panels",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run dev"
+  ],
+  "status": "in-progress"
+}

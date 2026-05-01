@@ -10,7 +10,7 @@ export type CommunityPostStatus =
   | 'hidden'
   | 'deleted';
 
-export type CommunitySortMode = 'latest' | 'hot' | 'featured' | 'most_favorited';
+export type CommunitySortMode = 'latest' | 'hot' | 'featured' | 'most_favorited' | 'recommended';
 
 export type CommunityView =
   | 'home'
@@ -103,6 +103,7 @@ export interface CommunityPersistedState {
     lastEnteredAt: number | null;
     unreadRecommendedCount: number;
     hasDraft: boolean;
+    lastPostTime: number | null; // 上次发布时间（用于频率限制）
   };
   uiSnapshot?: {
     category: CommunityCategory | 'all';

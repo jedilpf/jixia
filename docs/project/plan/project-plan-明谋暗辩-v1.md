@@ -93,7 +93,7 @@ interface RevealInfo {
 1. 立论进场
 2. 施策生效
 3. 议位胜负结算
-4. 根基变化/离场
+4. 学识变化/离场
 5. 大势/筹更新
 6. 胜利检查
 
@@ -112,7 +112,7 @@ function resolveRound(state: DebateBattleState): void {
   // Phase 3: 议位胜负结算
   resolveSeatBattles(state);
   
-  // Phase 4: 根基变化/离场
+  // Phase 4: 学识变化/离场
   resolveUnitDeath(state);
   
   // Phase 5: 大势/筹更新
@@ -283,7 +283,7 @@ interface PlannedAction {
 │  1. 立论进场                                                      │
 │  2. 施策生效                                                      │
 │  3. 议位胜负结算                                                  │
-│  4. 根基变化/离场                                                 │
+│  4. 学识变化/离场                                                 │
 │  5. 大势/筹更新                                                   │
 │  6. 胜利检查                                                      │
 └───────────────────────────────┬──────────────────────────────────┘

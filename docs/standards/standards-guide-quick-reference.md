@@ -119,9 +119,9 @@ kebab-case       →  battle-engine, card-resolver
 
 | 代码名称 | 用户看到 | 说明 |
 |----------|----------|------|
-| `mana` | 用度 | 法力资源 |
-| `health` | 生命 | 生命值 |
-| `shield` | 护持 | 护盾值 |
+| `cost` | 势 | 打出卡牌资源 |
+| `hp` | 学识 | 生命值 |
+| `shield` | 护体 | 护盾值 |
 | `momentum` | 大势 | 大势值 |
 | `mainQueue` | 主议 | 主议题区 |
 | `sideQueue` | 旁议 | 旁议题区 |

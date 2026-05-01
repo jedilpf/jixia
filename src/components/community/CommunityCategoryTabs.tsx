@@ -1,9 +1,27 @@
 import type { CommunityCategory } from '../../community/types';
 import { COMMUNITY_CATEGORIES } from '../../community/types';
+import { 
+  IconBambooSlips, 
+  IconTalk, 
+  IconCrossSwords, 
+  IconSeek, 
+  IconChronicle 
+} from '@/components/common/JixiaIcons';
 
 interface CommunityCategoryTabsProps {
   selected: CommunityCategory | 'all';
   onSelect: (category: CommunityCategory | 'all') => void;
+}
+
+function CategoryIcon({ id, color }: { id: string; color: string }) {
+    switch(id) {
+        case 'all': return <IconBambooSlips size={16} color={color} />;
+        case 'discussion': return <IconTalk size={16} color={color} />;
+        case 'battle_report': return <IconCrossSwords size={16} color={color} />;
+        case 'qa': return <IconSeek size={16} color={color} />;
+        case 'culture': return <IconChronicle size={16} color={color} />;
+        default: return null;
+    }
 }
 
 export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryTabsProps) {
@@ -14,6 +32,7 @@ export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryT
 
       {COMMUNITY_CATEGORIES.map((cat) => {
         const isActive = cat.id === selected;
+        const iconColor = isActive ? '#d4a520' : '#b89372';
         return (
           <button
             key={cat.id}
@@ -26,7 +45,7 @@ export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryT
               border: isActive
                 ? '1px solid rgba(212, 165, 32, 0.5)'
                 : '1px solid rgba(139, 90, 43, 0.2)',
-              color: isActive ? '#d4a520' : '#b89372',
+              color: iconColor,
               borderRadius: '2px',
               boxShadow: isActive
                 ? '0 2px 0 rgba(139, 90, 43, 0.35), inset 0 1px 0 rgba(212,165,32,0.1)'
@@ -39,7 +58,7 @@ export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryT
               style={{ background: 'rgba(139, 90, 43, 0.5)' }}
             />
 
-            <span className="text-sm leading-none">{cat.icon}</span>
+            <CategoryIcon id={cat.id} color={iconColor} />
             <span className="tracking-wider">{cat.label}</span>
 
             {/* 竹简纹理右线 */}

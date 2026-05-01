@@ -453,3 +453,266 @@ body {
 .gilded-edge {
   border-image: linear-gradient(to bottom, #d4a017, #8b4513, #d4a017) 1;
 }
+
+/* Ken Burns effect for story illustrations */
+@keyframes kenburns {
+  0% {
+    transform: scale(1);
+    transform-origin: center center;
+  }
+  100% {
+    transform: scale(1.1);
+    transform-origin: center center;
+  }
+}
+
+/* ─── V9 雅化视觉并轨 (Ink Splash Aesthetic) ─────────────────────────────────── */
+
+/* 水墨晕染基底 */
+.yahua-ink-btn {
+  @apply relative flex items-center justify-center transition-all duration-500 overflow-visible;
+  background: transparent;
+  padding: 1rem 2rem;
+  min-width: 200px;
+}
+
+.yahua-ink-btn::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  /* 模拟笔墨入水扩散的效果 */
+  background: radial-gradient(ellipse at center, rgba(20, 15, 10, 0.4) 0%, transparent 70%);
+  filter: blur(8px);
+  opacity: 0.3;
+  transition: all 0.6s ease-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.yahua-ink-btn:hover::before {
+  opacity: 0.8;
+  transform: scale(1.15) rotate(5deg);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6) 0%, rgba(20, 15, 10, 0.3) 40%, transparent 80%);
+}
+
+/* 白描风格图标 */
+.yahua-seal {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #D4AF65;
+  font-family: serif;
+  font-weight: 900;
+  font-size: 14px;
+  transform: rotate(-5deg);
+  transition: all 0.4s ease;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.yahua-seal svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 101, 0.3));
+  stroke-width: 1.5;
+}
+
+.yahua-ink-btn:hover .yahua-seal {
+  transform: scale(1.15) rotate(0deg);
+  filter: drop-shadow(0 0 8px rgba(212, 175, 101, 0.5));
+}
+
+/* 动感笔触文字 */
+.yahua-ink-text {
+  @apply relative z-10 font-serif font-bold tracking-[0.4em] transition-all;
+  color: rgba(224, 213, 193, 0.8);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.yahua-ink-btn:hover .yahua-ink-text {
+  color: #FDFBF7;
+  letter-spacing: 0.5em;
+  text-shadow: 0 0 15px rgba(253, 251, 247, 0.3);
+}
+
+/* 水墨散开粒子动画 */
+@keyframes ink-bleed {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { opacity: 0.2; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+
+.ink-bleed-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  pointer-events: none;
+  animation: ink-bleed 2s infinite ease-out;
+}
+
+/* 系统按钮水墨底纹 */
+.yahua-system-ink {
+  @apply relative flex items-center justify-center transition-all duration-300 pointer-events-auto;
+  width: 52px;
+  height: 52px;
+}
+
+.yahua-system-ink::before {
+  content: '';
+  position: absolute;
+  inset: 5%;
+  background: radial-gradient(circle at center, rgba(139, 115, 85, 0.25) 0%, transparent 70%);
+  filter: blur(4px);
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  z-index: 0;
+}
+
+.yahua-system-ink:hover::before {
+  background: radial-gradient(circle at center, rgba(30, 25, 20, 0.6) 0%, transparent 70%);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* 迷你朱砂印章（通知） */
+.yahua-mini-seal {
+  @apply absolute -top-1 -right-1 z-30 flex items-center justify-center;
+  width: 14px;
+  height: 14px;
+  background: #8D2F2F;
+  border: 1px solid rgba(212, 175, 101, 0.5);
+  box-shadow: 0 0 6px rgba(141, 47, 47, 0.8);
+  border-radius: 1px;
+}
+
+/* 玉佩头像容器 - 雅化静谧版 */
+.yahua-pendant-wrap {
+  @apply relative flex flex-col items-center pointer-events-auto;
+  animation: yahua-swing 8s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* 垂落丝线 - 银金丝质感 */
+.yahua-hanging-line {
+  width: 1.2px;
+  height: 45px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #4a5568 0px,
+    #2d3748 2px,
+    #a0aec0 4px,
+    #D4AF65 6px
+  );
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.8;
+}
+
+/* 墨翠金镶玉框架 */
+.yahua-jade-frame {
+  @apply relative w-16 h-16 rounded-full overflow-hidden z-10;
+  border: 2.5px solid rgba(212, 175, 101, 0.7);
+  background: radial-gradient(circle at center, #1a202c 0%, #0a0e14 100%);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(212, 175, 101, 0.25),
+    0 0 15px rgba(212, 175, 101, 0.1);
+  transition: all 0.4s ease;
+}
+
+.yahua-jade-frame:hover {
+  border-color: rgba(212, 175, 101, 1);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(212, 175, 101, 0.4);
+}
+
+/* 金镶玉外缘高光 */
+.yahua-jade-frame::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 101, 0.2);
+  pointer-events: none;
+}
+
+/* 底部流苏 */
+.yahua-tassel {
+  @apply flex flex-col items-center opacity-40 transition-opacity;
+  margin-top: -2px;
+}
+
+.yahua-tassel-thread {
+  width: 1px;
+  height: 25px;
+  background: linear-gradient(to bottom, #4a5568 0%, transparent 100%);
+  margin: 0 1px;
+}
+
+/* 灰色毛笔笔触背景 */
+.yahua-ink-stroke {
+  @apply relative flex items-center gap-3 px-8 py-2 transition-all duration-500 cursor-pointer pointer-events-auto;
+  min-width: 140px;
+}
+
+.yahua-ink-stroke::before {
+  content: '';
+  position: absolute;
+  inset: -10% -20%;
+  /* 模拟灰色水墨横扫笔触 */
+  background: linear-gradient(90deg, 
+    transparent 5%, 
+    rgba(120, 120, 120, 0.25) 20%, 
+    rgba(160, 160, 160, 0.45) 50%, 
+    rgba(120, 120, 120, 0.25) 80%, 
+    transparent 95%
+  );
+  /* 使用mask增加毛糙边缘感 */
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), 
+              linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+  mask-composite: intersect;
+  filter: blur(1px);
+  z-index: 0;
+  transform: skewX(-20deg) rotate(-1deg);
+  transition: all 0.5s ease;
+}
+
+.yahua-ink-stroke:hover::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(140, 140, 140, 0.35) 15%, 
+    rgba(180, 180, 180, 0.6) 50%, 
+    rgba(140, 140, 140, 0.35) 85%, 
+    transparent 100%
+  );
+  transform: skewX(-15deg) scaleX(1.1) scaleY(1.2);
+  filter: blur(0.5px);
+}
+
+.yahua-ink-stroke:hover {
+  transform: translateY(-2px);
+}
+
+.yahua-pendant-wrap:hover .yahua-tassel { opacity: 0.9; }
+.yahua-tag-body:hover {
+  border-color: rgba(212, 175, 101, 0.8);
+  transform: translateY(3px) scale(1.04);
+  background: #1a202c;
+  box-shadow: 
+    0 15px 35px rgba(0,0,0,0.8),
+    0 0 15px rgba(212, 175, 101, 0.25);
+}
+
+@keyframes yahua-swing {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
+}

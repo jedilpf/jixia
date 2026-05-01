@@ -26,23 +26,21 @@ function evaluateCardDiscardValue(card: DebateCard): number {
   // 保留价值高的卡牌，弃牌价值低的
   let value = 0;
 
-  // 效果类型权重
+  // 效果类型权重（简化版）
   const typeWeights: Record<string, number> = {
     '立论': 15,  // 主战牌，保留
-    '反诘': 12,  // 反制牌，重要
-    '策术': 8,   // 辅助牌
-    '门客': 10,  // 单位牌
-    '玄章': 6,   // 场地牌
+    '施策': 8,   // 辅助牌
   };
 
   value += typeWeights[card.type] || 5;
 
   // 费效比
-  if (card.effectValue > 0 && card.cost > 0) {
-    value += (card.effectValue / card.cost) * 5;
+  const effectValue = card.effectValue || 0;
+  if (effectValue > 0 && card.cost > 0) {
+    value += (effectValue / card.cost) * 5;
   }
 
-  // 门客属性
+  // 立论牌属性
   if (card.power && card.hp) {
     value += (card.power + card.hp) / 2;
   }

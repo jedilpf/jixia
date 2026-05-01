@@ -5,7 +5,7 @@
  * - 胜利条件：大势到8获胜
  * - 议区：主议 + 旁议（每个最多3张牌）
  * - 卡牌类型：立论 / 策术
- * - 资源：费用、大势、筹、护印、辩锋、根基
+ * - 资源：势、大势、筹、护体、辩锋、学识
  */
 
 export type Side = 'player' | 'enemy';
@@ -42,7 +42,7 @@ export interface DebateCard {
   type: CardTypeV2;           // 立论 / 策术
   cost: number;               // 费用
   power: number;              // 辩锋（单位牌主要使用）
-  hp: number;                 // 根基（单位牌主要使用）
+  hp: number;                 // 学识（单位牌主要使用）
   effectKind?: EffectKind;    // 策术主要使用
   effectValue?: number;       // 效果数值
   rule?: CardRuleSet;         // 结构化规则（优先）
@@ -62,8 +62,8 @@ export interface SeatUnit {
   cardId: string;
   name: string;
   power: number;              // 辩锋
-  hp: number;                 // 当前根基
-  maxHp: number;              // 最大根基
+  hp: number;                 // 当前学识
+  maxHp: number;              // 最大学识
 }
 
 // === 议区状态（改为units数组） ===
@@ -78,7 +78,7 @@ export interface Resources {
   maxCost: number;            // 本回合费用上限
   dashi: number;              // 大势（到8获胜）
   chou: number;               // 筹（最多1个，减费用）
-  guyin: number;              // 护印（护盾）
+  guyin: number;              // 护体
 }
 
 // === 大势胜利目标 ===

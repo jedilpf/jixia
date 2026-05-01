@@ -2,17 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import BattleFrameV2 from '@/components/BattleFrameV2';
 import { BattleSetup } from '@/components/BattleSetup';
 import { MainMenu, AppSettings, BrightnessOverlay } from '@/components/MainMenu';
-import { TransitionScreen } from '@/components/TransitionScreen';
 import { CharactersView } from '@/components/CharactersView';
 import { CardShowcase } from '@/components/CardShowcase';
 import { PreBattleFlow, PreBattleResult } from '@/components/PreBattleFlow';
 import { GameErrorBoundary } from '@/components/GameErrorBoundary';
 import { StoryScreen } from '@/ui/screens/StoryScreen';
+import { ResultScreenV2 } from '@/ui/screens/ResultScreenV2';
 import { ArenaId } from '@/battleV2/types';
+import type { GameState } from '@/core/types';
 import { uiAudio } from '@/utils/audioManager';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CommunityProvider } from '@/hooks/useCommunityState';
 import { AppStoreProvider } from '@/app/store';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 /**
  * App - 谋天下：问道百家 主入口
@@ -22,10 +24,10 @@ import { AppStoreProvider } from '@/app/store';
 
 type LegacyScreen =
   | 'menu'
-  | 'transition'
   | 'battle_setup'
   | 'pre_battle'
   | 'battle'
+  | 'settlement'
   | 'characters'
   | 'story'
   | 'collection';
@@ -36,6 +38,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   sfxVolume: 0.5,
   brightness: 1,
   fullscreen: false,
+  language: 'zh',
 };
 
 const HALL_BGM_SCREENS: ReadonlyArray<LegacyScreen> = [
@@ -45,6 +48,7 @@ const HALL_BGM_SCREENS: ReadonlyArray<LegacyScreen> = [
   'collection',
   'battle_setup',
   'pre_battle',
+  'settlement',
 ];
 
 const MENU_RETURN_COVER_MS = 180;
@@ -87,15 +91,17 @@ function App() {
 
   return (
     <ThemeProvider>
-      <AppStoreProvider>
-        <CommunityProvider>
-          <AppMainContent
-            settings={settings}
-            onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
-            isElectronRuntime={isElectronRuntime}
-          />
-        </CommunityProvider>
-      </AppStoreProvider>
+      <LanguageProvider>
+        <AppStoreProvider>
+          <CommunityProvider>
+            <AppMainContent
+              settings={settings}
+              onSettingsChange={(next) => setSettings((prev) => ({ ...prev, ...next }))}
+              isElectronRuntime={isElectronRuntime}
+            />
+          </CommunityProvider>
+        </AppStoreProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
@@ -116,6 +122,25 @@ function AppMainContent({
   const [preBattleResult, setPreBattleResult] = useState<PreBattleResult | null>(null);
   const [screenRecoveryKey, setScreenRecoveryKey] = useState(0);
   const [menuReturnPhase, setMenuReturnPhase] = useState<'hidden' | 'cover' | 'reveal'>('hidden');
+  // 结算界面状态
+  const [settlementState, setSettlementState] = useState<{
+    gameState: GameState;
+    progress: {
+      level: number;
+      exp: number;
+      opportunity: number;
+      winCount: number;
+      totalGames: number;
+    };
+    settlement: {
+      settlementKey: string;
+      playerMomentum: number;
+      opportunityGain: number;
+      expGain: number;
+      goldGain: number;
+      won: boolean;
+    } | null;
+  } | null>(null);
   const audioHallRef = useRef<HTMLAudioElement | null>(null);
   const audioBattleRef = useRef<HTMLAudioElement | null>(null);
   const menuReturnTimersRef = useRef<number[]>([]);
@@ -170,11 +195,6 @@ function AppMainContent({
       return;
     }
 
-    if (screen === 'transition') {
-      audioHallRef.current.pause();
-      return;
-    }
-
     if (screen === 'battle') {
       audioHallRef.current.pause();
       audioHallRef.current.currentTime = 0;
@@ -182,11 +202,7 @@ function AppMainContent({
     }
   }, [screen, isElectronRuntime]);
 
-  const handleStartGame = () => setScreen('transition');
-
-  const handleTransitionComplete = () => {
-    setScreen('battle_setup');
-  };
+  const handleStartGame = () => setScreen('battle_setup');
 
   const handleStartBattle = () => {
     setPreBattleResult(null);
@@ -237,6 +253,38 @@ function AppMainContent({
     setScreen('battle_setup');
   };
 
+  // 战斗结束，显示结算界面
+  const handleBattleEnd = useCallback((result: {
+    gameState: GameState;
+    progress: {
+      level: number;
+      exp: number;
+      opportunity: number;
+      winCount: number;
+      totalGames: number;
+    };
+    settlement: {
+      settlementKey: string;
+      playerMomentum: number;
+      opportunityGain: number;
+      expGain: number;
+      goldGain: number;
+      won: boolean;
+    } | null;
+  }) => {
+    setSettlementState(result);
+    setScreen('settlement');
+  }, []);
+
+  // 结算界面返回主页
+  const handleSettlementRestart = useCallback(() => {
+    setSettlementState(null);
+    setBattleFadeIn(false);
+    setPreBattleResult(null);
+    setBattleSessionKey((key) => key + 1);
+    setScreen('menu');
+  }, []);
+
   const retryCurrentScreen = () => {
     setScreenRecoveryKey((key) => key + 1);
   };
@@ -254,17 +302,6 @@ function AppMainContent({
            onCollection={() => setScreen('collection')}
            onCharacters={() => setScreen('characters')}
          />
-      ) : null}
-
-      {screen === 'transition' ? (
-        <GameErrorBoundary
-          key={`transition-${screenRecoveryKey}`}
-          screenName="transition"
-          onBackToMenu={handleBackToMenu}
-          onRetry={retryCurrentScreen}
-        >
-          <TransitionScreen onComplete={handleTransitionComplete} />
-        </GameErrorBoundary>
       ) : null}
 
       {screen === 'battle_setup' ? (
@@ -314,6 +351,33 @@ function AppMainContent({
               enemyMainFaction={preBattleResult?.enemyFaction}
               onMenu={handleBackToMenu}
               onReselectArena={handleReselectArena}
+              onFinished={(winnerId) => {
+                // 模拟结算数据，实际应从战斗系统获取
+                handleBattleEnd({
+                  gameState: {
+                    winnerId: winnerId as 'player' | 'enemy' | 'draw',
+                    players: {
+                      player: { momentum: 85 },
+                      enemy: { momentum: 42 },
+                    },
+                  } as GameState,
+                  progress: {
+                    level: 12,
+                    exp: 2450,
+                    opportunity: 3,
+                    winCount: winnerId === 'player' ? 15 : 14,
+                    totalGames: 20,
+                  },
+                  settlement: winnerId === 'player' ? {
+                    settlementKey: `battle-${Date.now()}`,
+                    playerMomentum: 85,
+                    opportunityGain: 1,
+                    expGain: 120,
+                    goldGain: 50,
+                    won: true,
+                  } : null,
+                });
+              }}
             />
             <div
               style={{
@@ -327,6 +391,22 @@ function AppMainContent({
               }}
             />
           </div>
+        </GameErrorBoundary>
+      ) : null}
+
+      {screen === 'settlement' && settlementState ? (
+        <GameErrorBoundary
+          key={`settlement-${screenRecoveryKey}`}
+          screenName="settlement"
+          onBackToMenu={handleBackToMenu}
+          onRetry={retryCurrentScreen}
+        >
+          <ResultScreenV2
+            state={settlementState.gameState}
+            progress={settlementState.progress}
+            settlement={settlementState.settlement}
+            onRestart={handleSettlementRestart}
+          />
         </GameErrorBoundary>
       ) : null}
 

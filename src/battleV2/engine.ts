@@ -383,7 +383,7 @@ function applySpellEffect(
       const dealt = applyDamageToSeat(target, targetSeat, op.value);
       const chunks: string[] = [];
       if (dealt.unitDamage > 0) chunks.push(`席位伤害 ${dealt.unitDamage}`);
-      if (dealt.absorbedByGuyin > 0) chunks.push(`护印吸收 ${dealt.absorbedByGuyin}`);
+      if (dealt.absorbedByGuyin > 0) chunks.push(`护体吸收 ${dealt.absorbedByGuyin}`);
       if (dealt.dashiPressure > 0) chunks.push(`大势压制 ${dealt.dashiPressure}`);
       if (chunks.length === 0) chunks.push('未造成有效影响');
       feed.push(`${ownerLabel}【${card.name}】：${chunks.join('，')}`);
@@ -398,7 +398,7 @@ function applySpellEffect(
 
     if (op.op === 'heal' || op.op === 'shield') {
       caster.resources.guyin += op.value;
-      feed.push(`${ownerLabel}【${card.name}】：护印 +${op.value}`);
+      feed.push(`${ownerLabel}【${card.name}】：护体 +${op.value}`);
       continue;
     }
 

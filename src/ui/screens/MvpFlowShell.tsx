@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { calculateLevelFromExp } from '@/config/levelSystem';
 import { TransitionScreen } from '@/components/TransitionScreen';
@@ -12,11 +12,11 @@ import {
   StoryScreen,
 } from '@/ui/screens';
 import BattleFrameV2 from '@/components/BattleFrameV2';
-import { 
-  loadPlayerProgress, 
-  savePlayerProgress, 
-  type PlayerProgressState, 
-  type BattleSettlementSummary 
+import { getProfileService } from '@/profile';
+import {
+  mergePlayerProgressState,
+  toPlayerProgressState,
+  type BattleSettlementSummary,
 } from '@/utils/persistence';
 
 /**
@@ -32,14 +32,17 @@ import {
 
 export function MvpFlowShell() {
   const { state, dispatch } = useAppStore();
+  const profileService = useMemo(() => getProfileService(), []);
   const [showTransition, setShowTransition] = useState(false);
   const [pendingMatchStart, setPendingMatchStart] = useState(false);
-  const [playerProgress, setPlayerProgress] = useState<PlayerProgressState>(loadPlayerProgress);
+  const [playerProgress, setPlayerProgress] = useState(() => toPlayerProgressState(profileService.getProfile()));
   const [latestSettlement, setLatestSettlement] = useState<BattleSettlementSummary | null>(null);
 
   useEffect(() => {
-    savePlayerProgress(playerProgress);
-  }, [playerProgress]);
+    return profileService.subscribe((profile) => {
+      setPlayerProgress(toPlayerProgressState(profile));
+    });
+  }, [profileService]);
 
   useEffect(() => {
     if (state.screen !== 'result') {
@@ -52,40 +55,47 @@ export function MvpFlowShell() {
     const won = state.winnerId === 'player';
     const settlementKey = `${state.seededAt}:${state.round}:${state.winnerId ?? 'none'}:${playerMomentum}:${enemyMomentum}`;
 
-    setPlayerProgress((prev) => {
-      if (prev.lastSettlementKey === settlementKey) {
-        return prev;
+    const opportunityGain = Math.max(0, playerMomentum);
+    const expGain = Math.max(20, playerMomentum * 12 + (won ? 60 : 25));
+    const goldGain = Math.max(50, playerMomentum * 20 + (won ? 80 : 30));
+    const settlement: BattleSettlementSummary = {
+      settlementKey,
+      playerMomentum,
+      opportunityGain,
+      expGain,
+      goldGain,
+      won,
+    };
+
+    let applied = false;
+    profileService.updateProfile((currentProfile) => {
+      const currentProgress = toPlayerProgressState(currentProfile);
+      if (currentProgress.lastSettlementKey === settlementKey) {
+        return currentProfile;
       }
 
-      const opportunityGain = Math.max(0, playerMomentum);
-      const expGain = Math.max(20, playerMomentum * 12 + (won ? 60 : 25));
-      const goldGain = Math.max(50, playerMomentum * 20 + (won ? 80 : 30));
-      const nextTotalExp = prev.totalExp + expGain;
+      applied = true;
+      const nextTotalExp = currentProgress.totalExp + expGain;
       const levelState = calculateLevelFromExp(nextTotalExp);
 
-      setLatestSettlement({
-        settlementKey,
-        playerMomentum,
-        opportunityGain,
-        expGain,
-        goldGain,
-        won,
-      });
-
-      return {
-        ...prev,
+      return mergePlayerProgressState(currentProfile, {
         totalExp: nextTotalExp,
         level: levelState.level,
         exp: levelState.exp,
-        totalGames: prev.totalGames + 1,
-        winCount: prev.winCount + (won ? 1 : 0),
-        winStreak: won ? prev.winStreak + 1 : 0,
-        totalDamage: prev.totalDamage + playerMomentum * 100,
-        opportunity: prev.opportunity + opportunityGain,
+        totalGames: currentProgress.totalGames + 1,
+        winCount: currentProgress.winCount + (won ? 1 : 0),
+        winStreak: won ? currentProgress.winStreak + 1 : 0,
+        totalDamage: currentProgress.totalDamage + playerMomentum * 100,
+        opportunity: currentProgress.opportunity + opportunityGain,
         lastSettlementKey: settlementKey,
-      };
+      });
     });
+
+    if (applied) {
+      setLatestSettlement(settlement);
+    }
   }, [
+    profileService,
     state.screen,
     state.seededAt,
     state.round,

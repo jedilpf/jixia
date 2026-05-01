@@ -383,7 +383,7 @@ const BUTTON_TEXT = {
 ```typescript
 // ✅ 正确示例
 const TOOLTIP_TEXT = {
-  MANA_INFO: '用度：用于打出卡牌的资源',
+  MANA_INFO: '势：用于打出卡牌的资源',
   HANDOVER_INFO: '请将设备交给玩家2，点击确认继续',
   VICTORY: '论道胜利！你成功说服了对手',
 };
@@ -540,9 +540,9 @@ Getting Started Guide.md    # 应使用kebab-case
 
 | 内部名称 | 外部显示 | 说明 |
 |----------|----------|------|
-| `mana` | 用度 | 法力资源 |
-| `health` | 生命 | 生命值 |
-| `shield` | 护持 | 护盾值 |
+| `cost` | 势 | 打出卡牌资源 |
+| `hp` | 学识 | 生命值 |
+| `shield` | 护体 | 护盾值 |
 | `momentum` | 大势 | 大势值 |
 | `mainQueue` | 主议 | 主议题区 |
 | `sideQueue` | 旁议 | 旁议题区 |

@@ -11,12 +11,12 @@ import { DebateCard, Side } from './types';
 function withSummonRule(card: Omit<DebateCard, 'rule' | 'ruleText' | 'flavorText'> & { flavorText: string }): DebateCard {
   return {
     ...card,
-    ruleText: `入场：辩锋${card.power}，根基${card.hp}`,
+    ruleText: `入场：辩锋${card.power}，学识${card.hp}`,
     rule: {
       version: 'v1',
       ops: [{ op: 'summon', target: 'self', value: 1 }],
     },
-    description: `辩锋${card.power} / 根基${card.hp}`,
+    description: `辩锋${card.power} / 学识${card.hp}`,
   };
 }
 
@@ -32,7 +32,7 @@ function makeSpell(
       ? `抽${card.value}张牌`
       : card.op === 'damage'
         ? `对敌方造成${card.value}点伤害`
-        : `获得${card.value}点护印`;
+        : `获得${card.value}点护体`;
 
   return {
     id: card.id,

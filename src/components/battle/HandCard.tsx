@@ -62,7 +62,8 @@ export function HandCard({
 
   // Use rarity and type colors from showcase definitions
   const rarityBadgeColor = rarityColor[card.rarity] || rarityColor['常见'];
-  const typeBadgeColor = typeColor[card.type === 'character' ? '角色' : card.type === 'gear' ? '装备' : card.type === 'field' ? '场地' : card.type === 'skill' ? '技能' : card.type === 'counter' ? '反制' : '事件'] || typeColor['技能'];
+  const cardTypeLabel = card.type === 'character' || card.type === 'skill' ? '\u7acb\u8bba' : '\u7b56\u672f';
+  const typeBadgeColor = typeColor[cardTypeLabel] || typeColor['\u7acb\u8bba'];
   const isCharacter = card.type === 'character';
 
   // Card dimensions (scaled up by ~40%: 140 -> 200, 196 -> 280)
@@ -283,7 +284,7 @@ export function HandCard({
                 padding: `${4 * fx}px ${8 * fx}px`,
                 marginTop: `${4 * fx}px`
               }}>
-              {card.type === 'character' ? '角色' : card.type === 'skill' ? '技能' : card.type === 'event' ? '事件' : card.type === 'gear' ? '装备' : card.type === 'counter' ? '反制' : '场地'}
+              {cardTypeLabel}
             </span>
             <div className="absolute bottom-[-1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-stone-800/30 to-transparent" />
           </div>
@@ -315,7 +316,7 @@ export function HandCard({
                 marginRight: `${4 * fx}px`,
                 fontSize: `${11 * fx}px`
               }}>
-              {card.type === 'character' ? '角色' : card.type === 'skill' ? '技能' : card.type === 'event' ? '事件' : card.type === 'gear' ? '装备' : card.type === 'counter' ? '反制' : '场地'}效果：
+              {cardTypeLabel}效果：
             </span>
             {card.skillDesc}
           </div>

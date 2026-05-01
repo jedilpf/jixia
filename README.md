@@ -1,9 +1,18 @@
-# 百家争鸣 2.0（项目主入口）
+# 思筹之录（项目主入口）
 
 本仓库当前基线为：
 - 论辩题材卡牌对战主玩法
 - 剧情模式与战斗链路并行开发
 - 190 张卡数据基线（见日常门禁输出）
+
+## For KMD / Portfolio Review: Start Here
+
+If you are reviewing the project as a portfolio entry (not as a developer), begin here:
+
+- English showcase entry: [`portfolio/README_EN.md`](./portfolio/README_EN.md)
+- Vertical slice demo script: [`portfolio/demo_script_en.md`](./portfolio/demo_script_en.md)
+- Research proposal: [`portfolio/research_proposal_en.md`](./portfolio/research_proposal_en.md)
+- Demo video link status: [`portfolio/video_link.md`](./portfolio/video_link.md)
 
 ## 快速开始
 

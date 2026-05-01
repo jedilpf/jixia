@@ -1,5 +1,7 @@
+import React from 'react';
+
 interface CommunityEmptyStateProps {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   message: string;
 }
@@ -16,7 +18,7 @@ export function CommunityEmptyState({ icon, title, message }: CommunityEmptyStat
       }}
     >
       <div
-        className="mb-5 flex h-16 w-16 items-center justify-center rounded-full text-3xl"
+        className="mb-5 flex h-16 w-16 items-center justify-center rounded-full"
         style={{
           background: 'radial-gradient(circle, rgba(214,151,73,0.24) 0%, rgba(158,61,43,0.08) 72%)',
           border: '1px solid rgba(214, 151, 73, 0.18)',

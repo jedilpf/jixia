@@ -20,38 +20,38 @@ const PHASE_CONFIG: Record<DebatePhase, {
   color: string;
   bgColor: string;
 }> = {
-  ming_bian: {
-    title: '明辩',
-    subtitle: '光明正大地陈述观点',
-    icon: '☀️',
-    color: '#f0c36e',
-    bgColor: 'rgba(240,195,110,0.18)',
+  play_1: {
+    title: '第一手',
+    subtitle: '选择本回合第一张牌',
+    icon: '一',
+    color: '#7ab8c9',
+    bgColor: 'rgba(122,184,201,0.18)',
   },
-  an_mou: {
-    title: '暗谋',
-    subtitle: '暗中布局，出奇制胜',
-    icon: '🌙',
-    color: '#7d3d23',
-    bgColor: 'rgba(125,61,35,0.18)',
+  resolve_1: {
+    title: '结算一',
+    subtitle: '立即结算第一手效果',
+    icon: '结',
+    color: '#C9A063',
+    bgColor: 'rgba(201,160,99,0.18)',
   },
-  reveal: {
-    title: '揭示',
-    subtitle: '真相大白于天下',
-    icon: '✨',
-    color: '#d46b42',
-    bgColor: 'rgba(212,102,66,0.18)',
+  play_2: {
+    title: '第二手',
+    subtitle: '继续打出第二张牌',
+    icon: '二',
+    color: '#9C88A8',
+    bgColor: 'rgba(156,136,168,0.18)',
   },
-  resolve: {
-    title: '结算',
-    subtitle: '胜负在此一决',
-    icon: '⚖️',
-    color: '#f0c36e',
-    bgColor: 'rgba(240,195,110,0.18)',
+  resolve_2: {
+    title: '结算二',
+    subtitle: '完成最终结算',
+    icon: '终',
+    color: '#c9952a',
+    bgColor: 'rgba(201,149,42,0.18)',
   },
   finished: {
     title: '终局',
     subtitle: '辩论结束',
-    icon: '🏆',
+    icon: '终',
     color: '#f0c36e',
     bgColor: 'rgba(240,195,110,0.22)',
   },

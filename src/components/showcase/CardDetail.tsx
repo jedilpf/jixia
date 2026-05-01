@@ -1,8 +1,50 @@
 import React, { useState } from 'react';
-import { getCardTierLabel } from '@/battleV2/tierSystem';
+import { getCardTierLabel, getCardTierBars } from '@/battleV2/tierSystem';
 import { CARDS, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getAssetUrl, getCardImageUrl } from '@/utils/assets';
+
+// 门派符号映射
+const FACTION_SYMBOLS: Record<string, string> = {
+  '礼心殿': '禮',
+  '衡戒廷': '衡',
+  '归真观': '真',
+  '玄匠盟': '匠',
+  '九阵堂': '阵',
+  '名相府': '相',
+  '司天台': '司',
+  '游策阁': '策',
+  '万农坊': '农',
+  '兼采楼': '兼',
+  '天工坊': '工',
+  '两仪署': '仪',
+  '杏林馆': '杏',
+  '稗言社': '言',
+  '养真院': '养',
+  '筹天阁': '筹',
+  '通用': '通',
+};
+
+// 门派颜色映射
+const FACTION_COLORS: Record<string, string> = {
+  '礼心殿': '#d4a520',
+  '衡戒廷': '#8b0000',
+  '归真观': '#4a90a4',
+  '玄匠盟': '#b87333',
+  '九阵堂': '#2e5d4b',
+  '名相府': '#6b4c9a',
+  '司天台': '#1e3a5f',
+  '游策阁': '#c75b39',
+  '万农坊': '#5a7d3a',
+  '兼采楼': '#8b6914',
+  '天工坊': '#4a6741',
+  '两仪署': '#7d6b91',
+  '杏林馆': '#2d7d6f',
+  '稗言社': '#8b4513',
+  '养真院': '#5a8a8a',
+  '筹天阁': '#4a6b8a',
+  '通用': '#888888',
+};
 
 interface CardDetailProps {
   currentIndex: number;
@@ -33,6 +75,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
   const isCharacter = card.attack !== undefined || card.hp !== undefined;
   const cardImageUrl = getCardImageUrl(card.id, card.name);
   const tierLabel = getCardTierLabel(card);
+  const tierBars = getCardTierBars(card.rarity);
   const ruleText = (card as any).ruleText ?? card.skill ?? '';
   const flavorText = card.background ?? (card as any).flavorText ?? '';
 
@@ -66,6 +109,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-[rgba(160,60,220,0.1)] rounded-full blur-[120px]" />
       </div>
 
+      {/* 返回按钮 - 左上角 */}
       <button
         onClick={() => {
           uiAudio.playClick();
@@ -78,6 +122,30 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         返回列表
       </button>
 
+      {/* 门派名称 - 绝对居中 */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
+        <div
+          className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg font-serif font-bold"
+          style={{
+            borderColor: FACTION_COLORS[card.faction] || '#d4a520',
+            color: FACTION_COLORS[card.faction] || '#d4a520',
+            textShadow: `0 0 10px ${FACTION_COLORS[card.faction] || '#d4a520'}40`,
+          }}
+        >
+          {FACTION_SYMBOLS[card.faction] || card.faction[0]}
+        </div>
+        <span
+          className="text-2xl font-serif font-bold tracking-[0.3em]"
+          style={{
+            color: FACTION_COLORS[card.faction] || '#d4a520',
+            textShadow: `0 0 20px ${FACTION_COLORS[card.faction] || '#d4a520'}60`,
+          }}
+        >
+          {card.faction}
+        </span>
+      </div>
+
+      {/* 页码 - 右上角 */}
       <div className="absolute top-6 right-6 z-50 text-[#d4a520]/60 text-sm font-serif tracking-widest">
         {currentIndex + 1} / {CARDS.length}
       </div>
@@ -100,19 +168,21 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
         ›
       </button>
 
-      <div
-        className="relative w-[360px] h-[540px] rounded-lg shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center overflow-visible group"
-        style={{
-          transition: 'opacity 0.2s, transform 0.2s',
-          opacity: slideDir ? 0 : 1,
-          transform:
-            slideDir === 'left'
-              ? 'translateX(-30px)'
-              : slideDir === 'right'
-                ? 'translateX(30px)'
-                : 'translateX(0)',
-        }}
-      >
+      <div className="flex items-center gap-16">
+        {/* 左侧：卡牌 */}
+        <div
+          className="relative w-[360px] h-[540px] rounded-lg shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center overflow-visible group flex-shrink-0"
+          style={{
+            transition: 'opacity 0.2s, transform 0.2s',
+            opacity: slideDir ? 0 : 1,
+            transform:
+              slideDir === 'left'
+                ? 'translateX(-30px)'
+                : slideDir === 'right'
+                  ? 'translateX(30px)'
+                  : 'translateX(0)',
+          }}
+        >
         <div className="absolute inset-[16px] rounded-lg overflow-hidden z-0 box-border bg-[#1a1107] flex items-center justify-center bg-transparent">
           <div
             className="w-[90%] h-[90%]"
@@ -145,17 +215,18 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
           {card.name}
         </div>
 
+        {/* 费用显示（底蕴）- 左上角 */}
         <div className="absolute top-6 left-5 z-30 w-[54px] h-[54px] flex flex-col items-center justify-center rounded-full cursor-pointer transition-transform duration-300 hover:scale-125 hover:drop-shadow-[0_0_12px_rgba(212,165,32,0.8)]">
           <img
             src={getAssetUrl('assets/cost.png')}
-            alt="tier"
+            alt="cost"
             className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
           />
           <span
-            className="relative z-10 text-[12px] font-bold text-[#f5e6b8] leading-tight tracking-[0.08em] text-center"
+            className="relative z-10 text-[20px] font-bold text-[#f5e6b8] leading-tight tracking-[0.08em] text-center"
             style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 6px rgba(212,165,32,0.6)' }}
           >
-            {tierLabel}
+            {card.cost}
           </span>
         </div>
 
@@ -193,26 +264,7 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
           </div>
         )}
 
-        {!isCharacter && card.shield !== undefined && (
-          <div
-            className="absolute top-6 right-5 z-30 flex flex-col items-center gap-1"
-            style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }}
-          >
-            <div className="w-[60px] h-[60px] flex flex-col items-center justify-center relative">
-              <img
-                src={getAssetUrl('assets/shield.png')}
-                alt="shield"
-                className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-              />
-              <span
-                className="relative z-10 text-[24px] font-bold text-white leading-none mt-1"
-                style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9)' }}
-              >
-                {card.shield}
-              </span>
-            </div>
-          </div>
-        )}
+        {/* 策术卡牌不在右上角显示属性徽章 */}
 
         <div
           className="absolute inset-0 z-0 transition-opacity duration-700 pointer-events-none rounded-lg"
@@ -243,8 +295,13 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
                   >
                     稀有度：{card.rarity}
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d4a520]/15 border border-[#d4a520]/40 text-[#8a5a00]">
-                    {tierLabel}
+                  {/* 等级用杠数显示 */}
+                  <span 
+                    className="text-[14px] font-bold tracking-wider"
+                    style={{ color: rarityBadgeColor, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}
+                    title={tierLabel}
+                  >
+                    {tierBars}
                   </span>
                 </div>
               </div>
@@ -266,25 +323,12 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
             )}
 
             {ruleText && (
-              <div className="text-[13px] text-stone-900 leading-7 font-medium">
-                <span className="font-bold text-white bg-[#8a3324]/90 px-1 py-0.5 rounded shadow-sm mr-1 border border-[#8a3324] text-[11px]">
-                  规则：
-                </span>
+              <div className="text-[16px] text-stone-900 leading-8 font-medium">
                 {ruleText}
               </div>
             )}
 
-            {flavorText && (
-              <p className="text-[12px] text-stone-800 leading-relaxed italic pl-3 border-l-2 border-stone-800/40">
-                "{flavorText}"
-              </p>
-            )}
-
-            <div className="mt-auto pt-2 flex justify-start text-[11px] text-stone-700 border-t border-stone-800/20">
-              <span>
-                门派：<span className="font-bold text-stone-900">{card.faction}</span>
-              </span>
-            </div>
+            {/* 门派信息已移至顶部导航栏 */}
           </div>
         </div>
 
@@ -299,6 +343,46 @@ export function CardDetail({ currentIndex, onBack, onNavigate, slideDir }: CardD
             className={`w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${isShaking ? 'animate-ring' : ''}`}
           />
         </button>
+        </div>
+
+        {/* 右侧：意志描述 */}
+        {flavorText && (
+          <div className="w-[320px] flex flex-col items-start gap-6">
+            {/* 装饰线 */}
+            <div className="w-full flex items-center gap-3">
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-[#d4a520]/60 to-transparent" />
+              <span className="text-[#d4a520]/40 text-xs font-serif tracking-[0.5em]">意志</span>
+              <div className="h-[1px] flex-1 bg-gradient-to-l from-[#d4a520]/60 to-transparent" />
+            </div>
+
+            {/* 意志文字 */}
+            <div className="relative">
+              {/* 竖排引号装饰 */}
+              <span className="absolute -left-4 -top-2 text-[#d4a520]/20 text-4xl font-serif">"</span>
+              
+              <p 
+                className="text-[#e8d5a3] font-serif text-lg leading-[2.2] tracking-wider"
+                style={{
+                  textShadow: '0 0 20px rgba(212, 165, 32, 0.15)',
+                  writingMode: 'horizontal-tb',
+                }}
+              >
+                {flavorText}
+              </p>
+
+              <span className="absolute -right-2 -bottom-4 text-[#d4a520]/20 text-4xl font-serif rotate-180">"</span>
+            </div>
+
+            {/* 底部装饰 */}
+            <div className="w-full flex items-center justify-center gap-2 mt-4">
+              <div className="w-1 h-1 rounded-full bg-[#d4a520]/40" />
+              <div className="w-8 h-[1px] bg-gradient-to-r from-[#d4a520]/40 to-transparent" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#d4a520]/30" />
+              <div className="w-8 h-[1px] bg-gradient-to-l from-[#d4a520]/40 to-transparent" />
+              <div className="w-1 h-1 rounded-full bg-[#d4a520]/40" />
+            </div>
+          </div>
+        )}
       </div>
 
       <div

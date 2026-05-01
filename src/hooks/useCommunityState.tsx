@@ -42,7 +42,12 @@ import {
   isSeedPost,
   generateSummary,
 } from '../community/selectors';
-import { validatePostInput, sanitizeContent } from '../community/moderation';
+import {
+  validatePostInput,
+  sanitizeContent,
+  checkPostFrequency,
+  getTimeUntilNextPost,
+} from '../community/moderation';
 
 const LOCAL_USER_ID = 'local-user-001';
 const LOCAL_USER_NAME = '机枢学徒';
@@ -50,7 +55,7 @@ const LOCAL_USER_NAME = '机枢学徒';
 const DEFAULT_UI_STATE: CommunityUiState = {
   view: 'home',
   selectedCategory: 'all',
-  sortMode: 'latest',
+  sortMode: 'recommended',
   selectedPostId: null,
   activeDraftId: null,
   composerMode: 'create',
@@ -84,6 +89,8 @@ interface CommunityContextValue {
   selectedPost: CommunityPost | null;
   hasNewContent: boolean;
   hasDraft: boolean;
+  canPost: boolean; // 是否可以发布新帖
+  nextPostTimeRemaining: number; // 距离下次可发布的剩余时间（毫秒）
   actions: {
     openHome(): void;
     openPost(postId: string): void;
@@ -241,7 +248,9 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       posts = filterPosts(merged, ui.selectedCategory, ui.searchQuery, ui.selectedTags);
     }
 
-    return sortPosts(posts, ui.sortMode);
+    return sortPosts(posts, ui.sortMode, {
+      viewedPostIds: persistedState.interactions.viewedPostIds,
+    });
   }, [runtime, persistedState, ui.view, ui.selectedCategory, ui.searchQuery, ui.selectedTags, ui.sortMode, getMergedPost]);
 
   const selectedPost = useMemo(() => {
@@ -258,6 +267,15 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   }, [persistedState.interactions.viewedPostIds]);
 
   const hasDraft = persistedState.drafts.length > 0;
+
+  // 发布频率限制
+  const canPost = useMemo(() => {
+    return checkPostFrequency(persistedState.meta.lastPostTime);
+  }, [persistedState.meta.lastPostTime]);
+
+  const nextPostTimeRemaining = useMemo(() => {
+    return getTimeUntilNextPost(persistedState.meta.lastPostTime);
+  }, [persistedState.meta.lastPostTime]);
 
   const openHome = useCallback(() => {
     setUi(prev => ({
@@ -416,6 +434,12 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const createPost = useCallback((input: { title: string; content: string; category: CommunityCategory; tags: string[]; imageUrls: string[] }): string | null => {
+    // 先检查发布频率
+    if (!checkPostFrequency(persistedState.meta.lastPostTime)) {
+      console.warn('[community] Post frequency limit reached');
+      return null;
+    }
+
     let newPostId: string | null = null;
     setPersistedState(prev => {
       const moderation = validatePostInput({
@@ -447,10 +471,12 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       });
 
       newPostId = newState.userPosts.at(-1)?.id ?? null;
-      return newState;
+
+      // 更新上次发布时间
+      return updateMeta(newState, { lastPostTime: Date.now() });
     });
     return newPostId;
-  }, []);
+  }, [persistedState.meta.lastPostTime]);
 
   const updatePost = useCallback((postId: string, input: { title?: string; content?: string; tags?: string[] }): boolean => {
     if (isSeedPost(postId)) return false;
@@ -662,6 +688,8 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       selectedPost,
       hasNewContent,
       hasDraft,
+      canPost,
+      nextPostTimeRemaining,
       actions,
       getMergedComment,
     }}>

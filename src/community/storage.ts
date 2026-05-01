@@ -21,6 +21,7 @@ const DEFAULT_META: CommunityPersistedState['meta'] = {
   lastEnteredAt: null,
   unreadRecommendedCount: 0,
   hasDraft: false,
+  lastPostTime: null,
 };
 
 function createDefaultState(): CommunityPersistedState {
@@ -79,6 +80,7 @@ export function loadCommunityState(): CommunityPersistedState {
         lastEnteredAt: parsed.meta?.lastEnteredAt ?? null,
         unreadRecommendedCount: parsed.meta?.unreadRecommendedCount ?? 0,
         hasDraft: parsed.meta?.hasDraft ?? false,
+        lastPostTime: parsed.meta?.lastPostTime ?? null,
       },
       uiSnapshot: parsed.uiSnapshot,
     };

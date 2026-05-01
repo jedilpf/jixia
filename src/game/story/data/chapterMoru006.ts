@@ -745,7 +745,7 @@ export const CHAPTER_MORU_006_NODES: StoryNode[] = [
 
 「若能广泛传播——」
 
-「必能动摇天子的统治根基。」
+「必能动摇天子的统治学识。」
 
 太子建眼前一亮。
 

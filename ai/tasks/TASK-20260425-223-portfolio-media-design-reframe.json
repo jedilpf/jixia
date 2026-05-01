@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260425-223-portfolio-media-design-reframe",
+  "goal": "Reframe the portfolio materials into a clear media design project narrative with five pillars: clarity, aesthetics, research question, prototype evidence, and future potential.",
+  "constraints": [
+    "This task is documentation-only; do not modify runtime gameplay code.",
+    "Keep the vertical-slice constraints unchanged: 2 schools, 1 topic, 1 battleground, 12-20 cards, 3 rounds.",
+    "Portfolio text must be value-first and review-friendly, not implementation-detail-heavy.",
+    "If any external submission artifact remains missing, keep it as UNKNOWN and keep open question tracking consistent."
+  ],
+  "deliverables": [
+    "Rewritten portfolio README in a five-pillar media design structure.",
+    "Updated demo script framed as prototype evidence for media design review.",
+    "Updated research proposal centered on a concise core research question and expansion trajectory."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "AI_ACTIVE_TASK.md",
+    "README.md",
+    "open_questions.md",
+    "docs/PROJECT_MEMORY.md",
+    "portfolio"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260425-223-portfolio-media-design-reframe.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260425-223-portfolio-media-design-reframe.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260425-223-portfolio-media-design-reframe.json"
+  ],
+  "status": "in_progress"
+}

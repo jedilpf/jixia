@@ -1,7 +1,50 @@
-import { getCardTierLabel } from '@/battleV2/tierSystem';
+import { useState } from 'react';
+import { getCardTierLabel, resolveStarTierByRarity } from '@/battleV2/tierSystem';
 import { CARDS, rarityColor, typeColor } from '@/data/cardsSource';
 import { uiAudio } from '@/utils/audioManager';
 import { getAssetUrl, getCardImageUrl } from '@/utils/assets';
+
+// 门派符号映射 - 每个门派一个独特的Unicode符号
+const FACTION_SYMBOLS: Record<string, string> = {
+  '礼心殿': '禮',
+  '衡戒廷': '衡',
+  '归真观': '真',
+  '玄匠盟': '匠',
+  '九阵堂': '阵',
+  '名相府': '相',
+  '司天台': '司',
+  '游策阁': '策',
+  '万农坊': '农',
+  '兼采楼': '兼',
+  '天工坊': '工',
+  '两仪署': '仪',
+  '杏林馆': '杏',
+  '稗言社': '言',
+  '养真院': '养',
+  '筹天阁': '筹',
+  '通用': '通',
+};
+
+// 门派颜色映射
+const FACTION_COLORS: Record<string, string> = {
+  '礼心殿': '#d4a520',
+  '衡戒廷': '#8b0000',
+  '归真观': '#4a90a4',
+  '玄匠盟': '#b87333',
+  '九阵堂': '#2e5d4b',
+  '名相府': '#6b4c9a',
+  '司天台': '#1e3a5f',
+  '游策阁': '#c75b39',
+  '万农坊': '#5a7d3a',
+  '兼采楼': '#8b6914',
+  '天工坊': '#4a6741',
+  '两仪署': '#7d6b91',
+  '杏林馆': '#2d7d6f',
+  '稗言社': '#8b4513',
+  '养真院': '#5a8a8a',
+  '筹天阁': '#4a6b8a',
+  '通用': '#888888',
+};
 
 interface CardGridProps {
   onBack: () => void;
@@ -9,6 +52,29 @@ interface CardGridProps {
 }
 
 export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
+  const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
+
+  const factions = Array.from(new Set(CARDS.map((card) => card.faction)));
+
+  const filteredCards = selectedFaction
+    ? CARDS.filter((card) => card.faction === selectedFaction)
+    : CARDS;
+
+  const groupedCards = filteredCards.reduce((acc, card) => {
+    if (!acc[card.faction]) acc[card.faction] = [];
+    acc[card.faction].push(card);
+    return acc;
+  }, {} as Record<string, typeof CARDS>);
+
+  // 对每个门派的卡牌按星级排序
+  Object.keys(groupedCards).forEach((faction) => {
+    groupedCards[faction].sort((a, b) => {
+      const tierA = resolveStarTierByRarity(a.rarity);
+      const tierB = resolveStarTierByRarity(b.rarity);
+      return tierA - tierB;
+    });
+  });
+
   return (
     <div className="w-full h-full min-h-screen flex flex-col items-center relative overflow-hidden select-none pb-8">
       <div
@@ -26,6 +92,7 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
         <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-[rgba(160,60,220,0.1)] rounded-full blur-[120px]" />
       </div>
 
+      {/* 顶部导航栏 */}
       <div className="w-full flex items-center justify-between p-6 z-50">
         <button
           onClick={() => {
@@ -44,16 +111,103 @@ export function CardGrid({ onBack, onSelectCard }: CardGridProps) {
         <div className="w-36 text-right text-[#d4a520]/60 font-serif">共 {CARDS.length} 卷</div>
       </div>
 
+      {/* 门派筛选栏 - 符号化 */}
+      <div className="w-full px-6 z-50 mb-4">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          {/* 全部按钮 */}
+          <button
+            onClick={() => {
+              uiAudio.playClick();
+              setSelectedFaction(null);
+            }}
+            onMouseEnter={() => uiAudio.playHover()}
+            className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg font-serif font-bold transition-all duration-300 ${
+              selectedFaction === null
+                ? 'border-[#d4a520] bg-[#d4a520]/20 text-[#f5e6b8] shadow-[0_0_12px_rgba(212,165,32,0.4)]'
+                : 'border-[#d4a520]/40 text-[#d4a520]/60 hover:border-[#d4a520]/70 hover:text-[#d4a520]'
+            }`}
+            title="全部门派"
+          >
+            全
+          </button>
+
+          {/* 分隔线 */}
+          <div className="w-[1px] h-8 bg-gradient-to-b from-transparent via-[#d4a520]/30 to-transparent mx-1" />
+
+          {/* 门派符号 */}
+          {factions.map((faction) => {
+            const symbol = FACTION_SYMBOLS[faction] || faction[0];
+            const color = FACTION_COLORS[faction] || '#d4a520';
+            const isSelected = selectedFaction === faction;
+
+            return (
+              <button
+                key={faction}
+                onClick={() => {
+                  uiAudio.playClick();
+                  setSelectedFaction(isSelected ? null : faction);
+                }}
+                onMouseEnter={() => uiAudio.playHover()}
+                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg font-serif font-bold transition-all duration-300 ${
+                  isSelected
+                    ? 'shadow-[0_0_12px_rgba(212,165,32,0.4)] scale-110'
+                    : 'hover:scale-105'
+                }`}
+                style={{
+                  borderColor: isSelected ? color : color + '60',
+                  backgroundColor: isSelected ? color + '30' : 'transparent',
+                  color: isSelected ? '#f5e6b8' : color + 'cc',
+                  textShadow: isSelected ? `0 0 8px ${color}` : 'none',
+                }}
+                title={faction}
+              >
+                {symbol}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 当前选中门派名称显示 */}
+      {selectedFaction && (
+        <div className="w-full text-center z-50 mb-4">
+          <span
+            className="text-lg font-serif font-bold tracking-[0.3em]"
+            style={{ color: FACTION_COLORS[selectedFaction] || '#d4a520' }}
+          >
+            {selectedFaction}
+          </span>
+          <span className="text-[#d4a520]/40 text-sm ml-2">
+            ({groupedCards[selectedFaction]?.length || 0} 张)
+          </span>
+        </div>
+      )}
+
       <div className="w-[96%] mx-auto flex-1 custom-scrollbar px-[6%] z-10 pb-12" style={{ overflowY: 'auto' }}>
-        {Array.from(new Set(CARDS.map((card) => card.faction))).map((faction) => {
-          const factionCards = CARDS.filter((card) => card.faction === faction);
+        {Object.entries(groupedCards).map(([faction, factionCards]) => {
           return (
             <div key={faction} className="mb-10 w-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#d4a520]/30" />
-                <h3 className="text-xl font-serif font-bold text-[#d4a520] tracking-[0.2em]">{faction}</h3>
-                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#d4a520]/30" />
-              </div>
+              {/* 门派标题 - 仅在显示全部时显示 */}
+              {!selectedFaction && (
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#d4a520]/30" />
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-8 h-8 rounded-full border border-current flex items-center justify-center text-sm font-serif font-bold"
+                      style={{ color: FACTION_COLORS[faction] || '#d4a520' }}
+                    >
+                      {FACTION_SYMBOLS[faction] || faction[0]}
+                    </span>
+                    <h3
+                      className="text-xl font-serif font-bold tracking-[0.2em]"
+                      style={{ color: FACTION_COLORS[faction] || '#d4a520' }}
+                    >
+                      {faction}
+                    </h3>
+                  </div>
+                  <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#d4a520]/30" />
+                </div>
+              )}
 
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                 {factionCards.map((card) => {

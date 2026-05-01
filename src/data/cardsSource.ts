@@ -1,15 +1,16 @@
 import { rarityColor, typeColor } from './showcaseCards';
 import {
   ACTIVE_CARDS as ADAPTER_ACTIVE_CARDS,
-  CARDS as ADAPTER_CARDS,
+  CATALOG_CARDS as ADAPTER_CARDS,
   CARD_SOURCE_INFO,
   NON_ACTIVE_CARDS as ADAPTER_NON_ACTIVE_CARDS,
-  type CardData,
+  type CatalogCard,
   type CardStatus,
 } from './catalogAdapter';
 import { getCardImageUrl } from '@/utils/assets';
 
-export type { CardData, CardStatus };
+export type CardData = CatalogCard;
+export type { CardStatus };
 export { getCardImageUrl, rarityColor, typeColor };
 
 export const CARDS: CardData[] = ADAPTER_CARDS;

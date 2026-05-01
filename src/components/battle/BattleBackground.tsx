@@ -1,4 +1,4 @@
-﻿// BattleBackground.tsx
+// BattleBackground.tsx
 // Skill: ui-theme-designer + ui-animation-designer + style-pass-bronze-mechanism
 // 应用稷下青铜机关城主题：炉火光晕 + 齿轮装饰 + 铜绿纹理 + 战场分割线
 
@@ -111,93 +111,75 @@ export function BattleBackground({ scale, containerWidth, containerHeight }: Bat
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
             }} />
-            {/* 暗色叠加蒙版（保证卡牌等元素对比度） */}
+            {/* 暗红叠加蒙版（保证红金色系的一致性） */}
             <div style={{
                 position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.28)',
+                background: 'rgba(58,13,10,0.45)', // 深红遮罩
             }} />
 
             {/* ── 层1：主背景渐变叠加 ── */}
             <div style={{
                 position: 'absolute', inset: 0,
                 background: `
-          radial-gradient(ellipse 80% 50% at 50% 110%, rgba(232,93,4,0.12) 0%, transparent 60%),
-          radial-gradient(ellipse 60% 40% at 50% -10%, rgba(74,124,111,0.08) 0%, transparent 60%)
+          radial-gradient(ellipse 80% 50% at 50% 110%, rgba(212,165,32,0.15) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 40% at 50% -10%, rgba(212,165,32,0.1) 0%, transparent 60%)
         `,
             }} />
 
-            {/* ── 层2：青铜织物纹理（重复小图样） ── */}
+            {/* ── 层2：金丝织物纹理 ── */}
             <div style={{
-                position: 'absolute', inset: 0, opacity: 0.04,
+                position: 'absolute', inset: 0, opacity: 0.06,
                 backgroundImage: `
-          repeating-linear-gradient(45deg, #8B7355 0px, transparent 1px, transparent 20px, #8B7355 21px),
-          repeating-linear-gradient(-45deg, #4A7C6F 0px, transparent 1px, transparent 20px, #4A7C6F 21px)
+          repeating-linear-gradient(45deg, #d4a520 0px, transparent 1px, transparent 20px, #d4a520 21px),
+          repeating-linear-gradient(-45deg, #8b2e2e 0px, transparent 1px, transparent 20px, #8b2e2e 21px)
         `,
                 animation: 'patina-flow 40s linear infinite',
             }} />
 
-            {/* ── 层3：炉火光晕（底部上升） ── */}
+            {/* ── 层3：龙魂/炉火红光（底部上升） ── */}
             <div style={{
                 position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%',
-                background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(232,93,4,0.18) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(139,46,46,0.25) 0%, transparent 70%)',
                 animation: 'forge-breathe 3.5s ease-in-out infinite',
             }} />
 
-            {/* ── 层4：顶部铜绿光 ── */}
+            {/* ── 层4：顶部金色辉光 ── */}
             <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, height: '35%',
-                background: 'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(74,124,111,0.12) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(212,165,32,0.15) 0%, transparent 70%)',
                 animation: 'forge-breathe 4s ease-in-out infinite 1.5s',
             }} />
 
-            {/* ── 层5：SVG齿轮装饰 ── */}
+            {/* ── 层5：SVG金质齿轮 ── */}
             <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
-                <BronzeGear x={-60} y={H * 0.05} size={180 * scale} speed={25} opacity={0.12} />
-                <BronzeGear x={W - 100 * scale} y={H * 0.0} size={200 * scale} speed={32} opacity={0.09} reverse />
-                <BronzeGear x={W * 0.08} y={H * 0.55} size={120 * scale} speed={20} opacity={0.1} reverse />
-                <BronzeGear x={W * 0.85} y={H * 0.5} size={100 * scale} speed={18} opacity={0.11} />
-                <BronzeGear x={W * 0.5 - 30 * scale} y={H * 0.42} size={60 * scale} speed={12} opacity={0.08} reverse />
+                <BronzeGear x={-60} y={H * 0.05} size={180 * scale} speed={25} opacity={0.15} />
+                <BronzeGear x={W - 100 * scale} y={H * 0.0} size={200 * scale} speed={32} opacity={0.12} reverse />
+                <BronzeGear x={W * 0.08} y={H * 0.55} size={120 * scale} speed={20} opacity={0.13} reverse />
+                <BronzeGear x={W * 0.85} y={H * 0.5} size={100 * scale} speed={18} opacity={0.14} />
             </svg>
 
-            {/* ── 层6：战场分割线系统 ── */}
+            {/* ── 层6：战线分割线（金红流动） ── */}
             <div style={{ position: 'absolute', top: `${midY}px`, left: 0, right: 0 }}>
                 {/* 主分割线 */}
                 <div style={{
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(139,115,85,0.4) 15%, rgba(232,93,4,0.7) 50%, rgba(139,115,85,0.4) 85%, transparent 100%)',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(212,165,32,0.4) 15%, #d4a520 50%, rgba(212,165,32,0.4) 85%, transparent 100%)',
                     animation: 'divider-pulse 3s ease-in-out infinite',
+                    boxShadow: '0 0 15px rgba(212,165,32,0.4)',
                 }} />
-                {/* 上辅助线 */}
+                {/* 辅助线 */}
                 <div style={{
                     position: 'absolute', top: `-${6 * scale}px`, left: 0, right: 0, height: '1px',
-                    background: 'linear-gradient(90deg, transparent 10%, rgba(74,124,111,0.25) 40%, rgba(74,124,111,0.25) 60%, transparent 90%)',
+                    background: 'linear-gradient(90deg, transparent 10%, rgba(139,46,46,0.4) 40%, rgba(139,46,46,0.4) 60%, transparent 90%)',
                 }} />
-                {/* 下辅助线 */}
-                <div style={{
-                    position: 'absolute', top: `${6 * scale}px`, left: 0, right: 0, height: '1px',
-                    background: 'linear-gradient(90deg, transparent 10%, rgba(74,124,111,0.25) 40%, rgba(74,124,111,0.25) 60%, transparent 90%)',
-                }} />
-
-                {/* 分割线中央装饰 */}
-                <div style={{
-                    position: 'absolute', left: '50%', top: '-12px',
-                    transform: 'translateX(-50%)',
-                    width: `${30 * scale}px`, height: `${24 * scale}px`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: `${14 * scale}px`, color: 'rgba(232,93,4,0.8)',
-                    textShadow: '0 0 8px rgba(232,93,4,0.6)',
-                    animation: 'divider-pulse 3s ease-in-out infinite',
-                }}>
-                    ⚙
-                </div>
             </div>
 
-            {/* ── 层7：四角青铜边框装饰 ── */}
+            {/* ── 层7：四角纹案边框 ── */}
             {[
-                { corner: 'top-left', x: 0, y: 0, rx: '0', ry: '0', rotX: '0', rotY: '0' },
-                { corner: 'top-right', x: W - 80 * scale, y: 0, rx: '0', ry: '0', rotX: '0', rotY: '0' },
-                { corner: 'bottom-left', x: 0, y: H - 80 * scale, rx: '0', ry: '0', rotX: '0', rotY: '0' },
-                { corner: 'bottom-right', x: W - 80 * scale, y: H - 80 * scale, rx: '0', ry: '0', rotX: '0', rotY: '0' },
+                { corner: 'top-left', x: 0, y: 0 },
+                { corner: 'top-right', x: W - 80 * scale, y: 0 },
+                { corner: 'bottom-left', x: 0, y: H - 80 * scale },
+                { corner: 'bottom-right', x: W - 80 * scale, y: H - 80 * scale },
             ].map(({ corner, x, y }) => (
                 <div key={corner} style={{ position: 'absolute', left: x, top: y, width: `${80 * scale}px`, height: `${80 * scale}px` }}>
                     <svg width="100%" height="100%" viewBox="0 0 80 80">
@@ -206,28 +188,28 @@ export function BattleBackground({ scale, containerWidth, containerHeight }: Bat
                                 ? corner.includes('bottom') ? 'M80,80 L80,50 L70,50 L70,70 L50,70 L50,80 Z' : 'M80,0 L80,30 L70,30 L70,10 L50,10 L50,0 Z'
                                 : corner.includes('bottom') ? 'M0,80 L0,50 L10,50 L10,70 L30,70 L30,80 Z' : 'M0,0 L0,30 L10,30 L10,10 L30,10 L30,0 Z'
                             }
-                            fill="rgba(139,115,85,0.2)"
-                            stroke="rgba(139,115,85,0.4)"
-                            strokeWidth="0.5"
+                            fill="rgba(212,165,32,0.15)"
+                            stroke="#d4a520"
+                            strokeWidth="1"
                         />
                     </svg>
                 </div>
             ))}
 
-            {/* ── 层8：敌方区域红晕 & 我方区域铜绿晕 ── */}
+            {/* ── 层8：势力区域红金晕 ── */}
             <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, height: '48%',
-                background: 'radial-gradient(ellipse 50% 80% at 50% 0%, rgba(139,38,53,0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse 50% 80% at 50% 0%, rgba(139,46,46,0.15) 0%, transparent 70%)',
                 pointerEvents: 'none',
             }} />
             <div style={{
                 position: 'absolute', bottom: 0, left: 0, right: 0, height: '48%',
-                background: 'radial-gradient(ellipse 50% 80% at 50% 100%, rgba(74,124,111,0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse 50% 80% at 50% 100%, rgba(212,165,32,0.12) 0%, transparent 70%)',
                 pointerEvents: 'none',
             }} />
 
-            {/* ── 层9：火星粒子（底部上扬） ── */}
-            <EmberLayer count={12} H={H} />
+            {/* ── 层9：火星粒子 ── */}
+            <EmberLayer count={16} H={H} />
         </div>
     );
 }

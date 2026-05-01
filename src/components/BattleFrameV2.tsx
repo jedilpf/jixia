@@ -24,7 +24,7 @@ import {
   SeatId,
 } from '@/battleV2/types';
 import { listAllDebateCardsForLibrary } from '@/battleV2/cards';
-import { CARDS, CardData } from '@/data/showcaseCards';
+import { CardData } from '@/data/showcaseCards';
 
 // 三层架构组件
 import {
@@ -71,7 +71,7 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
   // ═══════════════════════════════════════════════════════════
-  const { state, selectTopic, planCard, setTargetSeat, lockPublic, lockSecret } = useDebateBattle({
+  const { state, selectTopic, planCard, setTargetSeat, lockLayer1, lockLayer2 } = useDebateBattle({
     arenaId,
     forcedTopicId,
     playerMainFaction,
@@ -89,7 +89,7 @@ export default function BattleFrameV2({
   }, [isFinished, onFinished, state.winner]);
 
   const isTopicSelectionWindow =
-    state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'ming_bian';
+    state.topicSelectionPending && state.round >= state.topicSelectionRound && state.phase === 'play_1';
   const topicOptions = useMemo(() => {
     return state.topicOptions
       .map((topicId) => getTopicById(topicId))
@@ -100,7 +100,7 @@ export default function BattleFrameV2({
   // 本地UI状态
   // ═══════════════════════════════════════════════════════════
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [selectedAction, setSelectedAction] = useState<'main' | 'secret' | null>(null);
+  const [selectedAction, setSelectedAction] = useState<'layer1' | 'layer2' | null>(null);
 
   // 面板开关状态
   const [isCardLibraryOpen, setIsCardLibraryOpen] = useState(false);
@@ -116,19 +116,19 @@ export default function BattleFrameV2({
     if (isTopicSelectionWindow) return;
     setSelectedCardId(cardId);
     if (cardId) {
-      // 自动判断是明论还是暗策
+      // 自动判断是第一手还是第二手
       const card = player.hand.find(c => c.id === cardId);
       if (card) {
-        if (phase === 'ming_bian' && !player.plan.lockedPublic) {
-          setSelectedAction('main');
-        } else if (phase === 'an_mou' && !player.plan.lockedSecret) {
-          setSelectedAction('secret');
+        if (phase === 'play_1' && !player.plan.lockedLayer1) {
+          setSelectedAction('layer1');
+        } else if (phase === 'play_2' && !player.plan.lockedLayer2) {
+          setSelectedAction('layer2');
         }
       }
     } else {
       setSelectedAction(null);
     }
-  }, [isTopicSelectionWindow, phase, player.hand, player.plan.lockedPublic, player.plan.lockedSecret]);
+  }, [isTopicSelectionWindow, phase, player.hand, player.plan.lockedLayer1, player.plan.lockedLayer2]);
 
   // ═══════════════════════════════════════════════════════════
   // 席位选择处理
@@ -137,10 +137,10 @@ export default function BattleFrameV2({
     if (isTopicSelectionWindow) return;
     if (!selectedCardId || !selectedAction) return;
 
-    if (selectedAction === 'main') {
-      setTargetSeat('main', seat);
-    } else if (selectedAction === 'secret') {
-      setTargetSeat('secret', seat);
+    if (selectedAction === 'layer1') {
+      setTargetSeat('layer1', seat);
+    } else if (selectedAction === 'layer2') {
+      setTargetSeat('layer2', seat);
     }
   }, [isTopicSelectionWindow, selectedCardId, selectedAction, setTargetSeat]);
 
@@ -151,7 +151,7 @@ export default function BattleFrameV2({
     if (isTopicSelectionWindow) return;
     if (!selectedCardId || !selectedAction) return;
 
-    const slot: 'main' | 'secret' = selectedAction;
+    const slot: 'layer1' | 'layer2' = selectedAction;
     planCard(slot, selectedCardId);
 
     // 清空选择
@@ -172,12 +172,12 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   const handleEndTurn = useCallback(() => {
     if (isTopicSelectionWindow) return;
-    if (phase === 'ming_bian') {
-      lockPublic();
-    } else if (phase === 'an_mou') {
-      lockSecret();
+    if (phase === 'play_1') {
+      lockLayer1();
+    } else if (phase === 'play_2') {
+      lockLayer2();
     }
-  }, [isTopicSelectionWindow, phase, lockPublic, lockSecret]);
+  }, [isTopicSelectionWindow, phase, lockLayer1, lockLayer2]);
 
   const handleSelectTopic = useCallback(
     (topicId: string) => {
@@ -220,8 +220,8 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   // 图鉴数据
   // ═══════════════════════════════════════════════════════════
-  const allCards = useMemo(() => {
-    return listAllDebateCardsForLibrary();
+  const allCards: CardData[] = useMemo(() => {
+    return listAllDebateCardsForLibrary() as any[];
   }, []);
 
   // ═══════════════════════════════════════════════════════════
@@ -329,7 +329,7 @@ export default function BattleFrameV2({
               <div>
                 <h3 className="text-xl font-semibold tracking-wide text-[#f0ddb1]">选择本局议题</h3>
                 <p className="mt-1 text-sm text-[#b8a88a]">
-                  第 {state.round} 回合触发。确定后继续明辩与暗策流程。
+                  第 {state.round} 回合触发。确定后继续双步出牌流程。
                 </p>
               </div>
               <div className="rounded border border-[#8b6e44] bg-[#322717] px-3 py-1 text-sm text-[#ffd48a]">

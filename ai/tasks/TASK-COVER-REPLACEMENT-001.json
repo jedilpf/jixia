@@ -1,0 +1,28 @@
+{
+  "task_id": "TASK-COVER-REPLACEMENT-001",
+  "goal": "Replace the existing 'Bronze Tripod' cover image with a new V9 Mineral Aesthetic masterpiece.",
+  "constraints": [
+    "Follow V9 Mineral Aesthetic (Ivory, Gold, Cinnabar, Ink).",
+    "Must be high-contrast and minimalist (40% white space).",
+    "Replace 'bg-main.png' and 'bg-main1.png' or update references to point to the new asset.",
+    "Ensure the design feels 'epic' and 'premium' for the game cover."
+  ],
+  "deliverables": [
+    "New cover image asset in public/assets/v9/",
+    "Updated MainMenu.tsx and visualAssets.ts",
+    "Updated docs/PROJECT_MEMORY.md",
+    "Task completion report in artifacts"
+  ],
+  "allowed_write_paths": [
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks/TASK-COVER-REPLACEMENT-001.json",
+    "public/assets/v9/cover_v9.png",
+    "public/assets/v9/cover_v9_alt_gate.png",
+    "src/components/MainMenu.tsx",
+    "src/ui/screens/visualAssets.ts"
+  ],
+  "acceptance_commands": [
+    "npm run gate:daily"
+  ],
+  "status": "completed"
+}

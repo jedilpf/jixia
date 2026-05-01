@@ -47,20 +47,25 @@ export function HomeScreen({ onStart, onStoryMode, progress }: HomeScreenProps) 
                 collectedCards: progress.collectedCards,
               }}
             />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <button
                 type="button"
-                className="whitespace-nowrap px-4 py-1.5 text-xs font-bold text-[#3A5F41] border border-[#3A5F41]/30 rounded-md bg-[#EBF5EE] hover:bg-[#3A5F41] hover:text-white transition-all"
+                className="group relative flex items-center justify-between gap-4 px-5 py-2 rounded-xl bg-gradient-to-br from-[#1a1510] to-[#211d18] border-2 border-[#3A5F41]/30 text-[#F5E6B8] transition-all hover:border-[#3A5F41] hover:scale-[1.02] shadow-[0_4px_15px_rgba(0,0,0,0.2)] overflow-hidden"
                 onClick={() => setShowLevelDetail(true)}
               >
-                学说造诣
+                <div className="absolute inset-0 bg-[#3A5F41]/5 group-hover:bg-[#3A5F41]/10 transition-colors" />
+                <span className="relative z-10 text-[11px] font-black tracking-[0.2em] uppercase">学说造诣</span>
+                <div className="relative z-10 w-1.5 h-1.5 rounded-full bg-[#3A5F41] shadow-[0_0_8px_#3A5F41]" />
               </button>
+              
               <button
                 type="button"
-                className="whitespace-nowrap px-4 py-1.5 text-xs font-bold text-[#8D2F2F] border border-[#8D2F2F]/30 rounded-md bg-[#F5E6E6] hover:bg-[#8D2F2F] hover:text-white transition-all"
+                className="group relative flex items-center justify-between gap-4 px-5 py-2 rounded-xl bg-gradient-to-br from-[#1a1510] to-[#211d18] border-2 border-[#8D2F2F]/30 text-[#F5E6B8] transition-all hover:border-[#8D2F2F] hover:scale-[1.02] shadow-[0_4px_15px_rgba(0,0,0,0.2)] overflow-hidden"
                 onClick={() => setShowStats(true)}
               >
-                名士战绩
+                <div className="absolute inset-0 bg-[#8D2F2F]/5 group-hover:bg-[#8D2F2F]/10 transition-colors" />
+                <span className="relative z-10 text-[11px] font-black tracking-[0.2em] uppercase">名士战绩</span>
+                <div className="relative z-10 w-1.5 h-1.5 rounded-full bg-[#8D2F2F] shadow-[0_0_8px_#8D2F2F]" />
               </button>
             </div>
           </div>

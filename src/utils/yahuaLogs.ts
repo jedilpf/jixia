@@ -31,7 +31,7 @@ const TEMPLATES = {
   DAMAGE_DEALT: [
     "《{playerName}》词锋犀利，直击《{targetName}》本心，挫其底蕴 {value} 点。",
     "言如利剑，势如破竹。《{playerName}》一论既出，令《{targetName}》辩志不稳，底蕴受损 {value} 点。",
-    "《{playerName}》驳斥有力，如平地惊雷，震荡《{targetName}》根基，底蕴折损 {value} 点。"
+    "《{playerName}》驳斥有力，如平地惊雷，震荡《{targetName}》学识，底蕴折损 {value} 点。"
   ],
   SHIELD_GAIN: [
     "《{playerName}》秉持正道，其守若坚，立【护持】 {value} 层于席前。",

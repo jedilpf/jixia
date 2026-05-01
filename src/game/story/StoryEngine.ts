@@ -100,7 +100,7 @@ export class StoryEngine {
     if (initialNodeId && this.nodeMap.has(initialNodeId)) {
       this.currentNodeId = initialNodeId;
     } else {
-      this.currentNodeId = 'prolog_0_1';
+      this.currentNodeId = 'prolog_0_0'; // 从梦境节点开始
     }
     this.markNodeVisited(this.currentNodeId);
     this.syncChapterByNodeId(this.currentNodeId);

@@ -1,5 +1,11 @@
 import type { CommunityPost } from '../../community/types';
 import { COMMUNITY_CATEGORIES } from '../../community/types';
+import { 
+  IconTalk, 
+  IconCrossSwords, 
+  IconSeek, 
+  IconChronicle 
+} from '@/components/common/JixiaIcons';
 
 interface CommunityPostCardProps {
   post: CommunityPost;
@@ -8,6 +14,16 @@ interface CommunityPostCardProps {
   onClick: () => void;
   onLike: () => void;
   onFavorite: () => void;
+}
+
+function CategoryIcon({ id, color }: { id: string; color: string }) {
+    switch(id) {
+        case 'discussion': return <IconTalk size={12} color={color} />;
+        case 'battle_report': return <IconCrossSwords size={12} color={color} />;
+        case 'qa': return <IconSeek size={12} color={color} />;
+        case 'culture': return <IconChronicle size={12} color={color} />;
+        default: return null;
+    }
 }
 
 function formatTimeAgo(timestamp: number): string {
@@ -140,7 +156,7 @@ export function CommunityPostCard({
                   borderRadius: '2px',
                 }}
               >
-                <span>{categoryInfo.icon}</span>
+                <CategoryIcon id={post.category} color="#f1c697" />
                 <span>{categoryInfo.label}</span>
               </span>
             </div>
