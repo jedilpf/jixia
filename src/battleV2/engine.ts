@@ -204,7 +204,11 @@ function consumePlannedCard(player: BattlePlayer, cardId: string | null): Debate
   if (index < 0) return null;
 
   const [card] = player.hand.splice(index, 1);
-  player.discard.push(card);
+  // 立论在结算后以单位形式存在于议区，不应同时进入弃牌堆
+  // 只有策术（不驻场的即时卡）才进入弃牌堆
+  if (card.type !== '立论') {
+    player.discard.push(card);
+  }
   return card;
 }
 
@@ -254,21 +258,22 @@ function estimateCardThreat(card: DebateCard | null): number {
 }
 
 function evaluateAICard(card: DebateCard, state: DebateBattleState, phase: AIEvalPhase): number {
-  const enemy = state.enemy;
-  const player = state.player;
+  // enemy = AI 自己, player = 人类对手
+  const ai = state.enemy;
+  const opponent = state.player;
 
-  const myBoardPower =
-    enemy.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
-    + enemy.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
-  const oppBoardPower =
-    player.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
-    + player.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
+  const aiBoardPower =
+    ai.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
+    + ai.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
+  const opponentBoardPower =
+    opponent.seats.zhu_yi.units.reduce((sum, unit) => sum + unit.power, 0)
+    + opponent.seats.pang_yi.units.reduce((sum, unit) => sum + unit.power, 0);
 
   let score = 0;
 
   if (card.type === '立论') {
     score = card.power * 2 + card.hp * 1.15;
-    if (myBoardPower <= oppBoardPower) score += 1.4;
+    if (aiBoardPower <= opponentBoardPower) score += 1.4;
     if (card.cost <= 2) score += 0.4;
   } else {
     const ops = getCardRuleOps(card);
@@ -277,12 +282,13 @@ function evaluateAICard(card: DebateCard, state: DebateBattleState, phase: AIEva
     } else {
       for (const op of ops) {
         if (op.op === 'damage') {
-          score += op.value * 2.2 + estimateCardThreat(getCardFromHand(player, player.plan.layer1CardId)) * 0.1;
-          if (player.resources.dashi >= 6) score += 1.6;
+          // 评估 AI 伤害策术时，看对手场上的威胁（而非对手手牌）
+          score += op.value * 2.2 + estimateCardThreat(getCardFromHand(opponent, opponent.plan.layer1CardId)) * 0.1;
+          if (opponent.resources.dashi >= 6) score += 1.6;
         } else if (op.op === 'draw') {
-          score += op.value * 1.5 + Math.max(0, 4 - enemy.hand.length) * 0.8;
+          score += op.value * 1.5 + Math.max(0, 4 - ai.hand.length) * 0.8;
         } else if (op.op === 'heal' || op.op === 'shield') {
-          score += op.value * 1.6 + (enemy.resources.guyin <= 1 ? 0.9 : 0);
+          score += op.value * 1.6 + (ai.resources.guyin <= 1 ? 0.9 : 0);
         } else if (op.op === 'discard') {
           score += op.value * 1.7;
         } else {
@@ -506,6 +512,16 @@ function resolveLayerByKey(state: DebateBattleState, layer: 'layer1' | 'layer2')
 
   next.resolveFeed = feed;
   next.logs.push(...feed.map((text) => makeLog(next.round, text)));
+
+  // Bug #5 fix: 在每次 layer 结算后立即检查胜利，避免策术等效果达成胜利条件后游戏继续
+  const layerWinner = checkVictory(next);
+  if (layerWinner) {
+    next.phase = 'finished';
+    next.winner = layerWinner;
+    next.secondsLeft = 0;
+    return next;
+  }
+
   return next;
 }
 
@@ -755,8 +771,35 @@ function handlePlanCard(state: DebateBattleState, slot: PlanSlot, cardId: string
   if (cardId && slot === 'layer1' && player.plan.layer2CardId === cardId) return state;
   if (cardId && slot === 'layer2' && player.plan.layer1CardId === cardId) return state;
 
+  // Bug #4 fix: 出牌时验证目标议区容量
+  if (cardId) {
+    const targetSeat = slot === 'layer1' ? player.plan.layer1TargetSeat : player.plan.layer2TargetSeat;
+    const seat = player.seats[targetSeat];
+    const existingUnits = seat.units.length;
+    const otherLayerHasCard = slot === 'layer1'
+      ? Boolean(player.plan.layer2CardId)
+      : Boolean(player.plan.layer1CardId);
+    const otherLayerTargetSameSeat = (slot === 'layer1' && player.plan.layer2TargetSeat === targetSeat)
+      || (slot === 'layer2' && player.plan.layer1TargetSeat === targetSeat);
+    const otherLayerCount = (otherLayerHasCard && otherLayerTargetSameSeat) ? 1 : 0;
+    if (existingUnits + 1 + otherLayerCount > seat.maxUnits) {
+      return state; // 议区已满，拒绝出牌
+    }
+  }
+
   if (slot === 'layer1') player.plan.layer1CardId = cardId;
   if (slot === 'layer2') player.plan.layer2CardId = cardId;
+
+  // 策术立即触发：出牌时立即执行效果，不等待结算阶段
+  if (cardId) {
+    const card = getCardFromHand(player, cardId);
+    if (card?.type === '策术') {
+      const targetSeat = slot === 'layer1' ? player.plan.layer1TargetSeat : player.plan.layer2TargetSeat;
+      const spellFeed: string[] = [];
+      applySpellEffect(player, next.enemy, card, targetSeat, spellFeed, '我方');
+      next.logs.push(...spellFeed.map((text) => makeLog(next.round, text)));
+    }
+  }
 
   const costEval = evaluatePlanCost(player, player.plan.layer1CardId, player.plan.layer2CardId);
   if (!costEval.valid) return state;
@@ -767,6 +810,20 @@ function handlePlanCard(state: DebateBattleState, slot: PlanSlot, cardId: string
 
 function handleSetTargetSeat(state: DebateBattleState, slot: TargetableSlot, seatId: SeatId): DebateBattleState {
   const next = cloneState(state);
+  const player = next.player;
+
+  // Bug #4 fix: 议区容量验证 - 检查目标议区是否已满
+  // 计算在计划阶段该议区将承载的卡牌数（含已计划的 layer1/layer2）
+  const existingCount = player.seats[seatId].units.length;
+  const layer1Count = player.plan.layer1CardId ? 1 : 0;
+  const layer2Count = player.plan.layer2CardId ? 1 : 0;
+  // 当前变更的 layer 不应计入（尚未确定），其他 layer 的计入
+  const otherLayerCount = slot === 'layer1' ? layer2Count : layer1Count;
+  const maxUnits = player.seats[seatId].maxUnits;
+  if (existingCount + otherLayerCount + 1 > maxUnits) {
+    // 议区已满，拒绝变更目标
+    return state;
+  }
 
   if (slot === 'layer1') {
     next.player.plan.layer1TargetSeat = seatId;
@@ -781,7 +838,25 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
   switch (action.type) {
     case 'TICK': {
       if (state.phase === 'finished') return state;
-      if (state.secondsLeft <= 1) return advancePhase(state);
+      // Bug #8 fix: 在 play_1/play_2 阶段，倒计时归零时也要检查双方是否都已锁定，
+      // 只有双方都锁定（或有一方超时）才能推进阶段，避免单方面强制推进
+      if (state.secondsLeft <= 1) {
+        if (canAdvanceFromCurrentPlayPhase(state)) {
+          return advancePhase(state);
+        }
+        // 一方未锁定但倒计时已到，强制锁定当前玩家的规划并推进
+        const next = cloneState(state);
+        if (next.phase === 'play_1' && !next.player.plan.lockedLayer1) {
+          next.player.plan.lockedLayer1 = true;
+        }
+        if (next.phase === 'play_2' && !next.player.plan.lockedLayer2) {
+          next.player.plan.lockedLayer2 = true;
+        }
+        if (canAdvanceFromCurrentPlayPhase(next)) {
+          return advancePhase(next);
+        }
+        return next;
+      }
       return {
         ...state,
         secondsLeft: state.secondsLeft - 1,
@@ -830,6 +905,40 @@ export function battleReducer(state: DebateBattleState, action: BattleAction): D
       if (canAdvanceFromCurrentPlayPhase(next)) {
         return advancePhase(next);
       }
+      return next;
+    }
+
+    case 'CANCEL_LAYER1': {
+      // 取消 Layer1 出牌：只能取消未锁定的规划
+      if (state.phase !== 'play_1' && state.phase !== 'play_2') return state;
+      if (state.player.plan.lockedLayer1) return state;
+      if (!state.player.plan.layer1CardId) return state;
+
+      const next = cloneState(state);
+      const player = next.player;
+
+      // 重算 usedCost（只考虑 Layer2）
+      const costEval = evaluatePlanCost(player, null, player.plan.layer2CardId);
+      player.plan.layer1CardId = null;
+      player.plan.layer1TargetSeat = 'zhu_yi';
+      player.plan.usedCost = costEval.usedCost;
+      return next;
+    }
+
+    case 'CANCEL_LAYER2': {
+      // 取消 Layer2 出牌：只能取消未锁定的规划
+      if (state.phase !== 'play_1' && state.phase !== 'play_2') return state;
+      if (state.player.plan.lockedLayer2) return state;
+      if (!state.player.plan.layer2CardId) return state;
+
+      const next = cloneState(state);
+      const player = next.player;
+
+      // 重算 usedCost（只考虑 Layer1）
+      const costEval = evaluatePlanCost(player, player.plan.layer1CardId, null);
+      player.plan.layer2CardId = null;
+      player.plan.layer2TargetSeat = 'pang_yi';
+      player.plan.usedCost = costEval.usedCost;
       return next;
     }
 

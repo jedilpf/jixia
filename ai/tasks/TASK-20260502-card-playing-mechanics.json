@@ -1,0 +1,19 @@
+{
+  "taskId": "TASK-20260502-card-playing-mechanics",
+  "title": "出牌交互系统实现",
+  "description": "实现卡牌拖拽出牌、议区放置、点击取消、锁定机制的全套前端+逻辑",
+  "priority": "high",
+  "assignedAgents": ["frontend-dev", "battle-logic-dev", "ui-dev"],
+  "promptFile": "ai/out/TASK-20260502-card-playing-mechanics.prompt.md",
+  "status": "pending",
+  "dependencies": [],
+  "deliverables": [
+    "docs/game-rules/card-playing-mechanics.md（已输出）",
+    "src/components/battle/layers/BattleArena.tsx（议区拖拽）",
+    "src/components/battle/HandCard.tsx（可拖拽手牌）",
+    "src/battleV2/engine.ts（出牌逻辑扩展）",
+    "src/battleV2/types.ts（类型扩展）",
+    "src/components/battle/controls/LockButton.tsx（锁定按钮）",
+    "src/components/battle/controls/CostBadge.tsx（势显示）"
+  ]
+}

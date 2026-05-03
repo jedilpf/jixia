@@ -24,6 +24,8 @@ export interface DebateBattleController {
   setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => void;
   lockLayer1: () => void;
   lockLayer2: () => void;
+  cancelLayer1: () => void;
+  cancelLayer2: () => void;
   submitCard: (cardId: string, zone: Zone, useToken: boolean) => void;
   pass: () => void;
   confirmSubmit: () => void;
@@ -80,6 +82,8 @@ export function useDebateBattle(options?: CreateBattleStateOptions): DebateBattl
       setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => dispatch({ type: 'SET_TARGET_SEAT', slot, seatId }),
       lockLayer1: () => dispatch({ type: 'LOCK_LAYER1' }),
       lockLayer2: () => dispatch({ type: 'LOCK_LAYER2' }),
+      cancelLayer1: () => dispatch({ type: 'CANCEL_LAYER1' }),
+      cancelLayer2: () => dispatch({ type: 'CANCEL_LAYER2' }),
       submitCard: (cardId: string, zone: Zone, useToken: boolean) =>
         dispatch({ type: 'SUBMIT_CARD', cardId, zone, useToken }),
       pass: () => dispatch({ type: 'PASS' }),

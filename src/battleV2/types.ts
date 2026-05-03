@@ -222,6 +222,8 @@ export type BattleAction =
   | { type: 'SET_TARGET_SEAT'; slot: TargetableSlot; seatId: SeatId }
   | { type: 'LOCK_LAYER1' }
   | { type: 'LOCK_LAYER2' }
+  | { type: 'CANCEL_LAYER1' }
+  | { type: 'CANCEL_LAYER2' }
   | { type: 'AI_AUTO_PLAN' }
   | { type: 'SUBMIT_CARD'; cardId: string; zone: Zone; useToken: boolean }
   | { type: 'PASS' }
