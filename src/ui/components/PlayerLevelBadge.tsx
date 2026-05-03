@@ -352,7 +352,7 @@ export function PlayerLevelBadge({ level, exp, playerStats, compact = false }: P
                   </div>
                 ))}
               </div>
-              <span className="text-[10px] text-[#8a7a6a]">百家争鸣等级体系</span>
+              <span className="text-[10px] text-[#8a7a6a]">稷下等级体系</span>
             </div>
           </div>
         </div>

@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260503-NOMENCLATURE-UNIFICATION",
+  "goal": "Unify the interface nomenclature and visual branding across the system (MainMenu, Community, Battle, Story) strictly adhering to V9 standards.",
+  "status": "completed",
+  "constraints": [
+    "Strictly follow V9 Naming Convention (百家文库, 锋芒演武, 名士风采, etc.).",
+    "Maintain V9 Mineral Aesthetic (Ink, Gold, Ivory).",
+    "Ensure semantic consistency between menu labels and internal titles."
+  ],
+  "deliverables": [
+    "docs/standards/V9_NAMING_CONVENTION.md",
+    "Unified labels in MainMenu.tsx",
+    "Unified titles in CommunityScreen.tsx and CharactersView.tsx",
+    "Internal naming audit in Battle and Level components"
+  ],
+  "allowed_write_paths": [
+    "src/components/MainMenu.tsx",
+    "src/components/community/CommunityScreen.tsx",
+    "src/components/CharactersView.tsx",
+    "src/components/battle/layers/TopStatusBar.tsx",
+    "src/components/battle/SyncBattlePage.tsx",
+    "src/ui/components/PlayerLevelBadge.tsx",
+    "docs/standards/V9_NAMING_CONVENTION.md",
+    "ai/tasks/TASK-20260503-NOMENCLATURE-UNIFICATION.json"
+  ],
+  "acceptance_commands": [
+    "npm run lint"
+  ]
+}

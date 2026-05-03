@@ -15,9 +15,12 @@
   ],
   "allowed_write_paths": [
     "docs/PROJECT_MEMORY.md",
+    ".knowledge/project-notes.md",
     "ai/tasks/TASK-UI-MAINMENU-REIMAGINE.json",
     "src/components/MainMenu.tsx",
-    "src/index.css"
+    "src/index.css",
+    "src/ui/components/PlayerLevelBadge.tsx",
+    "src/ui/screens/HomeScreen.tsx"
   ],
   "acceptance_commands": [
     "npm run gate:daily"

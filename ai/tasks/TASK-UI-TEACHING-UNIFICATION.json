@@ -1,0 +1,37 @@
+{
+  "task_id": "TASK-UI-TEACHING-UNIFICATION-001",
+  "goal": "Unify the visual aesthetics of the '百家授业' (Hundred Schools Teaching) interface by applying the V9 Yahua design system and grid-based selection logic from BattleSetup.tsx.",
+  "constraints": [
+    "Adhere to Yahua design system (ink-wash, mineral palette, glass-morphism).",
+    "Do not alter core battle logic.",
+    "Modularize UI components where possible."
+  ],
+  "deliverables": [
+    "src/components/PreBattleFlow.tsx (UI refactor)",
+    "src/components/MainMenu.tsx (Visual polish)",
+    "docs/PROJECT_MEMORY.md (Updated documentation)"
+  ],
+  "allowed_write_paths": [
+    "src/components/PreBattleFlow.tsx",
+    "src/components/MainMenu.tsx",
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks",
+    "src/App.tsx",
+    "src/battleV2/cards.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/data/game/avatarRegistry.ts",
+    "src/profile/RemoteProfileService.ts",
+    "src/profile/index.ts",
+    "src/ui/components/PlayerStatsPanelV2.tsx",
+    "public/assets/chars/avatars/grandmaster_lv50.png",
+    "public/assets/chars/avatars/hanfeizi.png",
+    "public/assets/chars/avatars/kongqiu.png",
+    "public/assets/chars/avatars/mozi.png",
+    "public/assets/chars/avatars/scholar_lv30.png",
+    "public/assets/chars/avatars/zhuangzi.png"
+  ],
+  "acceptance_commands": [
+    "npm run build"
+  ],
+  "status": "in_progress"
+}

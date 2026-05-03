@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260417-214",
+  "goal": "为《思筹之录》PPT文档建立清晰可检索结构：新增固定入口目录、放置主线介绍稿、同步索引入口，便于项目维护者与AI共同查找。",
+  "constraints": [
+    "严格遵循 canon/ 与 scope/ 约束，不得越界写入。",
+    "保持主线文档可达，不做破坏性删除。",
+    "优先使用中文说明并明确“唯一主入口”。",
+    "如遇信息不足，写 UNKNOWN 并记录到 open_questions.md。"
+  ],
+  "deliverables": [
+    "新增 docs/project/presentation/ 目录下的入口文档。",
+    "将《思筹之录》PPT主线构思放入该目录并可直接使用。",
+    "更新 docs/index.md 的 PPT 入口指向固定目录。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/index.md",
+    "docs/project",
+    "docs/文档变更记录.md",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260417-214-ppt-doc-structure-mainline.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260417-214-ppt-doc-structure-mainline.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260417-214-ppt-doc-structure-mainline.json"
+  ],
+  "status": "in_progress"
+}

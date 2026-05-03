@@ -1,0 +1,29 @@
+{
+  "task_id": "TASK-20260419-217",
+  "goal": "Rework battleV2 card-type interaction so the five canonical types (立论/策术/玄章/门客/反诘) each provide meaningful and numerically distinct combat value during matches.",
+  "constraints": [
+    "Preserve the current battle loop structure (ming_bian -> an_mou -> reveal -> resolve) and keep UI flow stable.",
+    "Do not modify story system, menu system, community module, or unrelated gameplay modules.",
+    "Keep changes focused on battleV2 runtime card typing, effect application, and AI planning heuristics.",
+    "Ensure numeric interactions are interpretable: each type must have a clear combat role and non-trivial counterplay impact."
+  ],
+  "deliverables": [
+    "battleV2 supports all five canonical card types in runtime data and type definitions.",
+    "Resolve logic distinguishes five types with meaningful numeric impact (offense, sustain, board presence, control/counter).",
+    "AI auto plan prefers type choices based on board state instead of pure random selection.",
+    "Verification notes for typecheck/test and expected in-battle behavior changes."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "src/battleV2/types.ts",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/battleV2/aiStrategy.ts"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260419-217-battle-five-type-counterplay.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260419-217-battle-five-type-counterplay.json",
+    "npm run typecheck"
+  ],
+  "status": "in_progress"
+}

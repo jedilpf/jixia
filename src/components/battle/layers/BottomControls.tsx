@@ -1,10 +1,17 @@
 /**
  * 底部操作区组件
  * 显示：左侧提示、中间按钮、手牌区
+ *
+ * 拖拽支持：react-dnd useDrag
+ * - 手牌可拖拽到议区
+ * - 拖拽时显示 DragGhostLayer（DragManager 驱动）
+ * - 保留 onClick 点击选牌（兼容）
  */
 
 import React from 'react';
-import { DebateBattleState, DebateCard } from '@/battleV2/types';
+import { useDrag } from 'react-dnd';
+import { DebateBattleState, DebateCard, PlanSlot } from '@/battleV2/types';
+import { DRAG_CARD_TYPE } from '@/components/battle/dndTypes';
 
 interface BottomControlsProps {
   state: DebateBattleState;
@@ -13,6 +20,9 @@ interface BottomControlsProps {
   onEndTurn: () => void;
   onConfirm: () => void;
   onCancel: () => void;
+  planCard: (slot: PlanSlot, cardId: string) => void;
+  cancelLayer1: () => void;
+  cancelLayer2: () => void;
 }
 
 const CARD_FRAME_COLORS: Record<string, { border: string; bg: string; glow: string }> = {
@@ -31,7 +41,10 @@ const HandCard: React.FC<{
   onClick: () => void;
   index: number;
   total: number;
-}> = ({ card, isSelected, onClick, index, total }) => {
+  phase: 'play_1' | 'play_2' | string;
+  lockedLayer1: boolean;
+  lockedLayer2: boolean;
+}> = ({ card, isSelected, onClick, index, total, phase, lockedLayer1, lockedLayer2 }) => {
   const colors = CARD_FRAME_COLORS[card.type] || CARD_FRAME_COLORS['立论'];
   const frameAsset = CARD_FRAME_ASSETS[card.type] || CARD_FRAME_ASSETS['立论'];
   const hasStats = card.power !== undefined && card.hp !== undefined;
@@ -39,15 +52,37 @@ const HandCard: React.FC<{
   const fanOffset = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 5 : 7) : 0;
   const rotation = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 1.6 : 2.4) : 0;
 
+  // 出牌阶段的 layer（用于 drag item）
+  const sourceSlot: 'layer1' | 'layer2' = phase === 'play_1' ? 'layer1' : 'layer2';
+  const isLocked = phase === 'play_1' ? lockedLayer1 : lockedLayer2;
+  const isPlayablePhase = phase === 'play_1' || phase === 'play_2';
+
+  // useDrag — react-dnd 拖拽源
+  const [{ isDragging }, dragRef] = useDrag({
+    type: DRAG_CARD_TYPE,
+    item: {
+      type: DRAG_CARD_TYPE,
+      card,
+      sourceSlot,
+    },
+    canDrag: () => isPlayablePhase && !isLocked,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
   return (
     <button
-      onClick={onClick}
+      ref={dragRef}
+      onClick={isDragging ? undefined : onClick}
       className="relative transition-all duration-300 ease-out origin-bottom"
       style={{
         transform: isSelected
           ? 'scale(1.1) translateY(-12px)'
           : `rotate(${rotation}deg) translateX(${fanOffset}px)`,
         zIndex: isSelected ? 30 : 10 + index,
+        opacity: isDragging ? 0.35 : 1,
+        cursor: isDragging ? 'grabbing' : 'grab',
       }}
     >
       <div
@@ -256,6 +291,9 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
                 onClick={() => onSelectCard(selectedCardId === card.id ? null : card.id)}
                 index={index}
                 total={player.hand.length}
+                phase={phase}
+                lockedLayer1={player.plan.lockedLayer1}
+                lockedLayer2={player.plan.lockedLayer2}
               />
             ))
           )}

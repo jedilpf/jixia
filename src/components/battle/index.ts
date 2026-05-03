@@ -32,6 +32,7 @@ export { HeroCard } from './HeroCard';
 export { DeckPile } from './DeckPile';
 export { EmptySlot } from './EmptySlot';
 export { DragGhost } from './DragGhost';
+export { DragGhostLayer } from './DragGhostLayer';
 export { BattleBackground } from './BattleBackground';
 export { EndTurnButton } from './EndTurnButton';
 export { GameResultOverlay } from './GameResultOverlay';

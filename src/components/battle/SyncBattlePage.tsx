@@ -39,7 +39,7 @@ export const SyncBattlePage: React.FC = () => {
     return (
       <div className="sync-battle-result">
         <h1>{winner === 'player' ? '论道胜利！' : '论道失败...'}</h1>
-        <p>百家争鸣，各抒己见</p>
+        <p>各抒己见，争鸣不息</p>
         <button onClick={startGame} className="restart-btn">
           再战一局
         </button>

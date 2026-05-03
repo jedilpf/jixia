@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-20260417-215",
+  "goal": "统一玩家数据结构（userId/level/exp/unlock/save），并引入本地 ProfileService 作为读写入口，确保后续可替换为后端实现而不重写前端业务。",
+  "constraints": [
+    "严格遵循 canon/ 与 scope/ 约束，不得越界写入。",
+    "保持现有 UI 与流程行为不破坏，优先兼容现有 persistence 调用。",
+    "本次仅实现本地 ProfileService，不引入真实网络请求。",
+    "如遇信息不足，写 UNKNOWN 并记录到 open_questions.md。"
+  ],
+  "deliverables": [
+    "新增统一玩家档案结构定义（含 userId/level/exp/unlock/save）。",
+    "新增 ProfileService 抽象与本地实现（localStorage）。",
+    "将现有玩家进度读写入口迁移到 ProfileService（兼容原调用）。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "src/profile",
+    "src/utils/persistence.ts",
+    "src/ui/screens/MvpFlowShell.tsx",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260417-215-profile-service-local-first.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260417-215-profile-service-local-first.json",
+    "npm run typecheck",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260417-215-profile-service-local-first.json"
+  ],
+  "status": "in_progress"
+}

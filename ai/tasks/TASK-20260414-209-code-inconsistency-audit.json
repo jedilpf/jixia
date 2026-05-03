@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260414-209",
+  "goal": "Audit current repository for before/after code inconsistencies and report findings without making fixes.",
+  "constraints": [
+    "Do not modify gameplay code, UI code, assets, or docs outside task workflow files.",
+    "Compare HEAD, index, and working tree separately and cite concrete evidence.",
+    "Focus on inconsistencies that can affect behavior, build, or review handoff.",
+    "If any conclusion cannot be proven from local evidence, mark it as UNKNOWN."
+  ],
+  "deliverables": [
+    "A clear summary of inconsistencies between staged and unstaged states.",
+    "File-level mismatch report for key code paths.",
+    "Risk assessment and recommended next non-destructive checks (no fixes)."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "public/assets/story/chars",
+    "src/battleV2",
+    "src/components/battle"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260414-209-code-inconsistency-audit.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260414-209-code-inconsistency-audit.json"
+  ],
+  "status": "in_progress"
+}

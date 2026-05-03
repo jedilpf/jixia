@@ -53,79 +53,71 @@ function CommentItem({
 
   if (isDeleted) {
     return (
-      <div className="py-3 text-sm italic text-[#6b7280]">
-        此评论已删除
+      <div className="py-3 text-[11px] italic text-[#f6e4c3]/20 tracking-widest uppercase">
+        Message Dissolved
       </div>
     );
   }
 
   return (
     <div
-      className="rounded-2xl border p-4"
+      className={`rounded-xl border p-5 transition-all ${nested ? 'bg-[#0a0503]/20' : 'bg-[#0a0503]/40 shadow-lg'}`}
       style={{
-        background: nested ? 'rgba(35, 12, 13, 0.72)' : 'rgba(45, 18, 16, 0.8)',
-        borderColor: nested ? 'rgba(214, 151, 73, 0.08)' : 'rgba(214, 151, 73, 0.12)',
+        borderColor: isAccepted ? 'rgba(212, 175, 101, 0.4)' : 'rgba(212, 175, 101, 0.1)',
       }}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-black tracking-widest uppercase"
           style={{
-            background: 'linear-gradient(135deg, #5a221b, #8f3827)',
-            color: '#f5e6b8',
-            border: '1px solid rgba(214, 151, 73, 0.18)',
+            background: 'rgba(255, 255, 255, 0.03)',
+            color: '#D4AF65',
+            border: '1px solid rgba(212, 175, 101, 0.2)',
           }}
         >
           {comment.authorName.charAt(0)}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-[#f5e6b8]">{comment.authorName}</span>
-            {isAccepted ? (
-              <span
-                className="rounded-full px-2 py-0.5 text-[11px]"
-                style={{ background: 'rgba(214, 151, 73, 0.18)', color: '#f2c36d' }}
-              >
-                已采纳
-              </span>
-            ) : null}
-            <span className="text-xs text-[#a87a5d]">{formatTimeAgo(comment.createdAt)}</span>
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+               <span className="text-sm font-serif text-[#f6e4c3]">{comment.authorName}</span>
+               {isAccepted && (
+                 <span className="px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-[#D4AF65] text-[#0a0503] rounded-sm">
+                   Accepted
+                 </span>
+               )}
+            </div>
+            <span className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/20">{formatTimeAgo(comment.createdAt)}</span>
           </div>
 
-          <p className="mb-3 whitespace-pre-wrap text-sm leading-7 text-[#d4bf99]">
+          <p className="mb-4 whitespace-pre-wrap text-[13px] leading-relaxed text-[#f6e4c3]/60 font-serif">
             {comment.content}
           </p>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={onLike}
-              className="flex items-center gap-1 text-xs transition-colors"
-              style={{ color: isLiked ? '#ff8a5b' : '#b89372' }}
+              className={`flex items-center gap-1.5 transition-all hover:scale-110 ${isLiked ? 'text-[#831843]' : 'text-[#f6e4c3]/20 hover:text-[#f6e4c3]/40'}`}
             >
-              <span>{isLiked ? '♥' : '♡'}</span>
-              <span>{comment.likeCount}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{isLiked ? 'Liked' : 'Like'}</span>
+              <span className="font-mono text-[10px]">{comment.likeCount}</span>
             </button>
 
             <button
               onClick={() => onReply(comment.id)}
-              className="text-xs text-[#b89372] transition-colors"
+              className="text-[10px] font-black uppercase tracking-widest text-[#f6e4c3]/20 hover:text-[#D4AF65] transition-colors"
             >
-              回复
+              Reply
             </button>
 
-            {canAccept && !isAccepted ? (
+            {canAccept && !isAccepted && (
               <button
                 onClick={onAccept}
-                className="rounded-full px-2.5 py-1 text-xs transition-colors"
-                style={{
-                  background: 'rgba(214, 151, 73, 0.14)',
-                  border: '1px solid rgba(214, 151, 73, 0.28)',
-                  color: '#f2c36d',
-                }}
+                className="px-3 py-1 text-[9px] font-black tracking-widest uppercase bg-[#D4AF65]/10 border border-[#D4AF65]/30 text-[#D4AF65] rounded-md hover:bg-[#D4AF65] hover:text-[#0a0503] transition-all"
               >
-                采纳答案
+                Accept Answer
               </button>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
@@ -157,32 +149,22 @@ export function CommunityCommentSection({
   };
 
   return (
-    <div
-      className="rounded-[22px] border p-5"
-      style={{
-        background:
-          'linear-gradient(180deg, rgba(49, 20, 17, 0.9) 0%, rgba(24, 9, 11, 0.88) 100%)',
-        borderColor: 'rgba(214, 151, 73, 0.14)',
-      }}
-    >
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="mt-8 space-y-8">
+      <div className="flex items-center justify-between gap-3 border-b border-white/5 pb-4">
         <div className="flex flex-col">
-          <h3 className="text-base font-serif text-[#f5e6b8]">评论区</h3>
-          <span className="text-xs text-[#b89372]">共 {comments.length} 条讨论</span>
+          <h3 className="text-xl font-serif text-[#f6e4c3] tracking-wider">讨论室</h3>
+          <p className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/20 mt-1">Total {comments.length} Dialogues</p>
         </div>
       </div>
 
-      <div className="mb-5 space-y-3">
+      <div className="space-y-4">
         {rootComments.length === 0 ? (
-          <div
-            className="rounded-2xl px-4 py-8 text-center text-sm text-[#b89372]"
-            style={{ background: 'rgba(35, 12, 13, 0.64)', border: '1px solid rgba(214, 151, 73, 0.08)' }}
-          >
-            还没有评论，来留下第一条看法吧。
+          <div className="rounded-2xl py-12 text-center bg-white/5 border border-white/10">
+            <p className="text-[11px] font-black tracking-widest uppercase text-[#f6e4c3]/20">Empty Space · Awaiting Wisdom</p>
           </div>
         ) : (
           rootComments.map((comment) => (
-            <div key={comment.id} className="space-y-3">
+            <div key={comment.id} className="space-y-4">
               <CommentItem
                 comment={comment}
                 isLiked={likedCommentIds.includes(comment.id)}
@@ -192,8 +174,8 @@ export function CommunityCommentSection({
                 onAccept={() => onAcceptAnswer?.(comment.id)}
                 onReply={setReplyToId}
               />
-              {getChildren(comment.id).length > 0 ? (
-                <div className="ml-6 space-y-3 border-l border-[rgba(214,151,73,0.1)] pl-4">
+              {getChildren(comment.id).length > 0 && (
+                <div className="ml-10 space-y-4 border-l border-white/5 pl-6">
                   {getChildren(comment.id).map((child) => (
                     <CommentItem
                       key={child.id}
@@ -208,54 +190,36 @@ export function CommunityCommentSection({
                     />
                   ))}
                 </div>
-              ) : null}
+              )}
             </div>
           ))
         )}
       </div>
 
-      <div
-        className="rounded-2xl border p-4"
-        style={{
-          background: 'rgba(35, 12, 13, 0.72)',
-          borderColor: 'rgba(214, 151, 73, 0.1)',
-        }}
-      >
-        {replyToId ? (
-          <div className="mb-3 flex items-center gap-2 text-xs text-[#d9c3a0]">
-            <span>正在回复一条评论</span>
-            <button onClick={() => setReplyToId(null)} className="text-[#f97316]">
-              取消
-            </button>
+      <div className="relative rounded-2xl border p-6 bg-[#0a0503]/60 shadow-2xl" style={{ borderColor: 'rgba(212, 175, 101, 0.2)' }}>
+        {replyToId && (
+          <div className="mb-4 flex items-center justify-between px-4 py-2 bg-[#D4AF65]/10 border border-[#D4AF65]/30 rounded-lg">
+            <span className="text-[10px] font-black tracking-widest uppercase text-[#D4AF65]">Replying to comment</span>
+            <button onClick={() => setReplyToId(null)} className="text-[10px] font-black tracking-widest uppercase text-[#831843] hover:underline">Cancel</button>
           </div>
-        ) : null}
+        )}
 
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="写下你的看法..."
-          rows={4}
-          className="w-full resize-none rounded-2xl border px-4 py-3 text-sm outline-none"
-          style={{
-            background: 'rgba(34, 12, 13, 0.84)',
-            borderColor: 'rgba(214, 151, 73, 0.16)',
-            color: '#f5e6b8',
-          }}
+          rows={3}
+          className="w-full bg-transparent text-sm text-[#f6e4c3] outline-none placeholder:text-[#f6e4c3]/20 resize-none font-serif leading-relaxed"
         />
 
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <span className="text-xs text-[#a87a5d]">支持主评与楼中回复</span>
+        <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/5 pt-4">
+          <span className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/20">Dialogue Gateway</span>
           <button
             onClick={handleSubmit}
             disabled={!newComment.trim()}
-            className="rounded-xl px-4 py-2 text-sm transition-colors disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
-              border: '1px solid rgba(214, 151, 73, 0.32)',
-              color: '#f5e6b8',
-            }}
+            className="px-8 py-2 text-[11px] font-black tracking-widest uppercase bg-[#D4AF65] text-[#0a0503] rounded-lg shadow-[0_0_20px_rgba(212,175,101,0.2)] hover:scale-105 active:scale-95 transition-all disabled:opacity-20"
           >
-            发布评论
+            Publish
           </button>
         </div>
       </div>

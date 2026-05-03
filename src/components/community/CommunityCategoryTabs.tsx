@@ -24,48 +24,36 @@ function CategoryIcon({ id, color }: { id: string; color: string }) {
     }
 }
 
-export function CommunityCategoryTabs({ selected, onSelect }: CommunityCategoryTabsProps) {
+export function CommunityCategoryTabs({
+  selected,
+  onSelect,
+}: CommunityCategoryTabsProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {/* 竹简片分隔装饰 */}
-      <div className="h-6 w-px opacity-40" style={{ background: 'rgba(139, 90, 43, 0.5)' }} />
+    <div className="flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar">
+      {COMMUNITY_CATEGORIES.map((category) => {
+        const isActive = selected === category.id;
 
-      {COMMUNITY_CATEGORIES.map((cat) => {
-        const isActive = cat.id === selected;
-        const iconColor = isActive ? '#d4a520' : '#b89372';
         return (
           <button
-            key={cat.id}
-            onClick={() => onSelect(cat.id as CommunityCategory | 'all')}
-            className="relative flex items-center gap-1.5 px-3 py-1.5 text-sm font-serif transition-all duration-200"
-            style={{
-              background: isActive
-                ? 'linear-gradient(180deg, rgba(139, 90, 43, 0.35), rgba(100, 60, 30, 0.25))'
-                : 'rgba(28, 12, 10, 0.5)',
-              border: isActive
-                ? '1px solid rgba(212, 165, 32, 0.5)'
-                : '1px solid rgba(139, 90, 43, 0.2)',
-              color: iconColor,
-              borderRadius: '2px',
-              boxShadow: isActive
-                ? '0 2px 0 rgba(139, 90, 43, 0.35), inset 0 1px 0 rgba(212,165,32,0.1)'
-                : '0 1px 0 rgba(139, 90, 43, 0.2)',
-            }}
+            key={category.id}
+            onClick={() => onSelect(category.id)}
+            className="group relative flex flex-col items-center gap-2 px-6 py-2 transition-all"
           >
-            {/* 竹简纹理竖线 */}
             <div
-              className="absolute left-0 top-1 bottom-1 w-px opacity-30"
-              style={{ background: 'rgba(139, 90, 43, 0.5)' }}
-            />
+              className={`flex items-center gap-2 text-sm font-serif transition-all ${
+                isActive
+                  ? 'text-[#D4AF65] scale-110'
+                  : 'text-[#f6e4c3]/40 group-hover:text-[#f6e4c3]/60'
+              }`}
+            >
+              <CategoryIcon id={category.id} color="currentColor" />
+              <span className="tracking-[0.2em]">{category.label}</span>
+            </div>
 
-            <CategoryIcon id={cat.id} color={iconColor} />
-            <span className="tracking-wider">{cat.label}</span>
-
-            {/* 竹简纹理右线 */}
-            <div
-              className="absolute right-0 top-1 bottom-1 w-px opacity-30"
-              style={{ background: 'rgba(139, 90, 43, 0.5)' }}
-            />
+            {/* 激活指示器 - 金丝墨迹 */}
+            {isActive && (
+              <div className="absolute -bottom-1 w-full h-0.5 bg-gradient-to-r from-transparent via-[#D4AF65] to-transparent shadow-[0_0_10px_rgba(212,175,101,0.5)]" />
+            )}
           </button>
         );
       })}

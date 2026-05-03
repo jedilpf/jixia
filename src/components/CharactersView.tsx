@@ -370,8 +370,8 @@ export function CharactersView({ onBack }: { onBack: () => void }) {
                     <div className="flex justify-between items-end mb-6 relative">
                         <div className="absolute -left-4 top-2 w-2 h-8 bg-[#831843] opacity-80" />
                         <div>
-                            <h2 className="text-[#f6e4c3] text-3xl font-serif tracking-[0.2em] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{t('诸子百家', 'Hundred Schools')}</h2>
-                            <span className="text-[10px] text-[#e7e1f0]/50 uppercase tracking-[0.15em] mt-1 block">{t('百家争鸣', 'Hundred Schools')}</span>
+                            <h2 className="text-[#f6e4c3] text-3xl font-serif tracking-[0.2em] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{t('名士风采', 'Elite Characters')}</h2>
+                            <span className="text-[10px] text-[#e7e1f0]/50 uppercase tracking-[0.15em] mt-1 block">{t('名士风采', 'Elite Characters')}</span>
                         </div>
                         <button
                             onClick={() => { uiAudio.playClick(); setSchoolsExpanded(!schoolsExpanded); }}

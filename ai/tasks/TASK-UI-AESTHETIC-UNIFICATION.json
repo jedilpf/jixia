@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-UI-AESTHETIC-UNIFICATION",
+  "goal": "Systematically replace all legacy emoji-based UI elements with custom, independently drawn SVG assets that strictly adhere to the V9 mineral aesthetic standards.",
+  "status": "in_progress",
+  "constraints": [
+    "Strictly adhere to V9 Mineral Palette (Ivory, Ancient Gold, Cinnabar, Malachite, Ink Black).",
+    "Avoid all generic emojis and standard icons.",
+    "Maintain 'prestige' and 'materiality' (Yahya style)."
+  ],
+  "deliverables": [
+    "Centralized JixiaIcons library with thematic SVG components.",
+    "No legacy emojis in MainMenu and Community modules.",
+    "Crimson Seal style notification badges."
+  ],
+  "allowed_write_paths": [
+    "src/components/MainMenu.tsx",
+    "src/components/common/JixiaIcons.tsx",
+    "src/components/community/CommunityBadge.tsx",
+    "src/components/community/CommunityCategoryTabs.tsx",
+    "src/components/community/CommunityPostCard.tsx",
+    "src/components/community/CommunityEmptyState.tsx",
+    "src/components/community/CommunityHome.tsx",
+    "src/components/community/CommunityPostList.tsx",
+    "src/components/battle/HeroConsole.tsx",
+    "src/components/community/CommunityComposer.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run lint"
+  ]
+}

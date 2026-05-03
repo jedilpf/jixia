@@ -89,7 +89,7 @@ export const AVATAR_DATABASE: AvatarInfo[] = [
     assetPath: '/assets/factions/mohist_logo.png',
     fullPath: '/assets/factions/mohist_logo.png', // 势力徽记无立绘，使用同一图标
     unlockDesc: '墨家声望达到【推崇】',
-    isUnlocked: false,
+    isUnlocked: true,
     factionId: 'mohist',
   },
   {
@@ -99,7 +99,7 @@ export const AVATAR_DATABASE: AvatarInfo[] = [
     assetPath: '/assets/factions/legalist_logo.png',
     fullPath: '/assets/factions/legalist_logo.png', // 势力徽记无立绘，使用同一图标
     unlockDesc: '法家声望达到【推崇】',
-    isUnlocked: false,
+    isUnlocked: true,
     factionId: 'legalist',
   }
 ];

@@ -244,148 +244,132 @@ export function CommunityComposer({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col gap-5 overflow-hidden">
+      {/* 顶部标题栏 */}
       <div
-        className="rounded-[22px] border p-5"
+        className="rounded-3xl border p-6"
         style={{
-          background:
-            'linear-gradient(180deg, rgba(47, 18, 15, 0.94) 0%, rgba(22, 8, 10, 0.94) 100%)',
-          borderColor: 'rgba(214, 151, 73, 0.16)',
+          background: 'rgba(10, 5, 3, 0.6)',
+          backdropFilter: 'blur(12px)',
+          borderColor: 'rgba(212, 175, 101, 0.15)',
         }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-5">
             <button
               onClick={onBack}
-              className="rounded-xl px-3 py-2 text-sm transition-colors"
-              style={{
-                background: 'rgba(212, 165, 32, 0.1)',
-                border: '1px solid rgba(212, 165, 32, 0.24)',
-                color: '#d9c3a0',
-              }}
+              className="px-4 py-1.5 text-[10px] font-black tracking-widest uppercase bg-white/5 border border-white/10 text-[#f6e4c3]/60 rounded-lg hover:bg-white/10 transition-all"
             >
-              返回
+              Back
             </button>
             <div className="flex flex-col">
-              <span className="font-serif text-lg text-[#f5e6b8]">{titleText}</span>
-              <span className="text-xs text-[#b89372]">调整板块、正文与标签即可完成发布或存档</span>
+              <span className="font-serif text-xl text-[#f6e4c3] tracking-wider">{titleText}</span>
+              <span className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/20 mt-1">Adjust Sector · Ink the Content · Mark the Scroll</span>
             </div>
           </div>
-
-          </div>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto pr-1" style={{ overscrollBehavior: 'contain' }}>
-        <div className="space-y-4">
+        <div className="space-y-5">
+          {/* 选择板块 */}
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-3xl border p-6"
             style={{
-              background: 'rgba(45, 18, 16, 0.88)',
-              borderColor: 'rgba(214, 151, 73, 0.12)',
+              background: 'rgba(10, 5, 3, 0.4)',
+              borderColor: 'rgba(212, 175, 101, 0.1)',
             }}
           >
-            <label className="mb-3 block text-sm text-[#d9c3a0]">选择板块</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="mb-4 block text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/40">Select Sector</label>
+            <div className="flex flex-wrap gap-3">
               {COMMUNITY_CATEGORIES.filter((c) => c.id !== 'all').map((cat) => {
                 const isActive = category === cat.id;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id as CommunityCategory)}
-                    className="flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm transition-all"
+                    className="flex items-center gap-3 rounded-xl px-5 py-2.5 text-sm transition-all"
                     style={{
-                      background: isActive
-                        ? 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))'
-                        : 'rgba(34, 12, 13, 0.76)',
-                      border: `1px solid ${isActive ? 'rgba(214, 151, 73, 0.38)' : 'rgba(214, 151, 73, 0.12)'}`,
-                      color: isActive ? '#f5e6b8' : '#d9c3a0',
+                      background: isActive ? 'rgba(212, 175, 101, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                      border: `1px solid ${isActive ? 'rgba(212, 175, 101, 0.4)' : 'rgba(212, 175, 101, 0.1)'}`,
+                      color: isActive ? '#D4AF65' : '#f6e4c3/40',
                     }}
                   >
-                    <CategoryIcon id={cat.id} color={isActive ? '#f5e6b8' : '#d9c3a0'} />
-                    <span>{cat.label}</span>
+                    <CategoryIcon id={cat.id} color={isActive ? '#D4AF65' : 'currentColor'} />
+                    <span className="font-serif">{cat.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
+          {/* 标题输入 */}
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-3xl border p-6"
             style={{
-              background: 'rgba(45, 18, 16, 0.88)',
-              borderColor: 'rgba(214, 151, 73, 0.12)',
+              background: 'rgba(10, 5, 3, 0.4)',
+              borderColor: 'rgba(212, 175, 101, 0.1)',
             }}
           >
-            <label className="mb-2 block text-sm text-[#d9c3a0]">
-              标题 <span style={{ color: '#f97316' }}>*</span>
-            </label>
+            <div className="mb-4 flex items-center justify-between">
+               <label className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/40">Title *</label>
+               <span className={`text-[10px] font-mono ${title.length > 50 ? 'text-[#831843]' : 'text-[#f6e4c3]/20'}`}>{title.length}/50</span>
+            </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="请输入标题（6-50字）"
-              className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
-              style={{
-                background: 'rgba(34, 12, 13, 0.8)',
-                borderColor: 'rgba(214, 151, 73, 0.16)',
-                color: '#f5e6b8',
-              }}
+              placeholder="请输入标题..."
+              className="w-full bg-transparent border-b border-white/5 py-2 text-xl font-serif text-[#f6e4c3] outline-none placeholder:text-[#f6e4c3]/10"
             />
-            <div className="mt-2 text-right text-xs" style={{ color: title.length > 50 ? '#f97316' : '#6f8799' }}>
-              {title.length}/50
-            </div>
           </div>
 
+          {/* 正文输入 */}
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-3xl border p-6"
             style={{
-              background: 'rgba(45, 18, 16, 0.88)',
-              borderColor: 'rgba(214, 151, 73, 0.12)',
+              background: 'rgba(10, 5, 3, 0.4)',
+              borderColor: 'rgba(212, 175, 101, 0.1)',
             }}
           >
-            <label className="mb-2 block text-sm text-[#d9c3a0]">
-              正文 <span style={{ color: '#f97316' }}>*</span>
-            </label>
+            <div className="mb-4 flex items-center justify-between">
+               <label className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/40">Chronicle Content *</label>
+               <span className={`text-[10px] font-mono ${content.length > 5000 ? 'text-[#831843]' : 'text-[#f6e4c3]/20'}`}>{content.length}/5000</span>
+            </div>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="请输入正文内容（10-5000字）"
+              placeholder="请输入正文内容..."
               rows={12}
-              className="w-full resize-none rounded-2xl border px-4 py-3 text-sm outline-none"
-              style={{
-                background: 'rgba(34, 12, 13, 0.8)',
-                borderColor: 'rgba(214, 151, 73, 0.16)',
-                color: '#f5e6b8',
-              }}
+              className="w-full bg-transparent text-base font-serif text-[#f6e4c3]/80 leading-relaxed outline-none placeholder:text-[#f6e4c3]/10 resize-none"
             />
-            <div className="mt-2 text-right text-xs" style={{ color: content.length > 5000 ? '#f97316' : '#6f8799' }}>
-              {content.length}/5000
-            </div>
           </div>
 
+          {/* 标签选择 */}
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-3xl border p-6"
             style={{
-              background: 'rgba(45, 18, 16, 0.88)',
-              borderColor: 'rgba(214, 151, 73, 0.12)',
+              background: 'rgba(10, 5, 3, 0.4)',
+              borderColor: 'rgba(212, 175, 101, 0.1)',
             }}
           >
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <label className="block text-sm text-[#d9c3a0]">标签（最多 5 个）</label>
-              <span className="text-xs text-[#a87a5d]">{selectedTags.length}/{MAX_TAGS}</span>
+            <div className="mb-6 flex items-center justify-between">
+               <label className="text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/40">Archive Tags (Max 5)</label>
+               <span className="text-[10px] font-mono text-[#D4AF65]">{selectedTags.length}/{MAX_TAGS}</span>
             </div>
-            <div className="mb-4 flex flex-wrap gap-2">
+            
+            <div className="mb-6 flex flex-wrap gap-2">
               {availableTags.map((tag) => {
                 const isSelected = selectedTags.includes(tag);
                 return (
                   <button
                     key={tag}
                     onClick={() => handleTagToggle(tag)}
-                    className="rounded-full px-3 py-1.5 text-xs transition-all"
+                    className="px-3 py-1 text-[10px] font-black tracking-widest uppercase rounded-full transition-all"
                     style={{
-                      background: isSelected ? 'rgba(214, 151, 73, 0.22)' : 'rgba(34, 12, 13, 0.76)',
-                      border: `1px solid ${isSelected ? 'rgba(214, 151, 73, 0.34)' : 'rgba(214, 151, 73, 0.12)'}`,
-                      color: isSelected ? '#f5e6b8' : '#d9c3a0',
+                      background: isSelected ? 'rgba(212, 175, 101, 0.15)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${isSelected ? 'rgba(212, 175, 101, 0.4)' : 'rgba(212, 175, 101, 0.1)'}`,
+                      color: isSelected ? '#D4AF65' : '#f6e4c3/40',
                     }}
                   >
                     #{tag}
@@ -394,222 +378,105 @@ export function CommunityComposer({
               })}
             </div>
 
-            <div className="rounded-2xl p-3" style={{ background: 'rgba(34, 12, 13, 0.52)', border: '1px solid rgba(214, 151, 73, 0.1)' }}>
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <span className="text-sm text-[#d9c3a0]">自定义标签</span>
-                <span className="text-xs text-[#a87a5d]">按回车或点击添加</span>
-              </div>
+            <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <input
+                type="text"
+                value={customTagInput}
+                onChange={(e) => {
+                  setCustomTagInput(e.target.value);
+                  if (tagInputError) setTagInputError('');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddCustomTag();
+                  }
+                }}
+                placeholder="Custom Tag..."
+                className="flex-1 bg-transparent text-sm text-[#f6e4c3] outline-none placeholder:text-[#f6e4c3]/10"
+              />
+              <button
+                type="button"
+                onClick={handleAddCustomTag}
+                className="px-4 py-1.5 text-[10px] font-black tracking-widest uppercase bg-[#D4AF65]/10 border border-[#D4AF65]/30 text-[#D4AF65] rounded-lg hover:bg-[#D4AF65] hover:text-[#0a0503] transition-all"
+              >
+                Add
+              </button>
+            </div>
+            
+            {tagInputError && <p className="mt-3 text-[10px] text-[#831843] uppercase tracking-widest">{tagInputError}</p>}
 
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  type="text"
-                  value={customTagInput}
-                  onChange={(e) => {
-                    setCustomTagInput(e.target.value);
-                    if (tagInputError) {
-                      setTagInputError('');
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddCustomTag();
-                    }
-                  }}
-                  placeholder="输入你的标签"
-                  className="min-w-[180px] flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
-                  style={{
-                    background: 'rgba(24, 8, 10, 0.82)',
-                    borderColor: 'rgba(214, 151, 73, 0.16)',
-                    color: '#f5e6b8',
-                  }}
-                />
+            <div className="mt-6 flex flex-wrap gap-2 pt-6 border-t border-white/5">
+              {selectedTags.map((tag) => (
                 <button
-                  type="button"
-                  onClick={handleAddCustomTag}
-                  className="rounded-xl px-3.5 py-2 text-sm transition-colors"
-                  style={{
-                    background: 'rgba(214, 151, 73, 0.16)',
-                    border: '1px solid rgba(214, 151, 73, 0.24)',
-                    color: '#f5e6b8',
-                  }}
+                  key={tag}
+                  onClick={() => handleRemoveTag(tag)}
+                  className="px-3 py-1 text-[10px] font-black tracking-widest uppercase bg-[#831843]/10 border border-[#831843]/30 text-[#831843] rounded-full hover:bg-[#831843] hover:text-white transition-all"
                 >
-                  添加标签
+                  #{tag} ×
                 </button>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between gap-3 text-xs">
-                <span style={{ color: customTagInput.length > MAX_TAG_LENGTH ? '#f97316' : '#6f8799' }}>
-                  当前输入 {normalizeTag(customTagInput).length}/{MAX_TAG_LENGTH}
-                </span>
-                <span className="text-[#6f8799]">可与推荐标签混合使用</span>
-              </div>
-
-              {tagInputError ? (
-                <p className="mt-2 text-xs text-[#fca5a5]">{tagInputError}</p>
-              ) : null}
+              ))}
             </div>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {selectedTags.length > 0 ? (
-                selectedTags.map((tag) => {
-                  const isPreset = availableTags.includes(tag);
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="rounded-full px-3 py-1.5 text-xs transition-all"
-                      style={{
-                        background: isPreset ? 'rgba(214, 151, 73, 0.22)' : 'rgba(176, 83, 39, 0.22)',
-                        border: `1px solid ${isPreset ? 'rgba(214, 151, 73, 0.34)' : 'rgba(249, 115, 22, 0.28)'}`,
-                        color: '#f5e6b8',
-                      }}
-                    >
-                      #{tag} ×
-                    </button>
-                  );
-                })
-              ) : (
-                <span className="text-xs text-[#6f8799]">还没有选择标签</span>
-              )}
-            </div>
-
-            {customTags.length > 0 ? (
-              <p className="mt-2 text-xs text-[#a87a5d]">已添加自定义标签：{customTags.map((tag) => `#${tag}`).join('、')}</p>
-            ) : null}
           </div>
 
-          {validationErrors.length > 0 ? (
-            <div
-              className="rounded-[22px] border p-4"
-              style={{
-                background: 'rgba(239, 68, 68, 0.08)',
-                borderColor: 'rgba(239, 68, 68, 0.2)',
-              }}
-            >
-              <p className="mb-2 text-sm text-[#ef4444]">请先修正以下问题：</p>
-              <ul className="space-y-1 text-xs text-[#fca5a5]">
+          {validationErrors.length > 0 && (
+            <div className="rounded-2xl border border-[#831843]/30 bg-[#831843]/5 p-6">
+              <p className="mb-3 text-[10px] font-black tracking-widest uppercase text-[#831843]">Validation Errors</p>
+              <ul className="space-y-2">
                 {validationErrors.map((err, index) => (
-                  <li key={index}>- {err}</li>
+                  <li key={index} className="text-[12px] text-[#f6e4c3]/60 font-serif">• {err}</li>
                 ))}
               </ul>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
 
+      {/* 底部操作栏 */}
       <div
-        className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border p-4"
+        className="flex items-center justify-between gap-4 rounded-3xl border p-6"
         style={{
-          background: 'rgba(32, 11, 12, 0.82)',
-          borderColor: 'rgba(214, 151, 73, 0.12)',
+          background: 'rgba(10, 5, 3, 0.6)',
+          borderColor: 'rgba(212, 175, 101, 0.15)',
         }}
       >
-        <div className="flex flex-wrap items-center gap-2">
-          {mode === 'create' ? (
+        <div className="flex items-center gap-4">
+          {mode === 'create' && (
             <button
               onClick={handleSaveDraft}
-              className="rounded-xl px-4 py-2 text-sm transition-colors"
-              style={{
-                background: 'rgba(70, 21, 18, 0.26)',
-                border: '1px solid rgba(214, 151, 73, 0.16)',
-                color: '#d9c3a0',
-              }}
+              className="px-6 py-2.5 text-[11px] font-black tracking-widest uppercase bg-white/5 border border-white/10 text-[#f6e4c3]/60 rounded-xl hover:bg-white/10 transition-all"
             >
-              保存草稿
+              Draft
             </button>
-          ) : null}
+          )}
 
-          {/* 发布频率限制提示 */}
-          {mode === 'create' && !canPost ? (
-            <div
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
-              style={{
-                background: 'rgba(239, 68, 68, 0.08)',
-                border: '1px solid rgba(239, 68, 68, 0.18)',
-                color: '#fca5a5',
-              }}
-            >
-              <IconWait size={12} color="#fca5a5" />
-              <span>需等待 {formatRemainingTime(nextPostTimeRemaining)} 后可再次发布</span>
-            </div>
-          ) : null}
-
-          {mode === 'edit_draft' ? (
+          {mode === 'edit_draft' && (
             <>
               <button
                 onClick={handleUpdateDraft}
-                className="rounded-xl px-4 py-2 text-sm transition-colors"
-                style={{
-                  background: 'rgba(70, 21, 18, 0.26)',
-                  border: '1px solid rgba(214, 151, 73, 0.16)',
-                  color: '#d9c3a0',
-                }}
+                className="px-6 py-2.5 text-[11px] font-black tracking-widest uppercase bg-white/5 border border-white/10 text-[#f6e4c3]/60 rounded-xl hover:bg-white/10 transition-all"
               >
-                保存修改
+                Save Changes
               </button>
-              {onDeleteDraft ? (
+              {onDeleteDraft && (
                 <button
                   onClick={onDeleteDraft}
-                  className="rounded-xl px-4 py-2 text-sm transition-colors"
-                  style={{
-                    background: 'rgba(239, 68, 68, 0.08)',
-                    border: '1px solid rgba(239, 68, 68, 0.22)',
-                    color: '#ef4444',
-                  }}
+                  className="px-6 py-2.5 text-[11px] font-black tracking-widest uppercase bg-[#831843]/10 border border-[#831843]/30 text-[#831843] rounded-xl hover:bg-[#831843] hover:text-white transition-all"
                 >
-                  删除草稿
+                  Dissolve
                 </button>
-              ) : null}
+              )}
             </>
-          ) : null}
+          )}
         </div>
 
-        {mode === 'create' ? (
-          <button
-            onClick={handleSubmit}
-            disabled={!canPost}
-            className="rounded-xl px-6 py-2.5 text-sm font-serif transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: canPost
-                ? 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))'
-                : 'rgba(70, 21, 18, 0.26)',
-              border: '1px solid rgba(214, 151, 73, 0.34)',
-              color: '#f5e6b8',
-            }}
-          >
-            {canPost ? '发布' : `等待 ${formatRemainingTime(nextPostTimeRemaining)}`}
-          </button>
-        ) : null}
-
-        {mode === 'edit_draft' && onPublishDraft ? (
-          <button
-            onClick={handlePublishDraft}
-            className="rounded-xl px-6 py-2.5 text-sm font-serif transition-colors"
-            style={{
-              background: 'linear-gradient(180deg, rgba(214, 151, 73, 0.28), rgba(176, 83, 39, 0.12))',
-              border: '1px solid rgba(214, 151, 73, 0.3)',
-              color: '#f2d092',
-            }}
-          >
-            发布草稿
-          </button>
-        ) : null}
-
-        {mode === 'edit_post' ? (
-          <button
-            onClick={handleUpdatePost}
-            className="rounded-xl px-6 py-2.5 text-sm font-serif transition-colors"
-            style={{
-              background: 'linear-gradient(180deg, rgba(176, 83, 39, 0.34), rgba(214, 151, 73, 0.12))',
-              border: '1px solid rgba(214, 151, 73, 0.34)',
-              color: '#f5e6b8',
-            }}
-          >
-            保存修改
-          </button>
-        ) : null}
+        <button
+          onClick={mode === 'create' ? handleSubmit : mode === 'edit_draft' ? handlePublishDraft : handleUpdatePost}
+          disabled={mode === 'create' && !canPost}
+          className="px-10 py-3 text-[11px] font-black tracking-widest uppercase bg-[#D4AF65] text-[#0a0503] rounded-xl shadow-[0_0_30px_rgba(212,175,101,0.2)] hover:scale-105 active:scale-95 transition-all disabled:opacity-20"
+        >
+          {mode === 'create' ? (canPost ? 'Publish' : `Wait ${formatRemainingTime(nextPostTimeRemaining)}`) : 'Apply'}
+        </button>
       </div>
     </div>
   );

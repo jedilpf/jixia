@@ -42,120 +42,109 @@ export function CommunityPostDetail({
   const canAcceptAnswer = post.category === 'qa' && post.qaState !== 'resolved';
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1 rounded-xl px-3 py-2 text-sm transition-colors"
-          style={{
-            background: 'rgba(212, 165, 32, 0.1)',
-            border: '1px solid rgba(212, 165, 32, 0.24)',
-            color: '#d9c3a0',
-          }}
-        >
-          返回
-        </button>
-        <span
-          className="rounded-full px-3 py-1 text-xs"
-          style={{ background: 'rgba(116, 41, 29, 0.3)', color: '#f1c697' }}
-        >
-          {categoryInfo.icon} {categoryInfo.label}
-        </span>
-        {post.isPinned ? (
-          <span className="rounded-full px-3 py-1 text-xs" style={{ background: 'rgba(212,165,32,0.16)', color: '#d4a520' }}>
-            置顶
-          </span>
-        ) : null}
-        {post.isFeatured ? (
-          <span className="rounded-full px-3 py-1 text-xs" style={{ background: 'rgba(184,92,55,0.22)', color: '#efc28e' }}>
-            精华
-          </span>
-        ) : null}
-        {post.qaState === 'resolved' ? (
-          <span className="rounded-full px-3 py-1 text-xs" style={{ background: 'rgba(214,151,73,0.18)', color: '#f2c36d' }}>
-            已解决
-          </span>
-        ) : null}
+    <div className="flex h-full min-h-0 flex-col gap-5 overflow-hidden">
+      {/* 顶部操作区 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="px-4 py-1.5 text-[10px] font-black tracking-widest uppercase bg-white/5 border border-white/10 text-[#f6e4c3]/60 rounded-lg hover:bg-white/10 transition-all"
+          >
+            Back
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-white/5 border border-white/10 text-[#f6e4c3]/40 rounded-sm">
+              {categoryInfo.label}
+            </span>
+            {post.isPinned && (
+              <span className="px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-[#831843] text-white rounded-sm">
+                Pinned
+              </span>
+            )}
+            {post.isFeatured && (
+              <span className="px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-[#D4AF65] text-[#0a0503] rounded-sm">
+                Featured
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto pr-1" style={{ overscrollBehavior: 'contain' }}>
         <div
-          className="mb-4 rounded-[24px] border p-6"
+          className="relative mb-6 rounded-3xl border p-8"
           style={{
-            background:
-              'linear-gradient(180deg, rgba(47, 18, 15, 0.96) 0%, rgba(22, 8, 10, 0.96) 100%)',
-            borderColor: 'rgba(214, 151, 73, 0.16)',
-            boxShadow: '0 14px 32px rgba(0,0,0,0.22)',
+            background: 'rgba(10, 5, 3, 0.6)',
+            backdropFilter: 'blur(12px)',
+            borderColor: 'rgba(212, 175, 101, 0.15)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
           }}
         >
-          <div
-            className="mb-5 rounded-2xl p-5"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(176,83,39,0.12) 0%, rgba(214,151,73,0.04) 100%)',
-              border: '1px solid rgba(214, 151, 73, 0.08)',
-            }}
-          >
-            <h1 className="mb-3 text-2xl font-serif leading-10 text-[#f5e6b8]">{post.title}</h1>
+          {/* 金丝装饰 */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF65]/30 to-transparent" />
 
-            <div className="flex flex-wrap items-center gap-2 text-sm text-[#b89372]">
-              <span>{post.authorName}</span>
-              {post.authorFaction ? <span>/ {post.authorFaction}</span> : null}
-              <span>/ {formatDate(post.publishedAt ?? post.createdAt)}</span>
-              <span>/ {post.viewCount} 阅读</span>
+          <header className="mb-8 border-b border-white/5 pb-8">
+            <h1 className="mb-4 text-3xl font-serif leading-relaxed text-[#f6e4c3] tracking-wide">
+              {post.title}
+            </h1>
+
+            <div className="flex items-center gap-3 text-[10px] font-black tracking-widest uppercase text-[#f6e4c3]/30">
+              <span className="text-[#D4AF65]">{post.authorName}</span>
+              <span className="w-1 h-1 bg-white/10 rounded-full" />
+              {post.authorFaction && (
+                <>
+                  <span>{post.authorFaction}</span>
+                  <span className="w-1 h-1 bg-white/10 rounded-full" />
+                </>
+              )}
+              <span>{formatDate(post.publishedAt ?? post.createdAt)}</span>
+              <span className="w-1 h-1 bg-white/10 rounded-full" />
+              <span>{post.viewCount} VIEWS</span>
             </div>
-          </div>
+          </header>
 
-          <div className="mb-5 flex flex-wrap gap-2">
+          <div className="mb-8 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full px-3 py-1 text-xs"
-                style={{ background: 'rgba(214, 151, 73, 0.1)', color: '#e7c484' }}
+                className="text-[9px] font-black tracking-widest uppercase text-[#D4AF65]/40"
               >
                 #{tag}
               </span>
             ))}
           </div>
 
-          <div
-            className="mb-6 whitespace-pre-wrap rounded-2xl border p-5 text-sm leading-8"
-            style={{
-              background: 'rgba(31, 10, 12, 0.58)',
-              borderColor: 'rgba(214, 151, 73, 0.08)',
-              color: '#d4bf99',
-            }}
+          <article
+            className="mb-10 text-base leading-[1.8] text-[#f6e4c3]/80 font-serif whitespace-pre-wrap"
           >
             {post.content}
-          </div>
+          </article>
 
-          <div className="flex flex-wrap items-center gap-3 pt-4" style={{ borderTop: '1px solid rgba(212, 165, 32, 0.12)' }}>
+          <footer className="flex items-center gap-6 pt-8 border-t border-white/5">
             <button
               onClick={onLike}
-              className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-colors"
-              style={{
-                background: isLiked ? 'rgba(183, 54, 33, 0.2)' : 'rgba(255,244,230,0.04)',
-                border: `1px solid ${isLiked ? 'rgba(183, 54, 33, 0.34)' : 'rgba(214, 151, 73, 0.14)'}`,
-                color: isLiked ? '#ff8a5b' : '#d9c3a0',
-              }}
+              className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-all ${
+                isLiked 
+                  ? 'bg-[#831843]/10 border-[#831843] text-[#831843] shadow-[0_0_15px_rgba(131,24,67,0.2)]' 
+                  : 'bg-white/5 border-white/10 text-[#f6e4c3]/40 hover:border-[#f6e4c3]/20'
+              }`}
             >
-              <span>{isLiked ? '♥' : '♡'}</span>
-              <span>点赞 {post.likeCount}</span>
+              <span className="text-xs font-black uppercase tracking-widest">{isLiked ? 'Liked' : 'Like'}</span>
+              <span className="font-mono text-xs">{post.likeCount}</span>
             </button>
 
             <button
               onClick={onFavorite}
-              className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-colors"
-              style={{
-                background: isFavorited ? 'rgba(214, 151, 73, 0.16)' : 'rgba(255,244,230,0.04)',
-                border: `1px solid ${isFavorited ? 'rgba(214, 151, 73, 0.3)' : 'rgba(214, 151, 73, 0.14)'}`,
-                color: isFavorited ? '#d69849' : '#d9c3a0',
-              }}
+              className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-all ${
+                isFavorited 
+                  ? 'bg-[#D4AF65]/10 border-[#D4AF65] text-[#D4AF65] shadow-[0_0_15px_rgba(212,175,101,0.2)]' 
+                  : 'bg-white/5 border-white/10 text-[#f6e4c3]/40 hover:border-[#f6e4c3]/20'
+              }`}
             >
-              <span>{isFavorited ? '★' : '☆'}</span>
-              <span>收藏 {post.favoriteCount}</span>
+              <span className="text-xs font-black uppercase tracking-widest">{isFavorited ? 'Saved' : 'Save'}</span>
+              <span className="font-mono text-xs">{post.favoriteCount}</span>
             </button>
-          </div>
+          </footer>
         </div>
 
         <CommunityCommentSection

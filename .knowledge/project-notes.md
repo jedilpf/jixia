@@ -24,3 +24,7 @@
 - In showcase views, tier text belongs inside the original top-left yellow circular badge; adding a separate rectangular tier strip on the card face is considered placement drift.
 - After bulk physical card-art fills, audit same-series files by hash and not just by filename; `jianai4/5/6` once resolved correctly but still rendered the same image because the three PNG files were byte-identical.
 - Main-menu button art under `public/assets/btn-*.png` should keep transparent outer background; if hall buttons suddenly show white rectangles, inspect the raster alpha channel first before changing menu JSX or CSS.
+- UI 视觉与交互规范 (V9 Mineral Aesthetic):
+  - 雅化导航 (Yahua Navigation): 主菜单采用“琳琅饰件”风格。实物层（如头像挂坠）使用 yahua-swing 物理摆动；意境层（如货币按钮）使用 yahua-ink-stroke 灰色毛笔笔触背景。
+  - 措辞去现代化: 严禁在主界面使用 English-centric 术语。例如 "Scholars Rank" 应统一为 "学说造诣" 或 "名士阶位"。
+  - 动态意境背景: 首页背景应采用 6 层视差系统（L0-L6）。包括背景呼吸、水墨雾气漂移、丁达尔神光、及受鼠标坐标驱动的视差位移。所有位移必须使用 transform 以触发 GPU 加速。

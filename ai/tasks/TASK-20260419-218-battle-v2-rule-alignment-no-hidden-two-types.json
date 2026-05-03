@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-20260419-218",
+  "goal": "Align battle runtime with v2.0 rule intent: remove hidden-card semantics and reduce active battle card categories to two core types (立论/策术) while preserving playable combat value.",
+  "constraints": [
+    "Follow docs/battle/battle-design-核心规则-v2.0.md as primary rule reference for this adjustment.",
+    "Do not introduce extra card categories beyond 立论/策术 in battleV2 runtime.",
+    "Do not keep hidden/secret reveal semantics in active player interaction text or planned card presentation.",
+    "Keep changes scoped to battle runtime and directly related battle UI wording/presentation."
+  ],
+  "deliverables": [
+    "Conflict arbitration record documenting why previous 5-type + hidden-layer implementation is replaced.",
+    "battleV2 type and card data reduced to 立论/策术 runtime model.",
+    "engine planning/resolve no longer expresses hidden-card semantics.",
+    "BattleFrameV2-related hint and slot labels no longer describe 明牌/暗牌 hidden play."
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "docs/standards",
+    "src/battleV2/types.ts",
+    "src/battleV2/cards.ts",
+    "src/battleV2/engine.ts",
+    "src/battleV2/aiStrategy.ts",
+    "src/components/BattleFrameV2.tsx",
+    "src/components/battle/layers/BattleArena.tsx",
+    "src/components/battle/layers/BottomControls.tsx",
+    "src/components/battle/controls/OperationHints.tsx"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260419-218-battle-v2-rule-alignment-no-hidden-two-types.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260419-218-battle-v2-rule-alignment-no-hidden-two-types.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260419-218-battle-v2-rule-alignment-no-hidden-two-types.json"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "TASK-20260417-213",
+  "goal": "将 docs/index.md 的“最后更新”同步为 2026-04-17，并在 docs/文档变更记录.md 追加对应变更记录。",
+  "constraints": [
+    "严格遵循 canon/ 与 scope/ 约束，不得越界写入。",
+    "仅处理 docs/index.md、docs/文档变更记录.md 与任务流程所需 ai/tasks、ai/out 元数据。",
+    "保持最小改动，不调整既有文档结构与链接。",
+    "如遇信息不足，写 UNKNOWN 并记录到 open_questions.md。"
+  ],
+  "deliverables": [
+    "docs/index.md 中最后更新日期更新为 2026-04-17。",
+    "docs/文档变更记录.md 新增 2026-04-17 对应记录。"
+  ],
+  "allowed_write_paths": [
+    "ai/tasks",
+    "ai/out",
+    "docs/index.md",
+    "docs/文档变更记录.md",
+    "open_questions.md"
+  ],
+  "acceptance_commands": [
+    "npm run ai:task:validate -- --task ai/tasks/TASK-20260417-213-doc-index-date-sync.json",
+    "npm run ai:prompt -- --task ai/tasks/TASK-20260417-213-doc-index-date-sync.json",
+    "npm run ai:finalize -- --task ai/tasks/TASK-20260417-213-doc-index-date-sync.json"
+  ],
+  "status": "in_progress"
+}

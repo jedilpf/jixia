@@ -52,7 +52,7 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
         )}
         <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#1f1a12]/50 border border-[#3d3225]/30">
           <div className="w-2 h-2 rounded-full bg-[#c9952a] animate-pulse" />
-          <span className="text-xs text-[#c9b896] font-medium">百家争鸣</span>
+          <span className="text-xs text-[#c9b896] font-medium">锋芒演武</span>
         </div>
       </div>
 

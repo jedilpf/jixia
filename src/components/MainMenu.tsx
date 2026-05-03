@@ -30,9 +30,9 @@ import {
 
 function GoldenCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`yahua-paper rounded-lg border border-[rgba(212, 175, 101, 0.2)] p-5 transition-all hover:border-[rgba(212, 175, 101, 0.45)] hover:shadow-[0_0_25px_rgba(212, 175, 101, 0.15)] active:scale-[0.99] group overflow-hidden ${className}`}>
-      {/* Decorative inner light */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[rgba(212, 175, 101, 0.35)] to-transparent" />
+    <div className={`relative rounded-2xl bg-[#0a0503]/60 backdrop-blur-md border border-[#D4AF65]/20 p-6 transition-all hover:border-[#D4AF65]/50 hover:shadow-[0_0_30px_rgba(212,175,101,0.15)] group overflow-hidden ${className}`}>
+      {/* 装饰金丝线 */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF65]/30 to-transparent" />
       <div className="relative z-10">
         {children}
       </div>
@@ -44,17 +44,16 @@ function GoldenTab({ label, active, onClick, badge }: { label: string; active: b
   return (
     <button
       onClick={() => { uiAudio.playClick(); onClick(); }}
-      className={`relative px-6 py-2 text-sm font-serif tracking-widest transition-all border-b-2 ${
+      className={`relative px-8 py-3 text-sm font-serif tracking-[0.3em] transition-all border-b-2 ${
         active 
-          ? 'text-[#D4AF65] border-[#D4AF65] bg-[#D4AF65]/5' 
-          : 'text-[#f6e4c3]/60 border-transparent hover:text-[#f6e4c3] hover:bg-white/5'
+          ? 'text-[#D4AF65] border-[#D4AF65] bg-[#D4AF65]/10' 
+          : 'text-[#f6e4c3]/30 border-transparent hover:text-[#f6e4c3]/60 hover:bg-white/5'
       }`}
     >
       {label}
       {badge && (
-        <span className="absolute -top-1 -right-1 flex items-center justify-center">
-            <span className="w-2.5 h-2.5 bg-[#831843] rounded-full animate-pulse shadow-[0_0_8px_rgba(131,24,67,0.6)]" />
-            <span className="absolute w-4 h-4 border border-[#831843]/30 rounded-full animate-ping" />
+        <span className="absolute top-2 right-2">
+            <span className="w-2 h-2 bg-[#831843] rounded-full animate-pulse shadow-[0_0_10px_#831843]" />
         </span>
       )}
     </button>
@@ -147,19 +146,24 @@ function ShopItem({ icon, name, price, amount, onBuy, type = 'coin' }: {
 }) {
   const isCoin = type === 'coin';
   return (
-    <div className="group relative flex flex-col items-center bg-[#1a2840] border border-[rgba(212,165,32,0.3)] rounded-lg p-4 transition-all hover:border-[rgba(212,165,32,0.6)] hover:brightness-110">
-      <div className="text-4xl mb-3 filter drop-shadow-[0_0_8px_rgba(212,165,32,0.4)] group-hover:scale-110 transition-transform">{icon}</div>
-      <div className="text-[#f5e6b8] text-sm font-serif mb-1">{name}</div>
-      <div className="text-[#a7c5ba] text-xs mb-4">{amount}</div>
+    <div className="group relative flex flex-col items-center bg-[#0a0503]/60 backdrop-blur-md border border-[#D4AF65]/20 rounded-2xl p-6 transition-all hover:border-[#D4AF65]/60 hover:shadow-[0_0_30px_rgba(212,175,101,0.15)] hover:-translate-y-1">
+      {/* 装饰金角 */}
+      <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-[#D4AF65]/40 rounded-tl-xl" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[#D4AF65]/40 rounded-br-xl" />
+      
+      <div className="text-5xl mb-4 filter drop-shadow-[0_0_12px_rgba(212,175,101,0.3)] group-hover:scale-110 transition-transform duration-500">{icon}</div>
+      <div className="text-[#f6e4c3] text-base font-serif mb-1 tracking-widest">{name}</div>
+      <div className="text-[#D4AF65]/50 text-xs mb-6 font-bold tracking-tighter uppercase">{amount}</div>
+      
       <button 
         onClick={(e) => { e.stopPropagation(); onBuy(); }}
-        className={`w-full py-1.5 rounded border text-xs transition-all ${
+        className={`w-full py-2.5 rounded-lg border text-xs font-black tracking-[0.2em] transition-all shadow-lg ${
           isCoin 
-            ? 'border-[rgba(212,165,32,0.4)] text-[#d4a520] hover:bg-[#d4a520] hover:text-black' 
-            : 'border-[rgba(74,124,111,0.4)] text-[#a7c5ba] hover:bg-[#4a6b99] hover:text-white'
+            ? 'bg-[#D4AF65]/10 border-[#D4AF65]/30 text-[#D4AF65] hover:bg-[#D4AF65] hover:text-[#0a0503]' 
+            : 'bg-[#1e3a5f]/10 border-[#1e3a5f]/30 text-[#9eb9dd] hover:bg-[#1e3a5f] hover:text-white'
         }`}
       >
-        {typeof price === 'number' ? `💠 ${price}` : price}
+        {isCoin ? `🪙 ${price}` : `💠 ${price}`}
       </button>
     </div>
   );
@@ -956,7 +960,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
           />
 
           <InkSystemButton 
-            tooltip="翰林墨汇"
+            tooltip="百家文库"
             visible={hoveredLabel === 'community'}
             onMouseEnter={() => { uiAudio.playHover(); setHoveredLabel('community'); }}
             onMouseLeave={() => setHoveredLabel(null)}
@@ -967,7 +971,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
           <div className="w-px h-6 bg-[rgba(212,165,32,0.15)]" />
 
           <InkSystemButton 
-            tooltip="璇玑机枢"
+            tooltip="系统机枢"
             visible={hoveredLabel === 'settings'}
             onMouseEnter={() => { uiAudio.playHover(); setHoveredLabel('settings'); }}
             onMouseLeave={() => setHoveredLabel(null)}
@@ -998,38 +1002,38 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             }}
           />
 
-          {/* 主标题 - 图片优先，文字fallback */}
-          <h1 className="relative" style={{ animation: 'title-brush 3s ease-in-out infinite' }}>
-            {/* 标题图片 */}
-            <img
-              src={asset('assets/title-logo.png')}
-              alt="思筹之录"
-              style={{
-                width: 'clamp(320px, 60vw, 520px)',
-                height: 'auto',
-                display: 'block',
-                filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 15px rgba(212,165,32,0.3))',
-              }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'block';
-              }}
-            />
-            {/* 文字fallback */}
+          {/* 主标题 - 使用 CSS 渲染以确保色彩统一与矿物感 */}
+          <h1 className="relative flex flex-col items-center" style={{ animation: 'title-brush 4s ease-in-out infinite' }}>
+            {/* 文字标题 */}
             <span
+              className="relative z-10"
               style={{
-                display: 'none',
                 fontSize: 'clamp(64px, 11vw, 108px)',
                 fontWeight: 900,
                 fontFamily: '"STKaiti", "KaiTi", "楷体", serif',
-                background: 'linear-gradient(175deg, #fef3c7 0%, #f5e6b8 15%, #d4a520 35%, #a07020 55%, #5d3a1a 80%, #2a1508 100%)',
+                background: 'linear-gradient(180deg, #f6e4c3 0%, #D4AF65 45%, #D4AF65 55%, #8B7355 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                letterSpacing: 'clamp(8px, 2vw, 20px)',
-                lineHeight: 1.05,
-                textIndent: '0.1em',
-                WebkitTextStroke: '1px rgba(139,90,43,0.3)',
+                letterSpacing: 'clamp(8px, 2vw, 24px)',
+                lineHeight: 1.1,
+                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(212,175,101,0.2))',
+                WebkitTextStroke: '1px rgba(212,175,101,0.15)',
+              }}
+            >
+              思筹之录
+            </span>
+            
+            {/* 底部倒影/辉光 */}
+            <span 
+              className="absolute inset-0 blur-[30px] opacity-20 pointer-events-none select-none"
+              style={{
+                fontSize: 'clamp(64px, 11vw, 108px)',
+                fontWeight: 900,
+                fontFamily: '"STKaiti", "KaiTi", "楷体", serif',
+                color: '#D4AF65',
+                letterSpacing: 'clamp(8px, 2vw, 24px)',
+                lineHeight: 1.1,
+                transform: 'translateY(4px)'
               }}
             >
               思筹之录
@@ -1071,7 +1075,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
 
         <div className="flex flex-col gap-8 w-fit items-center">
           <InkButton 
-            label="开始辩斗" 
+            label="锋芒演武" 
             icon={
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.5 17.5L3 6V3h3l11.5 11.5"/>
@@ -1098,7 +1102,7 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
             onMouseEnter={() => uiAudio.playHover()}
           />
           <InkButton 
-            label="人物志" 
+            label="名士风采" 
             icon={
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="8" r="4"/>
@@ -1135,512 +1139,497 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
 
       {/* ★ 弹窗渲染区 */}
       {activeModal === 'profile' && (
-        <SystemModal title="玩家档案" onClose={() => setActiveModal(null)}>
-          <div className="w-full h-full flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar max-h-[70vh]">
-            {/* Tabs for Profile */}
-            <div className="flex gap-4 border-b border-white/5 pb-2">
-              <button onClick={() => setProfileTab('overview')} className={`text-sm font-serif tracking-widest pb-1 border-b-2 transition-all ${profileTab === 'overview' ? 'text-[#d4a520] border-[#d4a520]' : 'text-[#a7c5ba] border-transparent'}`}>概览</button>
-              <button onClick={() => setProfileTab('collection')} className={`text-sm font-serif tracking-widest pb-1 border-b-2 transition-all ${profileTab === 'collection' ? 'text-[#d4a520] border-[#d4a520]' : 'text-[#a7c5ba] border-transparent'}`}>头像库</button>
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          {/* 背景：大面积水墨晕染与深邃遮罩 */}
+          <div 
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-all duration-1000"
+            onClick={() => setActiveModal(null)}
+          />
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-60"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(10, 14, 20, 0.95) 0%, rgba(10, 14, 20, 0.4) 60%, transparent 100%)',
+              animation: 'ink-spread 1.5s cubic-bezier(0.16, 1, 0.3, 1) both'
+            }}
+          />
+
+          {/* 核心内容区：无框设计，浮动于墨色空间 */}
+          <div className="relative w-full max-w-5xl h-[75vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-700 z-10">
+            {/* 顶栏：紧凑化标题 */}
+            <div className="w-full flex items-center justify-between px-16 mb-6">
+              <div className="flex items-center gap-6">
+                <div className="w-1 h-6 bg-gradient-to-b from-[#D4AF65] to-transparent rounded-full shadow-[0_0_10px_#D4AF65]" />
+                <div>
+                  <h2 className="text-[#f6e4c3] font-serif text-3xl tracking-[0.3em] drop-shadow-lg select-none">名士风采</h2>
+                </div>
+              </div>
+              <button 
+                onClick={() => { uiAudio.playClick(); setActiveModal(null); }}
+                className="group relative w-10 h-10 flex items-center justify-center text-[#f6e4c3]/40 hover:text-[#f6e4c3] transition-colors z-20"
+              >
+                <div className="absolute inset-0 border border-[#D4AF65]/20 rounded-full group-hover:scale-110 group-hover:border-[#D4AF65]/50 transition-all" />
+                <span className="text-xl font-light group-hover:rotate-90 transition-transform">✕</span>
+              </button>
             </div>
 
-            {profileTab === 'overview' ? (
-              <>
-                {/* Header Info */}
-                <div className="flex items-center gap-6">
-                  <div className="relative group">
-                    <div className="w-24 h-24 rounded-lg border-2 border-[#d4a520] overflow-hidden shadow-[0_0_20px_rgba(212,165,32,0.3)] bg-black/40">
-                      <img 
-                        src={asset(selectedAvatar.assetPath)} 
-                        alt="头像" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 bg-[#d4a520] text-black text-[10px] px-2 py-0.5 rounded font-bold shadow-lg">
-                      LV.12
-                    </div>
+            {/* 左右分栏布局 - 移除滚动，使用 Flex 适配 */}
+            <div className="w-full flex-1 flex gap-12 px-16 overflow-hidden">
+              {/* 左侧：名士立像 - 调整为更紧凑的垂直分布 */}
+              <div className="w-80 flex flex-col items-center justify-start pt-4">
+                <div className="relative group mb-6">
+                  {/* 背景装饰层级调低 */}
+                  <div className="absolute -inset-6 border border-[#D4AF65]/5 rounded-full animate-[spin_20s_linear_infinite] z-0" />
+                  <div className="absolute -inset-4 border-2 border-[#D4AF65]/10 rounded-full animate-[spin_12s_linear_infinite_reverse] z-0" />
+                  
+                  <div className="relative w-40 h-40 rounded-full border-2 border-[#D4AF65] p-1 bg-[#0a0503] shadow-[0_0_30px_rgba(212,175,101,0.2)] overflow-hidden z-10">
+                    <img 
+                      src={asset(selectedAvatar.assetPath)} 
+                      alt="名士头像" 
+                      className="w-full h-full object-cover rounded-full opacity-90 group-hover:scale-105 transition-all duration-700"
+                    />
                   </div>
                   
-                  <div className="flex flex-col flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      {isEditingName ? (
-                        <div className="flex items-center gap-2">
-                          <input 
-                            value={tempName} 
-                            onChange={(e) => setTempName(e.target.value)}
-                            className="bg-black/40 border border-[#d4a520]/40 text-[#f5e6b8] px-2 py-1 rounded outline-none font-serif text-lg w-40"
-                            autoFocus
-                          />
-                          <button 
-                            onClick={() => {
-                              setUserName(tempName);
-                              localStorage.setItem('jixia_user_name', tempName);
-                              setIsEditingName(false);
-                              uiAudio.playClick();
-                            }}
-                            className="text-[#d4a520] hover:text-[#f5e6b8] text-xs"
-                          >保存</button>
-                        </div>
-                      ) : (
-                        <>
-                          <h2 className="text-[#f5e6b8] text-2xl font-serif tracking-widest">{userName}</h2>
-                          <button onClick={() => { setIsEditingName(true); setTempName(userName); }} className="text-[#a7c5ba] hover:text-[#d4a520] transition-colors">
-                            <span className="text-sm">✎</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="text-[#a7c5ba]">墨家门徒</span>
-                      <div className="w-1 h-1 rounded-full bg-[#d4a520]/40" />
-                      <span className="text-[#d4a520]">段位：青铜 Ⅲ</span>
-                    </div>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#D4AF65] text-[#0a0503] text-[10px] px-4 py-0.5 rounded-full font-black shadow-xl tracking-widest border border-white/20 z-20">
+                    等级 · 12
                   </div>
                 </div>
 
-                {/* Currency Bar */}
-                <div className="w-full py-4 border-y border-[rgba(212,165,32,0.15)] flex justify-around text-base">
-                  <div className="flex items-center gap-2">
-                    <IconKnifeMoney size={20} color="#d4a520" />
-                    <span className="text-[#a7c5ba]">铜钱：</span>
-                    <span className="text-[#f5e6b8] font-mono">{coinBalance.toLocaleString()}</span>
+                <div className="text-center space-y-3 z-10">
+                  <div className="flex items-center justify-center gap-2">
+                    <h3 className="text-[#f6e4c3] text-2xl font-serif tracking-[0.2em] drop-shadow-md">{userName}</h3>
+                    <button onClick={() => { setIsEditingName(true); setTempName(userName); }} className="opacity-30 hover:opacity-100 text-[#D4AF65] transition-opacity">
+                      <span className="text-base">✎</span>
+                    </button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <IconJadeJue size={20} color="#3A5F41" />
-                    <span className="text-[#a7c5ba]">机关玉：</span>
-                    <span className="text-[#f5e6b8] font-mono">{jadeBalance.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
-                      <span>◆</span> 战斗记录
-                    </h3>
-                    <div className="bg-black/20 rounded-lg p-3 border border-white/5 space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#a7c5ba]">总场次</span>
-                        <span className="text-[#f5e6b8]">42</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#a7c5ba]">胜率</span>
-                        <span className="text-[#f5e6b8]">64%</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#a7c5ba]">最高连胜</span>
-                        <span className="text-[#f5e6b8]">5</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
-                      <span>◆</span> 最爱门派
-                    </h3>
-                    <div className="bg-black/20 rounded-lg p-3 border border-white/5 flex items-center gap-2">
-                      <div className="flex-1">
-                        <div className="flex justify-between text-[10px] text-[#a7c5ba] mb-1">
-                          <span>墨家 (32场)</span>
-                          <span>76%</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#d4a520] w-[76%]" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Achievements */}
-                <div className="space-y-3 pb-4">
-                  <h3 className="text-[#d4a520] text-xs font-serif tracking-[0.2em] flex items-center gap-2">
-                    <span>◆</span> 近期成就
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { title: '首次论道', done: true },
-                      { title: '连胜3场', done: true },
-                      { title: '收集10张卡', done: false },
-                    ].map((ach, idx) => (
-                      <div key={idx} className={`flex items-center justify-center p-2 rounded border text-[10px] gap-1.5 transition-colors ${
-                        ach.done ? 'bg-[#d4a520]/10 border-[#d4a520]/30 text-[#f5e6b8]' : 'bg-black/20 border-white/5 text-[#a7c5ba]'
-                      }`}>
-                        <span>{ach.done ? '🏆' : '⬜'}</span>
-                        {ach.title}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="space-y-6 pb-6">
-                <div className="bg-black/20 p-4 rounded-lg border border-[rgba(212,165,32,0.1)]">
-                   <p className="text-[#f5e6b8] text-sm font-serif mb-4 flex items-center gap-2">
-                     <span className="text-[#d4a520]">✦</span> 稷下名士影谱
-                   </p>
-                   <div className="grid grid-cols-4 gap-4">
-                     {AvatarBackend.listAll().map((av) => (
-                       <button
-                         key={av.id}
-                         onClick={() => {
-                           if (av.isUnlocked) {
-                             AvatarBackend.select(av.id);
-                             setSelectedAvatar(av);
-                             uiAudio.playClick();
-                           }
-                         }}
-                         className={`relative aspect-square rounded-lg border-2 transition-all ${
-                           selectedAvatar.id === av.id 
-                             ? 'border-[#d4a520] shadow-[0_0_15px_rgba(212,165,32,0.4)] scale-105 z-10' 
-                             : av.isUnlocked 
-                               ? 'border-white/10 hover:border-[#d4a520]/50' 
-                               : 'border-transparent opacity-40 cursor-not-allowed'
-                         }`}
-                       >
-                         <img 
-                           src={asset(av.assetPath)} 
-                           className="w-full h-full object-cover rounded-md" 
-                           alt={av.name}
-                         />
-                         {selectedAvatar.id === av.id && (
-                           <div className="absolute -top-1 -right-1 bg-[#d4a520] text-black rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">✓</div>
-                         )}
-                         {!av.isUnlocked && (
-                           <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-md">
-                             <span className="text-[10px] text-white">未解锁</span>
-                           </div>
-                         )}
-                         <div className="absolute inset-x-0 bottom-0 bg-black/60 py-0.5 text-[8px] text-[#f5e6b8] font-serif truncate px-1 rounded-b-md">
-                           {av.name}
-                         </div>
-                       </button>
-                     ))}
-                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                   <p className="text-[#d4a520] text-xs font-serif tracking-widest">选中头像解锁条件</p>
-                   <p className="text-[#a7c5ba] text-xs leading-relaxed italic border-l-2 border-[#d4a520]/40 pl-3">
-                     {selectedAvatar.unlockDesc}
-                   </p>
-                </div>
-
-                <div className="bg-[#1a2840] p-4 rounded-lg border border-white/5 flex items-center gap-4">
-                  <div className="w-16 h-16 rounded border border-[#d4a520]/30 overflow-hidden">
-                    <img src={asset(selectedAvatar.assetPath)} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-[#f5e6b8] font-serif">{selectedAvatar.name}</h4>
-                    <p className="text-[#a7c5ba] text-[10px] mt-1">
-                      {selectedAvatar.category === 'scholar' ? '学塾名士系列头像' : '稷下特殊成就系列'}
-                    </p>
+                  <div className="flex flex-col gap-1 items-center py-2 px-6 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
+                    <span className="text-[#D4AF65] text-[10px] font-bold tracking-[0.2em] uppercase">学派 · 墨家</span>
+                    <span className="text-[#f6e4c3]/60 text-[10px] tracking-widest">段位 · 青铜 Ⅲ</span>
                   </div>
                 </div>
               </div>
-            )}
+
+              {/* 右侧：数据看板与成就 - 优化布局以适应无滚动 */}
+              <div className="flex-1 flex flex-col gap-6 overflow-hidden">
+                {/* 页签切换 */}
+                <div className="flex gap-10 border-b border-[#D4AF65]/10 pb-2 z-10">
+                  <button 
+                    onClick={() => setProfileTab('overview')}
+                    className={`text-xs tracking-[0.2em] font-bold transition-all ${profileTab === 'overview' ? 'text-[#D4AF65]' : 'text-[#f6e4c3]/30 hover:text-[#f6e4c3]/60'}`}
+                  >纵览概要</button>
+                  <button 
+                    onClick={() => setProfileTab('records')}
+                    className={`text-xs tracking-[0.2em] font-bold transition-all ${profileTab === 'records' ? 'text-[#D4AF65]' : 'text-[#f6e4c3]/30 hover:text-[#f6e4c3]/60'}`}
+                  >名士影谱</button>
+                </div>
+
+                {profileTab === 'overview' ? (
+                  <div className="flex-1 flex flex-col justify-between py-2 animate-in fade-in slide-in-from-right-4 duration-500 overflow-hidden">
+                    {/* 资产看板 - 紧凑型 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center gap-4 group hover:bg-white/10 transition-colors z-10">
+                        <div className="w-10 h-10 rounded-lg bg-[#D4AF65]/10 flex items-center justify-center border border-[#D4AF65]/20">
+                          <IconKnifeMoney size={20} color="#D4AF65" />
+                        </div>
+                        <div>
+                          <p className="text-[#D4AF65]/40 text-[9px] font-bold tracking-widest mb-0.5">铜钱</p>
+                          <p className="text-[#f6e4c3] font-mono text-lg tabular-nums leading-none">{coinBalance.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center gap-4 group hover:bg-white/10 transition-colors z-10">
+                        <div className="w-10 h-10 rounded-lg bg-[#3A5F41]/10 flex items-center justify-center border border-[#3A5F41]/20">
+                          <IconJadeJue size={20} color="#3A5F41" />
+                        </div>
+                        <div>
+                          <p className="text-[#3A5F41]/60 text-[9px] font-bold tracking-widest mb-0.5">机关玉</p>
+                          <p className="text-[#f6e4c3] font-mono text-lg tabular-nums leading-none">{jadeBalance.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 战绩记录 - 横向排布 */}
+                    <div className="p-5 rounded-xl bg-[#0a0503]/40 border border-white/5 z-10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-2 h-2 bg-[#D4AF65] rotate-45" />
+                        <h4 className="text-[#f6e4c3] font-serif text-sm tracking-widest">论道战绩</h4>
+                      </div>
+                      <div className="flex justify-around items-center">
+                        {[
+                          { label: '总场次', val: '42', color: '#f6e4c3' },
+                          { label: '胜率', val: '64%', color: '#D4AF65' },
+                          { label: '连胜', val: '5', color: '#1e3a5f' }
+                        ].map((stat, i) => (
+                          <div key={i} className="text-center px-6 border-r border-white/5 last:border-0">
+                            <p className="text-[#f6e4c3]/40 text-[8px] font-bold tracking-widest mb-1 uppercase">{stat.label}</p>
+                            <p className="text-xl font-black tabular-nums leading-none" style={{ color: stat.color }}>{stat.val}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 成就墙 - 缩减列表长度或紧凑排列 */}
+                    <div className="space-y-4 z-10">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 bg-[#D4AF65] rotate-45" />
+                          <h4 className="text-[#f6e4c3] font-serif text-sm tracking-widest">近期成就</h4>
+                        </div>
+                        <span className="text-[9px] text-[#D4AF65]/60 font-bold tracking-widest">24 / 120</span>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        {[
+                          { title: '首次论道', done: true },
+                          { title: '连胜3场', done: true },
+                          { title: '墨家翘楚', done: true },
+                          { title: '卡牌新手', done: false },
+                          { title: '论战不休', done: false }
+                        ].map((ach, idx) => (
+                          <div key={idx} className={`px-4 py-1.5 rounded-full border text-[10px] font-bold tracking-widest transition-all ${
+                            ach.done 
+                              ? 'bg-[#D4AF65]/10 border-[#D4AF65]/30 text-[#D4AF65]' 
+                              : 'bg-white/5 border-white/5 text-[#f6e4c3]/10'
+                          }`}>
+                            {ach.done && <span className="mr-1.5 text-[8px]">✦</span>}
+                            {ach.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500 overflow-hidden z-10">
+                     <div className="grid grid-cols-4 gap-4 flex-1">
+                       {AvatarBackend.listAll().slice(0, 8).map((av) => (
+                         <button
+                           key={av.id}
+                           onClick={() => {
+                             if (av.isUnlocked) {
+                               AvatarBackend.select(av.id);
+                               setSelectedAvatar(av);
+                               uiAudio.playClick();
+                             }
+                           }}
+                           className={`relative aspect-square rounded-xl border-2 transition-all duration-500 overflow-hidden group/item ${
+                             selectedAvatar.id === av.id 
+                               ? 'border-[#D4AF65] shadow-[0_0_20px_rgba(212,175,101,0.2)] z-10 scale-105' 
+                               : av.isUnlocked 
+                                 ? 'border-white/5 hover:border-[#D4AF65]/40' 
+                                 : 'border-transparent opacity-20 grayscale'
+                           }`}
+                         >
+                           <img 
+                             src={asset(av.assetPath)} 
+                             className={`w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110 ${av.id === 'faction_legalist' ? 'scale-[0.82]' : ''}`} 
+                             alt={av.name}
+                           />
+                           {selectedAvatar.id === av.id && (
+                             <div className="absolute top-1 right-1 bg-[#D4AF65] text-[#0a0503] rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-black">✓</div>
+                           )}
+                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent py-1 text-[8px] text-[#f6e4c3] font-serif tracking-widest truncate px-2">
+                             {av.name}
+                           </div>
+                         </button>
+                       ))}
+                     </div>
+                     <div className="mt-4 p-4 rounded-xl bg-[#0a0503]/40 border border-white/5">
+                        <p className="text-[#D4AF65] text-[9px] font-black tracking-[0.2em] uppercase mb-1">Unlock Condition</p>
+                        <p className="text-[#f6e4c3]/60 text-xs leading-relaxed italic font-serif">
+                          「 {selectedAvatar.unlockDesc} 」
+                        </p>
+                     </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </SystemModal>
+        </div>
       )}
       {activeModal === 'store_coin' && (
-        <SystemModal title="铜钱商店" onClose={() => setActiveModal(null)}>
-          <div className="w-full flex flex-col gap-6">
-            <div className="grid grid-cols-3 gap-4">
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-md transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          <div className="absolute inset-0 pointer-events-none opacity-40" style={{ background: 'radial-gradient(circle at 50% 50%, #0a0e14 0%, transparent 100%)' }} />
+          
+          <div className="relative w-full max-w-5xl h-[65vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 z-10 px-16">
+            <div className="w-full flex items-center justify-between mb-10">
+               <div className="flex items-center gap-6">
+                <div className="w-1 h-8 bg-[#D4AF65] shadow-[0_0_15px_#D4AF65]" />
+                <h2 className="text-[#f6e4c3] font-serif text-4xl tracking-[0.4em] drop-shadow-xl">珍宝阁</h2>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-3xl font-light transition-all hover:rotate-90">✕</button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-8 w-full mb-12">
               <ShopItem icon="🃏" name="随机卡牌" price="500 铜钱" amount="包含 1 张随机卡牌" onBuy={() => handleBuyCoinPack(COIN_PACKS[0])} />
               <ShopItem icon="🏯" name="门派礼包" price="1000 铜钱" amount="墨/儒门派基础卡" onBuy={() => handleBuyCoinPack(COIN_PACKS[1])} />
               <ShopItem icon="💎" name="每日特惠" price="300 铜钱" amount="限时 7 折优惠" onBuy={() => handleBuyCoinPack(COIN_PACKS[2])} />
             </div>
-            <div className="text-center py-2 border-t border-white/5">
-              <span className="text-xs text-[#a7c5ba]">当前拥有：</span>
-              <span className="text-sm text-[#f5e6b8] font-mono">🪙 {coinBalance.toLocaleString()}</span>
+
+            <div className="mt-auto py-4 px-12 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl flex items-center gap-6">
+              <span className="text-[#D4AF65]/60 text-xs font-bold tracking-widest uppercase">当前储备</span>
+              <span className="text-[#f6e4c3] font-mono text-2xl tabular-nums drop-shadow-[0_0_10px_rgba(212,175,101,0.3)]">🪙 {coinBalance.toLocaleString()}</span>
             </div>
           </div>
-        </SystemModal>
+        </div>
       )}
+
       {activeModal === 'store_jade' && (
-        <SystemModal title="机关玉兑换" onClose={() => setActiveModal(null)}>
-          <div className="w-full flex flex-col gap-6">
-            <div className="grid grid-cols-3 gap-4">
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          
+          <div className="relative w-full max-w-5xl h-[65vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 z-10 px-16">
+            <div className="w-full flex items-center justify-between mb-10">
+               <div className="flex items-center gap-6">
+                <div className="w-1 h-8 bg-[#1e3a5f] shadow-[0_0_15px_#1e3a5f]" />
+                <h2 className="text-[#f6e4c3] font-serif text-4xl tracking-[0.4em] drop-shadow-xl">珍宝阁</h2>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-3xl font-light transition-all hover:rotate-90">✕</button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-8 w-full mb-12">
               <ShopItem type="jade" icon="✨" name="限定卡牌" price="200" amount="本季限定传说卡" onBuy={() => handleBuyJadePack(JADE_PACKS[0])} />
               <ShopItem type="jade" icon="🎭" name="皮肤碎片" price="50" amount="用于兑换名士外观" onBuy={() => handleBuyJadePack(JADE_PACKS[1])} />
               <ShopItem type="jade" icon="🖼️" name="头像框" price="100" amount="稷下学宫特殊框" onBuy={() => handleBuyJadePack(JADE_PACKS[2])} />
             </div>
-            <div className="text-center py-2 border-t border-white/5">
-              <span className="text-xs text-[#a7c5ba]">当前拥有：</span>
-              <span className="text-sm text-[#9eb9dd] font-mono">💠 {jadeBalance.toLocaleString()}</span>
+
+            <div className="mt-auto py-4 px-12 rounded-full bg-[#1e3a5f]/10 border border-[#1e3a5f]/20 backdrop-blur-xl flex items-center gap-6">
+              <span className="text-[#9eb9dd]/60 text-xs font-bold tracking-widest uppercase">机关密藏</span>
+              <span className="text-[#f6e4c3] font-mono text-2xl tabular-nums drop-shadow-[0_0_10px_rgba(158,185,221,0.3)]">💠 {jadeBalance.toLocaleString()}</span>
             </div>
           </div>
-        </SystemModal>
+        </div>
       )}
       {activeModal === 'events' && (
-        <FullscreenScreen
-          isOpen={activeModal === 'events'}
-          onClose={() => setActiveModal(null)}
-          title="活动中心"
-          subtitle="限时活动"
-          icon={<MineralIconWrapper type="seal" size={40}><IconFire size={28} color="#f5e6b8" /></MineralIconWrapper>}
-        >
-          <div className="flex h-full flex-col gap-6">
-            {/* Enhanced Banner */}
-            <div className="relative rounded-xl overflow-hidden group shadow-2xl">
-              <div className="h-40 bg-gradient-to-br from-[#1a2840] via-[#2a3c66] to-[#1a2840] flex flex-col justify-center px-10 relative z-10 border border-[rgba(212,165,32,0.3)]">
-                {/* Background Decoration */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-                <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#d4a520]/10 to-transparent pointer-events-none" />
-                
-                <h3 className="text-[#f5e6b8] text-2xl font-serif mb-2 flex items-center gap-3">
-                  <IconFire size={28} className="animate-pulse" /> 
-                  限时活动：稷下开学季
-                </h3>
-                <p className="text-[#a7c5ba] text-sm mb-5 max-w-sm leading-relaxed">墨子亲传机枢秘笈限时发放，参与公开课论辩即可解锁限定门派卡牌“非攻”。</p>
-                
-                <div className="flex items-center justify-between gap-12">
-                  <div className="flex-1">
-                    <div className="flex justify-between text-[10px] text-[#d4a520] mb-2 uppercase tracking-tighter">
-                      <span>已完成论道</span>
-                      <span>3 / 5</span>
-                    </div>
-                    <div className="h-2 w-full bg-black/50 rounded-full p-0.5 border border-white/5 shadow-inner">
-                      <div className="h-full bg-gradient-to-r from-[#8b5e00] via-[#d4a520] to-[#f5e6b8] w-[60%] rounded-full shadow-[0_0_10px_rgba(212,165,32,0.5)]" />
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => { uiAudio.playClick(); onStartGame(); }} 
-                    className="whitespace-nowrap bg-gradient-to-b from-[#d4a520] to-[#b8860b] text-black text-sm px-8 py-2.5 rounded shadow-[0_4px_15px_rgba(212,165,32,0.3)] font-black hover:scale-105 hover:brightness-110 transition-all active:scale-95"
-                  >
-                    前往论辩
-                  </button>
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          
+          <div className="relative w-full max-w-5xl h-[75vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 z-10 px-16">
+            <div className="w-full flex items-center justify-between mb-8">
+               <div className="flex items-center gap-6">
+                <div className="w-1.5 h-10 bg-gradient-to-b from-[#831843] to-transparent shadow-[0_0_20px_#831843]" />
+                <div>
+                  <h2 className="text-[#f6e4c3] font-serif text-4xl tracking-[0.4em] drop-shadow-xl">百家盛会</h2>
+                  <p className="text-[#831843] text-[10px] tracking-[0.2em] font-black uppercase mt-1">Jixia Events Hub</p>
                 </div>
               </div>
-              <div className="absolute top-4 right-8 text-[11px] text-[#f5e6b8]/40 italic font-serif flex items-center gap-2">
-                <IconLantern size={16} color="#d4a520" /> 结束倒计时：3天 12:45:21
-              </div>
+              <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-3xl font-light transition-all hover:rotate-90">✕</button>
             </div>
 
-            {/* Sub-Events List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <GoldenCard className="flex items-center justify-between border-l-4 border-l-[#d4a520]">
-                <div>
-                  <div className="text-[#f5e6b8] text-lg font-serif mb-1 flex items-center gap-2">
-                    <IconCalendar size={20} color="#d4a520" /> 日常签到
+            <div className="w-full flex-1 flex flex-col gap-6 overflow-hidden">
+              {/* V9 Banner */}
+              <div className="relative w-full h-48 rounded-2xl overflow-hidden border border-[#D4AF65]/30 group shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0503] via-[#0a0503]/80 to-transparent z-10" />
+                <div className="absolute inset-0 bg-[#0a0503] opacity-20 group-hover:scale-110 transition-transform duration-[3s]" />
+                
+                <div className="relative z-20 h-full flex flex-col justify-center px-12">
+                  <div className="flex items-center gap-3 mb-2 text-[#D4AF65]">
+                    <IconFire size={20} className="animate-pulse" />
+                    <span className="text-xs font-black tracking-[0.3em] uppercase">Limited Time</span>
                   </div>
-                  <div className="text-[#a7c5ba] text-xs">每日首胜奖励翻倍，额外获赠 400 铜钱</div>
+                  <h3 className="text-[#f6e4c3] text-3xl font-serif mb-3 tracking-widest">稷下开学季 · 墨子公开课</h3>
+                  <p className="text-[#f6e4c3]/50 text-xs max-w-lg leading-relaxed mb-6">墨子亲传机枢秘笈限时发放，参与公开课论辩即可解锁限定门派卡牌“非攻”。</p>
+                  
+                  <div className="flex items-center gap-8 w-96">
+                    <div className="flex-1">
+                      <div className="flex justify-between text-[10px] text-[#D4AF65] mb-2 font-bold tracking-widest">
+                        <span>论道进度</span>
+                        <span>3 / 5</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                        <div className="h-full bg-gradient-to-r from-[#D4AF65] to-[#f6e4c3] w-[60%] rounded-full shadow-[0_0_10px_#D4AF65]" />
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => { uiAudio.playClick(); onStartGame(); }}
+                      className="px-10 py-2.5 bg-[#D4AF65] text-[#0a0503] text-xs font-black tracking-[0.2em] rounded-full hover:scale-105 transition-all shadow-lg active:scale-95"
+                    >立即前往</button>
+                  </div>
                 </div>
-                <button className="text-[#d4a520] text-xs font-serif uppercase tracking-widest bg-[#d4a520]/5 px-5 py-2 rounded border border-[#d4a520]/20 hover:bg-[#d4a520]/20 transition-all">
-                  进行中
-                </button>
-              </GoldenCard>
+                
+                <div className="absolute top-6 right-8 text-[10px] text-[#D4AF65]/40 font-black tracking-[0.2em] z-20 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-[#D4AF65] rounded-full animate-ping" />
+                  剩余时间：3天 12:45
+                </div>
+              </div>
 
-              <GoldenCard className="flex items-center justify-between opacity-70 group-hover:opacity-100 transition-opacity">
-                <div>
-                  <div className="text-[#a7c5ba] text-lg font-serif mb-1 line-through decoration-[#d4a520]/40 flex items-center gap-2">
-                    <IconGift size={20} color="#a7c5ba" style={{ opacity: 0.6 }} /> 萌新礼包
+              {/* Sub-Events */}
+              <div className="grid grid-cols-2 gap-6 pb-4">
+                <GoldenCard className="flex items-center justify-between border-l-4 border-l-[#D4AF65] py-5">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-full bg-[#D4AF65]/10 flex items-center justify-center border border-[#D4AF65]/20">
+                      <IconCalendar size={24} color="#D4AF65" />
+                    </div>
+                    <div>
+                      <h4 className="text-[#f6e4c3] text-lg font-serif mb-1">日常签到</h4>
+                      <p className="text-[#f6e4c3]/40 text-xs">每日首胜奖励翻倍，额外获赠 400 铜钱</p>
+                    </div>
                   </div>
-                  <div className="text-[#a7c5ba]/60 text-xs">恭喜获得初始墨家基础卡组 × 1</div>
-                </div>
-                <div className="bg-[#50b478]/10 text-[#50b478] text-[10px] px-3 py-1 rounded border border-[#50b478]/20 flex items-center gap-1.5 font-bold">
-                  <IconCheck size={12} color="#50b478" /> 已领取
-                </div>
-              </GoldenCard>
+                  <div className="text-[#D4AF65] text-[10px] font-black tracking-[0.2em] px-4 py-1.5 bg-[#D4AF65]/5 rounded-full border border-[#D4AF65]/20">进行中</div>
+                </GoldenCard>
+
+                <GoldenCard className="flex items-center justify-between opacity-50 py-5">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                      <IconGift size={24} color="#f6e4c3" />
+                    </div>
+                    <div>
+                      <h4 className="text-[#f6e4c3]/60 text-lg font-serif mb-1 line-through">萌新礼包</h4>
+                      <p className="text-[#f6e4c3]/30 text-xs">恭喜获得初始墨家基础卡组 × 1</p>
+                    </div>
+                  </div>
+                  <div className="text-white/20 text-[10px] font-black tracking-[0.2em] px-4 py-1.5 bg-white/5 rounded-full border border-white/5">已领取</div>
+                </GoldenCard>
+              </div>
             </div>
             
-            <div className="mt-auto pt-6 text-center border-t border-white/5">
-              <p className="text-[10px] text-[#a7c5ba]/40 tracking-widest">稷下学宫 · 勤学不倦</p>
+            <div className="mt-auto py-6 border-t border-white/5 w-full text-center">
+              <span className="text-[10px] text-[#f6e4c3]/20 tracking-[0.5em] font-serif uppercase">Jixia Academic Academy · Scholarly Pursuit</span>
             </div>
           </div>
-        </FullscreenScreen>
+        </div>
       )}
       {activeModal === 'quests' && (
-        <FullscreenScreen
-          isOpen={activeModal === 'quests'}
-          onClose={() => setActiveModal(null)}
-          title="修行任务"
-          subtitle="日积月累"
-          icon={<MineralIconWrapper type="bronze" size={40}><IconBambooSlips size={28} color="#f5e6b8" /></MineralIconWrapper>}
-        >
-          <div className="flex h-full flex-col">
-            {/* Tabs */}
-            <div className="flex gap-4 mb-6">
-              <GoldenTab label="今日修行" active={questTab === 'daily'} onClick={() => setQuestTab('daily')} />
-              <GoldenTab label="每周课业" active={questTab === 'weekly'} onClick={() => setQuestTab('weekly')} />
-              <GoldenTab label="历程成就" active={questTab === 'achieve'} onClick={() => setQuestTab('achieve')} />
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          
+          <div className="relative w-full max-w-6xl h-[80vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 z-10 px-16">
+            <div className="w-full flex items-center justify-between mb-6">
+               <div className="flex items-center gap-6">
+                <div className="w-1.5 h-10 bg-gradient-to-b from-[#D4AF65] to-transparent shadow-[0_0_20px_#D4AF65]" />
+                <div>
+                  <h2 className="text-[#f6e4c3] font-serif text-4xl tracking-[0.4em] drop-shadow-xl">修行课业</h2>
+                  <p className="text-[#D4AF65]/60 text-[10px] tracking-[0.2em] font-black uppercase mt-1">Spiritual Cultivation Tasks</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-3xl font-light transition-all hover:rotate-90">✕</button>
             </div>
 
-            {/* List */}
-            <div className="flex-1 min-h-0 space-y-4 overflow-y-auto pr-3 custom-scrollbar">
-              <div className="flex items-center gap-4 mb-6 px-1">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(212,165,32,0.2)] to-transparent" />
-                <div className="text-[10px] text-[#a7c5ba] uppercase tracking-[0.3em] font-serif">
-                  {questTab === 'daily' ? '日常任务 · 每日五时更新' : questTab === 'weekly' ? '本周任务 · 周一凌晨更新' : '历史成就 · 记录点滴成长'}
-                </div>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(212,165,32,0.2)] to-transparent" />
+            {/* Tabs & Layout */}
+            <div className="w-full flex flex-col gap-6 overflow-hidden">
+              <div className="flex gap-10 border-b border-[#D4AF65]/10 pb-2">
+                <button onClick={() => setQuestTab('daily')} className={`text-xs tracking-[0.2em] font-bold transition-all ${questTab === 'daily' ? 'text-[#D4AF65]' : 'text-[#f6e4c3]/30'}`}>今日修行</button>
+                <button onClick={() => setQuestTab('weekly')} className={`text-xs tracking-[0.2em] font-bold transition-all ${questTab === 'weekly' ? 'text-[#D4AF65]' : 'text-[#f6e4c3]/30'}`}>每周课业</button>
+                <button onClick={() => setQuestTab('achieve')} className={`text-xs tracking-[0.2em] font-bold transition-all ${questTab === 'achieve' ? 'text-[#D4AF65]' : 'text-[#f6e4c3]/30'}`}>历程成就</button>
               </div>
 
-              {quests.map((item) => {
-                const done = item.progress >= item.target;
-                return (
-                  <GoldenCard key={item.id} className={`group ${item.claimed ? 'opacity-40 grayscale-[0.5]' : ''}`}>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <MineralIconWrapper type="bronze" size={44}>
-                          {item.title.includes('胜利') ? <IconMartial size={24} color="#f5e6b8" /> : item.title.includes('战') ? <IconCrossSwords size={24} color="#f5e6b8" /> : <IconBambooSlips size={24} color="#f5e6b8" />}
-                        </MineralIconWrapper>
-                        <div className="flex flex-col">
-                          <span className="text-[#f5e6b8] text-base font-serif tracking-wide">{item.title}</span>
-                          <span className="text-[10px] text-[#a7c5ba] mt-0.5">完成即可获得丰厚学宫奖励</span>
+              {/* Grid Layout to avoid scrolling */}
+              <div className="grid grid-cols-2 gap-4 flex-1">
+                {quests.slice(0, 4).map((item) => {
+                  const done = item.progress >= item.target;
+                  return (
+                    <GoldenCard key={item.id} className={`py-4 px-6 ${item.claimed ? 'opacity-30' : ''}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[#D4AF65]/10 border border-[#D4AF65]/20 flex items-center justify-center">
+                             {item.title.includes('胜利') ? <IconMartial size={20} color="#D4AF65" /> : <IconBambooSlips size={20} color="#D4AF65" />}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[#f6e4c3] text-sm font-serif">{item.title}</span>
+                            <div className="flex gap-3 mt-1">
+                              {item.rewardCoin > 0 && <span className="text-[9px] text-[#D4AF65]/60 font-mono">🪙 {item.rewardCoin}</span>}
+                              {item.rewardJade > 0 && <span className="text-[9px] text-[#3A5F41] font-mono">💠 {item.rewardJade}</span>}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <span className={`font-mono text-sm ${done ? 'text-[#d4a520]' : 'text-[#a7c5ba]/60'}`}>
-                          {item.progress} <span className="opacity-30 mx-1">/</span> {item.target}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="h-1 w-full bg-black/40 rounded-full mb-5 overflow-hidden border border-white/5">
-                      <div
-                        className={`h-full bg-gradient-to-r from-[#6b4300] via-[#d4a520] to-[#f5e6b8] transition-all duration-700 ease-out rounded-full shadow-[0_0_8px_rgba(212,165,32,0.3)]`}
-                        style={{ width: `${Math.min(100, (item.progress / item.target) * 100)}%` }}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-5">
-                        {item.rewardCoin > 0 && (
-                          <div className="flex items-center gap-1.5 bg-[#d4a520]/5 px-2 py-0.5 rounded-md border border-[#d4a520]/10">
-                            <IconKnifeMoney size={14} color="#d4a520" />
-                            <span className="text-[11px] text-[#d4a520]/80 font-mono mt-0.5">{item.rewardCoin}</span>
-                          </div>
-                        )}
-                        {item.rewardJade > 0 && (
-                          <div className="flex items-center gap-1.5 bg-[#9eb9dd]/5 px-2 py-0.5 rounded-md border border-[#9eb9dd]/10">
-                            <IconJadeJue size={14} color="#3A5F41" />
-                            <span className="text-[11px] text-[#9eb9dd]/80 font-mono mt-0.5">{item.rewardJade}</span>
-                          </div>
-                        )}
+                        <span className="text-[10px] font-mono text-[#D4AF65]/60">{item.progress} / {item.target}</span>
                       </div>
                       
-                      <button
-                        disabled={!done || item.claimed}
-                        onClick={() => handleClaimQuest(item.id)}
-                        className={`text-[11px] font-bold px-6 py-2 rounded-full transition-all tracking-widest ${
-                          item.claimed
-                            ? 'bg-transparent text-white/10 border border-white/5 cursor-default'
-                            : done
-                              ? 'bg-gradient-to-b from-[#d4a520] to-[#b8860b] text-black shadow-[0_0_15px_rgba(212,165,32,0.2)] hover:scale-105 active:scale-95'
-                              : 'bg-black/40 text-[#a7c5ba]/40 border border-white/5'
-                        }`}
-                      >
-                        {item.claimed ? '已领取' : done ? '领取奖励' : '未完成'}
-                      </button>
-                    </div>
-                  </GoldenCard>
-                );
-              })}
-
-              <div className="text-center py-8 opacity-20">
-                <div className="inline-block px-12 h-px bg-gradient-to-r from-transparent via-[rgba(212,165,32,0.5)] to-transparent mb-2" />
-                <div className="text-[10px] text-[#a7c5ba] uppercase tracking-[0.5em] font-serif">万卷诗书 · 勤学不待</div>
-              </div>
-            </div>
-          </div>
-        </FullscreenScreen>
-      )}
-      {activeModal === 'mail' && (
-        <FullscreenScreen
-          isOpen={activeModal === 'mail'}
-          onClose={() => setActiveModal(null)}
-          title="百灵鸟传书"
-          subtitle="音讯往来"
-          icon={<MineralIconWrapper type="bronze" size={40}><IconVanninBird size={34} color="#f5e6b8" /></MineralIconWrapper>}
-        >
-          <div className="flex h-full flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-[10px] text-[#a7c5ba] uppercase tracking-[0.3em] font-serif bg-black/20 px-4 py-1.5 rounded-full border border-white/5">
-                收件箱 · {mails.filter(m => !m.read).length} 封未读
-              </div>
-              <button
-                onClick={() => setMails(prev => prev.map(m => ({ ...m, read: true })))}
-                className="text-xs text-[#d4a520] border border-[#d4a520]/20 px-5 py-1.5 rounded-full hover:bg-[#d4a520]/10 transition-all font-serif tracking-widest"
-                onMouseEnter={() => uiAudio.playHover()}
-              >
-                全部阅毕
-              </button>
-            </div>
-
-            <div className="flex-1 min-h-0 space-y-4 overflow-y-auto pr-3 custom-scrollbar">
-              {mails.map((item) => (
-                <GoldenCard key={item.id} className={`${item.read ? 'opacity-60' : 'border-l-4 border-l-[#d4a520]'}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl bg-black/40 border border-white/5 relative`}>
-                        {item.rewardCoin || item.rewardJade ? <IconGift size={28} /> : <IconBambooSlips size={28} />}
-                        {!item.read && (
-                          <span className="absolute -top-1 -right-1 flex items-center justify-center">
-                            <span className="w-2.5 h-2.5 bg-[#8D2F2F] rounded-full shadow-[0_0_8px_rgba(141,47,47,0.6)] animate-pulse border-2 border-[#1a2840]" />
-                          </span>
-                        )}
+                      <div className="h-1 w-full bg-white/5 rounded-full mb-4 overflow-hidden border border-white/5">
+                        <div className="h-full bg-gradient-to-r from-[#D4AF65] to-[#f6e4c3] transition-all duration-700" style={{ width: `${Math.min(100, (item.progress / item.target) * 100)}%` }} />
                       </div>
-                      <div className="flex flex-col">
-                        <h3 className={`text-base font-serif tracking-wide ${item.read ? 'text-[#a7c5ba]' : 'text-[#f5e6b8]'}`}>
-                          {item.title}
-                        </h3>
-                        <span className="text-[10px] text-[#a7c5ba]/50 font-mono mt-0.5 uppercase tracking-tighter">Received: 2026-04-15 14:02</span>
-                      </div>
-                    </div>
-                  </div>
 
-                  <p className={`text-sm leading-relaxed mb-5 ${item.read ? 'text-[#a7c5ba]/60' : 'text-[#a7c5ba]'}`}>
-                    {item.content}
-                  </p>
-
-                  <div className="flex items-center justify-between border-t border-white/5 pt-4">
-                    <div className="flex gap-3">
-                      {item.rewardCoin > 0 && (
-                        <div className="flex items-center gap-2 bg-[#d4a520]/10 px-3 py-1 rounded-md border border-[#d4a520]/20">
-                          <IconKnifeMoney size={14} color="#d4a520" />
-                          <span className="text-xs text-[#d4a520] font-mono">{item.rewardCoin}</span>
-                        </div>
-                      )}
-                      {item.rewardJade > 0 && (
-                        <div className="flex items-center gap-2 bg-[#9eb9dd]/10 px-3 py-1 rounded-md border border-[#9eb9dd]/20">
-                          <IconJadeJue size={14} color="#3A5F41" />
-                          <span className="text-xs text-[#9eb9dd] font-mono">{item.rewardJade}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex gap-3 items-center">
-                      {(item.rewardCoin > 0 || item.rewardJade > 0) && (
+                      <div className="flex justify-end">
                         <button
-                          disabled={item.claimed}
-                          onClick={() => handleClaimMail(item.id)}
-                          className={`text-[11px] font-bold px-6 py-2 rounded transition-all tracking-widest ${
-                            item.claimed
-                              ? 'text-white/10 cursor-default'
-                              : 'bg-white/5 text-[#d4a520] border border-[#d4a520]/30 hover:bg-[#d4a520] hover:text-black active:scale-95'
+                          disabled={!done || item.claimed}
+                          onClick={() => handleClaimQuest(item.id)}
+                          className={`text-[9px] px-5 py-1.5 rounded-full transition-all tracking-widest font-black uppercase ${
+                            item.claimed ? 'bg-transparent text-white/10' : done ? 'bg-[#D4AF65] text-[#0a0503] shadow-lg' : 'bg-white/5 text-[#f6e4c3]/20 border border-white/5'
                           }`}
                         >
-                          {item.claimed ? '已领取' : '领取附件'}
+                          {item.claimed ? 'Claimed' : done ? 'Claim Rewards' : 'In Progress'}
                         </button>
-                      )}
-                      <button
-                        className="text-xs text-[#a7c5ba]/40 hover:text-red-400/60 transition-colors px-2 py-2"
-                        onMouseEnter={() => uiAudio.playHover()}
-                      >
-                        焚毁
-                      </button>
-                    </div>
-                  </div>
-                </GoldenCard>
-              ))}
+                      </div>
+                    </GoldenCard>
+                  );
+                })}
+              </div>
             </div>
             
-            <div className="mt-auto py-4 text-center opacity-10">
-              <span className="text-[10px] font-serif tracking-[1em]">百灵传音 · 莫失莫忘</span>
+            <div className="mt-auto py-6 border-t border-white/5 w-full text-center">
+              <span className="text-[10px] text-[#f6e4c3]/20 tracking-[0.5em] font-serif uppercase">Cultivation Path · Persistence is Virtue</span>
             </div>
           </div>
-        </FullscreenScreen>
+        </div>
+      )}
+      {activeModal === 'mail' && (
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          
+          <div className="relative w-full max-w-5xl h-[75vh] flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 z-10 px-16">
+            <div className="w-full flex items-center justify-between mb-8">
+               <div className="flex items-center gap-6">
+                <div className="w-1.5 h-10 bg-gradient-to-b from-[#1e3a5f] to-transparent shadow-[0_0_20px_#1e3a5f]" />
+                <div>
+                  <h2 className="text-[#f6e4c3] font-serif text-4xl tracking-[0.4em] drop-shadow-xl">万宁传书</h2>
+                  <p className="text-[#1e3a5f]/80 text-[10px] tracking-[0.2em] font-black uppercase mt-1">Messenger Chronicles</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-8">
+                <button
+                  onClick={() => setMails(prev => prev.map(m => ({ ...m, read: true })))}
+                  className="text-[10px] text-[#D4AF65] border border-[#D4AF65]/30 px-6 py-2 rounded-full hover:bg-[#D4AF65]/10 transition-all font-black tracking-widest uppercase"
+                >Mark All Read</button>
+                <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-3xl font-light transition-all hover:rotate-90">✕</button>
+              </div>
+            </div>
+
+            <div className="w-full flex-1 flex flex-col gap-4 overflow-hidden">
+              <div className="grid grid-cols-2 gap-4">
+                {mails.slice(0, 4).map((item) => (
+                  <GoldenCard key={item.id} className={`py-4 px-6 ${item.read ? 'opacity-40' : 'border-l-4 border-l-[#D4AF65]'}`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-xl">
+                           {item.rewardCoin || item.rewardJade ? <IconGift size={22} color="#D4AF65" /> : <IconVanninBird size={22} color="#f6e4c3" />}
+                        </div>
+                        <div className="flex flex-col">
+                           <h3 className="text-[#f6e4c3] text-sm font-serif">{item.title}</h3>
+                           <span className="text-[8px] text-[#f6e4c3]/30 font-mono tracking-tighter">APRIL 15, 2026</span>
+                        </div>
+                      </div>
+                      {!item.read && <div className="w-2 h-2 bg-[#831843] rounded-full animate-pulse shadow-[0_0_10px_#831843]" />}
+                    </div>
+                    
+                    <p className="text-[#f6e4c3]/50 text-[11px] leading-relaxed line-clamp-2 mb-4">{item.content}</p>
+
+                    <div className="flex items-center justify-between">
+                       <div className="flex gap-2">
+                         {item.rewardCoin > 0 && <div className="bg-[#D4AF65]/10 px-2 py-0.5 rounded text-[9px] text-[#D4AF65]">🪙 {item.rewardCoin}</div>}
+                         {item.rewardJade > 0 && <div className="bg-[#1e3a5f]/10 px-2 py-0.5 rounded text-[9px] text-[#9eb9dd]">💠 {item.rewardJade}</div>}
+                       </div>
+                       <div className="flex gap-3">
+                         <button
+                           disabled={item.claimed}
+                           onClick={() => handleClaimMail(item.id)}
+                           className={`text-[9px] px-4 py-1.5 rounded-full transition-all font-black uppercase ${
+                             item.claimed ? 'text-white/10' : 'bg-white/5 text-[#D4AF65] border border-[#D4AF65]/20 hover:bg-[#D4AF65]/20'
+                           }`}
+                         >
+                           {item.claimed ? 'Received' : 'Claim Attachment'}
+                         </button>
+                         <button className="text-[#831843] opacity-30 hover:opacity-100 transition-opacity">
+                            <IconFire size={14} />
+                         </button>
+                       </div>
+                    </div>
+                  </GoldenCard>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mt-auto py-6 border-t border-white/5 w-full text-center">
+              <span className="text-[10px] text-[#f6e4c3]/20 tracking-[0.5em] font-serif uppercase">Messenger Chronicles · Distant Echoes</span>
+            </div>
+          </div>
+        </div>
       )}
       {activeModal === 'community' && (
         <CommunityScreen
@@ -1649,9 +1638,30 @@ export function MainMenu({ settings, onSettingsChange, onStartGame, onStory, onC
         />
       )}
       {activeModal === 'settings' && (
-        <SystemModal title="机枢设置" onClose={() => setActiveModal(null)}>
-          <SettingsPanel settings={settings} onSettingsChange={onSettingsChange} />
-        </SystemModal>
+        <div className="absolute inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-2xl transition-all duration-1000" onClick={() => setActiveModal(null)} />
+          
+          <div className="relative w-full max-w-3xl h-[60vh] flex flex-col items-center animate-in fade-in slide-in-from-bottom-10 duration-500 z-10 px-12 py-10 bg-[#0a0503]/80 border border-[#D4AF65]/30 rounded-3xl shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+            <div className="w-full flex items-center justify-between mb-10">
+               <div className="flex items-center gap-6">
+                <div className="w-1.5 h-10 bg-[#D4AF65] shadow-[0_0_20px_#D4AF65]" />
+                <div>
+                  <h2 className="text-[#f6e4c3] font-serif text-3xl tracking-[0.4em] drop-shadow-xl">机枢设置</h2>
+                  <p className="text-[#D4AF65]/60 text-[10px] tracking-[0.2em] font-black uppercase mt-1">System Configuration</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="text-[#f6e4c3]/40 hover:text-[#f6e4c3] text-2xl font-light transition-all hover:rotate-90">✕</button>
+            </div>
+
+            <div className="w-full flex-1 overflow-hidden">
+              <SettingsPanel settings={settings} onSettingsChange={onSettingsChange} />
+            </div>
+            
+            <div className="mt-8 pt-6 border-t border-[#D4AF65]/10 w-full text-center">
+              <p className="text-[10px] text-[#f6e4c3]/20 tracking-[0.3em] font-serif uppercase">Jixia Academic Academy · Tech Division</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

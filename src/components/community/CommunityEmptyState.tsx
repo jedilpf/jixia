@@ -9,25 +9,25 @@ interface CommunityEmptyStateProps {
 export function CommunityEmptyState({ icon, title, message }: CommunityEmptyStateProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-[20px] px-6 py-16 text-center"
+      className="flex flex-col items-center justify-center rounded-3xl px-6 py-20 text-center"
       style={{
-        background:
-          'linear-gradient(180deg, rgba(49, 20, 17, 0.92) 0%, rgba(24, 9, 11, 0.92) 100%)',
-        border: '1px solid rgba(214, 151, 73, 0.16)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+        background: 'rgba(10, 5, 3, 0.4)',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(212, 175, 101, 0.1)',
       }}
     >
       <div
-        className="mb-5 flex h-16 w-16 items-center justify-center rounded-full"
+        className="mb-8 flex h-20 w-20 items-center justify-center rounded-2xl"
         style={{
-          background: 'radial-gradient(circle, rgba(214,151,73,0.24) 0%, rgba(158,61,43,0.08) 72%)',
-          border: '1px solid rgba(214, 151, 73, 0.18)',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(212, 175, 101, 0.2)',
+          boxShadow: '0 0 30px rgba(212, 175, 101, 0.05)',
         }}
       >
         {icon}
       </div>
-      <p className="mb-2 text-lg font-serif tracking-wide text-[#f5e6b8]">{title}</p>
-      <p className="max-w-md text-sm leading-7 text-[#d9c3a0]">{message}</p>
+      <p className="mb-3 text-2xl font-serif tracking-[0.2em] text-[#f6e4c3] uppercase">{title}</p>
+      <p className="max-w-md text-[13px] leading-relaxed text-[#f6e4c3]/30 font-serif">{message}</p>
     </div>
   );
 }

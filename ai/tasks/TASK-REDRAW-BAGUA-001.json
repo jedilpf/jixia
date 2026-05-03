@@ -1,0 +1,26 @@
+{
+  "task_id": "TASK-REDRAW-BAGUA-001",
+  "goal": "Redraw the '八卦阵图' card image in the card gallery following V9 aesthetic guidelines, without text.",
+  "constraints": [
+    "Follow V9 aesthetic (Ivory bottom, Ancient Gold/Ink Black/Cinnabar/Malachite accents)",
+    "Ink-wash style with 10% mineral texture",
+    "At least 40% white space ratio",
+    "No text allowed in the image",
+    "Update assets.ts mapping to prefer PNG for this card"
+  ],
+  "deliverables": [
+    "New card image file at public/assets/cards/jiuzhen10.png",
+    "Updated mapping in src/utils/assets.ts",
+    "Updated PROJECT_MEMORY.md"
+  ],
+  "allowed_write_paths": [
+    "public/assets/cards",
+    "src/utils/assets.ts",
+    "docs/PROJECT_MEMORY.md",
+    "ai/tasks"
+  ],
+  "acceptance_commands": [
+    "npm run build"
+  ],
+  "status": "draft"
+}

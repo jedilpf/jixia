@@ -1,14 +1,24 @@
 /**
  * 中央主战斗区组件
  * 稷下受业：杏坛对垒 (V9 雅化版)
+ *
+ * 拖拽支持：react-dnd useDrop
+ * - SeatArea 作为 drop 目标，高亮显示可放置区域
+ * - CardSlot（我方已出卡牌）点击触发取消
  */
 
 import React from 'react';
-import { DebateBattleState, DebateCard, SeatId, SeatState } from '@/battleV2/types';
+import { useDrop } from 'react-dnd';
+import { DebateBattleState, DebateCard, SeatId, SeatState, PlanSlot, TargetableSlot } from '@/battleV2/types';
+import { DRAG_CARD_TYPE, CardDragItem } from '@/components/battle/dndTypes';
 
 interface BattleArenaProps {
   state: DebateBattleState;
   onSelectSeat: (seat: SeatId) => void;
+  planCard: (slot: PlanSlot, cardId: string) => void;
+  setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => void;
+  cancelLayer1: () => void;
+  cancelLayer2: () => void;
 }
 
 const SEAT_CONFIG: Record<SeatId, { name: string; color: string; icon: string; title: string }> = {
@@ -71,7 +81,9 @@ const CardSlot: React.FC<{
   isRevealed: boolean;
   label: string;
   isEnemy?: boolean;
-}> = ({ card, isRevealed, label, isEnemy }) => {
+  onCancel?: () => void;
+  isLocked?: boolean;
+}> = ({ card, isRevealed, label, isEnemy, onCancel, isLocked }) => {
   if (!card) {
     return (
       <div className="w-[100px] h-[140px] rounded-2xl border-2 border-dashed border-[#D4AF65]/30 flex flex-col items-center justify-center gap-3 bg-white/5 backdrop-blur-sm grayscale">
@@ -92,7 +104,12 @@ const CardSlot: React.FC<{
   }
 
   return (
-    <div className={`w-[100px] h-[140px] rounded-2xl border-4 shadow-2xl overflow-hidden relative group transition-all duration-500 ${isEnemy ? 'border-[#831843]' : 'border-[#064e3b]'}`}>
+    <div
+      onClick={() => !isEnemy && !isLocked && onCancel?.()}
+      className={`w-[100px] h-[140px] rounded-2xl border-4 shadow-2xl overflow-hidden relative group transition-all duration-500 ${
+        isEnemy ? 'border-[#831843]' : 'border-[#064e3b]'
+      } ${!isEnemy && !isLocked ? 'cursor-pointer hover:scale-105 hover:shadow-lg' : ''}`}
+    >
       <img src={card.art || ''} alt={card.name} className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0503] via-transparent to-transparent opacity-80" />
       <div className="absolute top-2 left-2 w-7 h-7 bg-[#f6e4c3] rounded-md flex items-center justify-center shadow-lg border border-[#0a0503]/10 transform -rotate-12">
@@ -101,6 +118,18 @@ const CardSlot: React.FC<{
       <div className="absolute bottom-2 inset-x-0 text-center">
         <span className="text-[10px] font-black text-[#f6e4c3] uppercase tracking-tighter truncate px-2 block">{card.name}</span>
       </div>
+      {/* 取消按钮（仅我方未锁定时显示） */}
+      {!isEnemy && !isLocked && onCancel && (
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <span className="text-xs text-white font-bold bg-red-600/80 px-2 py-1 rounded">取消</span>
+        </div>
+      )}
+      {/* 锁定图标（已锁定时显示） */}
+      {!isEnemy && isLocked && (
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <span className="text-lg">🔒</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -112,14 +141,49 @@ const SeatArea: React.FC<{
   isSelectable: boolean;
   isTarget: boolean;
   onSelect: (seat: SeatId) => void;
-}> = ({ seatId, playerSeat, enemySeat, isSelectable, isTarget, onSelect }) => {
+  planCard: (slot: PlanSlot, cardId: string) => void;
+  setTargetSeat: (slot: TargetableSlot, seatId: SeatId) => void;
+}> = ({ seatId, playerSeat, enemySeat, isSelectable, isTarget, onSelect, planCard, setTargetSeat }) => {
   const config = SEAT_CONFIG[seatId];
+
+  // useDrop — react-dnd drop 目标
+  const [{ isOver, canDrop }, dropRef] = useDrop({
+    accept: DRAG_CARD_TYPE,
+    canDrop: (_item: CardDragItem) => {
+      // 检查议区容量（最多 3 张）
+      const existingUnits = playerSeat.units.length;
+      const otherLayerCount = 0; // 简化：暂不考虑另一层的卡
+      return existingUnits + 1 + otherLayerCount <= playerSeat.maxUnits;
+    },
+    drop: (item: CardDragItem) => {
+      const { card, sourceSlot } = item;
+      // 先设置目标席位（容量已由 canDrop 验证）
+      setTargetSeat(sourceSlot, seatId);
+      // 再出牌（engine 验证费用等）
+      planCard(sourceSlot, card.id);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  });
+
+  // 拖拽进入时的高亮样式
+  const isHighlighted = isOver && canDrop;
+  const isBlocked = isOver && !canDrop;
 
   return (
     <div
+      ref={dropRef}
       onClick={() => isSelectable && onSelect(seatId)}
       className={`flex-1 flex flex-col items-center justify-between h-[420px] transition-all duration-700 relative group cursor-pointer ${
         isTarget ? 'z-20 scale-105' : 'z-10'
+      } ${
+        isHighlighted
+          ? 'ring-4 ring-green-500/70 ring-inset shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+          : isBlocked
+          ? 'ring-4 ring-red-500/70 ring-inset'
+          : ''
       }`}
     >
       {/* 敌方侧落位：墨玉台 */}
@@ -159,6 +223,10 @@ const SeatArea: React.FC<{
 export const BattleArena: React.FC<BattleArenaProps> = ({
   state,
   onSelectSeat,
+  planCard,
+  setTargetSeat,
+  cancelLayer1,
+  cancelLayer2,
 }) => {
   const { player, enemy, phase } = state;
   const isRevealed = true;
@@ -217,6 +285,8 @@ export const BattleArena: React.FC<BattleArenaProps> = ({
             isSelectable={phase === 'play_1' || phase === 'play_2'}
             isTarget={player.plan.layer1TargetSeat === seatId || player.plan.layer2TargetSeat === seatId}
             onSelect={onSelectSeat}
+            planCard={planCard}
+            setTargetSeat={setTargetSeat}
           />
         ))}
       </div>
@@ -224,8 +294,20 @@ export const BattleArena: React.FC<BattleArenaProps> = ({
       {/* 我方侧：论根 */}
       <div className="h-40 flex items-center justify-center gap-16 px-12 relative z-10 mb-6">
         <div className="flex gap-6 items-start">
-          <CardSlot card={getPlannedCard('player', 'layer1')} isRevealed={true} label="第一手" />
-          <CardSlot card={getPlannedCard('player', 'layer2')} isRevealed={true} label="第二手" />
+          <CardSlot
+            card={getPlannedCard('player', 'layer1')}
+            isRevealed={true}
+            label="第一手"
+            onCancel={cancelLayer1}
+            isLocked={player.plan.lockedLayer1}
+          />
+          <CardSlot
+            card={getPlannedCard('player', 'layer2')}
+            isRevealed={true}
+            label="第二手"
+            onCancel={cancelLayer2}
+            isLocked={player.plan.lockedLayer2}
+          />
         </div>
 
         <div className="flex flex-col items-center">
