@@ -1,28 +1,22 @@
 /**
  * BattleFrameV2 - 百家争鸣战斗主界面
- *
+ * 
  * 三层架构设计：
  * 第一层：主战斗层（常驻显示）
  *   - 顶部状态栏
  *   - 中央主战斗区
  *   - 底部操作区
- *
+ * 
  * 第二层：信息面板层（按钮打开）
  *   - 图鉴面板
  *   - 状态面板
  *   - 日志抽屉
- *
+ * 
  * 第三层：轻社交层（轻量浮层）
  *   - 消息/表情浮层
- *
- * 拖拽支持：react-dnd
- *   - DndProvider 包裹，提供 drag & drop 上下文
- *   - DragGhostLayer 渲染拖拽预览（DragManager 驱动）
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDebateBattle } from '@/battleV2/useDebateBattle';
 import { getTopicById } from '@/battleV2/topics';
 import {
@@ -44,7 +38,6 @@ import {
   OperationHints,
   LogButton,
   ExitConfirmModal,
-  DragGhostLayer,
 } from './battle';
 
 
@@ -78,7 +71,7 @@ export default function BattleFrameV2({
   // ═══════════════════════════════════════════════════════════
   // 战斗状态管理
   // ═══════════════════════════════════════════════════════════
-  const { state, selectTopic, planCard, setTargetSeat, lockLayer1, lockLayer2, cancelLayer1, cancelLayer2 } = useDebateBattle({
+  const { state, selectTopic, planCard, setTargetSeat, lockLayer1, lockLayer2 } = useDebateBattle({
     arenaId,
     forcedTopicId,
     playerMainFaction,
@@ -251,9 +244,7 @@ export default function BattleFrameV2({
       />
 
       {/* 主内容区 */}
-      <DndProvider backend={HTML5Backend}>
-        <DragGhostLayer />
-
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* 左侧日志按钮 */}
         <LogButton
           onClick={() => setIsLogDrawerOpen(true)}
@@ -265,10 +256,6 @@ export default function BattleFrameV2({
           <BattleArena
             state={state}
             onSelectSeat={handleSelectSeat}
-            planCard={planCard}
-            setTargetSeat={setTargetSeat}
-            cancelLayer1={cancelLayer1}
-            cancelLayer2={cancelLayer2}
           />
         </div>
 
@@ -279,20 +266,17 @@ export default function BattleFrameV2({
             selectedCardId={selectedCardId}
           />
         </div>
+      </div>
 
-        {/* 底部操作区（需要 DndProvider 上下文来 useDrag） */}
-        <BottomControls
-          state={state}
-          selectedCardId={selectedCardId}
-          onSelectCard={handleSelectCard}
-          onEndTurn={handleEndTurn}
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          planCard={planCard}
-          cancelLayer1={cancelLayer1}
-          cancelLayer2={cancelLayer2}
-        />
-      </DndProvider>
+      {/* 底部操作区 */}
+      <BottomControls
+        state={state}
+        selectedCardId={selectedCardId}
+        onSelectCard={handleSelectCard}
+        onEndTurn={handleEndTurn}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
 
       {/* ═══════════════════════════════════════════════════════
           第二层：信息面板层（弹层/抽屉）

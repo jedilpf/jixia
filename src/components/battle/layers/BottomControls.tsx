@@ -1,17 +1,10 @@
 /**
  * 底部操作区组件
  * 显示：左侧提示、中间按钮、手牌区
- *
- * 拖拽支持：react-dnd useDrag
- * - 手牌可拖拽到议区
- * - 拖拽时显示 DragGhostLayer（DragManager 驱动）
- * - 保留 onClick 点击选牌（兼容）
  */
 
 import React from 'react';
-import { useDrag } from 'react-dnd';
-import { DebateBattleState, DebateCard, PlanSlot } from '@/battleV2/types';
-import { DRAG_CARD_TYPE } from '@/components/battle/dndTypes';
+import { DebateBattleState, DebateCard } from '@/battleV2/types';
 
 interface BottomControlsProps {
   state: DebateBattleState;
@@ -20,9 +13,6 @@ interface BottomControlsProps {
   onEndTurn: () => void;
   onConfirm: () => void;
   onCancel: () => void;
-  planCard: (slot: PlanSlot, cardId: string) => void;
-  cancelLayer1: () => void;
-  cancelLayer2: () => void;
 }
 
 const CARD_FRAME_COLORS: Record<string, { border: string; bg: string; glow: string }> = {
@@ -41,10 +31,7 @@ const HandCard: React.FC<{
   onClick: () => void;
   index: number;
   total: number;
-  phase: 'play_1' | 'play_2' | string;
-  lockedLayer1: boolean;
-  lockedLayer2: boolean;
-}> = ({ card, isSelected, onClick, index, total, phase, lockedLayer1, lockedLayer2 }) => {
+}> = ({ card, isSelected, onClick, index, total }) => {
   const colors = CARD_FRAME_COLORS[card.type] || CARD_FRAME_COLORS['立论'];
   const frameAsset = CARD_FRAME_ASSETS[card.type] || CARD_FRAME_ASSETS['立论'];
   const hasStats = card.power !== undefined && card.hp !== undefined;
@@ -52,37 +39,15 @@ const HandCard: React.FC<{
   const fanOffset = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 5 : 7) : 0;
   const rotation = total > 1 ? (index - (total - 1) / 2) * (total >= 6 ? 1.6 : 2.4) : 0;
 
-  // 出牌阶段的 layer（用于 drag item）
-  const sourceSlot: 'layer1' | 'layer2' = phase === 'play_1' ? 'layer1' : 'layer2';
-  const isLocked = phase === 'play_1' ? lockedLayer1 : lockedLayer2;
-  const isPlayablePhase = phase === 'play_1' || phase === 'play_2';
-
-  // useDrag — react-dnd 拖拽源
-  const [{ isDragging }, dragRef] = useDrag({
-    type: DRAG_CARD_TYPE,
-    item: {
-      type: DRAG_CARD_TYPE,
-      card,
-      sourceSlot,
-    },
-    canDrag: () => isPlayablePhase && !isLocked,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
   return (
     <button
-      ref={dragRef}
-      onClick={isDragging ? undefined : onClick}
+      onClick={onClick}
       className="relative transition-all duration-300 ease-out origin-bottom"
       style={{
         transform: isSelected
           ? 'scale(1.1) translateY(-12px)'
           : `rotate(${rotation}deg) translateX(${fanOffset}px)`,
         zIndex: isSelected ? 30 : 10 + index,
-        opacity: isDragging ? 0.35 : 1,
-        cursor: isDragging ? 'grabbing' : 'grab',
       }}
     >
       <div
@@ -268,17 +233,28 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
             )}
           </>
         ) : (
-          <button
-            onClick={onEndTurn}
-            disabled={!canAct || isFinished}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-[#c9952a] to-[#b88520] text-white font-medium hover:from-[#d9a53a] hover:to-[#c89530] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#c9952a]/20"
-          >
-            结束回合
-          </button>
+          <>
+            <button
+              onClick={onEndTurn}
+              disabled={!canAct || isFinished}
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-[#c9952a] to-[#b88520] text-white font-medium hover:from-[#d9a53a] hover:to-[#c89530] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#c9952a]/20"
+            >
+              结束回合
+            </button>
+            {canAct && (
+              <div className="text-[10px] text-[#6a5a4a] text-center leading-tight mt-1">
+                {phase === 'play_1' ? '选择卡牌 → 点击座位 → 确认出牌' : phase === 'play_2' ? '可出第二手牌' : '等待阶段'}
+              </div>
+            )}
+          </>
         )}
       </div>
 
       <div className="flex-1 px-2 py-3 md:px-4 md:py-4 overflow-x-auto overflow-y-visible">
+        {/* 手牌标题 */}
+        <div className="text-xs text-[#8a7a6a] uppercase tracking-widest mb-1 text-center">
+          手牌 {player.hand.length} 张
+        </div>
         <div className="flex items-end justify-center h-full min-w-max mx-auto gap-1 sm:gap-1.5">
           {player.hand.length === 0 ? (
             <div className="text-[#5c4d3a] text-sm">手牌已空</div>
@@ -291,9 +267,6 @@ export const BottomControls: React.FC<BottomControlsProps> = ({
                 onClick={() => onSelectCard(selectedCardId === card.id ? null : card.id)}
                 index={index}
                 total={player.hand.length}
-                phase={phase}
-                lockedLayer1={player.plan.lockedLayer1}
-                lockedLayer2={player.plan.lockedLayer2}
               />
             ))
           )}
